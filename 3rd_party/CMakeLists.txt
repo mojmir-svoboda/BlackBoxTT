@@ -1,0 +1,21 @@
+add_subdirectory(fnv)
+add_subdirectory(imgui)
+add_subdirectory(DirectXTex)
+add_subdirectory(yaml-cpp)
+
+if (OPTION_USE_TCL)
+	add_subdirectory(tcl8.6.4/win)
+endif (OPTION_USE_TCL)
+
+SET_TARGET_PROPERTIES(parse PROPERTIES FOLDER "3rd/yaml-c++") 
+SET_TARGET_PROPERTIES(format PROPERTIES FOLDER "3rd/yaml-c++") 
+SET_TARGET_PROPERTIES(gmock PROPERTIES FOLDER "3rd/yaml-c++") 
+SET_TARGET_PROPERTIES(gmock_main PROPERTIES FOLDER "3rd/yaml-c++") 
+SET_TARGET_PROPERTIES(gtest PROPERTIES FOLDER "3rd/yaml-c++") 
+SET_TARGET_PROPERTIES(gtest_main PROPERTIES FOLDER "3rd/yaml-c++") 
+SET_TARGET_PROPERTIES(gtest_main PROPERTIES FOLDER "3rd/yaml-c++") 
+SET_TARGET_PROPERTIES(read PROPERTIES FOLDER "3rd/yaml-c++") 
+SET_TARGET_PROPERTIES(run-tests PROPERTIES FOLDER "3rd/yaml-c++") 
+SET_TARGET_PROPERTIES(sandbox PROPERTIES FOLDER "3rd/yaml-c++") 
+SET_TARGET_PROPERTIES(yaml-cpp PROPERTIES FOLDER "3rd/yaml-c++") 
+

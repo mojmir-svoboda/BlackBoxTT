@@ -1,0 +1,81 @@
+ProtocolModule
+    { iso org(3) dod(6) internet(1) private(4)
+      enterprise(1) mojomir(1024) software(1)
+      dbgtoolkit(16) proto(2) wut(1) 1 }
+DEFINITIONS AUTOMATIC TAGS ::=
+BEGIN
+
+Command ::= CHOICE {
+	config ConfigMsg,
+	log    LogMsg,
+  snd    SoundMsg,
+	plot   PlotMsg,
+  plotm  PlotMarkerMsg,
+	dict   DictionaryMsg
+}
+
+ConfigMsg ::= SEQUENCE {
+	app    OCTET STRING,
+	mixer  OCTET STRING,
+	buffered BOOLEAN,
+	pid    INTEGER
+}
+
+DictionaryMsg ::= SEQUENCE {
+	type   INTEGER (0..127),
+	dict   SEQUENCE OF DictPair
+}
+
+DictPair ::= SEQUENCE {
+	value  INTEGER,
+	name   OCTET STRING
+}
+
+LogMsg ::= SEQUENCE {
+	ctime  INTEGER,
+	lvl    INTEGER,
+	ctx    INTEGER,
+	tid    INTEGER,
+	file   OCTET STRING,
+	line   INTEGER,
+	scope  LogScopeType DEFAULT scopeNone,
+	func   OCTET STRING,
+	msg    OCTET STRING,
+	wdgt   OCTET STRING
+}
+
+SoundMsg ::= SEQUENCE {
+	ctime  INTEGER,
+	lvl    INTEGER,
+	ctx    INTEGER,
+  loop   INTEGER,
+  vol    REAL,
+	msg    OCTET STRING
+}
+
+PlotMsg ::= SEQUENCE {
+	ctime  INTEGER,
+	lvl    INTEGER,
+	ctx    INTEGER,
+	x      REAL,
+	y      REAL,
+	wdgt   OCTET STRING
+}
+
+PlotMarkerMsg ::= SEQUENCE {
+	ctime  INTEGER,
+	lvl    INTEGER,
+	ctx    INTEGER,
+	x      REAL,
+	y      REAL,
+	wdgt   OCTET STRING
+}
+
+LogScopeType ::= ENUMERATED {
+	scopeNone,
+	scopeEntry,
+	scopeExit
+}
+
+
+END

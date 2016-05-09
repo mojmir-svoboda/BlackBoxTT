@@ -1,0 +1,5 @@
+_project*/
+!.gitignore
+trace_server.pro.user
+trace_server/version.cpp
+*.swp
