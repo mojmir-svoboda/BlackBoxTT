@@ -31,5 +31,10 @@
 namespace bb {
 	void initTrace (char const * appName, char const * addr, char const * port);
 }
+#else
+#	include <3rd_party/logging/trace_dummy.h>
+namespace bb {
+	inline void initTrace (char const * appName, char const * addr, char const * port) { }
+}
 #endif
 
