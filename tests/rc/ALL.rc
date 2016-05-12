@@ -1,0 +1,1090 @@
+# ------------------------------------------
+# bbZero 1.17.x - blackbox.rc - basic settings
+
+# Lines starting with # or ! are ignored
+# All items are configurable from the menu
+
+# - the toolbar -
+session.screen0.toolbar.enabled: false
+session.screen0.toolbar.placement: BottomCenter
+session.screen0.toolbar.widthPercent: 66
+session.screen0.toolbar.onTop: true
+session.screen0.toolbar.autoHide: false
+session.screen0.toolbar.pluginToggle: true
+session.screen0.toolbar.alpha.enabled: false
+session.screen0.toolbar.alpha.value: 224
+
+# - the menu -
+session.menu.position.x: 280
+session.menu.position.y: 148
+session.menu.maxWidth: 300
+session.menu.popupDelay: 80
+session.menu.mouseWheelFactor: 3
+session.menu.alpha.enabled: false
+session.menu.alpha.value: 255
+session.menu.onTop: false
+session.menu.sticky: true
+session.menu.snapWindow: true
+session.menu.pluginToggle: true
+session.menu.openDirection: bullet
+session.menu.sortbyExtension: true
+session.menu.drawSeparators: true
+session.menu.dropShadows: true
+session.menu.icon.saturation: 80
+session.menu.icon.hue: 60
+session.menu.icon.size: 16
+session.menu.overlap: 0
+
+# - appearance -
+session.appearance.bullet.unix: true
+session.appearance.arrow.unix: false
+session.appearance.cursor.usedefault: false
+
+# - graphics -
+session.background.smartWallpaper: false
+session.background.enabled: true
+session.opaqueMove: true
+session.imageDither: 0
+session.outlineText: false
+session.force.font.Shadows: false
+
+# - snap -
+session.snap.toPlugins: true
+session.snap.padding: 2
+session.snap.threshold: 10
+
+# - misc options -
+session.screen0.focusModel: ClickToFocus
+session.screen0.fullMaximization: false
+session.screen0.strftimeformat: %H:%M %a %d %b
+
+# - workspace options -
+session.screen0.workspaces_wraparound: true
+session.screen0.workspaces: 3
+session.screen0.workspacesX: 3
+session.screen0.workspacesY: 1
+session.workspaces.followActive: true
+session.workspaces.restoreToCurrent: true
+session.workspaces.altMethod: true
+session.workspaces.styleXPFix: false
+session.screen0.workspacenames: alpha,beta,gamma
+
+# - additional menu settings  -<S-F12>
+session.autoraisedelay: 250
+session.options.UTF8Encoding: false
+
+# - non-menu settings  -
+session.menufile: menu.rc
+session.openFolderCommand: explorer.exe /e,"%1"
+session.options.disableTray: false
+session.options.disableVWM: false
+session.options.disableMargins: false
+session.options.disableDesk: false
+session.options.disableDDE: false
+session.options.desktopHook: false
+session.options.shellContextMenu: false
+
+# - under Explorer (non-menu) -
+session.options.hideExplorer: true
+session.options.hideTaskbar: true
+
+# - the slit -
+session.screen0.slit.placement: TopRight
+session.screen0.slit.direction: Horizontal
+session.screen0.slit.autoHide: false
+session.screen0.slit.ontop: true
+session.screen0.slit.toggle: false
+
+# - current style -
+session.styleFile: styles\nightBlue.style
+# --------------------------------------------------------------
+# bsetroot.rc - options and image searchpath for bsetroot 2.1
+
+# Options are read just like commandline switches.
+# Lines starting with # or ! are ignored.
+# Paths containing spaces need to have quotes.
+
+# Example: (uncomment to use)
+! -path c:\some\path\to\images
+! -path c:\another\path\to\images
+
+-quiet
+# -----------------------------------------------------
+# bbZero 1.17.x - extensions.rc
+
+# Lines starting with # or ! are ignored
+
+# -----------------------------------------------------
+# Favorite Tool
+
+# The default editor for menu, styles and settings
+blackbox.editor: bbnote.exe
+
+# Alternative menu bullets (a template is in 'docs')
+! blackbox.appearance.bullet.bitmap: menu-bullets.bmp
+
+# -----------------------------------------------------
+# Drag'n-dropped background images are saved here
+blackbox.background.rootCommand: style
+
+# -----------------------------------------------------
+# Desktop Mouse Clicks
+
+# General: blackbox.desktop.[<mod>]<button>Click: <command>
+# <mod>    = Alt, Shift, Ctrl
+# <button> = Left, Mid, Right, X1, X2, X3, Double
+
+# these are built-in, but may be changed here
+! blackbox.desktop.RightClick: @BBCore.ShowMenu root
+! blackbox.desktop.MidClick: @BBCore.ShowMenu workspaces
+
+# styles menu
+blackbox.desktop.AltMidClick: @BBCore.ShowMenu styles >> @BBCore.style %1
+
+# workspaces menu
+blackbox.desktop.CtrlLeftClick: @BBCore.ShowMenu workspaces
+
+# tasks menu
+blackbox.desktop.CtrlRightClick: @BBCore.ShowMenu tasks
+
+# configuration menu
+blackbox.desktop.AltRightClick: @BBCore.ShowMenu configuration
+
+# alternative menu
+! blackbox.desktop.CtrlRightClick: @BBCore.ShowMenu alt-menu.rc
+
+
+# -----------------------------------------------------
+# Miscellaneous options (uncomment to use)
+
+# command for double left click on a folder in the menu
+! blackbox.options.openFolderCommand: explorer.exe /e,"%1"
+
+# other locale may be set (for the clock display)
+! blackbox.options.locale: <usa, gbr, rus, fra, ita, etc ...>
+
+# run something after processing the system startup items
+! blackbox.startup.run: <any command or @broam>
+
+# enable some debug output during startup (to "blackbox.log"):
+! blackbox.options.log: startup tray
+
+# use unicode for filenames and UTF-8 for menus
+! blackbox.options.UTF8Encoding: false
+
+
+# -----------------------------------------------------
+# System dependent Tweak
+
+# Left margin adjustment for contextmenus with icons (normal/sendTo)
+! blackbox.contextmenu.itemAdjust: 28/28
+
+
+# -----------------------------------------------------
+# Global font override - for special purposes
+
+# Enable this feature?
+blackbox.global.fonts.enabled: false
+
+# override font definitions from styles:
+blackbox.global.toolbar.font: verdana
+blackbox.global.toolbar.fontHeight: 13
+blackbox.global.toolbar.fontWeight: normal
+
+blackbox.global.menu.title.font: verdana
+blackbox.global.menu.title.fontHeight: 13
+blackbox.global.menu.title.fontWeight: bold
+
+blackbox.global.menu.frame.font: verdana
+blackbox.global.menu.frame.fontHeight: 13
+blackbox.global.menu.frame.fontWeight: normal
+
+blackbox.global.window.font: verdana
+blackbox.global.window.fontHeight: 13
+blackbox.global.window.fontWeight: bold
+
+# -----------------------------------------------------
+# -----------------------------------------------------------------
+# bbZero 1.17.x - MENU FILE
+# -----------------------------------------------------------------
+
+# Available menu commands are listed in the documentation.
+
+[begin] (BlackBox)
+    [search] (Search) {SEARCHMENU|COMMON_SEARCHMENU}
+    [path] (Start) {STARTMENU|COMMON_STARTMENU}
+    [path] (Desktop) {DESKTOPDIRECTORY|COMMON_DESKTOPDIRECTORY}
+    [path] (Quick) {APPDATA\Microsoft\Internet Explorer\Quick Launch}
+
+    [nop]
+    [exec] (Explorer) {explorer.exe}
+    # Paths with spaces should have quotes:
+    # [exec] (Firefox) {"PROGRAM_FILES\Mozilla Firefox\firefox.exe"}
+    [submenu] (System)
+        [path] (My Computer) {DRIVES}
+        [path] (Personal) {PERSONAL}
+        [path] (Bitbucket) {BITBUCKET}
+        [path] (Controls) {CONTROLS}
+        # Uncomment this line to check out all available system folders
+        # [include] {shellfolders.rc}
+        [run]  (Run)
+        [end]
+    [nop]
+    [stylesmenu] (Styles) {styles}
+    [submenu] (BlackBox)
+        [config] (Configuration)
+        [include] {plugins\bbLeanSkin\bbLeanSkinMenu.rc}
+        [submenu] (About)
+            [aboutstyle] (About Style)
+            [aboutplugins] (About Plugins)
+            [about] (About BlackBox)
+            [end]
+        [submenu] (Edit)
+            [editstyle] (Current Style)
+            [editmenu] (menu.rc)
+            [editblackbox] (blackbox.rc)
+            [editextensions] (extensions.rc)
+            [editplugins] (plugins.rc)
+            [edit] (bbKeys.rc) {plugins\bbKeys\bbKeys.rc}
+            [end]
+        [nop]
+        # Also note that relative paths refer to the blackbox directory
+        [exec] (Documentation) {docs\bblean.htm}
+        [exec] (Install/Uninstall) {bsetshell.exe}
+        [exec] (bbStyleMaker) {bbstylemaker.exe}
+        [nop]
+        [reconfig] (Reconfigure)
+        [restart] (Restart)
+        [exit]  (Quit)
+        [end]
+    [submenu] (Off)
+        [lockworkstation] (Lock)
+        [logoff] (Logoff)
+        [suspend] (Standby)
+        [reboot] (Reboot)
+        [shutdown] (Shutdown)
+        [end]
+[end]
+bbAnalog.placement: BottomLeft
+bbAnalog.position.x: 0
+bbAnalog.position.y: 1032
+bbAnalog.useSlit: false
+bbAnalog.alwaysOnTop: false
+bbAnalog.autoHide: false
+bbAnalog.clickRaise: true
+bbAnalog.snapWindow: 20
+bbAnalog.pluginToggle: true
+bbAnalog.alpha.enabled: false
+bbAnalog.alpha.value: 192
+bbAnalog.icon.saturation: 80
+bbAnalog.icon.hue: 60
+bbAnalog.orientation: vertical
+bbcmd.xpos: 381
+bbcmd.ypos: 646
+# Settings
+bbDesktop.maxIconLabelWidth: 60
+bbDesktop.gridSize: 10
+bbDesktop.snapToGrid: true
+bbDesktop.fontName: Tahoma
+bbDesktop.fontSize: 10
+bbDesktop.foreColor: #FFFFFF
+bbDesktop.shadowColor: #404040
+bbDesktop.textEffect: shadow
+bbDesktop.iconsFile: icons.rc
+# bbDesktop icons.rc file
+bbdesktop.iconcount: 7
+bbdesktop.icon1.title: LightWave Modeller
+bbdesktop.icon1.command: d:\program\LightWave9\Programs\modeler.exe
+bbdesktop.icon1.parameters:
+bbdesktop.icon1.workdir: d:\program\LightWave9\Programs
+bbdesktop.icon1.icon: d:\program\LightWave9\Programs\modeler.exe
+bbdesktop.icon1.x: 20
+bbdesktop.icon1.y: 20
+bbdesktop.icon2.title: LightWave Layout
+bbdesktop.icon2.command: d:\program\LightWave9\Programs\lightwav.exe
+bbdesktop.icon2.parameters:
+bbdesktop.icon2.workdir: d:\program\LightWave9\Programs
+bbdesktop.icon2.icon: d:\program\LightWave9\Programs\lightwav.exe
+bbdesktop.icon2.x: 20
+bbdesktop.icon2.y: 90
+bbdesktop.icon3.title: µTorrent
+bbdesktop.icon3.command: c:\program\uTorrent\uTorrent.exe
+bbdesktop.icon3.x: 20
+bbdesktop.icon3.y: 160
+bbdesktop.icon4.title: Mozilla Thunderbird
+bbdesktop.icon4.command: c:\program\Mozilla Thunderbird\thunderbird.exe
+bbdesktop.icon4.x: 20
+bbdesktop.icon4.y: 230
+bbdesktop.icon5.title: Mozilla Minefield
+bbdesktop.icon5.command: c:\program\Minefield\firefox.exe
+bbdesktop.icon5.x: 20
+bbdesktop.icon5.y: 300
+bbdesktop.icon6.title: Mozilla Firefox
+bbdesktop.icon6.command: c:\program\Mozilla Firefox\firefox.exe
+bbdesktop.icon6.x: 20
+bbdesktop.icon6.y: 370
+bbdesktop.icon7.title: Mozilla Sunbird
+bbdesktop.icon7.command: c:\program\Mozilla SunBird\sunbird.exe
+bbdesktop.icon7.x: 20
+bbdesktop.icon7.y: 440
+bbIconBox.id.count: 3
+bbIconBox.id.1: Desktop
+bbIconBox.id.2: TaskBar
+bbIconBox.id.3: search
+bbIconBox.id.4: task1
+bbIconBox.id.5: task1
+bbIconBox.id.6: search/3
+bbIconBox.Desktop.placement: Left
+bbIconBox.Desktop.position.x: 0
+bbIconBox.Desktop.position.y: 77
+bbIconBox.Desktop.useSlit: false
+bbIconBox.Desktop.alwaysOnTop: false
+bbIconBox.Desktop.autoHide: false
+bbIconBox.Desktop.clickRaise: true
+bbIconBox.Desktop.snapWindow: 20
+bbIconBox.Desktop.pluginToggle: true
+bbIconBox.Desktop.alpha.enabled: false
+bbIconBox.Desktop.alpha.value: 192
+bbIconBox.Desktop.icon.saturation: 80
+bbIconBox.Desktop.icon.hue: 60
+bbIconBox.Desktop.orientation: vertical
+bbIconBox.Desktop.path: DESKTOP
+bbIconBox.Desktop.title: Desktop
+bbIconBox.Desktop.rows: 4
+bbIconBox.Desktop.columns: 4
+bbIconBox.Desktop.icon.size: 16
+bbIconBox.Desktop.drawTitle: true
+bbIconBox.Desktop.drawBorder: true
+bbIconBox.Desktop.toolTips: true
+bbIconBox.Desktop.style: Toolbar
+bbIconBox.TaskBar.placement: Left
+bbIconBox.TaskBar.position.x: 0
+bbIconBox.TaskBar.position.y: 210
+bbIconBox.TaskBar.useSlit: false
+bbIconBox.TaskBar.alwaysOnTop: false
+bbIconBox.TaskBar.autoHide: false
+bbIconBox.TaskBar.clickRaise: true
+bbIconBox.TaskBar.snapWindow: 20
+bbIconBox.TaskBar.pluginToggle: true
+bbIconBox.TaskBar.alpha.enabled: false
+bbIconBox.TaskBar.alpha.value: 192
+bbIconBox.TaskBar.icon.saturation: 80
+bbIconBox.TaskBar.icon.hue: 60
+bbIconBox.TaskBar.icon.size: 16
+bbIconBox.TaskBar.orientation: horizontal
+bbIconBox.TaskBar.path: APPDATA\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar
+bbIconBox.TaskBar.title: TaskBar
+bbIconBox.TaskBar.rows: 4
+bbIconBox.TaskBar.columns: 4
+bbIconBox.TaskBar.drawTitle: true
+bbIconBox.TaskBar.drawBorder: false
+bbIconBox.TaskBar.toolTips: true
+bbIconBox.task1.placement: User
+bbIconBox.task1.position.x: 20
+bbIconBox.task1.position.y: 20
+bbIconBox.task1.useSlit: false
+bbIconBox.task1.alwaysOnTop: false
+bbIconBox.task1.autoHide: false
+bbIconBox.task1.clickRaise: true
+bbIconBox.task1.snapWindow: 20
+bbIconBox.task1.pluginToggle: true
+bbIconBox.task1.alpha.enabled: false
+bbIconBox.task1.alpha.value: 192
+bbIconBox.task1.icon.saturation: 80
+bbIconBox.task1.icon.hue: 60
+bbIconBox.task1.icon.size: 16
+bbIconBox.task1.orientation: vertical
+bbIconBox.task1.path: TASK1
+bbIconBox.task1.title: task1
+bbIconBox.task1.rows: 4
+bbIconBox.task1.columns: 4
+bbIconBox.task1.drawTitle: false
+bbIconBox.task1.drawBorder: true
+bbIconBox.task1.toolTips: true
+bbIconBox.search.placement: TopLeft
+bbIconBox.search.position.x: 0
+bbIconBox.search.position.y: 0
+bbIconBox.search.useSlit: false
+bbIconBox.search.alwaysOnTop: false
+bbIconBox.search.autoHide: false
+bbIconBox.search.clickRaise: true
+bbIconBox.search.snapWindow: 20
+bbIconBox.search.pluginToggle: true
+bbIconBox.search.alpha.enabled: false
+bbIconBox.search.alpha.value: 192
+bbIconBox.search.icon.saturation: 80
+bbIconBox.search.icon.hue: 60
+bbIconBox.search.icon.size: 16
+bbIconBox.search.orientation: vertical
+bbIconBox.search.path: C:\bbZero_devel\search
+bbIconBox.search.title: search
+bbIconBox.search.rows: 4
+bbIconBox.search.columns: 4
+bbIconBox.search.drawTitle: false
+bbIconBox.search.drawBorder: true
+bbIconBox.search.toolTips: true
+bbIconBox.search/2.placement: User
+bbIconBox.search/3.placement: User
+bbIconBox.search/4.placement: User
+bbIconBox.search/4.position.x: 124
+bbIconBox.search/4.position.y: 67
+bbIconBox.search/4.useSlit: false
+bbIconBox.search/4.alwaysOnTop: false
+bbIconBox.search/4.autoHide: false
+bbIconBox.search/4.clickRaise: true
+bbIconBox.search/4.snapWindow: 20
+bbIconBox.search/4.pluginToggle: true
+bbIconBox.search/4.alpha.enabled: false
+bbIconBox.search/4.alpha.value: 192
+bbIconBox.search/4.icon.saturation: 80
+bbIconBox.search/4.icon.hue: 60
+bbIconBox.search/4.icon.size: 16
+bbIconBox.search/4.orientation: vertical
+bbIconBox.search/4.path: C:\bbZero_devel\search
+bbIconBox.search/4.title: search/4
+bbIconBox.search/4.rows: 4
+bbIconBox.search/4.columns: 4
+bbIconBox.search/4.drawTitle: false
+bbIconBox.search/4.drawBorder: true
+bbIconBox.search/4.toolTips: true
+bbIconBox.search/3.position.x: 35
+bbIconBox.search/3.position.y: 53
+bbIconBox.search/3.useSlit: false
+bbIconBox.search/3.alwaysOnTop: false
+bbIconBox.search/3.autoHide: false
+bbIconBox.search/3.clickRaise: true
+bbIconBox.search/3.snapWindow: 20
+bbIconBox.search/3.pluginToggle: true
+bbIconBox.search/3.alpha.enabled: false
+bbIconBox.search/3.alpha.value: 192
+bbIconBox.search/3.icon.saturation: 80
+bbIconBox.search/3.icon.hue: 60
+bbIconBox.search/3.icon.size: 16
+bbIconBox.search/3.orientation: vertical
+bbIconBox.search/3.path: C:\bbZero_devel\search
+bbIconBox.search/3.title: search/3
+bbIconBox.search/3.rows: 4
+bbIconBox.search/3.columns: 4
+bbIconBox.search/3.drawTitle: false
+bbIconBox.search/3.drawBorder: true
+bbIconBox.search/3.toolTips: true
+bbIconBox.search/2.position.x: 146
+bbIconBox.search/2.position.y: 43
+bbIconBox.search/2.useSlit: false
+bbIconBox.search/2.alwaysOnTop: false
+bbIconBox.search/2.autoHide: false
+bbIconBox.search/2.clickRaise: true
+bbIconBox.search/2.snapWindow: 20
+bbIconBox.search/2.pluginToggle: true
+bbIconBox.search/2.alpha.enabled: false
+bbIconBox.search/2.alpha.value: 192
+bbIconBox.search/2.icon.saturation: 80
+bbIconBox.search/2.icon.hue: 60
+bbIconBox.search/2.icon.size: 16
+bbIconBox.search/2.orientation: vertical
+bbIconBox.search/2.path: C:\bbZero_devel\search
+bbIconBox.search/2.title: search/2
+bbIconBox.search/2.rows: 4
+bbIconBox.search/2.columns: 4
+bbIconBox.search/2.drawTitle: false
+bbIconBox.search/2.drawBorder: true
+bbIconBox.search/2.toolTips: true
+# ------------------------------
+# bbkeys.rc - bblean 1.17
+
+# This if uncommented disables the echo of bbkeys commands on the toolbar
+# -nolabel
+
+# This if uncommented shows a warning box if a hotkey could not be set
+# (like when it is already in use by another program)
+# -debug
+
+# Invoke menu:
+KeyToGrab(LWIN),        WithModifier(),         WithAction(ShowMenu -key root)
+KeyToGrab(RWIN),        WithModifier(),         WithAction(ShowMenu -key)
+
+# alternatively (show at mouse cursor):
+KeyToGrab(M),           WithModifier(Win+Ctrl), WithAction(ShowMenu)
+KeyToGrab(M),           WithModifier(Win+Shift),WithAction(ShowWorkspaceMenu)
+
+# Workspaces:
+KeyToGrab(Num1),        WithModifier(Win),      WithAction(Workspace1)
+KeyToGrab(Num2),        WithModifier(Win),      WithAction(Workspace2)
+KeyToGrab(Num3),        WithModifier(Win),      WithAction(Workspace3)
+KeyToGrab(Num4),        WithModifier(Win),      WithAction(Workspace4)
+KeyToGrab(Num5),        WithModifier(Win),      WithAction(Workspace5)
+KeyToGrab(Num6),        WithModifier(Win),      WithAction(Workspace6)
+KeyToGrab(Left),        WithModifier(Win),      WithAction(PrevWorkspace)
+KeyToGrab(Right),       WithModifier(Win),      WithAction(NextWorkspace)
+KeyToGrab(Left),        WithModifier(Win+Ctrl), WithAction(PrevWindow)
+KeyToGrab(Right),       WithModifier(Win+Ctrl), WithAction(NextWindow)
+KeyToGrab(Up),          WithModifier(Win+Ctrl), WithAction(PrevWindowAllWorkspaces)
+KeyToGrab(Down),        WithModifier(Win+Ctrl), WithAction(NextWindowAllWorkspaces)
+KeyToGrab(Up),          WithModifier(Win),      WithAction(MoveWindowLeft)
+KeyToGrab(Down),        WithModifier(Win),      WithAction(MoveWindowRight)
+KeyToGrab(G),           WithModifier(Win),      WithAction(GatherWindows)
+
+# Windows:
+KeyToGrab(X),           WithModifier(Win),      WithAction(MaximizeWindow)
+KeyToGrab(V),           WithModifier(Win),      WithAction(MaximizeVertical)
+KeyToGrab(H),           WithModifier(Win),      WithAction(MaximizeHorizontal)
+KeyToGrab(Y),           WithModifier(Win),      WithAction(RestoreWindow)
+KeyToGrab(N),           WithModifier(Win),      WithAction(MinimizeWindow)
+KeyToGrab(D),           WithModifier(Win),      WithAction(MinimizeAll)
+KeyToGrab(PageUp),      WithModifier(Win),      WithAction(RaiseWindow)
+KeyToGrab(PageDown),    WithModifier(Win),      WithAction(LowerWindow)
+KeyToGrab(End),         WithModifier(Win),      WithAction(ShadeWindow)
+KeyToGrab(Insert),      WithModifier(Win),      WithAction(StickWindow)
+KeyToGrab(Delete),      WithModifier(Win),      WithAction(CloseWindow)
+
+# Blackbox
+KeyToGrab(R),           WithModifier(Win+Ctrl), WithAction(Reconfigure)
+KeyToGrab(R),           WithModifier(Win+Alt),  WithAction(Restart)
+KeyToGrab(Q),           WithModifier(Win),      WithAction(Quit)
+KeyToGrab(M),           WithModifier(Win),      WithAction(EditMenu)
+KeyToGrab(P),           WithModifier(Win),      WithAction(EditPlugins)
+KeyToGrab(S),           WithModifier(Win),      WithAction(EditStyle)
+KeyToGrab(S),           WithModifier(Win+Ctrl), WithAction(AboutStyle)
+KeyToGrab(P),           WithModifier(Win+Ctrl), WithAction(TogglePlugins)
+
+# System
+KeyToGrab(R),           WithModifier(Win),      WithAction(Run)
+KeyToGrab(F10),         WithModifier(Win),      WithAction(Logoff)
+KeyToGrab(F11),         WithModifier(Win),      WithAction(Reboot)
+KeyToGrab(F12),         WithModifier(Win+Alt),  WithAction(Suspend)
+KeyToGrab(F12),         WithModifier(Win+Ctrl), WithAction(Hibernate)
+KeyToGrab(F12),         WithModifier(Win),      WithAction(Shutdown)
+KeyToGrab(Spacebar),    WithModifier(Win),      WithAction(LockWorkstation)
+
+# Extern commands:
+KeyToGrab(E),           WithModifier(Win),      WithAction(Exec explorer.exe /e,c:\)
+KeyToGrab(Pause),       WithModifier(Win),      WithAction(Exec control.exe sysdm.cpl)
+KeyToGrab(Home),        WithModifier(Win),      WithAction(Exec docs\bblean.htm)
+
+# BroadcastMessage example (toggles bbLeanSkin, uncomment to use)
+! KeyToGrab(L), WithModifier(Win), WithAction(exec @BBCfg.plugin.load bbLeanSkin)
+# -----------------------------------------------
+# - bbleanskin.rc
+# - Lines starting with # or ! are ignored.
+
+# - Titlebar Buttons
+# - 0 = Empty
+# - 1 = Close
+# - 2 = Maximize
+# - 3 = Minimize
+# - 4 = Rollup
+# - 5 = AlwaysOnTop
+# - 6 = Pin
+# - 7 = Application Icon
+
+bbleanskin.titlebar.buttons: 4-321
+
+# -----------------------------------------------
+# - Titlebar Button Glyphs
+# - May be a bitmap file or "default"
+
+bbleanskin.titlebar.glyphs: buttons\buttons_11x11.bmp
+
+# icon saturation / hue for inactive window
+bbleanskin.titlebar.iconSat: 255
+bbleanskin.titlebar.iconHue: 0
+
+# -----------------------------------------------
+# - Titlebar Clicks
+# - format: [<modifier>]<button>Click: <action>
+# - buttons: Left, Mid, Right, Dbl
+# - modifiers: shift, ctrl, alt
+# - actions: 1-6 from above, "Lower" or "Menu"
+
+bbleanskin.titlebar.DblClick: Maximize
+bbleanskin.titlebar.RightClick: Menu
+bbleanskin.titlebar.MidClick: Close
+
+# alternative suggestion
+! bbleanskin.titlebar.DblClick: Rollup
+! bbleanskin.titlebar.RightClick: Minimize
+! bbleanskin.titlebar.ShiftRightClick: Close
+! bbleanskin.titlebar.altRightClick: Menu
+
+# -----------------------------------------------
+# - Options
+
+# - Snap windows to screen edges
+bbleanskin.option.snapWindows: false
+
+# - Rollup style
+bbleanskin.option.nixShadeStyle: true
+
+# - Show log window
+bbleanskin.option.enableLog: false
+
+# - Automatically adjust the systemwide caption
+# - height to match the current style. (Some
+# - apps might draw distorted icons with this)
+bbleanskin.option.adjustCaptionHeight: false
+
+# - Switch workspace with 'Send To' from window menu
+bbleanskin.option.sendToSwitchTo: false
+
+# -----------------------------------------------
+# - Windows Appearance (uncomment to apply)
+! bbleanskin.windows.menu.Height: 15
+! bbleanskin.windows.menu.Font: shoe's 6pt ownage
+! bbleanskin.windows.menu.FontHeight: 8
+! bbleanskin.windows.ScrollbarSize: 13
+! bbleanskin.windows.setTooltipColor: true
+[begin] (bbLeanSkin)
+    [exec] (Toggle Log) {@BBLeanSkin.ToggleLog}
+    [exec] (Toggle Skin) {@BBLeanSkin.ToggleSkin}
+    [sep]
+    [submenu] (Button Order)
+        [exec] (Linux) {@BBLeanSkin.buttonOrder 3-21}
+        [exec] (Windows) {@BBLeanSkin.buttonOrder 4-321}
+        [exec] (Icon) {@BBLeanSkin.buttonOrder 7-321}
+        [exec] (All Buttons) {@BBLeanSkin.buttonOrder 7456-321}
+        [end]
+    [submenu] (Button Glyphs)
+        [exec] (Default Buttons) {@BBLeanSkin.buttonGlyphs default}
+        [sep]
+        [insertpath] {plugins\bbleanskin\buttons >> @BBLeanSkin.buttonGlyphs %1}
+        [end]
+    [sep]
+    [edit] (Edit Settings) {plugins\bbleanskin\bbleanskin.rc}
+    [edit] (Edit Exclusions) {plugins\bbleanskin\exclusions.rc}
+    [edit] (Edit This Menu) {plugins\bbleanskin\bbLeanSkinMenu.rc}
+    [sep]
+    [edit] (Readme) {plugins\bbleanskin\readme.txt}
+    [exec] (About) {@BBLeanSkin.About}
+[end]
+# ---------------------------------------
+# exclusions.rc - for bbLeanSkinEng.dll
+
+# Format: program:classname
+#   program               excludes all windows from 'program'
+#   program:classname     excludes only that window from 'program'
+#   *:classname           excludes all windows with 'classname'
+
+# Get the appropriate names from bbleanskin's log-window.
+# See README.TXT for further information.
+
+# supported wildcards are ? and *
+# h?llo = hallo, hello
+# h*o   = hallo, hejo, ho
+
+# ---------------------------------------
+# Invisible windows:
+# (Listed here to save resources, and possibly trouble)
+
+BROWSEUI.DLL:OTClass
+SYSTRAY.EXE:SystemTray_Main
+WEBCHECK.DLL:MS_WebcheckMonitor
+STMGR.EXE:STATEMGRPROC
+WIASERVC.DLL:STIExe_Window_Class
+TAPISRV.EXE:UmdmSP Class
+TAPISRV.EXE:WAN_Class
+RNAAPP.EXE:RNAENGCLASS
+USER32.dll:#32770
+wuaclt.exe
+wscntfy.dll:SecNotify
+
+QUARTZ.DLL:FilterGraphWindow
+
+comctl32.dll
+conime.exe:ConsoleIMEClass
+conime.exe
+NvMcTray.dll
+NVSVC.dll
+Reader_sl.exe
+sa-gui.exe:QWidget
+#TextPad.exe:Afx:00400000:8:00010005:00000000:00000000
+winxmove.exe
+# visual studio
+msenv.dll:VBFloatingPalette
+msenv.dll:VBMdiChildH
+# firefox|mozilla
+xul.dll:MozillaHiddenWindowClass
+# thunderbird
+thunderbird.exe:MozillaHiddenWindowClass
+# Snarl
+iTunes.exe:iTunesSnarl
+firefox.exe:SnarlXPCOMClass
+MSVBVM60.DLL:ThunderRT6FormDC
+
+# vista invisible windows ??
+csrss.exe
+dwm.exe
+sdclt.exe
+taskeng.exe
+winlogon.exe
+
+kbdmgr.exe
+
+# various programs
+*:TApplication
+
+# programs which come with their own skin:
+foo_ui_std.dll
+Logic Platinum*
+toolkit.dll
+trillian.exe
+#winamp
+vis_*.dll
+winamp.exe
+# WMP
+WMPUI.DLL:TimerWindowClass
+WMPLAYER.EXE:atlcommon_timer*
+Wmp.dll
+# iTunes
+iTunes.DLL 
+iTunes.exe:iTunes
+iTunes.exe:WinAMRestoreWndClass
+iTunesLocalized.DLL
+iTunesRegistry.DLL 
+# windows live photo gallery
+WLXPhotoLibraryMain.dll:WLX_Photo_Library_MainWnd
+WLXPhotoViewer.dll:Photo_Lightweight_Viewer
+
+# programs with trouble
+AdobeOwl.dll:OWL.TabPane
+ccupdate.dll
+ccupdate.dll:*
+nero.exe
+Photoshop.exe:Photoshop
+squidcam.exe
+# wxWidgets version DevCpp
+wxdevcpp.exe
+
+# vista issues
+nlite.exe
+taskmgr.exe
+
+# additions from 2014
+devenv.exe
+BBmuse.plugin.x:                        224
+BBmuse.plugin.y:                        864
+BBmuse.plugin.width:                    166
+BBmuse.plugin.height:                   17
+BBmuse.plugin.inSlit:                   true
+BBmuse.plugin.alwaysontop:              false
+BBmuse.plugin.snapwindow:               true
+BBmuse.plugin.togglewithplugins:        true
+BBmuse.plugin.transparency.enabled:     false
+BBmuse.plugin.scrolling:                true
+BBmuse.plugin.update.url:               http://www.geocities.com/madant8/meta.html
+BBmuse.plugin.transback.enabled:        false
+BBmuse.plugin.showTrackNumber:          true
+BBmuse.plugin.showBorder:               false
+BBmuse.plugin.scroll_style:             EndToEnd
+BBmuse.plugin.useCustomFont:            false
+BBmuse.plugin.font:                     Snap
+BBmuse.plugin.font.height:              16
+BBmuse.plugin.font.weight:              1
+BBmuse.plugin.idle.state:               1
+BBmuse.plugin.idle.message:             BBmuse
+BBmuse.plugin.idle.TimeStr:             %a %d %b - %I:%M %p
+BBmuse.plugin.transparency.alpha:       160
+BBmuse.plugin.bbInterfaceExtensions:    true
+BBoscilliscope.plugin.x:                15
+BBoscilliscope.plugin.y:                680
+BBoscilliscope.plugin.width:            166
+BBoscilliscope.plugin.height:           17
+bbPager.position.x: 23
+bbPager.position.y: 337
+!---- BBInterface 0.9.62 ----
+@BBInterface Plugin SetPluginProperty SnapWindows true
+@BBInterface Plugin SetPluginProperty SnapDistance 7
+@BBInterface Plugin SetPluginProperty SnapPadding 2
+@BBInterface Plugin SetPluginProperty IconSaturation 255
+@BBInterface Plugin SetPluginProperty IconHue 0
+@BBInterface Plugin SetPluginProperty ClickRaise false
+@BBInterface Plugin SetPluginProperty DeskDropCommand ""
+@BBInterface Plugin SetPluginProperty SuppressErrors true
+@BBInterface Plugin SetPluginProperty ZeroControlsAllowed false
+
+!---- ElapsedAndTotal ----
+@BBInterface Control Create Label ElapsedAndTotal
+@BBInterface Control SetWindowProperty ElapsedAndTotal X 10
+@BBInterface Control SetWindowProperty ElapsedAndTotal Y 10
+@BBInterface Control SetWindowProperty ElapsedAndTotal Width 128
+@BBInterface Control SetWindowProperty ElapsedAndTotal Height 16
+@BBInterface Control SetWindowProperty ElapsedAndTotal Border true
+@BBInterface Control SetWindowProperty ElapsedAndTotal Style "Toolbar"
+@BBInterface Control SetWindowProperty ElapsedAndTotal IsVisible true
+@BBInterface Control SetWindowProperty ElapsedAndTotal IsToggledWithPlugins true
+@BBInterface Control SetWindowProperty ElapsedAndTotal IsOnAllWorkspaces true
+@BBInterface Control SetWindowProperty ElapsedAndTotal IsOnTop true
+@BBInterface Control SetWindowProperty ElapsedAndTotal AutoHide false
+@BBInterface Control SetWindowProperty ElapsedAndTotal IsSlitted false
+@BBInterface Control SetWindowProperty ElapsedAndTotal IsTransparent false
+@BBInterface Control SetWindowProperty ElapsedAndTotal Transparency 100
+@BBInterface Control SetControlProperty ElapsedAndTotal HAlign "Center"
+@BBInterface Control SetControlProperty ElapsedAndTotal VAlign "Center"
+@BBInterface Control SetAgent ElapsedAndTotal Caption StaticText "00:00 / 00:00"
+
+!---- ElapsedTime ----
+@BBInterface Control Create Label ElapsedTime
+@BBInterface Control SetWindowProperty ElapsedTime X 10
+@BBInterface Control SetWindowProperty ElapsedTime Y 30
+@BBInterface Control SetWindowProperty ElapsedTime Width 128
+@BBInterface Control SetWindowProperty ElapsedTime Height 16
+@BBInterface Control SetWindowProperty ElapsedTime Border true
+@BBInterface Control SetWindowProperty ElapsedTime Style "Toolbar"
+@BBInterface Control SetWindowProperty ElapsedTime IsVisible true
+@BBInterface Control SetWindowProperty ElapsedTime IsToggledWithPlugins true
+@BBInterface Control SetWindowProperty ElapsedTime IsOnAllWorkspaces true
+@BBInterface Control SetWindowProperty ElapsedTime IsOnTop true
+@BBInterface Control SetWindowProperty ElapsedTime AutoHide false
+@BBInterface Control SetWindowProperty ElapsedTime IsSlitted false
+@BBInterface Control SetWindowProperty ElapsedTime IsTransparent false
+@BBInterface Control SetWindowProperty ElapsedTime Transparency 100
+@BBInterface Control SetControlProperty ElapsedTime HAlign "Center"
+@BBInterface Control SetControlProperty ElapsedTime VAlign "Center"
+@BBInterface Control SetAgent ElapsedTime Caption StaticText "00:00"
+bbSlit.placement: CenterRight
+bbSlit.position.x: 1920
+bbSlit.position.y: 540
+bbSlit.useSlit: false
+bbSlit.alwaysOnTop: false
+bbSlit.autoHide: false
+bbSlit.clickRaise: true
+bbSlit.snapWindow: 20
+bbSlit.pluginToggle: true
+bbSlit.alpha.enabled: false
+bbSlit.alpha.value: 192
+bbSlit.icon.saturation: 80
+bbSlit.icon.hue: 60
+bbSlit.orientation: vertical
+BlackboxBar.placement: BottomCenter
+BlackboxBar.position.x: 960
+BlackboxBar.position.y: 1080
+BlackboxBar.useSlit: false
+BlackboxBar.alwaysOnTop: false
+BlackboxBar.autoHide: false
+BlackboxBar.clickRaise: true
+BlackboxBar.snapWindow: 20
+BlackboxBar.pluginToggle: true
+BlackboxBar.alpha.enabled: false
+BlackboxBar.alpha.value: 192
+BlackboxBar.icon.saturation: 80
+BlackboxBar.icon.hue: 60
+BB.Button.Text:                         QL
+BB.Button.R.Command:                    "C:\Program Files\Programmer's Notepad\pn.exe"
+BB.Button.L.Command:                    "C:\Program Files\DOSBox-0.72\dosbox.exe" -conf "C:\Program Files\DOSBox-0.72\dosbox.conf"
+BB.Button.M.Command:                    "C:\msys\1.0\msys.bat"
+Inscription.Text:                       BLACKBOX
+!Clock.Tooltip: %a %#d %b
+Clock.Tooltip:                          %#I:%M%p %A %B, %d, %Y (%j/365)
+Clock.Format:                           %#I:%M%p %a, %b %d, %Y
+Placement.Config:                       0145632
+Width.Percent:                          66
+Custom.Height:                          28
+Window.Alpha:                           0
+Position.X:                             245
+Position.Y:                             883
+Font.Size:                              12
+Task.Icon.Size:                         8
+Task.Icon.Sat:                          0
+Task.Icon.Hue:                          70
+Task.MaxWidth:                          0
+Tray.Icon.Size:                         8
+Tray.Icon.Sat:                          0
+Tray.Icon.Hue:                          70
+Tooltip.MaxWidth:                       250
+Tooltip.Distance:                       0
+Tooltip.Delay:                          0
+Tooltip.Alpha:                          255
+Tooltip.Shadow:                         0
+.DT:                                    2
+.HT:                                    0
+.PL:                                    5
+.SM:                                    29890048
+.SC:                                    1699556230
+.OC:                                    826880
+.PC:                                    9992
+.R:                                     -2080243712
+.M:                                     108265472
+.L:                                     5242881
+.RD:                                    0
+.MD:                                    0
+.LD:                                    0
+.EC:                                    660541565
+WindowLabel.R.Command:                  default
+WindowLabel.L.Command:                  default
+WindowLabel.M.Command:                  default
+toolbar.button.shadowColor:             #000000
+toolbar.button.shadowX:                 2
+toolbar.button.shadowY:                 2
+toolbar.button.pressed.shadowColor:     #0000ff
+toolbar.button.pressed.shadowX:         2
+toolbar.button.pressed.shadowY:         2
+! 
+# ---------------------------------------------
+# bbZero 1.17.x - plugin.rc - the plugins to load
+
+# - Items may be added, enabled or disabled from
+# - the config menu as needed. Removal is left to
+# - manual editing.
+
+# - the BB hotkeys, see bbkeys.rc
+plugins\bbKeys\bbKeys.dll
+
+# - Integrated toolbar with tasks and tray
+plugins\BlackboxBar\BlackboxBar.dll
+
+# - Lean window skinner
+! plugins\bbLeanSkin\bbLeanSkin.dll
+
+# - The Slit - a common place for other plugins
+plugins\bbSlit\bbSlit.dll
+
+# - bb interface plugin(s)
+! plugins\bbInterface_iTunes\bbInterface_iTunes.dll
+
+! plugins\SystemBarEx\SystemBarEx.dll
+
+# - separator line for the plugin menu
+[sep]
+
+# - Plugins in the slit
+& plugins\bbAnalog\bbAnalog.dll
+& plugins\bbIconBox\bbIconBox.dll
+! & plugins\BBAnalogExMod\BBAnalogExMod.dll
+! & plugins\bbFoomp\bbFoomp.dll
+plugins\bbColor3dc\bbColor3dc.dll
+
+# - submenu with more plugins
+[sep]
+[submenu] (other)
+! plugins\bbPager\bbPager.dll
+! plugins\bbRecycleBin\bbRecycleBin.dll
+! plugins\bbWorkspaceWheel\bbWorkspaceWheel.dll
+! plugins\BBRSS\BBRSS.dll
+! plugins\bbCalendar\bbCalendar.dll
+! plugins\BBDigitalEx\BBDigitalEx.dll
+! plugins\BBMagnify\BBMagnify.dll
+! plugins\BBMessageBox\BBMessageBox.dll
+! plugins\BBStyle\BBStyle.dll
+! plugins\BBSysMeter\BBSysMeter.dll
+[end]
+
+[sep]
+[submenu] (players)
+! plugins\bbFooMan\bbFooMan.dll
+! plugins\bbPlayer\bbPlayer.dll
+! plugins\bbMuse\bbMuse.dll
+! plugins\bbSeekBar\bbSeekBar.dll
+[end]
+
+[sep]
+[submenu] (toys)
+! plugins\BB8Ball\BB8Ball.dll
+! plugins\BBXO\BBXO.dll
+[end]
+
+
+
+# ------------------------------------------
+# bbZero 1.18.x - search.rc - search settings
+
+# Lines starting with # or ! are ignored
+
+search.location.0.dir: C:\Program Files\
+search.location.0.includes: .*\.exe;.*\.com;.*\.bat;.*\.cmd
+search.location.0.excludes: C:\Program Files\NVIDIA Corporation\Installer2
+search.location.0.recursive: true
+
+search.location.1.dir: C:\bin\
+search.location.1.includes: .*\.exe;.*\.com;.*\.bat;.*\.cmd
+search.location.1.excludes:
+search.location.1.recursive: true
+
+search.location.2.dir: C:\totalcmd\
+search.location.2.includes: .*\.exe;.*\.com;.*\.bat;.*\.cmd
+search.location.2.excludes:
+search.location.2.recursive: false
+
+search.location.3.dir: C:\Program Files (x86)\
+search.location.3.includes: .*\.exe;.*\.com;.*\.bat;.*\.cmd
+search.location.3.excludes: C:\Program Files\NVIDIA Corporation\Installer2
+search.location.3.recursive: true
+
+search.location.4.dir: C:\Windows\
+search.location.4.includes: .*\.exe;.*\.com;.*\.bat;.*\.cmd
+search.location.4.excludes:
+search.location.4.recursive: false
+
+search.location.5.dir: C:\Windows\SysWOW64\WindowsPowerShell\v1.0\
+search.location.5.includes: .*\.exe;.*\.com;.*\.bat;.*\.cmd
+search.location.5.excludes:
+search.location.5.recursive: false
+
+search.location.6.dir: C:\Windows\SysWOW64\
+search.location.6.includes: .*\.exe;.*\.com;.*\.bat;.*\.cmd
+search.location.6.excludes:
+search.location.6.recursive: false
+
+search.location.7.dir: C:\Windows\System32\WindowsPowerShell\v1.0\
+search.location.7.includes: .*\.exe;.*\.com;.*\.bat;.*\.cmd
+search.location.7.excludes:
+search.location.7.recursive: false
+
+search.location.8.dir: C:\Windows\System32
+search.location.8.includes: .*\.exe;.*\.com;.*\.bat;.*\.cmd
+search.location.8.excludes:
+search.location.8.recursive: false
+
+search.location.9.dir: C:\bbZero\
+search.location.9.includes: .*\.exe;.*\.com;.*\.bat;.*\.cmd
+search.location.9.excludes:
+search.location.9.recursive: true
+
+# shellfolders.rc - examples for accessing the various system folders
+
+[submenu] (All Shellfolders)
+  [path] (admintools)         {ADMINTOOLS}
+  [path] (altstartup)         {ALTSTARTUP}
+  [path] (appdata)            {APPDATA}
+  [path] (bitbucket)          {BITBUCKET}
+  [path] (common_admintools)  {COMMON_ADMINTOOLS}
+  [path] (common_altstartup)  {COMMON_ALTSTARTUP}
+  [path] (common_appdata)     {COMMON_APPDATA}
+  [path] (common_desktopdirectory) {COMMON_DESKTOPDIRECTORY}
+  [path] (common_documents)   {COMMON_DOCUMENTS}
+  [path] (common_favorites)   {COMMON_FAVORITES}
+  [path] (common_programs)    {COMMON_PROGRAMS}
+  [path] (common_startmenu)   {COMMON_STARTMENU}
+  [path] (common_startup)     {COMMON_STARTUP}
+  [path] (common_templates)   {COMMON_TEMPLATES}
+  [path] (connections)        {CONNECTIONS}
+  [path] (controls)           {CONTROLS}
+  [path] (cookies)            {COOKIES}
+  [path] (desktop)            {DESKTOP}
+  [path] (desktopdirectory)   {DESKTOPDIRECTORY}
+  [path] (drives)             {DRIVES}
+  [path] (favorites)          {FAVORITES}
+  [path] (fonts)              {FONTS}
+  [path] (history)            {HISTORY}
+  [path] (internet)           {INTERNET}
+  [path] (internet_cache)     {INTERNET_CACHE}
+  [path] (local_appdata)      {LOCAL_APPDATA}
+  [path] (mypictures)         {MYPICTURES}
+  [path] (nethood)            {NETHOOD}
+  [path] (network)            {NETWORK}
+  [path] (personal)           {PERSONAL}
+  [path] (printers)           {PRINTERS}
+  [path] (printhood)          {PRINTHOOD}
+  [path] (profile)            {PROFILE}
+  [path] (program_files)      {PROGRAM_FILES}
+  [path] (program_files_common)   {PROGRAM_FILES_COMMON}
+  [path] (program_files_commonx86)  {PROGRAM_FILES_COMMONX86}
+  [path] (program_filesx86)     {PROGRAM_FILESX86}
+  [path] (programs)           {PROGRAMS}
+  [path] (recent)             {RECENT}
+  [path] (sendto)             {SENDTO}
+  [path] (startmenu)          {STARTMENU}
+  [path] (startup)            {STARTUP}
+  [path] (system)             {SYSTEM}
+  [path] (systemx86)            {SYSTEMX86}
+  [path] (templates)          {TEMPLATES}
+  [path] (windows)            {WINDOWS}
+[end]

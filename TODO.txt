@@ -1,0 +1,20 @@
+* asserts
+* 32b on 64b for taskhook
+* codecvt_utf16_utf8 destination to buffer on stack
+*     uint32_t const nx = c_maxIconTextureSize / b.bmWidth;
+      uint32_t const ny = c_maxIconTextureSize / b.bmHeight;
+
+* http://stackoverflow.com/questions/1394250/detect-program-termination-c-windows
+		If you're using boost, you can use boost::interprocess::windows_shared_memory.
+		It is guaranteed to be released when the process ends.
+		Boost is just a neat wrapper around the windows API in this case. It wraps the Windows Named Shared Memory API.
+
+* script
+		http://chaiscript.com/examples.html
+		http://squirrel-lang.org/
+		http://www.gnu.org/software/guile/
+
+	http://www.swig.org/Doc3.0/Introduction.html#Introduction_nn10
+	http://www.swig.org/Doc3.0/Scripting.html#Scripting
+		link as dll, not static
+

@@ -1,0 +1,71 @@
+---
+BlackBox:
+  style:
+    - 'default'
+  styleCycle:
+
+WorkSpaces:
+  - group: 'work'
+    hotkey: 'Alt + 1'
+    desktop:
+      x: 3
+      y: 2
+      names: [ 'a1', 'a2', 'a3', 'b1', 'b2', 'b3' ]
+      circularX: false
+      circularY: false
+  - group: 'net'
+    hotkey: 'Alt + 2'
+    desktop:
+      x: 2
+      y: 1
+      names: [ 'a1', 'a2' ]
+      circularX: true
+      circularY: false
+  - group: 'misc'
+
+Tasks:
+  - window: '^Windows Shell Experience Host$'
+    ignored: true
+  - window: '^Foo$'
+
+Menu:
+  - menu: 'Start'
+    cmd: 'SEARCHMENU'
+    type: 'path'
+  - menu: 'Explorer'
+    cmd: 'explorer.exe'
+    type: 'exec'
+
+Plugins:
+  - plugin: 'bbSlit'
+    path: 'c:/bb_devel/plugins/bbSlit/bbSlit.dll'
+    enabled: true
+    is_slit: true
+    in_slit: false
+
+  - plugin: 'bbSDK'
+    path: 'c:/bb_devel/plugins/bbSDK/bbSDK.dll'
+    enabled: false
+    in_slit: false
+
+  - plugin: 'bbFooMP'
+    path: 'c:/bb_devel/plugins/bbFoomp/bbFoomp.dll'
+    enabled: false
+    in_slit: true
+
+  - plugin: 'bbAnalog'
+    path: 'c:/bb_devel/plugins/bbAnalog/bbAnalog.dll'
+    enabled: true
+    in_slit: true
+ 
+  - plugin: 'bbAnalogExMod'
+    path: 'c:/bb_devel/plugins/bbAnalogExMod/bbAnalogExMod.dll'
+    enabled: false
+    in_slit: false
+
+Tray:
+  show: true
+
+Explorer:
+  show: false
+...

@@ -1,0 +1,87 @@
+ ============================================================================
+ bbFoomp // The foobar2000 plugin for Blackbox for Windows!
+ Copyright © 2004 freeb0rn@yahoo.com
+
+ Credits and thanks:
+ qwilk, without his help and code I would have never started!
+ azathoth, nc-17, tres`ni and other channel regulars, coders or not,
+ thanks for bearing with my (often stupid) questions and helping me out!
+ ============================================================================
+ bbFoomp // The foobar2000 plugin for Blackbox for Windows!
+ Copyright © 2004-2005 isidoros.passadis@gmail.com
+
+ Credits and thanks:
+ qwilk, without his help and code I would have never started!
+ azathoth, nc-17, tres`ni and other channel regulars, coder or not,
+ thanks for bearing with my (often stupid) questions and helping me out!
+ Lots of thanks also goes to MrJukes for his jAmp plugin and song scrolling
+ which I relied heavily on for help, and Azathoth and Geekmaster
+ for their geekAmp and other amp plugins, from which many of the ideas for the
+ code came.
+
+ As of version 1.7 this source-code is public. Follow the GPL if you wish to
+ redistribute any changes. Enjoy.
+ ============================================================================
+
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of the GNU General Public License
+  as published by the Free Software Foundation; either version 2
+  of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+ ============================================================================
+ Foomp 1.8 (August 26 2014) / mojmir
+	» cleaning woman shift
+
+ Foomp 1.7 (August 12 2006) / pkt-zer0
+	» Shadow support
+	» User-defined button actions and images
+	» Wider variety of styles to choose from
+	» Adjustable scroll speed
+	» Major code rewrite
+ 
+ Foomp 1.6 (June 2 2006) / pkt-zer0
+	» Just a few changes to keep it compatible with the new foobar 9.1 and Columns UI
+
+ Foomp 1.5 (June 21 2005) / freeb0rn
+	» Fixed some bugs
+	» Fixed support for foobar 8.3 and new UI Columns--assholes keep changing the class name.
+	» First public code release.
+
+ Foomp 1.4 (July 28 2004) / freeb0rn
+	» Fixed a bug in FooMegaMode.
+	» Added customizable default text.
+
+ Foomp 1.3 (July 26 2004) / freeb0rn
+	» Change what toolbar element GetStyleSettings() references to draw
+		the outer rectangle so that it may fit in with other plugins better.
+	» Added left/right alignment for FooMegaMode.
+
+ Foomp 1.2 (July 24 2004) / freeb0rn 
+	» Changed the the color that the buttons/controls are drawn with 
+		(from button.PicColor to label.textcolor)
+	» Changed... well, alot.
+		Organized some code.
+		Ability to choose which style the inner rectangle is drawn in.
+			(Which subsequently effects the font color).
+
+ Foomp 1.1 (July 15 2004) / freeb0rn 
+	» Added adjustable height value.
+	» Added adjustable border-thickness value.
+	» Fixed the rendering of the buttons at different heights.
+	» Fixed the rendering of the scrolling text at different heights.
+
+ Foomp 1.0 (July 15 2004) / freeb0rn 
+	- Original release
+
+ ============================================================================
+
+

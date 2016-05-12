@@ -1,0 +1,136 @@
+! style info
+
+style.name:         nightBlue
+style.author:       PovRayMan (prm@indecisions.org)
+style.date:         Saturday Feb 22nd 2003
+style.credits:      I used NC-17's ember as a template!
+style.comments:     I <3 Boobies
+
+! ---------------------------------------- toolbar ------
+
+toolbar:                        raised gradient elliptical
+toolbar.color:                  #006699
+toolbar.colorTo:                #050505
+toolbar.textColor:              #B7E2EE
+toolbar.font:                   snap
+toolbar.justify:                center
+
+toolbar.button:                 parentrelative
+toolbar.button.color:                  #006699
+toolbar.button.colorTo:                #050505
+toolbar.button.picColor:        #B7E2EE
+
+toolbar.button.pressed:         sunken gradient elliptical
+toolbar.button.pressed.color:   #006699
+toolbar.button.pressed.colorTo: #050505
+toolbar.button.pressed.picColor: #FFFFFF
+
+! alternative label
+toolbar.label:            sunken gradient diagonal
+toolbar.label.color:      #006699
+toolbar.label.colorTo:    #050505
+toolbar.label.textColor:  #B7E2EE
+
+! alternative windowLabel
+toolbar.windowLabel:              parentrelative
+toolbar.windowLabel.color:                  #006699
+toolbar.windowLabel.colorTo:                #050505
+toolbar.windowLabel.textColor:    #B7E2EE
+
+! alternative clock
+toolbar.clock:            sunken gradient diagonal
+toolbar.clock.color:      #006699
+toolbar.clock.colorTo:    #050505
+toolbar.clock.textColor:  #B7E2EE
+
+! ---------------------------------------- menu ---------
+
+menu.title:                     raised gradient elliptical
+menu.title.color:               #006699
+menu.title.colorTo:             #050505
+menu.title.textColor:           #B7E2EE
+menu.title.font:                snap
+menu.title.justify:             center
+
+menu.frame:                     raised gradient diagonal
+menu.frame.color:               #006699
+menu.frame.colorTo:             #050505
+menu.frame.textColor:           #B7E2EE
+menu.frame.font:                snap
+menu.frame.justify:             left
+menu.frame.disableColor:        #000000
+
+menu.hilite:                    raised gradient elliptical
+menu.hilite.color:              #006699
+menu.hilite.colorTo:            #050505
+menu.hilite.textColor:          #FFFFFF
+
+menu.bullet:                    circle
+
+! ---------------------------------------- window -------
+
+window.font:                    snap
+window.justify:                 center
+
+window.button.focus:            parentrelative
+window.button.focus.picColor:   #B7E2EE
+
+window.button.unfocus:          parentrelative
+window.button.unfocus.color:     #666666
+window.button.unfocus.colorTo:   #050505
+window.button.unfocus.picColor: #B7E2EE
+
+window.button.pressed:          sunken gradient diagonal
+window.button.pressed.color:    #0099CC
+window.button.pressed.colorTo:  #000000
+
+window.grip.focus:              parentrelative
+window.grip.focus.color:        #000000
+window.grip.focus.colorTo:      #000000
+
+window.grip.unfocus:            parentrelative
+window.grip.unfocus.color:      #000000
+window.grip.unfocus.colorTo:    #000000
+
+window.handle.focus:            raised gradient elliptical
+window.handle.focus.color:      #666666
+window.handle.focus.colorTo:    #050505
+
+window.handle.unfocus:          raised gradient elliptical
+window.handle.unfocus.color:    #666666
+window.handle.unfocus.colorTo:  #050505
+
+window.label.focus:             sunken gradient diagonal
+window.label.focus.color:       #006699
+window.label.focus.colorTo:     #003333
+window.label.focus.textColor:   #B7E2EE
+window.label.focus.font:        snap
+window.label.focus.justify:     center
+
+window.label.unfocus:           parentrelative
+window.label.unfocus.color:     #666666
+window.label.unfocus.colorTo:   #050505
+window.label.unfocus.textColor: #dddddd
+
+window.title.focus:             raised gradient elliptical
+window.title.focus.color:       #666666
+window.title.focus.colorTo:     #050505
+
+window.title.unfocus:           raised gradient elliptical
+window.title.unfocus.color:     #666666
+window.title.unfocus.colorTo:   #050505
+
+window.frame.focusColor:        #000000
+window.frame.unfocusColor:      #000000
+
+! ---------------------------------------- other --------
+
+handleWidth:        5
+frameWidth:         1
+bevelWidth:         2
+borderWidth:        1
+borderColor:        #000000
+
+*Font:              snap
+
+rootCommand: bsetroot -gradient Crossdiagonalinterlaced -from #006699 -to #000000

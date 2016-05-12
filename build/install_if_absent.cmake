@@ -1,0 +1,16 @@
+function(install_if_absent dst)
+	foreach(f ${ARGN})
+		if(NOT EXISTS \"${CMAKE_INSTALL_PREFIX}/${f}\")
+			install(FILES ${f} DESTINATION ${dst})
+		endif()
+	endforeach()
+endfunction()
+
+function(installdir_if_absent dst)
+	foreach(f ${ARGN})
+		if(NOT EXISTS \"${CMAKE_INSTALL_PREFIX}/${f}\")
+			install(DIRECTORY ${f} DESTINATION ${dst})
+		endif()
+	endforeach()
+endfunction()
+

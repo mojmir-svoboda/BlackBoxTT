@@ -1,0 +1,121 @@
+! -- info --
+style.name:       default                  
+style.author:     unkamunka                  
+style.date:         2009-06-01                
+style.credits:      based on old bb4winDevTeam site colours
+style.comments:	bb4win_mod 1.19 default colour scheme                     
+
+! -- background --
+rootCommand:	bsetroot -gradient vertical -from #333333 -to #000000                        
+
+! -- toolbar --
+toolbar:                            raised gradient diagonal
+toolbar.color:                      #333333
+toolbar.colorTo:                    #0000000
+toolbar.textColor:                  #cccccc
+toolbar.justify:                    left
+
+toolbar.label:                      raised gradient diagonal
+toolbar.label.color:                #333333
+toolbar.label.colorTo:              #000000
+toolbar.label.textColor:            #cccccc
+
+toolbar.windowLabel:                raised gradient vertical
+toolbar.windowLabel.color:          #eeeeee
+toolbar.windowLabel.colorTo:        #cccccc
+toolbar.windowLabel.textColor:      #000000
+
+toolbar.clock:                      raised gradient diagonal
+toolbar.clock.color:                #333333
+toolbar.clock.colorTo:              #000000
+toolbar.clock.textColor:            #cccccc
+
+toolbar.button:                     raised gradient vertical
+toolbar.button.color:               #eeeeee
+toolbar.button.colorTo:             #cccccc
+toolbar.button.picColor:            #000000
+
+toolbar.button.pressed:             raised gradient diagonal
+toolbar.button.pressed.color:       #333333
+toolbar.button.pressed.colorTo:     #000000
+toolbar.button.pressed.picColor:    #cccccc
+
+! -- menu --
+menu.title:                         raised gradient vertical
+menu.title.color:                   #eeeeee
+menu.title.colorTo:                 #cccccc
+menu.title.textColor:               #000000
+menu.title.justify:                 left
+
+menu.frame:                         raised gradient diagonal
+menu.frame.color:                   #333333
+menu.frame.colorTo:                 #000000
+menu.frame.textColor:               #cccccc
+menu.frame.justify:                 left
+
+menu.hilite:                        raised gradient vertical
+menu.hilite.color:                  #eeeeee
+menu.hilite.colorTo:                #cccccc
+menu.hilite.textColor:              #000000
+
+menu.bullet:                        arrow
+menu.bullet.position:               right
+
+! -- window --
+window.title.focus:                 raised gradient diagonal
+window.title.focus.color:           #333333
+window.title.focus.colorTo:         #000000
+
+window.label.focus:                 raised gradient vertical
+window.label.focus.color:           #eeeeee
+window.label.focus.colorTo:        #cccccc
+window.label.focus.textColor:       #000000
+
+window.handle.focus:                raised gradient diagonal
+window.handle.focus.color:          #333333
+window.handle.focus.colorTo:        #000000
+
+window.grip.focus:                  raised gradient vertical
+window.grip.focus.color:            #eeeeee
+window.grip.focus.colorTo:          #cccccc
+
+window.button.focus:                raised gradient vertical
+window.button.focus.color:          #eeeeee
+window.button.focus.colorTo:       #cccccc
+window.button.focus.picColor:       #000000
+
+window.button.pressed:              raised gradient diagonal
+window.button.pressed.color:        #333333
+window.button.pressed.colorTo:      #000000
+window.button.pressed.picColor:     #cccccc
+
+window.title.unfocus:               raised gradient diagonal
+window.title.unfocus.color:         #333333
+window.title.unfocus.colorTo:       #000000
+
+window.label.unfocus:               raised gradient diagonal
+window.label.unfocus.color:         #333333
+window.label.unfocus.colorTo:       #000000
+window.label.unfocus.textColor:     #cccccc
+
+window.handle.unfocus:              raised gradient diagonal
+window.handle.unfocus.color:        #333333
+window.handle.unfocus.colorTo:      #000000
+
+window.grip.unfocus:                raised gradient diagonal
+window.grip.unfocus.color:          #333333
+window.grip.unfocus.colorTo:        #000000
+
+window.button.unfocus:              raised gradient vertical
+window.button.unfocus.color:        #eeeeee
+window.button.unfocus.colorTo:      #cccccc
+window.button.unfocus.picColor:     #000000
+
+window.justify:                     left
+
+! -- misc. --
+borderColor:                        #eeeeee
+borderWidth:                        1
+bevelWidth:                         0
+frameWidth:                         1
+handleWidth:                        5
