@@ -180,7 +180,7 @@ inline bool getExeName (HINSTANCE h, TCHAR * dest, size_t destSize)
 	DWORD length = ::GetModuleFileName(h, dest, destSize);
 	if (MAX_PATH > destSize)
 		return false;
-	PathRemoveFileSpec(dest);
+//	PathRemoveFileSpec(dest);
 	return true;
 }
 inline bool getExeName (TCHAR * dest, size_t destSize)

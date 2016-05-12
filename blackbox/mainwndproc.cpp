@@ -24,21 +24,49 @@ void initShellHook32on64 (HWND bb_hwnd)
 	TCHAR path[1024];
 	bb::getExePath(path, 1024);
 
-	//TCHAR szModule[MAX_PATH];
 	TCHAR szCommand[MAX_PATH * 2];
-
 	TCHAR mod[MAX_PATH * 2];
 	_snwprintf(mod, MAX_PATH * 2, L"%s\\blackbox32.exe", path);
-	//DWORD cch = GetModuleFileName(NULL, szModule, MAX_PATH);
-	//if (cch > 0 && cch < MAX_PATH &&
+
 	if (SUCCEEDED(StringCchPrintf(szCommand, MAX_PATH * 2, TEXT("\"%s\" %I64d"), mod, (INT64)(INT_PTR)bb_hwnd)))
 	{
-		STARTUPINFO si = { sizeof(si) };
-		PROCESS_INFORMATION pi;
+		BOOL bIsProcessInJob = false;
+		BOOL bSuccess = ::IsProcessInJob(GetCurrentProcess(), NULL, &bIsProcessInJob);
+		if (bSuccess == 0)
+		{
+			TRACE_MSG(LL_ERROR, CTX_BB | CTX_HOOK | CTX_INIT, "IsProcessInJob failed");
+		}
 
-		BOOL bRes = CreateProcess(mod, szCommand, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi);
+		HANDLE hJob = ::CreateJobObject(NULL, NULL);
+		if (hJob == NULL)
+		{
+			TRACE_MSG(LL_ERROR, CTX_BB | CTX_HOOK | CTX_INIT, "CreateJobObject failed");
+		}
+
+		JOBOBJECT_EXTENDED_LIMIT_INFORMATION jeli = { 0 };
+		jeli.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+		bSuccess = ::SetInformationJobObject(hJob, JobObjectExtendedLimitInformation, &jeli, sizeof(jeli));
+		if (bSuccess == false)
+		{
+			TRACE_MSG(LL_ERROR, CTX_BB | CTX_HOOK | CTX_INIT, "SetInformationJobObject failed");
+		}
+
+		PROCESS_INFORMATION pi = { 0 };
+		STARTUPINFO si = { 0 };
+		si.cb = sizeof(si);
+		DWORD const dwCreationFlags = bIsProcessInJob ? CREATE_BREAKAWAY_FROM_JOB : 0;
+
+		BOOL const bRes = :::CreateProcess(mod, szCommand, NULL, NULL, TRUE, dwCreationFlags, NULL, NULL, &si, &pi);
 		if (bRes)
+		{
+			BOOL const bSuccess = ::AssignProcessToJobObject(hJob, pi.hProcess);
+			if (bSuccess == 0)
+			{
+				TRACE_MSG(LL_ERROR, CTX_BB | CTX_HOOK | CTX_INIT, "SetInformationJobObject failed");
+			}
+
 			WaitForInputIdle(pi.hProcess, INFINITE);
+		}
 	}
 }
 
@@ -53,7 +81,7 @@ LRESULT CALLBACK mainWndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 		{
 			if (!bb.m_cmdLine.NoTaskHook())
 			{
-				initShellHook(hwnd);
+				//initShellHook(hwnd);
 				initShellHook32on64(hwnd);
 			}
 			if (!bb.m_cmdLine.NoTrayHook())
