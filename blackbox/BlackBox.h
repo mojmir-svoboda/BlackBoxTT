@@ -22,6 +22,8 @@ namespace bb {
 		constexpr static wchar_t const * const s_BlackboxClass = L"BlackBoxClass";
 		HINSTANCE m_hMainInstance;
 		HWND m_hwnd;
+		HANDLE m_job;
+		bool m_inJob;
 		BlackBoxConfig m_config;
 		CommandLine m_cmdLine;
 
@@ -47,6 +49,8 @@ namespace bb {
 		bool Win32RegisterClass (wchar_t const * classname, WNDPROC wndproc, int flags);
 		BB_API void Run ();
 
+		HANDLE GetJob () const { return m_job; }
+		bool GetInJob () const { return m_inJob; }
 		Tasks & GetTasks () { return m_tasks; }
 		Tasks const & GetTasks () const { return m_tasks; }
 		Tray & GetTray () { return m_tray; }

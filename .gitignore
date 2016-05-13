@@ -1,28 +1,13 @@
-# Compiled Object files
-*.slo
-*.lo
+# Compiled source #
 *.o
 *.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
 *.exe
-*.out
-*.app
+*.dll
+*.a
+*.lib:
+resource.res
+# projects usually go here:
+_projects*
+# bbversion is generated:
+BlackboxZero/blackbox/bbversion.h
+BlackboxZero/build.ver

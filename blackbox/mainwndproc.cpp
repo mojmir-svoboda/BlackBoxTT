@@ -8,6 +8,7 @@
 #include <BlackBox.h>
 #include <Gfx/Gui.h>
 #include <utils_paths.h>
+#include <bblib/logging.h>
 
 BOOL CALLBACK taskEnumProc (HWND hwnd, LPARAM lParam)
 {
@@ -18,8 +19,9 @@ BOOL CALLBACK taskEnumProc (HWND hwnd, LPARAM lParam)
 	return TRUE;
 }
 
+
 #include <strsafe.h>
-void initShellHook32on64 (HWND bb_hwnd)
+bool initShellHook32on64 (HWND bb_hwnd, HANDLE job, bool pcs_in_job)
 {
 	TCHAR path[1024];
 	bb::getExePath(path, 1024);
@@ -30,44 +32,26 @@ void initShellHook32on64 (HWND bb_hwnd)
 
 	if (SUCCEEDED(StringCchPrintf(szCommand, MAX_PATH * 2, TEXT("\"%s\" %I64d"), mod, (INT64)(INT_PTR)bb_hwnd)))
 	{
-		BOOL bIsProcessInJob = false;
-		BOOL bSuccess = ::IsProcessInJob(GetCurrentProcess(), NULL, &bIsProcessInJob);
-		if (bSuccess == 0)
-		{
-			TRACE_MSG(LL_ERROR, CTX_BB | CTX_HOOK | CTX_INIT, "IsProcessInJob failed");
-		}
-
-		HANDLE hJob = ::CreateJobObject(NULL, NULL);
-		if (hJob == NULL)
-		{
-			TRACE_MSG(LL_ERROR, CTX_BB | CTX_HOOK | CTX_INIT, "CreateJobObject failed");
-		}
-
-		JOBOBJECT_EXTENDED_LIMIT_INFORMATION jeli = { 0 };
-		jeli.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
-		bSuccess = ::SetInformationJobObject(hJob, JobObjectExtendedLimitInformation, &jeli, sizeof(jeli));
-		if (bSuccess == false)
-		{
-			TRACE_MSG(LL_ERROR, CTX_BB | CTX_HOOK | CTX_INIT, "SetInformationJobObject failed");
-		}
-
 		PROCESS_INFORMATION pi = { 0 };
 		STARTUPINFO si = { 0 };
 		si.cb = sizeof(si);
-		DWORD const dwCreationFlags = bIsProcessInJob ? CREATE_BREAKAWAY_FROM_JOB : 0;
+		DWORD const dwCreationFlags = job && pcs_in_job ? CREATE_BREAKAWAY_FROM_JOB : 0;
 
-		BOOL const bRes = :::CreateProcess(mod, szCommand, NULL, NULL, TRUE, dwCreationFlags, NULL, NULL, &si, &pi);
-		if (bRes)
+		if ( ::CreateProcess(mod, szCommand, NULL, NULL, TRUE, dwCreationFlags, NULL, NULL, &si, &pi))
 		{
-			BOOL const bSuccess = ::AssignProcessToJobObject(hJob, pi.hProcess);
-			if (bSuccess == 0)
+			if (job)
 			{
-				TRACE_MSG(LL_ERROR, CTX_BB | CTX_HOOK | CTX_INIT, "SetInformationJobObject failed");
+				if (false == ::AssignProcessToJobObject(job, pi.hProcess))
+				{
+					TRACE_MSG(LL_ERROR, CTX_BB | CTX_HOOK | CTX_INIT, "SetInformationJobObject failed");
+				}
 			}
 
 			WaitForInputIdle(pi.hProcess, INFINITE);
+			return true;
 		}
 	}
+	return false;
 }
 
 
@@ -82,7 +66,7 @@ LRESULT CALLBACK mainWndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 			if (!bb.m_cmdLine.NoTaskHook())
 			{
 				//initShellHook(hwnd);
-				initShellHook32on64(hwnd);
+				initShellHook32on64(hwnd, bb.GetJob(), bb.GetInJob());
 			}
 			if (!bb.m_cmdLine.NoTrayHook())
 			{

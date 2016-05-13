@@ -12,6 +12,7 @@
 #include <widgets/Plugins.h>
 #include <widgets/ControlPanel.h>
 #include <widgets/Debug.h>
+#include "utils_win32.h"
 
 LRESULT CALLBACK mainWndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -136,7 +137,8 @@ namespace bb {
 
 	BlackBox::BlackBox ()
 		: m_hMainInstance(nullptr)
-		, m_hwnd()
+		, m_hwnd(nullptr)
+		, m_job(nullptr), m_inJob(false)
 		, m_defaultStyle(new StyleStruct)
 		, m_style()
 		, m_explorer(new Explorer)
@@ -274,6 +276,7 @@ namespace bb {
 		bool ok = true;
 
 		ok &= DetectConfig();
+		ok &= mkJobObject(m_job, m_inJob);
 		ok &= m_cmdLine.Init();
 		ok &= LoadConfig();
 		rc::init();
