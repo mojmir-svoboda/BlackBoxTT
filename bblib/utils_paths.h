@@ -52,7 +52,6 @@ inline bool makePath (wchar_t const * drive, wchar_t const * dir, wchar_t const 
 	errno_t const res = _tmakepath_s(buff_path, drive, dir, fname, fext);
 	if (res == 0)
 	{
-		path = buff_path;
 		_tcsncpy(path, buff_path, pathsz);
 		return true;
 	}
