@@ -1,0 +1,21 @@
+ProtocolModule
+    { iso org(3) dod(6) internet(1) private(4)
+      enterprise(1) mojomir(1024) software(1)
+      bbTT(16) proto(2) wut(1) 1 }
+DEFINITIONS AUTOMATIC TAGS ::=
+BEGIN
+
+Command ::= CHOICE {
+	bbhwnd BBHwndMsg,
+	bb32wm BB32WMMsg
+}
+
+BBHwndMsg ::= SEQUENCE {
+	hwnd    INTEGER
+}
+
+BB32WMMsg ::= SEQUENCE {
+	wmmsg   INTEGER
+}
+
+END

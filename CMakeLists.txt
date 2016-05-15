@@ -65,6 +65,7 @@ include_directories (3rd_party/yaml-cpp/include)
 add_subdirectory(crazyrc)
 # blackbox core
 add_subdirectory(bblib)
+add_subdirectory(bbproto)
 add_subdirectory(blackbox)
 # plugins
 add_subdirectory(bblibcompat)
