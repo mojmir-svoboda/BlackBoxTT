@@ -14,3 +14,5 @@ SHELLHOOK_API void initShellHook (HWND bb_hwnd);
 SHELLHOOK_API void doneShellHook ();
 LRESULT CALLBACK taskManagerHookProc (int code, WPARAM wParam, LPARAM lParam);
 
+SHELLHOOK_API void initShellHook32 (HWND bb_hwnd);
+LRESULT CALLBACK taskManagerHookProc32 (int code, WPARAM wParam, LPARAM lParam);

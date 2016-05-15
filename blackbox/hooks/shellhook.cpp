@@ -3,6 +3,7 @@
 #include <cstdint>
 
 wchar_t const * const c_shellHookName = L"shellhook";
+wchar_t const * const c_shellHook32Name = L"shellhook32";
 
 #pragma data_seg(".shared")
 SHELLHOOK_API HHOOK g_shellHook = 0;
@@ -23,17 +24,45 @@ LRESULT CALLBACK taskManagerHookProc (int code, WPARAM wParam, LPARAM lParam)
 SHELLHOOK_API void initShellHook (HWND bb_hwnd)
 {
 	g_bbHwnd = bb_hwnd;
-	g_WM_ShellHook = RegisterWindowMessage(c_shellHookName);
+	g_WM_ShellHook = ::RegisterWindowMessage(c_shellHookName);
 	wchar_t tmp[128];
 	_snwprintf(tmp, 128, L"%ws.dll", c_shellHookName);
-	HINSTANCE shellhook_hinst = GetModuleHandle(tmp);
-	g_shellHook = SetWindowsHookEx(WH_SHELL, (HOOKPROC)taskManagerHookProc, shellhook_hinst, 0);
+	HINSTANCE shellhook_hinst = ::GetModuleHandle(tmp);
+	g_shellHook = ::SetWindowsHookEx(WH_SHELL, (HOOKPROC)taskManagerHookProc, shellhook_hinst, 0);
+	//RegisterShellHookWindow 
 
 	if (!g_shellHook)
 	{
 		uint32_t const err = GetLastError();
 	}
 }
+
+
+LRESULT CALLBACK taskManagerHookProc32 (int code, WPARAM wParam, LPARAM lParam)
+{
+	if (code >= 0)
+	{
+		::PostMessage(g_bbHwnd, g_WM_ShellHook, code, wParam);
+	}
+	return ::CallNextHookEx(g_shellHook, code, wParam, lParam);
+}
+
+SHELLHOOK_API void initShellHook32 (HWND bb_hwnd)
+{
+	g_bbHwnd = bb_hwnd;
+	g_WM_ShellHook = ::RegisterWindowMessage(c_shellHook32Name);
+	wchar_t tmp[128];
+	_snwprintf(tmp, 128, L"%ws.dll", c_shellHook32Name);
+	HINSTANCE shellhook_hinst = GetModuleHandle(tmp);
+	g_shellHook = SetWindowsHookEx(WH_SHELL, (HOOKPROC)taskManagerHookProc, shellhook_hinst, 0);
+	//g_shellHook = SetWindowsHookEx(WH_CBT, (HOOKPROC)taskManagerHookProc32, shellhook_hinst, 0);
+
+	if (!g_shellHook)
+	{
+		uint32_t const err = GetLastError();
+	}
+}
+
 
 SHELLHOOK_API void doneShellHook ()
 {

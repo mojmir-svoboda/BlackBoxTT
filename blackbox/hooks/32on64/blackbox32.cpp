@@ -9,7 +9,7 @@ void initShellHook32 (LPSTR pszCmdLine)
 	if (StrToInt64ExA(pszCmdLine, STIF_DEFAULT, &llHandle))
 	{
 		HWND bbHwnd = (HWND)(INT_PTR)llHandle;
-		initShellHook(bbHwnd);
+		initShellHook32(bbHwnd);
 	}
 }
 

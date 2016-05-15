@@ -11,10 +11,16 @@ add_library(shellhook32 SHARED ../shellhook.cpp)
 target_link_libraries(shellhook32 version comctl32)
 #set_property(TARGET shellhook32 PROPERTY FOLDER "hooks/shellhook32")
 install(TARGETS shellhook32 RUNTIME DESTINATION .)
+if(MSVC)
+	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/Debug/shellhook32.pdb DESTINATION .	CONFIGURATIONS Debug)
+endif(MSVC)
 
 add_executable(blackbox32 WIN32 blackbox32.cpp)
 target_link_libraries(blackbox32 shellhook32 version comctl32 shlwapi)
 install(TARGETS blackbox32 RUNTIME DESTINATION .)
+if(MSVC)
+	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/Debug/blackbox32.pdb DESTINATION .	CONFIGURATIONS Debug)
+endif(MSVC)
 
 ###############################################################################
 # debug stuff

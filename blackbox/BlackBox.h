@@ -16,10 +16,11 @@ namespace bb {
 
 	struct /*BB_API*/ BlackBox
 	{
-		constexpr static wchar_t const * const s_BlackboxName = L"BlackBox";
-		constexpr static char const * const s_BlackboxConfig = "blackbox.yaml";
+		constexpr static wchar_t const * const s_blackboxName = L"BlackBox";
+		constexpr static char const * const s_blackboxConfig = "blackbox.yaml";
 		//constexpr static char const * const s_BlackboxClass = "BlackBoxClass";
-		constexpr static wchar_t const * const s_BlackboxClass = L"BlackBoxClass";
+		constexpr static wchar_t const * const s_blackboxClass = L"BlackBoxClass";
+		constexpr static wchar_t const * const s_blackbox32Name = L"blackbox32.exe";
 		HINSTANCE m_hMainInstance;
 		HWND m_hwnd;
 		HANDLE m_job;

@@ -221,8 +221,8 @@ namespace bb {
 	{
 		m_hwnd = ::CreateWindowEx(
 			WS_EX_TOOLWINDOW,
-			s_BlackboxClass,
-			s_BlackboxName,
+			s_blackboxClass,
+			s_blackboxName,
 			WS_POPUP | WS_DISABLED,
 			// sizes are assigned for cursor behaviour with
 			// AutoRaise Focus on winME, win2k
@@ -283,7 +283,7 @@ namespace bb {
 		rc::init();
 		ok &= m_server.Init(m_config.m_server);
 
-		Win32RegisterClass(s_BlackboxClass, mainWndProc, 0);
+		Win32RegisterClass(s_blackboxClass, mainWndProc, 0);
 		ok &= CreateBBWindow();
 		ok &= m_gfx.Init();
 		ok &= m_tasks.Init(m_config.m_tasks);
@@ -331,7 +331,7 @@ namespace bb {
 
 		::DestroyWindow(m_hwnd);
 		m_hwnd = nullptr;
-		::UnregisterClass(s_BlackboxClass, m_hMainInstance);
+		::UnregisterClass(s_blackboxClass, m_hMainInstance);
 		return ok;
 	}
 
