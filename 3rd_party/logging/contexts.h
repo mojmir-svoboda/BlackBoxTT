@@ -24,4 +24,5 @@ const trace::context_t CTX_BBLIB      =  (1 << 14);
 const trace::context_t CTX_BBLIBCOMPAT=  (1 << 15);
 const trace::context_t CTX_PLUGINMGR  =  (1 << 16);
 const trace::context_t CTX_PLUGIN     =  (1 << 17);
-//const trace::context_t CTX_           =  (1 << 18);
+const trace::context_t CTX_NET        =  (1 << 18);
+//const trace::context_t CTX_           =  (1 << 19);

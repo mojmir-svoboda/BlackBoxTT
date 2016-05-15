@@ -2,6 +2,7 @@
 #include "TasksConfig.h"
 #include "TrayConfig.h"
 #include "WorkSpacesConfig.h"
+#include "net/ServerConfig.h"
 #include "plugin/PluginsConfig.h"
 
 namespace bb {
@@ -38,6 +39,7 @@ namespace bb {
 		TrayConfig m_tray;
 		WorkSpacesConfig m_wspaces;
 		PluginsConfig m_plugins;
+		ServerConfig m_server;
 	};
 }
 

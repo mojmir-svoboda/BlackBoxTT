@@ -8,6 +8,7 @@
 #include "gfx/Gfx.h"
 #include <bblib/logging.h>
 #include <crazyrc/rc.h>
+#include <net/Server.h>
 #include <widgets/StyleEditor.h>
 #include <widgets/Plugins.h>
 #include <widgets/ControlPanel.h>
@@ -280,6 +281,7 @@ namespace bb {
 		ok &= m_cmdLine.Init();
 		ok &= LoadConfig();
 		rc::init();
+		ok &= m_server.Init(m_config.m_server);
 
 		Win32RegisterClass(s_BlackboxClass, mainWndProc, 0);
 		ok &= CreateBBWindow();
@@ -325,6 +327,7 @@ namespace bb {
 		ok &= m_gfx.Done();
 		ok &= m_tray.Done();
 		ok &= m_explorer->Done();
+		ok &= m_server.Done();
 
 		::DestroyWindow(m_hwnd);
 		m_hwnd = nullptr;

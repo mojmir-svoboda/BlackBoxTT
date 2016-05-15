@@ -44,6 +44,8 @@ add_subdirectory(hooks)
 Build32on64(shellhook hooks)
 Build32on64(blackbox hooks) # NOTE: this is not blackbox, but blackbox32.exe
 
+# bb networking
+add_subdirectory(net)
 
 set(blackbox_SOURCES
 	mainwndproc.cpp
@@ -131,6 +133,7 @@ target_link_libraries(blackbox imgui)
 target_link_libraries(blackbox dwmapi)
 target_link_libraries(blackbox d3d11)
 target_link_libraries(blackbox d3dcompiler)
+target_link_libraries(blackbox net)
 if(OPTION_USE_TRACE)
 	target_link_libraries(blackbox ${TRACE_LIBRARY})
 endif(OPTION_USE_TRACE)
