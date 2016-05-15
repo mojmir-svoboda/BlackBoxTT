@@ -332,6 +332,8 @@ namespace bb {
 		::DestroyWindow(m_hwnd);
 		m_hwnd = nullptr;
 		::UnregisterClass(s_blackboxClass, m_hMainInstance);
+		::CloseHandle(m_job);
+		m_job = nullptr;
 		return ok;
 	}
 
