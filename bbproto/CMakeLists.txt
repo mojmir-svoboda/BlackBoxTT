@@ -8,26 +8,26 @@ add_definitions("-DUSE_CXX_ALLOCATOR")
 
 set(ASN1_SOURCES
   asn_codecs_prim.c
-  asn_SEQUENCE_OF.c
-  asn_SET_OF.c
+	#asn_SEQUENCE_OF.c
+	#asn_SET_OF.c
   ber_decoder.c
   ber_tlv_length.c
   ber_tlv_tag.c
   BIT_STRING.c
   constr_CHOICE.c
-  constr_SEQUENCE.c
-  constr_SEQUENCE_OF.c
-  constr_SET_OF.c
+	#constr_SEQUENCE.c
+	#constr_SEQUENCE_OF.c
+	#constr_SET_OF.c
   constr_TYPE.c
   constraints.c
   der_encoder.c
   INTEGER.c
   NativeEnumerated.c
   NativeInteger.c
-	NativeReal.c
+	#NativeReal.c
   OCTET_STRING.c
-	REAL.c
-  BOOLEAN.c
+	#REAL.c
+	#BOOLEAN.c
   per_decoder.c
   per_encoder.c
   per_opentype.c
@@ -42,8 +42,8 @@ set(ASN1_HEADERS
   asn_application.h
   asn_codecs.h
   asn_codecs_prim.h
-  asn_SEQUENCE_OF.h
-  asn_SET_OF.h
+	#asn_SEQUENCE_OF.h
+	#asn_SET_OF.h
   asn_internal.h
   asn_system.h
   ber_decoder.h
@@ -51,19 +51,19 @@ set(ASN1_HEADERS
   ber_tlv_tag.h
   BIT_STRING.h
   constr_CHOICE.h
-  constr_SEQUENCE.h
-  constr_SEQUENCE_OF.h
-  constr_SET_OF.h
+	#constr_SEQUENCE.h
+	#constr_SEQUENCE_OF.h
+	#constr_SET_OF.h
   constr_TYPE.h
   constraints.h
   der_encoder.h
   INTEGER.h
   NativeEnumerated.h
   NativeInteger.h
-	NativeReal.h
+	#NativeReal.h
   OCTET_STRING.h
-	REAL.h
-  BOOLEAN.h
+	#REAL.h
+	#BOOLEAN.h
   per_decoder.h
   per_encoder.h
   per_opentype.h
@@ -97,8 +97,14 @@ add_custom_command(
 	DEPENDS bbproto.asn1
 )
 
+
+set(bbproto_SOURCES
+	encoder.cpp
+	decoder_alloc.cpp
+)
+
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
-add_library(bbproto ${GENERATED_SRC})
+add_library(bbproto ${GENERATED_SRC} ${bbproto_SOURCES})
 set_source_files_properties(${GENERATED_SRC} PROPERTIES LANGUAGE CXX)
 set_target_properties(bbproto PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -150,19 +156,15 @@ prepend_path_and_install_asn("${bbASN1_SOURCES}")
 
 
 set(bbPROTO_INCLUDE_HEADERS
-	dictionary.h
-	header.h
+	bbproto.asn1
+	#header.h
 	alloc.cpp
 	alloc.h
-	decoder.h
-	decoder_alloc.h
-	encode_config.h
-	encode_dictionary.h
-	encode_log.h
-	encode_plot.h
+	#decoder.h
+	#decoder_alloc.h
+	encode_bb32wm.h
 	encoder.h
-	bbproto.asn1
-	bbproto.h
+	#bbproto.h
 )
 
 function(prepend_path_and_install args)
