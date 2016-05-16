@@ -3,6 +3,11 @@
 #include <thread>
 #include <asio.hpp>
 #include <iostream>
+#include <bbproto/Header.h>
+#include <bbproto/encoder.h>
+
+// test
+#include <bbproto/encode_bb32wm.h>
 
 struct Client
 {
@@ -16,19 +21,32 @@ struct Client
     DoConnect(endpoints);
   }
 
-  /*void write (const chat_message & msg)
+  void Write (char const * buff, size_t ln)
   {
-    asio::post(io_context_,
-        [this, msg]()
-        {
-          bool write_in_progress = !write_msgs_.empty();
-          write_msgs_.push_back(msg);
-          if (!write_in_progress)
-          {
-            do_write();
-          }
-        });
-  }*/	
+		asio::async_write(m_socket,
+		asio::buffer(buff, ln),
+			[this](std::error_code ec, std::size_t /*length*/)
+			{
+				if (!ec)
+				{
+				}
+				else
+				{
+					m_socket.close();
+				}
+			});
+
+//     asio::post(m_io,
+//         [this, buff, ln]()
+//         {
+//           bool write_in_progress = !write_msgs_.empty();
+//           write_msgs_.push_back(msg);
+//           if (!write_in_progress)
+//           {
+//             do_write();
+//           }
+//         });
+  }
 
   void close ()
   {
@@ -114,25 +132,24 @@ int main (int argc, char * argv[])
 {
   try
   {
-    if (argc != 3)
-    {
-      //std::cerr << "Usage: bbcli <host> <port>\n";
-      return 1;
-    }
-
+		char const * argv1 = argc == 3 ? argv[1] : "127.0.0.1";
+		char const * argv2 = argc == 3 ? argv[2] : "13199";
     asio::io_context io;
 
 		asio::ip::tcp::resolver resolver(io);
-    auto endpoints = resolver.resolve(argv[1], argv[2]);
+    auto endpoints = resolver.resolve(argv1, argv2);
     Client c(io, endpoints);
 
     std::thread t([&io](){ io.run(); });
+
+		char msg[256];
+		size_t const n = bb::encode_bb32wm(msg, 256, 0x12345678);
+		c.Write(msg, n);
 
     //char line[chat_message::max_body_length + 1];
 		char line[16384];
     while (std::cin.getline(line, 16384))
     {
-      //chat_message msg;
       //msg.body_length(std::strlen(line));
       //std::memcpy(msg.body(), line, msg.body_length());
       //msg.encode_header();
