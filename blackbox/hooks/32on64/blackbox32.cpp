@@ -15,7 +15,7 @@ void initShellHook32 (LPSTR pszCmdLine)
 
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pszCmdLine, int iCmdShow)
 {
-	system("pause");
+	//system("pause");
 	initShellHook32(pszCmdLine);
 
   MSG msg;
