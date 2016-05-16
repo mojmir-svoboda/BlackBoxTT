@@ -63,13 +63,20 @@ include_directories (3rd_party/yaml-cpp/include)
 
 # rc reader
 add_subdirectory(crazyrc)
+set_target_properties(libcrazyrc PROPERTIES FOLDER "bbTT") 
 # blackbox core
 add_subdirectory(bblib)
+set_target_properties(bblib PROPERTIES FOLDER "bbTT") 
 add_subdirectory(bbproto)
+set_target_properties(bbproto PROPERTIES FOLDER "bbTT") 
 add_subdirectory(blackbox)
+set_target_properties(blackbox PROPERTIES FOLDER "bbTT") 
 # plugins
 add_subdirectory(bblibcompat)
+set_target_properties(bblibcompat PROPERTIES FOLDER "bbTT") 
 add_subdirectory(plugins)
+# tools
+add_subdirectory(tools)
 
 # installation
 set(main_CONFIGS

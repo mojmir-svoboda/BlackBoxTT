@@ -5,6 +5,7 @@ include("${CMAKE_SOURCE_DIR}/build/version.cmake")
 # version
 add_custom_target(bbversion_h ALL)
 add_custom_command(TARGET bbversion_h COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P ${CMAKE_SOURCE_DIR}/build/version.cmake)
+set_target_properties(bbversion_h PROPERTIES FOLDER "bbTT") 
 
 include_directories(${CMAKE_SOURCE_DIR}/blackbox)
 
@@ -46,6 +47,7 @@ Build32on64(blackbox hooks) # NOTE: this is not blackbox, but blackbox32.exe
 
 # bb networking
 add_subdirectory(net)
+set_target_properties(net PROPERTIES FOLDER "bbTT") 
 
 set(blackbox_SOURCES
 	mainwndproc.cpp
@@ -134,6 +136,7 @@ target_link_libraries(blackbox dwmapi)
 target_link_libraries(blackbox d3d11)
 target_link_libraries(blackbox d3dcompiler)
 target_link_libraries(blackbox net)
+target_link_libraries(blackbox bbproto)
 if(OPTION_USE_TRACE)
 	target_link_libraries(blackbox ${TRACE_LIBRARY})
 endif(OPTION_USE_TRACE)

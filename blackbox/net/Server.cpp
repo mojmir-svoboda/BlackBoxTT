@@ -6,12 +6,16 @@
 #include <asio/ts/buffer.hpp>
 #include <asio/ts/internet.hpp>
 #include <bblib/logging.h>
+#include <bbproto/decoder.h>
 
 namespace bb {
 
 	struct Session : std::enable_shared_from_this<Session>
 	{
 		asio::ip::tcp::socket m_socket;
+		DecodedCommand m_currentCmd;
+		DecodingContext m_decodingCtx;
+		Asn1Allocator m_asn1Allocator;
 
 		Session (asio::ip::tcp::socket socket)
 			: m_socket(std::move(socket))

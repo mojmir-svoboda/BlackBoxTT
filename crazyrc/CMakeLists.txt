@@ -25,13 +25,12 @@ add_library (libcrazyrc SHARED
     )
 target_link_libraries(libcrazyrc Shlwapi)
 
-add_executable (testcrazyrc main.cpp)
-target_link_libraries(testcrazyrc libcrazyrc Shlwapi)
-
 install(TARGETS libcrazyrc RUNTIME DESTINATION .  LIBRARY DESTINATION lib ARCHIVE DESTINATION lib/static) 
 
 if(MSVC)
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/Debug/libcrazyrc.pdb DESTINATION .  CONFIGURATIONS Debug)
 endif(MSVC)
 
+#add_executable (testcrazyrc main.cpp)
+#target_link_libraries(testcrazyrc libcrazyrc Shlwapi)
 
