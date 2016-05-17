@@ -18,4 +18,8 @@ BB32WMMsg ::= SEQUENCE {
 	wmmsg   INTEGER
 }
 
+AckBB32WMMsg ::= SEQUENCE {
+	bbhwnd   INTEGER
+}
+
 END

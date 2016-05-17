@@ -7,18 +7,32 @@
 #include <asio/ts/internet.hpp>
 #include <bblib/logging.h>
 #include <bbproto/decoder.h>
+#include "commands.h"
 
 namespace bb {
 
+  Command * mkCommand (DecodedCommand const & cmd)
+  {
+    switch (cmd.present)
+    {
+			case Command_PR_bb32wm: return new Command_bb32wm(static_cast<unsigned>(cmd.choice.bb32wm.wmmsg));
+      default:
+      {
+        TRACE_MSG(LL_ERROR, CTX_BB | CTX_NET, "Unknown command");
+        return nullptr;
+      }
+    }
+  }
+
 	struct Session : std::enable_shared_from_this<Session>
 	{
+    Server * m_server;
 		asio::ip::tcp::socket m_socket;
-		DecodedCommand m_currentCmd;
 		DecodingContext m_decodingCtx;
 		Asn1Allocator m_asn1Allocator;
 
-		Session (asio::ip::tcp::socket socket)
-			: m_socket(std::move(socket))
+		Session (Server * s, asio::ip::tcp::socket socket)
+			: m_server(s), m_socket(std::move(socket))
 		{
 			TRACE_MSG(LL_DEBUG, CTX_BB | CTX_NET, "Server session @ 0x%x started, waiting for data", this);
 			m_asn1Allocator.resizeStorage(m_asn1Allocator.calcNextSize());
@@ -33,6 +47,9 @@ namespace bb {
 		{
 			auto self(shared_from_this());
 			
+			m_decodingCtx.reset();
+			m_decodingCtx.resetCurrentCommand();
+			m_asn1Allocator.reset();
 			size_t const hdr_sz = sizeof(asn1::Header);
 			asio::async_read(
 				m_socket,
@@ -42,7 +59,6 @@ namespace bb {
 				{
 					if (!ec)
 					{
-						//m_decodingCtx.moveEnd(length);
 						DoReadBody();
 					}
 					else
@@ -68,8 +84,6 @@ namespace bb {
 						if (!ok)
 							m_socket.close();
 
-						m_decodingCtx.reset();
-						m_asn1Allocator.reset();
 						DoReadHeader();
 					}
 					else
@@ -79,7 +93,7 @@ namespace bb {
 
 		bool DoDecodeBody ()
 		{
-			Command * cmd_ptr = &m_decodingCtx.m_command;
+			::Command * cmd_ptr = &m_decodingCtx.m_command;
 			void * cmd_void_ptr = cmd_ptr;
 			char const * payload = m_decodingCtx.getPayload();
 			asn1::Header const & hdr = m_decodingCtx.getHeader();
@@ -90,16 +104,10 @@ namespace bb {
 			if (av < size_estimate)
 			{
 				// not enough memory for asn1 decoder (**)
-				//Stats::get().m_decoder_mem_asn1_realloc_count++;
 				// 1) flush everything
-				//emit onHandleCommandsCommit();
-				//batch_size = 0;
-				//Stats::get().m_received_batches++;
 				// 2) resize 
 				m_asn1Allocator.Reset();
-				//m_dcd_ctx.resetCurrentCommand();
 				m_asn1Allocator.resizeStorage(m_asn1Allocator.calcNextSize());
-				//Stats::get().updateDecoderMemAsn1Max(m_asn1_allocator.capacity());
 				// 3) check
 				size_t const av = m_asn1Allocator.available();
 				if (av < size_estimate)
@@ -111,31 +119,40 @@ namespace bb {
 			const asn_dec_rval_t rval = ber_decode(&m_asn1Allocator, 0, &asn_DEF_Command, &cmd_void_ptr, payload, hdr.m_len);
 			if (rval.code != RC_OK)
 			{
-				//TRACE_MSG(LL_DEBUG, CTX_BB | CTX_NET, "Server worker got connection");
-				//QMessageBox::critical(0, tr("trace server"), tr("Decoder exception: Error while decoding ASN1: err=%1, consumed %2 bytes").arg(rval.code).arg(rval.consumed), QMessageBox::Ok, QMessageBox::Ok);
+				TRACE_MSG(LL_ERROR, CTX_BB | CTX_NET, "Decoder exception: Error while decoding ASN1: err=%u, consumed %u bytes", rval.code, rval.consumed);
 
 				m_decodingCtx.resetCurrentCommand();
+				m_decodingCtx.reset();
 				m_asn1Allocator.Reset();
-				//Stats::get().m_received_failed_cmds++;
 				return false;
 			}
-			else
-			{
-				//Stats::get().m_received_cmds++;
-			}
 
-			//tryHandleCommand(m_decodingCtx.m_command, e_RecvBatched);
-
-			m_decodingCtx.resetCurrentCommand(); // reset current decoder command for another decoding pass
-			m_asn1Allocator.Reset();
+			TryHandleCommand(m_decodingCtx.m_command);
 			return true;
+		}
+
+		bool TryHandleCommand (DecodedCommand const & cmd)
+		{
+      Command * c = mkCommand(cmd);
+			// mk response
+
+      if (c)
+      {
+        m_server->AddCommand(c);
+				return true;
+      }
+			return false;
 		}
 	};
 
 	struct AsioServer
 	{
-		AsioServer (asio::io_context & io, unsigned short port)
-			: m_acceptor(io, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port))
+		Server * m_server;
+		asio::ip::tcp::acceptor m_acceptor;
+
+		AsioServer (Server * s, asio::io_context & io, unsigned short port)
+			: m_server(s)
+			, m_acceptor(io, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port))
 		{
 			DoAccept();
 		}
@@ -147,16 +164,13 @@ namespace bb {
 				TRACE_MSG(LL_DEBUG, CTX_BB | CTX_NET, "Server worker got connection");
 				if (!ec)
 				{
-					std::make_shared<Session>(std::move(socket))->Start();
+					std::make_shared<Session>(m_server, std::move(socket))->Start();
 				}
 
 				DoAccept();
 			};
 			m_acceptor.async_accept(fn);
 		}
-
-	private:
-		asio::ip::tcp::acceptor m_acceptor;
 	};
 
 	bool Server::Run ()
@@ -165,7 +179,7 @@ namespace bb {
 		{
 			TRACE_MSG(LL_DEBUG, CTX_BB | CTX_NET, "Server worker started");
 			asio::io_context io_context;
-			AsioServer s(io_context, m_config.m_port);
+			AsioServer s(this, io_context, m_config.m_port);
 			io_context.run();
 		}
 		catch (std::exception & e)
