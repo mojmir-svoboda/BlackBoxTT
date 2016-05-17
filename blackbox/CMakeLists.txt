@@ -31,6 +31,7 @@ function(Build32on64 proj_name proj_dir)
 			${proj_name}32
 			CMAKE_GENERATOR ${GENERATOR_FOR_32}
 			CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+			INSTALL_DIR ${CMAKE_BINARY_DIR}/install
 			SOURCE_DIR	${${proj_name}32_PATH}
 			DOWNLOAD_COMMAND ""
 		)
@@ -121,9 +122,8 @@ endif (NOT MINGW)
 #set(CMAKE_RC_COMPILER_INIT windres)
 #ENABLE_LANGUAGE(RC)
 
-#if(MINGW)
-# SET(CMAKE_RC_COMPILE_OBJECT "<CMAKE_RC_COMPILER> <FLAGS> -O coff <DEFINES> -i <SOURCE> -o <OBJECT>")
-#endif(MINGW)
+
+### blackbox dll
 
 add_library(blackbox SHARED ${blackbox_SOURCES} ${blackbox_HEADERS} blackbox.def)
 set_target_properties(blackbox PROPERTIES ENABLE_EXPORTS ON)
@@ -137,23 +137,17 @@ target_link_libraries(blackbox d3d11)
 target_link_libraries(blackbox d3dcompiler)
 target_link_libraries(blackbox net)
 target_link_libraries(blackbox bbproto)
+target_link_libraries(blackbox libcrazyrc)
 if(OPTION_USE_TRACE)
 	target_link_libraries(blackbox ${TRACE_LIBRARY})
 endif(OPTION_USE_TRACE)
 #target_link_libraries(blackbox WICTextureLoader)
 #target_link_libraries(blackbox WICTextureLoader runtimeobject)
+
 install(TARGETS blackbox RUNTIME DESTINATION .	LIBRARY DESTINATION lib ARCHIVE DESTINATION lib/static) 
 if(MSVC)
 	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/Debug/blackbox.pdb DESTINATION .	CONFIGURATIONS Debug)
-	#install(TARGETS logging DESTINATION .)
 endif(MSVC)
-
-# libcrazyrc
-target_link_libraries(blackbox libcrazyrc Shlwapi)
-#install(TARGETS libcrazyrc RUNTIME DESTINATION .  LIBRARY DESTINATION lib ARCHIVE DESTINATION lib/static) 
-#if(MSVC)
-#  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/Debug/libcrazyrc.pdb DESTINATION .  CONFIGURATIONS Debug)
-#endif(MSVC)
 
 ### main exe
 
@@ -164,8 +158,6 @@ install(TARGETS main RUNTIME DESTINATION .	LIBRARY DESTINATION lib ARCHIVE DESTI
 if(MSVC)
 	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/Debug/main.pdb DESTINATION .	CONFIGURATIONS Debug)
 endif(MSVC)
-
-
 
 ### script bindings
 
