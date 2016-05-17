@@ -1,7 +1,6 @@
 # Compiled source #
 *.o
 *.obj
-*.exe
 *.dll
 *.a
 *.lib:
