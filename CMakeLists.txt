@@ -38,13 +38,13 @@ if (OPTION_USE_TRACE)
 
 	#get_filename_component(UTF_BASE_NAME ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY_RELEASE} NAME_WE)
 	#get_filename_component(UTF_PATH ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY_RELEASE} PATH)
-	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/3rd_party/logging/Release/bin/logging.dll
-		DESTINATION .
+	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/3rd_party/logging/Release/bin/logging.dll DESTINATION .
 		CONFIGURATIONS Release RelWithDebInfo
 		)
 
 	#get_filename_component(UTF_BASE_NAME_DEBUG ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY_DEBUG} NAME_WE)
 	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/3rd_party/logging/Debug/bin/logging.dll
+		${CMAKE_CURRENT_SOURCE_DIR}/3rd_party/logging/Debug/bin/logging.pdb
 		DESTINATION .
 		CONFIGURATIONS Debug
 		)
