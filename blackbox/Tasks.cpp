@@ -127,7 +127,7 @@ bool Tasks::AddTask (HWND hwnd)
 
 LRESULT update (WPARAM wParam, LPARAM lParam);
 
-LRESULT Tasks::UpdateFromShellHook (WPARAM wParam, LPARAM lParam)
+LRESULT Tasks::UpdateFromTaskHook (WPARAM wParam, LPARAM lParam)
 {
 	switch (wParam)
 	{

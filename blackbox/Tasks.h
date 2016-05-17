@@ -29,7 +29,7 @@ namespace bb {
 		void EnumTasks ();
 		bool AddTask (HWND hwnd);
 
-		LRESULT UpdateFromShellHook (WPARAM wParam, LPARAM lParam);
+		LRESULT UpdateFromTaskHook (WPARAM wParam, LPARAM lParam);
 
 		void MakeSticky (HWND hwnd);
 		void REemoveSticky (HWND hwnd);

@@ -2,14 +2,14 @@ include_directories(${CMAKE_SOURCE_DIR}/blackbox)
 include_directories(${CMAKE_SOURCE_DIR}/bblib)
 #include_directories(${CMAKE_SOURCE_DIR}/plugins/bbPlugin)
 
-### shellhook
-add_library(shellhook SHARED shellhook.cpp)
-target_link_libraries(shellhook bblib)
-target_link_libraries(shellhook version comctl32)
-set_property(TARGET shellhook PROPERTY FOLDER "bbTT/hooks/shellhook")
-install(TARGETS shellhook RUNTIME DESTINATION .)
+### taskhook
+add_library(taskhook SHARED taskhook.cpp)
+target_link_libraries(taskhook bblib)
+target_link_libraries(taskhook version comctl32)
+set_property(TARGET taskhook PROPERTY FOLDER "bbTT/hooks/taskhook")
+install(TARGETS taskhook RUNTIME DESTINATION .)
 if(MSVC)
-	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/Debug/shellhook.pdb DESTINATION .	CONFIGURATIONS Debug)
+	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/Debug/taskhook.pdb DESTINATION .	CONFIGURATIONS Debug)
 endif(MSVC)
 
 ### trayhook

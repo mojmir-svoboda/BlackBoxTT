@@ -1,5 +1,5 @@
 #include <platform_win.h>
-#include <hooks/shellhook.h>
+#include <hooks/taskhook.h>
 #include <hooks/trayhook.h>
 #include <vector>
 #include <SpinLock.h>
@@ -21,7 +21,7 @@ BOOL CALLBACK taskEnumProc (HWND hwnd, LPARAM lParam)
 
 
 #include <strsafe.h>
-bool initShellHook32on64 (HWND bb_hwnd, HANDLE job, bool pcs_in_job)
+bool initTaskHook32on64 (HWND bb_hwnd, HANDLE job, bool pcs_in_job)
 {
 	TCHAR path[1024];
 	bb::getExePath(path, 1024);
@@ -69,8 +69,8 @@ LRESULT CALLBACK mainWndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 		{
 			if (!bb.m_cmdLine.NoTaskHook())
 			{
-				//initShellHook(hwnd);
-				initShellHook32on64(hwnd, bb.GetJob(), bb.GetInJob());
+				//initTaskHook(hwnd);
+				initTaskHook32on64(hwnd, bb.GetJob(), bb.GetInJob());
 			}
 			if (!bb.m_cmdLine.NoTrayHook())
 			{
@@ -79,7 +79,7 @@ LRESULT CALLBACK mainWndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 			return 0;
 		}
 		case WM_DESTROY:
-			doneShellHook();
+			doneTaskHook();
 			PostQuitMessage(0);
 			break;
 
@@ -113,9 +113,9 @@ LRESULT CALLBACK mainWndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 
 		default:
 		{
-			if (uMsg == g_WM_ShellHook)
+			if (uMsg == g_WM_TaskHook)
 			{
-				LRESULT const res = bb::BlackBox::Instance().GetTasks().UpdateFromShellHook(wParam, lParam);
+				LRESULT const res = bb::BlackBox::Instance().GetTasks().UpdateFromTaskHook(wParam, lParam);
 				return res;
 			}
 

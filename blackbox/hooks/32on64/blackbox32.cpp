@@ -1,22 +1,22 @@
 #include <platform_win.h>
-#include <hooks/shellhook.h>
+#include <hooks/taskhook.h>
 
 // https://blogs.msdn.microsoft.com/oldnewthing/20031211-00/?p=41543
 #include <Shlwapi.h>
-void initShellHook32 (LPSTR pszCmdLine)
+void initTaskHook32 (LPSTR pszCmdLine)
 {
 	LONGLONG llHandle;
 	if (StrToInt64ExA(pszCmdLine, STIF_DEFAULT, &llHandle))
 	{
 		HWND bbHwnd = (HWND)(INT_PTR)llHandle;
-		initShellHook32(bbHwnd);
+		initTaskHook32(bbHwnd);
 	}
 }
 
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pszCmdLine, int iCmdShow)
 {
 	//system("pause");
-	initShellHook32(pszCmdLine);
+	initTaskHook32(pszCmdLine);
 
   MSG msg;
   while (GetMessage(&msg, NULL, 0, 0) && WM_QUIT != msg.message)
@@ -25,7 +25,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pszCmdLin
     DispatchMessage(&msg);
   }
 
-  doneShellHook();
+  doneTaskHook();
   return static_cast<int>(msg.wParam);
 }
 

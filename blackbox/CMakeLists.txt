@@ -31,7 +31,6 @@ function(Build32on64 proj_name proj_dir)
 			${proj_name}32
 			CMAKE_GENERATOR ${GENERATOR_FOR_32}
 			CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
-			INSTALL_DIR ${CMAKE_BINARY_DIR}/install
 			SOURCE_DIR	${${proj_name}32_PATH}
 			DOWNLOAD_COMMAND ""
 		)
@@ -43,7 +42,7 @@ endfunction()
 add_subdirectory(hooks)
 
 # 32b for 64b build
-Build32on64(shellhook hooks)
+Build32on64(taskhook hooks)
 Build32on64(blackbox hooks) # NOTE: this is not blackbox, but blackbox32.exe
 
 # bb networking
@@ -129,7 +128,7 @@ add_library(blackbox SHARED ${blackbox_SOURCES} ${blackbox_HEADERS} blackbox.def
 set_target_properties(blackbox PROPERTIES ENABLE_EXPORTS ON)
 target_link_libraries(blackbox bblib)
 target_link_libraries(blackbox version comctl32 shlwapi)
-target_link_libraries(blackbox shellhook trayhook)
+target_link_libraries(blackbox taskhook trayhook)
 target_link_libraries(blackbox yaml-cpp)
 target_link_libraries(blackbox imgui)
 target_link_libraries(blackbox dwmapi)
