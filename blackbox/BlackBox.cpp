@@ -140,6 +140,8 @@ namespace bb {
 	BlackBox::BlackBox ()
 		: m_hMainInstance(nullptr)
 		, m_hwnd(nullptr)
+		, m_taskHookWM(0)
+		, m_taskHook32on64WM(0)
 		, m_job(nullptr), m_inJob(false)
 		, m_defaultStyle(new StyleStruct)
 		, m_style()
@@ -420,22 +422,34 @@ namespace bb {
 		
 		for (size_t i = 0, ie = m_server.m_requests.size(); i < ie; ++i)
 		{
-			std::unique_ptr<PendingCommand> c = std::move(m_server.m_requests[i]);
-			if (c)
+			std::unique_ptr<PendingCommand> req = std::move(m_server.m_requests[i]);
+			if (req)
 			{
-				//std::unique_ptr<Command> c = mkResponse(
+				std::unique_ptr<Command> resp = HandleServerMessage(req->m_request);
+				if (resp)
+				{
+					req->m_response = std::move(resp);
+					m_server.m_responses.push_back(std::move(req));
+				}
 			}
 		}
+
+		m_server.PostPendingResponses();
 
 		m_server.m_responseLock.Unlock();
 		m_server.m_requestLock.Unlock();
 	}
 
-  std::unique_ptr<Command> mkResponse (std::unique_ptr<Command> const & request)
+  std::unique_ptr<Command> BlackBox::HandleServerMessage (std::unique_ptr<Command> const & request)
   {
     switch (request->GetType())
     {
-			case E_CommandType::e_bb32wm: return std::unique_ptr<Command>();
+			case E_CommandType::e_bb32wm:
+			{
+				Command_bb32wm const * const r = static_cast<Command_bb32wm const *>(request.get());
+				m_taskHook32on64WM = r->m_bb32wm;
+				return std::unique_ptr<Command>(new Command_bb32wm_ack(m_hwnd));
+			}
       default:
       {
         TRACE_MSG(LL_ERROR, CTX_BB | CTX_NET, "Unknown command");

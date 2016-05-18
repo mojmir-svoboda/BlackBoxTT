@@ -171,6 +171,20 @@ namespace bb {
 		}
 	};
 
+	void Server::PostPendingResponses ()
+	{
+		asio::post(m_io, [this]() { m_}
+// 		for (size_t i = 0, ie = m_responses.size(); i < ie; ++i)
+// 		{
+// 			std::unique_ptr<PendingCommand> resp = std::move(m_server.m_responses[i]);
+// 			if (resp)
+// 			{
+// 				
+// 			}
+// 		}
+
+	}
+
 	bool Server::Run ()
 	{
 		try

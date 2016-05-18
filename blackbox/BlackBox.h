@@ -23,6 +23,8 @@ namespace bb {
 		constexpr static wchar_t const * const s_blackbox32Name = L"blackbox32.exe";
 		HINSTANCE m_hMainInstance;
 		HWND m_hwnd;
+		unsigned m_taskHookWM;
+		unsigned m_taskHook32on64WM;
 		HANDLE m_job;
 		bool m_inJob;
 		BlackBoxConfig m_config;
@@ -51,7 +53,7 @@ namespace bb {
 		bool Win32RegisterClass (wchar_t const * classname, WNDPROC wndproc, int flags);
 		BB_API void Run ();
 		void HandleServerMessages ();
-		//std::unique_ptr<Command> HandleServerMessage (std::unique_ptr<Command> const & request);
+		std::unique_ptr<Command> HandleServerMessage (std::unique_ptr<Command> const & request);
 
 		HANDLE GetJob () const { return m_job; }
 		bool GetInJob () const { return m_inJob; }

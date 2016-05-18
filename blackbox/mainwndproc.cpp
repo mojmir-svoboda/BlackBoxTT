@@ -113,7 +113,7 @@ LRESULT CALLBACK mainWndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 
 		default:
 		{
-			if (uMsg == g_WM_TaskHook)
+			if (uMsg == g_WM_TaskHook || uMsg == bb.m_taskHook32on64WM)
 			{
 				LRESULT const res = bb::BlackBox::Instance().GetTasks().UpdateFromTaskHook(wParam, lParam);
 				return res;

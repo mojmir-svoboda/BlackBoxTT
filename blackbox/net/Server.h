@@ -41,15 +41,8 @@ namespace bb {
 			m_requestLock.Unlock();
 			return true;
 		}
-		bool AddPendingResponse (std::unique_ptr<PendingCommand> p)
-		{
-			m_responseLock.Lock();
 
-			m_responses.push_back(std::move(p));
-
-			m_responseLock.Unlock();
-			return true;
-		}
+		bool PostPendingResponses ();
 	};
 }
 
