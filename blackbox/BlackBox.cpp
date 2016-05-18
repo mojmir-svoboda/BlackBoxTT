@@ -9,6 +9,7 @@
 #include <bblib/logging.h>
 #include <crazyrc/rc.h>
 #include <net/Server.h>
+#include <net/commands.h>
 #include <widgets/StyleEditor.h>
 #include <widgets/Plugins.h>
 #include <widgets/ControlPanel.h>
@@ -387,6 +388,8 @@ namespace bb {
 
 				m_gfx.NewFrame();
 
+				HandleServerMessages();
+
 				if (!m_cmdLine.NoTrayHook())
 					m_tray.UpdateFromTrayHook();
 
@@ -410,4 +413,39 @@ namespace bb {
 		//TRACE_MSG(trace::e_Info, trace::CTX_BBCore, "Main message loop terminated...");
 	}
 
+	void BlackBox::HandleServerMessages ()
+	{
+		m_server.m_requestLock.Lock();
+		m_server.m_responseLock.Lock();
+		
+		for (size_t i = 0, ie = m_server.m_requests.size(); i < ie; ++i)
+		{
+			std::unique_ptr<PendingCommand> c = std::move(m_server.m_requests[i]);
+			if (c)
+			{
+				//std::unique_ptr<Command> c = mkResponse(
+			}
+		}
+
+		m_server.m_responseLock.Unlock();
+		m_server.m_requestLock.Unlock();
+	}
+
+  std::unique_ptr<Command> mkResponse (std::unique_ptr<Command> const & request)
+  {
+    switch (request->GetType())
+    {
+			case E_CommandType::e_bb32wm: return std::unique_ptr<Command>();
+      default:
+      {
+        TRACE_MSG(LL_ERROR, CTX_BB | CTX_NET, "Unknown command");
+        return nullptr;
+      }
+    }
+  }
+
+// 	std::unique_ptr<Command> BlackBox::HandleServerMessage (std::unique_ptr<Command> const & request)
+// 	{
+// 		
+// 	}
 }

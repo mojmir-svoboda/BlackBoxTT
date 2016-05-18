@@ -50,6 +50,8 @@ namespace bb {
 		BB_API bool Done ();
 		bool Win32RegisterClass (wchar_t const * classname, WNDPROC wndproc, int flags);
 		BB_API void Run ();
+		void HandleServerMessages ();
+		//std::unique_ptr<Command> HandleServerMessage (std::unique_ptr<Command> const & request);
 
 		HANDLE GetJob () const { return m_job; }
 		bool GetInJob () const { return m_inJob; }

@@ -11,11 +11,11 @@
 
 namespace bb {
 
-  Command * mkCommand (DecodedCommand const & cmd)
+  std::unique_ptr<Command> mkCommand (DecodedCommand const & cmd)
   {
     switch (cmd.present)
     {
-			case Command_PR_bb32wm: return new Command_bb32wm(static_cast<unsigned>(cmd.choice.bb32wm.wmmsg));
+			case Command_PR_bb32wm: return std::unique_ptr<Command>(new Command_bb32wm(static_cast<unsigned>(cmd.choice.bb32wm.wmmsg)));
       default:
       {
         TRACE_MSG(LL_ERROR, CTX_BB | CTX_NET, "Unknown command");
@@ -133,12 +133,10 @@ namespace bb {
 
 		bool TryHandleCommand (DecodedCommand const & cmd)
 		{
-      Command * c = mkCommand(cmd);
-			// mk response
-
+      std::unique_ptr<Command> c = mkCommand(cmd);
       if (c)
       {
-        m_server->AddCommand(c);
+        m_server->AddPendingRequest(std::move(c), this);
 				return true;
       }
 			return false;
