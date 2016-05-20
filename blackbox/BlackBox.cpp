@@ -418,7 +418,6 @@ namespace bb {
 	void BlackBox::HandleServerMessages ()
 	{
 		m_server.m_requestLock.Lock();
-		m_server.m_responseLock.Lock();
 		
 		for (size_t i = 0, ie = m_server.m_requests.size(); i < ie; ++i)
 		{
@@ -434,10 +433,9 @@ namespace bb {
 			}
 		}
 
-		m_server.PostPendingResponses();
-
-		m_server.m_responseLock.Unlock();
 		m_server.m_requestLock.Unlock();
+
+		m_server.DispatchResponses();
 	}
 
   std::unique_ptr<Command> BlackBox::HandleServerMessage (std::unique_ptr<Command> const & request)

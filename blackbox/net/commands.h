@@ -1,5 +1,8 @@
 #pragma once
 #include "Command.h"
+#include <platform_win.h>
+#include <memory>
+struct DecodedCommand;
 
 namespace bb {
 
@@ -26,4 +29,6 @@ namespace bb {
 		virtual ~Command_bb32wm_ack () { }
 		virtual E_CommandType GetType () const override { return E_CommandType::e_bb32wm_ack; }
 	};
-};
+
+	std::unique_ptr<Command> mkCommand (DecodedCommand const & cmd);
+}

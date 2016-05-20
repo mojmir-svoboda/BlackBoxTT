@@ -5,10 +5,15 @@ add_definitions(-DASIO_STANDALONE)
 
 set(net_SOURCES
   Server.cpp
+  Session.cpp
+	commands.cpp
 )
 
 set(net_HEADERS
   Server.h
+  Session.h
+	Command.h
+	commands.h
 )
 
 # bbproto
