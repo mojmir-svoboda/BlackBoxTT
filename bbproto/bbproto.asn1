@@ -7,7 +7,8 @@ BEGIN
 
 Command ::= CHOICE {
 	bbhwnd BBHwndMsg,
-	bb32wm BB32WMMsg
+	bb32wm BB32WMMsg,
+	bb32wmack BB32WMMsgAck
 }
 
 BBHwndMsg ::= SEQUENCE {
@@ -18,7 +19,7 @@ BB32WMMsg ::= SEQUENCE {
 	wmmsg   INTEGER
 }
 
-AckBB32WMMsg ::= SEQUENCE {
+BB32WMMsgAck ::= SEQUENCE {
 	bbhwnd   INTEGER
 }
 
