@@ -49,7 +49,7 @@ NativeInteger_decode_ber(Allocator * allocator, asn_codec_ctx_t *opt_codec_ctx,
 	asn_TYPE_descriptor_t *td,
 	void **nint_ptr, const void *buf_ptr, size_t size, int tag_mode) {
 	asn_INTEGER_specifics_t *specs=(asn_INTEGER_specifics_t *)td->specifics;
-	long *native = (long *)*nint_ptr;
+	long_t *native = (long_t *)*nint_ptr;
 	asn_dec_rval_t rval;
 	ber_tlv_len_t length;
 
@@ -57,7 +57,7 @@ NativeInteger_decode_ber(Allocator * allocator, asn_codec_ctx_t *opt_codec_ctx,
 	 * If the structure is not there, allocate it.
 	 */
 	if(native == NULL) {
-		native = (long *)(*nint_ptr = CXX_ALLOC_WRAP CALLOC(1, sizeof(*native)));
+		native = (long_t *)(*nint_ptr = CXX_ALLOC_WRAP CALLOC(1, sizeof(*native)));
 		if(native == NULL) {
 			rval.code = RC_FAIL;
 			rval.consumed = 0;
@@ -100,14 +100,14 @@ NativeInteger_decode_ber(Allocator * allocator, asn_codec_ctx_t *opt_codec_ctx,
 			const void *constbuf;
 			void *nonconstbuf;
 		} unconst_buf;
-		long l;
+		long_t l;
 
 		unconst_buf.constbuf = buf_ptr;
 		tmp.buf = (uint8_t *)unconst_buf.nonconstbuf;
 		tmp.size = length;
 
 		if((specs&&specs->field_unsigned)
-			? asn_INTEGER2ulong(&tmp, (unsigned long *)&l) /* sic */
+			? asn_INTEGER2ulong(&tmp, (ulong_t *)&l) /* sic */
 			: asn_INTEGER2long(&tmp, &l)) {
 			rval.code = RC_FAIL;
 			rval.consumed = 0;
@@ -121,7 +121,7 @@ NativeInteger_decode_ber(Allocator * allocator, asn_codec_ctx_t *opt_codec_ctx,
 	rval.consumed += length;
 
 	ASN_DEBUG("Took %ld/%ld bytes to encode %s (%ld)",
-		(long)rval.consumed, (long)length, td->name, (long)*native);
+		(long)rval.consumed, (long)length, td->name, (long_t)*native);
 
 	return rval;
 }
@@ -133,7 +133,7 @@ asn_enc_rval_t
 NativeInteger_encode_der(Allocator * allocator, asn_TYPE_descriptor_t *sd, void *ptr,
 	int tag_mode, ber_tlv_tag_t tag,
 	asn_app_consume_bytes_f *cb, void *app_key) {
-	unsigned long native = *(unsigned long *)ptr;	/* Disable sign ext. */
+	ulong_t native = *(ulong_t *)ptr;	/* Disable sign ext. */
 	asn_enc_rval_t erval;
 	INTEGER_t tmp;
 
@@ -174,10 +174,10 @@ NativeInteger_decode_xer(Allocator * allocator, asn_codec_ctx_t *opt_codec_ctx,
 	asn_dec_rval_t rval;
 	INTEGER_t st;
 	void *st_ptr = (void *)&st;
-	long *native = (long *)*sptr;
+	long_t *native = (long_t *)*sptr;
 
 	if(!native) {
-		native = (long *)(*sptr = CXX_ALLOC_WRAP CALLOC(1, sizeof(*native)));
+		native = (long_t *)(*sptr = CXX_ALLOC_WRAP CALLOC(1, sizeof(*native)));
 		if(!native) _ASN_DECODE_FAILED;
 	}
 
@@ -185,9 +185,9 @@ NativeInteger_decode_xer(Allocator * allocator, asn_codec_ctx_t *opt_codec_ctx,
 	rval = INTEGER_decode_xer(allocator, opt_codec_ctx, td, &st_ptr, 
 		opt_mname, buf_ptr, size);
 	if(rval.code == RC_OK) {
-		long l;
+		long_t l;
 		if((specs&&specs->field_unsigned)
-			? asn_INTEGER2ulong(&st, (unsigned long *)&l) /* sic */
+			? asn_INTEGER2ulong(&st, (ulong_t *)&l) /* sic */
 			: asn_INTEGER2long(&st, &l)) {
 			rval.code = RC_FAIL;
 			rval.consumed = 0;
@@ -214,7 +214,7 @@ NativeInteger_encode_xer(Allocator * allocator, asn_TYPE_descriptor_t *td, void 
 	asn_INTEGER_specifics_t *specs=(asn_INTEGER_specifics_t *)td->specifics;
 	char scratch[32];	/* Enough for 64-bit int */
 	asn_enc_rval_t er;
-	const long *native = (const long *)sptr;
+	const long_t *native = (const long_t *)sptr;
 
 	(void)ilevel;
 	(void)flags;
@@ -238,7 +238,7 @@ NativeInteger_decode_uper(Allocator * allocator, asn_codec_ctx_t *opt_codec_ctx,
 
 	asn_INTEGER_specifics_t *specs=(asn_INTEGER_specifics_t *)td->specifics;
 	asn_dec_rval_t rval;
-	long *native = (long *)*sptr;
+	long_t *native = (long_t *)*sptr;
 	INTEGER_t tmpint;
 	void *tmpintptr = &tmpint;
 
@@ -246,7 +246,7 @@ NativeInteger_decode_uper(Allocator * allocator, asn_codec_ctx_t *opt_codec_ctx,
 	ASN_DEBUG("Decoding NativeInteger %s (UPER)", td->name);
 
 	if(!native) {
-		native = (long *)(*sptr = CXX_ALLOC_WRAP CALLOC(1, sizeof(*native)));
+		native = (long_t *)(*sptr = CXX_ALLOC_WRAP CALLOC(1, sizeof(*native)));
 		if(!native) _ASN_DECODE_FAILED;
 	}
 
@@ -255,7 +255,7 @@ NativeInteger_decode_uper(Allocator * allocator, asn_codec_ctx_t *opt_codec_ctx,
 				   &tmpintptr, pd);
 	if(rval.code == RC_OK) {
 		if((specs&&specs->field_unsigned)
-			? asn_INTEGER2ulong(&tmpint, (unsigned long *)native)
+			? asn_INTEGER2ulong(&tmpint, (ulong_t *)native)
 			: asn_INTEGER2long(&tmpint, native))
 			rval.code = RC_FAIL;
 		else
@@ -272,12 +272,12 @@ NativeInteger_encode_uper(Allocator * allocator, asn_TYPE_descriptor_t *td,
 	asn_per_constraints_t *constraints, void *sptr, asn_per_outp_t *po) {
 	asn_INTEGER_specifics_t *specs=(asn_INTEGER_specifics_t *)td->specifics;
 	asn_enc_rval_t er;
-	long native;
+	long_t native;
 	INTEGER_t tmpint;
 
 	if(!sptr) _ASN_ENCODE_FAILED;
 
-	native = *(long *)sptr;
+	native = *(long_t *)sptr;
 
 	ASN_DEBUG("Encoding NativeInteger %s %ld (UPER)", td->name, native);
 
@@ -298,7 +298,7 @@ int
 NativeInteger_print(Allocator * allocator, asn_TYPE_descriptor_t *td, const void *sptr, int ilevel,
 	asn_app_consume_bytes_f *cb, void *app_key) {
 	asn_INTEGER_specifics_t *specs=(asn_INTEGER_specifics_t *)td->specifics;
-	const long *native = (const long *)sptr;
+	const long_t *native = (const long_t *)sptr;
 	char scratch[32];	/* Enough for 64-bit int */
 	int ret;
 

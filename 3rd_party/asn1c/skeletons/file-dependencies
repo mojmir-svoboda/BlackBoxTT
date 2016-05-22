@@ -43,8 +43,8 @@ constr_SET_OF.h constr_SET_OF.c asn_SET_OF.h
 
 COMMON-FILES:			# THIS IS A SPECIAL SECTION
 asn_application.h		# Applications should include this file
-asn_allocator.h                 # Custom allocator
 asn_system.h			# Platform-dependent types
+asn_allocator.h   # Allocator support
 asn_codecs.h			# Return types of encoders and decoders
 asn_internal.h			# Internal stuff
 OCTET_STRING.h OCTET_STRING.c	# This one is used too widely
@@ -65,6 +65,6 @@ per_encoder.h per_encoder.c	# PER encoding support
 per_opentype.h per_opentype.c	# PER "open type" handling
 
 CONVERTER:			# THIS IS A SPECIAL SECTION
-converter-sample.c		# A default name for sample transcoder
+#converter-sample.c		# A default name for sample transcoder
 
 CODEC-PER:			# THIS IS A SPECIAL SECTION

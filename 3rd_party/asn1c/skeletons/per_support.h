@@ -82,7 +82,7 @@ ssize_t uper_get_nslength(asn_per_data_t *pd);
 ssize_t uper_get_nsnnwn(asn_per_data_t *pd);
 
 /* X.691-2008/11, #11.5.6 */
-int uper_get_constrained_whole_number(asn_per_data_t *pd, unsigned long *v, int nbits);
+int uper_get_constrained_whole_number(asn_per_data_t *pd, ulong_t *v, int nbits);
 
 /* Non-thread-safe debugging function, don't use it */
 char *per_data_string(asn_per_data_t *pd);

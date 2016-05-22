@@ -18,7 +18,7 @@ extern asn_TYPE_descriptor_t asn_DEF_INTEGER;
 
 /* Map with <tag> to integer value association */
 typedef struct asn_INTEGER_enum_map_s {
-	long		 nat_value;	/* associated native integer value */
+	long_t		 nat_value;	/* associated native integer value */
 	size_t		 enum_len;	/* strlen("tag") */
 	const char	*enum_name;	/* "tag" */
 } asn_INTEGER_enum_map_t;
@@ -52,28 +52,28 @@ per_type_encoder_f INTEGER_encode_uper;
  * -1/ERANGE: Value encoded is out of range for long representation
  * -1/ENOMEM: Memory allocation failed (in asn_long2INTEGER()).
  */
-int asn_INTEGER2long(const INTEGER_t *i, long *l);
-int asn_INTEGER2ulong(const INTEGER_t *i, unsigned long *l);
-int asn_long2INTEGER(Allocator * allocator, INTEGER_t *i, long l);
-int asn_ulong2INTEGER(Allocator * allocator, INTEGER_t *i, unsigned long l);
+int asn_INTEGER2long(const INTEGER_t *i, long_t *l);
+int asn_INTEGER2ulong(const INTEGER_t *i, ulong_t *l);
+int asn_long2INTEGER(Allocator * allocator, INTEGER_t *i, long_t l);
+int asn_ulong2INTEGER(Allocator * allocator, INTEGER_t *i, ulong_t l);
 
 /* A a reified version of strtol(3) with nicer error reporting. */
 enum asn_strtol_result_e {
-    ASN_STRTOL_ERROR_RANGE = -3,  /* Input outside of numeric range for long type */
+    ASN_STRTOL_ERROR_RANGE = -3,  /* Input outside of numeric range for long_t type */
     ASN_STRTOL_ERROR_INVAL = -2,  /* Invalid data encountered (e.g., "+-") */
     ASN_STRTOL_EXPECT_MORE = -1,  /* More data expected (e.g. "+") */
     ASN_STRTOL_OK          =  0,  /* Conversion succeded, number ends at (*end) */
     ASN_STRTOL_EXTRA_DATA  =  1,  /* Conversion succeded, but the string has extra stuff */
 };
-enum asn_strtol_result_e asn_strtol_lim(const char *str, const char **end, long *l);
+enum asn_strtol_result_e asn_strtol_lim(const char *str, const char **end, long_t *l);
 
 /* The asn_strtol is going to be DEPRECATED soon */
-enum asn_strtol_result_e asn_strtol(const char *str, const char *end, long *l);
+enum asn_strtol_result_e asn_strtol(const char *str, const char *end, long_t *l);
 
 /*
  * Convert the integer value into the corresponding enumeration map entry.
  */
-const asn_INTEGER_enum_map_t *INTEGER_map_value2enum(asn_INTEGER_specifics_t *specs, long value);
+const asn_INTEGER_enum_map_t *INTEGER_map_value2enum(asn_INTEGER_specifics_t *specs, long_t value);
 
 #if defined __cplusplus && defined USE_C_LINKAGE
 }

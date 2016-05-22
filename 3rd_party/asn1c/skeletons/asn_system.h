@@ -42,6 +42,14 @@
 # define ASSUMESTDTYPES 1
 #endif
 #define	ssize_t		SSIZE_T
+#ifdef USE_INT64
+#include <stdint.h>
+typedef uint64_t ulong_t;
+typedef int64_t long_t;
+#else
+typedef unsigned long ulong_t;
+typedef signed long long_t;
+#endif
 #ifdef	ASSUMESTDTYPES	/* Standard types have been defined elsewhere */
 #	include <stdint.h>
 #else
@@ -58,7 +66,7 @@ typedef	unsigned int	uint32_t;
 #define isnan _isnan
 #define finite _finite
 #define copysign _copysign
-#if _MSC_VER < 1900 // maybe earlier, adjust if necessary
+#if _MSC_VER < 1800 // maybe earlier, adjust if necessary
 #	define	ilogb	_logb
 #endif
 #else	/* !_MSC_VER */
