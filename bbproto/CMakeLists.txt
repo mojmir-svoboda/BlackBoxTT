@@ -77,12 +77,14 @@ set(bbASN1_HEADERS
   Command.h
   BBHwndMsg.h
   BB32WMMsg.h
+  BB32WMMsgAck.h
 )
 
 set(bbASN1_SOURCES
-  BB32WMMsg.c
-  BBHwndMsg.c
   Command.c
+  BBHwndMsg.c
+  BB32WMMsg.c
+  BB32WMMsgAck.c
 )
 
 set(GENERATED_SRC ${ASN1_SOURCES} ${bbASN1_SOURCES})
@@ -93,7 +95,7 @@ message("asn1c cmd: asn1c -gen-PER -S ${ASN1C_DATA} ${ASN1_PROTOCOL_FILE}")
 #message("*** GENERATOR TEMPORARILY TURNED OFF *** uncomment to re-generate and suffer")
 add_custom_command(
   OUTPUT ${GENERATED_SRC}
-  COMMAND asn1c -gen-PER -S ${ASN1C_DATA} ${ASN1_PROTOCOL_FILE}
+  COMMAND asn1c -gen-PER -fuse-int64 -S ${ASN1C_DATA} ${ASN1_PROTOCOL_FILE}
 	DEPENDS bbproto.asn1
 )
 
