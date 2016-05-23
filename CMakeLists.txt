@@ -71,9 +71,9 @@ add_definitions ("-DUNICODE")
 add_definitions ("-D_UNICODE")
 
 add_subdirectory(3rd_party)
-include_directories (3rd_party)
-include_directories (3rd_party/yaml-cpp/include)
-
+include_directories(3rd_party)
+include_directories(3rd_party/yaml-cpp/include)
+include_directories(3rd_party/liblfds7.0.0/liblfds700/inc)
 
 # rc reader
 add_subdirectory(crazyrc)
