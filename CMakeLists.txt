@@ -1,5 +1,5 @@
 project(BlackBox)
-message("Welcome to BlackBox!")
+message("Welcome to BlackBox!\n")
 cmake_minimum_required(VERSION 2.8.9)
 set(CMAKE_VERBOSE_MAKEFILE on)
 
@@ -73,8 +73,14 @@ add_definitions ("-D_UNICODE")
 add_subdirectory(3rd_party)
 include_directories (3rd_party)
 include_directories (3rd_party/yaml-cpp/include)
+# asio
+add_definitions("-DASIO_STANDALONE")
+include_directories (${CMAKE_SOURCE_DIR}/3rd_party/asio/include)
 
-
+# bbproto + asn1
+add_definitions("-DASSUMESTDTYPES") # asn1: use types from cstdint 
+add_definitions("-DUSE_CXX_ALLOCATOR")
+include_directories(${CMAKE_BINARY_DIR}/bbproto)
 # rc reader
 add_subdirectory(crazyrc)
 set_target_properties(libcrazyrc PROPERTIES FOLDER "bbTT") 
