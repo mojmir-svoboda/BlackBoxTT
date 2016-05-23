@@ -1,0 +1,57 @@
+project (liblfds)
+
+set(liblfds_SOURCES
+  liblfds700/src/lfds700_btree_addonly_unbalanced/lfds700_btree_addonly_unbalanced_cleanup.c
+  liblfds700/src/lfds700_btree_addonly_unbalanced/lfds700_btree_addonly_unbalanced_get.c
+  liblfds700/src/lfds700_btree_addonly_unbalanced/lfds700_btree_addonly_unbalanced_init.c
+  liblfds700/src/lfds700_btree_addonly_unbalanced/lfds700_btree_addonly_unbalanced_insert.c
+  liblfds700/src/lfds700_btree_addonly_unbalanced/lfds700_btree_addonly_unbalanced_query.c
+  liblfds700/src/lfds700_freelist/lfds700_freelist_cleanup.c
+  liblfds700/src/lfds700_freelist/lfds700_freelist_init.c
+  liblfds700/src/lfds700_freelist/lfds700_freelist_pop.c
+  liblfds700/src/lfds700_freelist/lfds700_freelist_push.c
+  liblfds700/src/lfds700_freelist/lfds700_freelist_query.c
+  liblfds700/src/lfds700_hash_addonly/lfds700_hash_addonly_cleanup.c
+  liblfds700/src/lfds700_hash_addonly/lfds700_hash_addonly_get.c
+  liblfds700/src/lfds700_hash_addonly/lfds700_hash_addonly_init.c
+  liblfds700/src/lfds700_hash_addonly/lfds700_hash_addonly_insert.c
+  liblfds700/src/lfds700_hash_addonly/lfds700_hash_addonly_iterate.c
+  liblfds700/src/lfds700_hash_addonly/lfds700_hash_addonly_query.c
+  liblfds700/src/lfds700_list_addonly_ordered_singlylinked/lfds700_list_addonly_ordered_singlylinked_cleanup.c
+  liblfds700/src/lfds700_list_addonly_ordered_singlylinked/lfds700_list_addonly_ordered_singlylinked_get.c
+  liblfds700/src/lfds700_list_addonly_ordered_singlylinked/lfds700_list_addonly_ordered_singlylinked_init.c
+  liblfds700/src/lfds700_list_addonly_ordered_singlylinked/lfds700_list_addonly_ordered_singlylinked_insert.c
+  liblfds700/src/lfds700_list_addonly_ordered_singlylinked/lfds700_list_addonly_ordered_singlylinked_query.c
+  liblfds700/src/lfds700_list_addonly_singlylinked_unordered/lfds700_list_addonly_singlylinked_unordered_cleanup.c
+  liblfds700/src/lfds700_list_addonly_singlylinked_unordered/lfds700_list_addonly_singlylinked_unordered_get.c
+  liblfds700/src/lfds700_list_addonly_singlylinked_unordered/lfds700_list_addonly_singlylinked_unordered_init.c
+  liblfds700/src/lfds700_list_addonly_singlylinked_unordered/lfds700_list_addonly_singlylinked_unordered_insert.c
+  liblfds700/src/lfds700_list_addonly_singlylinked_unordered/lfds700_list_addonly_singlylinked_unordered_query.c
+  liblfds700/src/lfds700_misc/lfds700_misc_cleanup.c
+  liblfds700/src/lfds700_misc/lfds700_misc_globals.c
+  liblfds700/src/lfds700_misc/lfds700_misc_init.c
+  liblfds700/src/lfds700_misc/lfds700_misc_prng.c
+  liblfds700/src/lfds700_misc/lfds700_misc_query.c
+  liblfds700/src/lfds700_queue/lfds700_queue_cleanup.c
+  liblfds700/src/lfds700_queue/lfds700_queue_dequeue.c
+  liblfds700/src/lfds700_queue/lfds700_queue_enqueue.c
+  liblfds700/src/lfds700_queue/lfds700_queue_init.c
+  liblfds700/src/lfds700_queue/lfds700_queue_query.c
+  liblfds700/src/lfds700_queue_bounded_singleconsumer_singleproducer/lfds700_queue_bounded_singleconsumer_singleproducer_cleanup.c
+  liblfds700/src/lfds700_queue_bounded_singleconsumer_singleproducer/lfds700_queue_bounded_singleconsumer_singleproducer_dequeue.c
+  liblfds700/src/lfds700_queue_bounded_singleconsumer_singleproducer/lfds700_queue_bounded_singleconsumer_singleproducer_enqueue.c
+  liblfds700/src/lfds700_queue_bounded_singleconsumer_singleproducer/lfds700_queue_bounded_singleconsumer_singleproducer_init.c
+  liblfds700/src/lfds700_queue_bounded_singleconsumer_singleproducer/lfds700_queue_bounded_singleconsumer_singleproducer_query.c
+  liblfds700/src/lfds700_ringbuffer/lfds700_ringbuffer_cleanup.c
+  liblfds700/src/lfds700_ringbuffer/lfds700_ringbuffer_init.c
+  liblfds700/src/lfds700_ringbuffer/lfds700_ringbuffer_query.c
+  liblfds700/src/lfds700_ringbuffer/lfds700_ringbuffer_read.c
+  liblfds700/src/lfds700_ringbuffer/lfds700_ringbuffer_write.c
+  liblfds700/src/lfds700_stack/lfds700_stack_cleanup.c
+  liblfds700/src/lfds700_stack/lfds700_stack_init.c
+  liblfds700/src/lfds700_stack/lfds700_stack_pop.c
+  liblfds700/src/lfds700_stack/lfds700_stack_push.c
+  liblfds700/src/lfds700_stack/lfds700_stack_query.c
+)
+
+add_library(liblfds STATIC ${liblfds_SOURCES})
