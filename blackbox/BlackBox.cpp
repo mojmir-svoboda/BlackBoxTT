@@ -15,6 +15,7 @@
 #include <widgets/ControlPanel.h>
 #include <widgets/Debug.h>
 #include "utils_win32.h"
+#include <liblfds700.h>
 
 LRESULT CALLBACK mainWndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -143,9 +144,10 @@ namespace bb {
 		, m_taskHookWM(0)
 		, m_taskHook32on64WM(0)
 		, m_job(nullptr), m_inJob(false)
+		, m_lfdsState()
 		, m_defaultStyle(new StyleStruct)
 		, m_style()
-		, m_explorer(new Explorer)
+		, m_explorer()
 	{
 		setDefaultValuesTo(*m_defaultStyle.get());
 	}
@@ -283,6 +285,11 @@ namespace bb {
 		ok &= mkJobObject(m_job, m_inJob);
 		ok &= m_cmdLine.Init();
 		ok &= LoadConfig();
+		lfds700_misc_prng_init(&m_lfdsState);
+
+		m_lfdsState = std::make_unique(new lfds700_misc_prng_state { 0 });
+		m_explorer = std::make_unique(new Explorer);
+
 		rc::init();
 		ok &= m_server.Init(m_config.m_server);
 
