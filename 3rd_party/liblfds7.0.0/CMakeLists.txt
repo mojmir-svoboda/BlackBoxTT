@@ -55,3 +55,5 @@ set(liblfds_SOURCES
 )
 
 add_library(liblfds STATIC ${liblfds_SOURCES})
+set_target_properties(liblfds PROPERTIES FOLDER "3rd/liblfds")
+
