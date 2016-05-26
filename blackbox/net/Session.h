@@ -6,6 +6,7 @@
 #include <asio.hpp>
 #include <asio/ts/internet.hpp>
 #include <bbproto/decoder.h>
+#include "SessionQueue.h"
 
 namespace bb {
 
@@ -20,7 +21,7 @@ namespace bb {
 		Asn1Allocator m_asn1Allocator;
 		asio::io_service::strand m_writeStrand;
 		SpinLock m_responseLock;
-		std::deque<std::string> m_responses;
+		SessionQueue<std::unique_ptr<PendingCommand>> m_responses;
 
 		Session (Server * s, asio::io_context & io, asio::ip::tcp::socket socket);
 		void Start ();

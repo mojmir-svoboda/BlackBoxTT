@@ -13,6 +13,7 @@ namespace bb {
 		std::weak_ptr<Session> m_session;
 		std::unique_ptr<Command> m_request;
 		std::unique_ptr<Command> m_response;
+		std::vector<char> m_encodedResponse;
 
 		PendingCommand (std::unique_ptr<Command> cmd, std::shared_ptr<Session> s) : m_session(s), m_request(std::move(cmd)) { }
 	};
@@ -27,6 +28,7 @@ namespace bb {
     std::vector<std::unique_ptr<PendingCommand>> m_responses;
 		std::unique_ptr<AsioServer> m_impl;
 		std::vector<std::weak_ptr<Session>> m_sessions;
+		std::vector<char> m_encodingBuffer;
 
 		Server ();
 		~Server ();

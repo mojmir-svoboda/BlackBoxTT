@@ -28,6 +28,8 @@ namespace bb {
 		Command_bb32wm_ack (HANDLE h) : m_hwnd(h) { }
 		virtual ~Command_bb32wm_ack () { }
 		virtual E_CommandType GetType () const override { return E_CommandType::e_bb32wm_ack; }
+
+		virtual size_t Encode (char * buff, size_t buffsz) override;
 	};
 
 	std::unique_ptr<Command> mkCommand (DecodedCommand const & cmd);

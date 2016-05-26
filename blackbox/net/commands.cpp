@@ -16,6 +16,12 @@ namespace bb {
 			}
 		}
 	}
+
+	size_t Command_bb32wm_ack::Encode (char * buff, size_t buffsz)
+	{
+
+		return 0;
+	}
 }
 
 

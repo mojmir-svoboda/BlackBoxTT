@@ -4,15 +4,17 @@
 namespace bb {
 
 	template <class T>
-	struct Queue
+	struct SessionQueue
 	{
 		lfds700_list_asu_state m_context;
 		lfds700_ringbuffer_state m_ringbuff;
+		lfds700_misc_prng_state m_prng;
 
-		Queue (size_t n)
+		SessionQueue ()
 		{
 			lfds700_list_asu_init_valid_on_current_logical_core(&m_context, NULL, NULL);
 			lfds700_misc_library_init_valid_on_current_logical_core();
+			lfds700_misc_prng_init(&m_prng);
 		}
 
 		void Begin ()
@@ -23,7 +25,8 @@ namespace bb {
 		bool Enqueue (T * t)
 		{
 			void * t0 = t;
-			int const rv = lfds700_queue_bss_enqueue(&m_l, NULL, t0);
+			lfds700_queue_element * qe = qe = util_aligned_malloc(sizeof(struct lfds700_queue_element), LFDS700_PAL_ATOMIC_ISOLATION_IN_BYTES);
+			int const rv = lfds700_queue_enqueue(&m_l, NULL, &m_prng);
 			return rv == 1;
 		}
 
@@ -35,10 +38,11 @@ namespace bb {
 
 		bool Dequeue (T * & t)
 		{
-			//void * ptr = nullptr;
-			//int const rv = lfds700_queue_bss_dequeue(&m_queue, NULL, &ptr);
+			lfds700_queue_element * qe = nullptr;
+			int const rv = lfds700_queue_bss_dequeue(&m_queue, &qe, &m_prng);
 			//t = static_cast<T *>(ptr);
-			//return rv == 1;
+			util_aligned_free(qe);
+			return rv == 1;
 		}
 
 	};

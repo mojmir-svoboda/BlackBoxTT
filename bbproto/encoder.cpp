@@ -21,8 +21,8 @@ namespace asn1 {
 	{
 		Command_t command;
 		memset(&command, 0, sizeof(Command));
-		command.present = Command_PR_bb32wm_ack;
-		command.choice.bb32wm.wmmsg = wm;
+		command.present = Command_PR_bb32wmack;
+		command.choice.bb32wm.wmmsg = reinterpret_cast<intptr_t>(hwnd);
 
 		asn_enc_rval_t const ec = der_encode_to_buffer(allocator, &asn_DEF_Command, &command, buff, buff_ln);
 		if (ec.encoded == -1)

@@ -76,7 +76,11 @@ namespace bb {
 			{
 				if (std::shared_ptr<Session> p = resp->m_session.lock())
 				{
-					p->AddResponse(std::move(resp));
+					m_encodingBuffer.clear();
+					if (size_t const n = resp->m_response->Encode(&m_encodingBuffer[0], m_encodingBuffer.size()))
+					{
+						p->AddResponse(std::move(resp));
+					}
 				}
 			}
 		}
@@ -103,6 +107,7 @@ namespace bb {
 	bool Server::Init (ServerConfig const & cfg)
 	{
 		m_config = cfg;
+		m_encodingBuffer.resize(m_config.m_encodeBuffSz);
 		TRACE_MSG(LL_INFO, CTX_BB | CTX_INIT, "Server init, port=%u", cfg.m_port);
 		m_thread = std::thread(&Server::Run, this);
 		return true;

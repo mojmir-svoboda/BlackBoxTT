@@ -21,11 +21,11 @@ namespace bb {
 	{
 		TRACE_MSG(LL_DEBUG, CTX_BB | CTX_NET, "Server session @ 0x%x started, waiting for data", this);
 		m_asn1Allocator.resizeStorage(m_asn1Allocator.calcNextSize());
-		m_responses.reserve(16);
+		//m_responses.reserve(16);
 	}
 
 	void Session::Start ()
-
+	{
 		DoReadHeader();
 	}
 
@@ -130,20 +130,14 @@ namespace bb {
 
 	bool Session::AddResponse (std::unique_ptr<PendingCommand> cmd)
 	{
-		::Command asn_c;
-		memset(&asn_c, 0, sizeof(::Command));
-
-    char msg[16384];
-    size_t const n = bb::encode_bb32wm_ack(msg, 256, 0x12345678);
-
 		m_writeStrand.post(
 				m_io, 
 				[this, cmd] ()
 				{
-					m_responseLock.Lock();
+					//m_responseLock.Lock();
 					bool const write_in_progress = !m_responses.empty();
-					m_responses.push_back(std::move(cmd));
-					m_responseLock.Unlock();
+					m_responses.enqueue(std::move(cmd));
+					//m_responseLock.Unlock();
 
 					if (!write_in_progress)
 						DoWriteResponse ();
