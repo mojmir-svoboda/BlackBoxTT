@@ -4,7 +4,7 @@ include_directories(${CMAKE_SOURCE_DIR}/bblib)
 
 ### taskhook
 add_library(taskhook SHARED taskhook.cpp)
-target_link_libraries(taskhook bblib bbproto bbprotlib)
+target_link_libraries(taskhook bblib bbprotolib)
 target_link_libraries(taskhook version comctl32)
 set_property(TARGET taskhook PROPERTY FOLDER "bbTT/hooks/taskhook")
 install(TARGETS taskhook RUNTIME DESTINATION .)

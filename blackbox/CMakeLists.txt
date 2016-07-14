@@ -20,30 +20,12 @@ if ( buildbits EQUAL 64 )
 endif( buildbits EQUAL 64 )
 
 
-include(ExternalProject)
-# TODO directory into arguments
-function(Build32on64 proj_name proj_dir)
-	if ( buildbits EQUAL 64 )
-		set(${proj_name}_SOURCE_DIR  ${CMAKE_CURRENT_SOURCE_DIR}/${proj_dir})
-		set(${proj_name}32_PATH ${${proj_name}_SOURCE_DIR}/32on64)
-		message("${proj_name} 32 on 64bit... path=${${proj_name}32_PATH}")
-		ExternalProject_Add (
-			${proj_name}32
-			CMAKE_GENERATOR ${GENERATOR_FOR_32}
-			CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
-			SOURCE_DIR	${${proj_name}32_PATH}
-			DOWNLOAD_COMMAND ""
-		)
-		set_property(TARGET ${proj_name}32 PROPERTY FOLDER "${proj_dir}/${proj_name}")
-	endif( buildbits EQUAL 64 )
-endfunction()
-
 # native hooks first
 add_subdirectory(hooks)
 
 # 32b for 64b build
-Build32on64(taskhook hooks)
-Build32on64(blackbox hooks) # NOTE: this is not blackbox, but blackbox32.exe
+Build32on64(taskhook hooks "32on64")
+Build32on64(blackbox hooks "32on64") # NOTE: this is not blackbox, but blackbox32.exe
 
 # bb networking
 add_subdirectory(net)

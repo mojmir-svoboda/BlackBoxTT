@@ -6,6 +6,8 @@
 if (WIN32)
 	set(ASN1C_PATH ${CMAKE_SOURCE_DIR}/3rd_party/asn1c)
 
+  message("asn1c searching in: ${ASN1C_PATH}")
+
   find_program(ASN1C_EXECUTABLE
     NAMES "asn1c.exe"
 		HINTS "${ASN1C_PATH}/bin"

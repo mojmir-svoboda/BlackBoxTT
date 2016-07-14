@@ -7,8 +7,10 @@ add_definitions ("-D_UNICODE")
 include_directories(${CMAKE_SOURCE_DIR}/../../../blackbox)
 include_directories(${CMAKE_SOURCE_DIR}/../../../bblib)
 
+
 add_library(taskhook32 SHARED ../taskhook.cpp ${files})
-target_link_libraries(taskhook32 version comctl32 bbproto bbprotlib)
+target_link_libraries(taskhook32 version comctl32 bbprotolib32)
+add_dependencies(taskhook32 bbproto32)
 #set_property(TARGET taskhook32 PROPERTY FOLDER "bbTT/hooks")
 install(TARGETS taskhook32 RUNTIME DESTINATION .)
 if(MSVC)

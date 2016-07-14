@@ -1,4 +1,4 @@
-project(BlackBox)
+project(BlackBoxTT)
 message("Welcome to BlackBox!\n")
 cmake_minimum_required(VERSION 2.8.9)
 set(CMAKE_VERBOSE_MAKEFILE on)
@@ -6,6 +6,7 @@ set(CMAKE_VERBOSE_MAKEFILE on)
 ###############################################################################################################################
 ### OPTIONS
 option(OPTION_DEVEL "Development build" OFF)
+option(OPTION_RUN_ASN1C "Generate code from asn.1 (run asn1c)" OFF)
 option(OPTION_USE_TRACE "Logging" OFF)
 option(OPTION_USE_TCL "TCL" OFF)
 
@@ -78,6 +79,24 @@ include_directories(3rd_party/liblfds7.0.0/liblfds700/inc)
 add_definitions("-DASIO_STANDALONE")
 include_directories (${CMAKE_SOURCE_DIR}/3rd_party/asio/include)
 
+include(ExternalProject)
+# TODO directory into arguments
+function(Build32on64 proj_name proj_dir proj_subdir)
+	if ( buildbits EQUAL 64 )
+		set(${proj_name}_SOURCE_DIR  ${CMAKE_CURRENT_SOURCE_DIR}/${proj_dir})
+		set(${proj_name}32_PATH ${${proj_name}_SOURCE_DIR}/${proj_subdir})
+		message("32on64: ${proj_name} sources=${${proj_name}32_PATH}")
+		ExternalProject_Add (
+			${proj_name}32
+			CMAKE_GENERATOR ${GENERATOR_FOR_32}
+      CMAKE_ARGS -DBB32on64=1 -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+			SOURCE_DIR	${${proj_name}32_PATH}
+			DOWNLOAD_COMMAND ""
+		)
+		set_property(TARGET ${proj_name}32 PROPERTY FOLDER "${proj_dir}/${proj_name}")
+	endif( buildbits EQUAL 64 )
+endfunction()
+
 # bbproto + asn1
 add_definitions("-DASSUMESTDTYPES") # asn1: use types from cstdint 
 add_definitions("-DUSE_CXX_ALLOCATOR")
@@ -89,7 +108,8 @@ set_target_properties(libcrazyrc PROPERTIES FOLDER "bbTT")
 add_subdirectory(bblib)
 set_target_properties(bblib PROPERTIES FOLDER "bbTT") 
 add_subdirectory(bbproto)
-set_target_properties(bbproto PROPERTIES FOLDER "bbTT") 
+Build32on64(bbproto bbproto "")
+set_target_properties(bbprotolib PROPERTIES FOLDER "bbTT") 
 add_subdirectory(blackbox)
 set_target_properties(blackbox PROPERTIES FOLDER "bbTT") 
 # plugins
