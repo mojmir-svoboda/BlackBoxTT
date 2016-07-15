@@ -11,7 +11,9 @@ else (Boost_FOUND)
   message("crazyrc requires boost::spirit. that's THE reason for the 'crazy' part in the name...")
 
 	# hotfix for boost with no libraries
-	include_directories(c:/devel/boost_1_59_0) # tmp @TODO @FIXME
+	include_directories(c:/devel/boost_1_61_0) # tmp @TODO @FIXME
+  # they changed boost::optional in 1.61.0, boost::qi needs adjustment for this.. @TODO @FIXME
+  add_definitions(-DBOOST_OPTIONAL_CONFIG_USE_OLD_IMPLEMENTATION_OF_OPTIONAL)
 
 endif (Boost_FOUND)
 
