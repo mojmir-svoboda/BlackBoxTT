@@ -7,10 +7,12 @@ add_definitions ("-D_UNICODE")
 include_directories(${CMAKE_SOURCE_DIR}/../../../blackbox)
 include_directories(${CMAKE_SOURCE_DIR}/../../../bblib)
 
+include("${CMAKE_SOURCE_DIR}/../../../build/FindReleaseAndDebug.cmake")
+FIND_RELEASE_AND_DEBUG(BBPROTO32 bbprotolib32.lib bbprotolib32.lib ${CMAKE_CURRENT_BINARY_DIR}/bbproto32/Release ${CMAKE_CURRENT_BINARY_DIR}/bbproto32/Debug)
 
 add_library(taskhook32 SHARED ../taskhook.cpp ${files})
-target_link_libraries(taskhook32 version comctl32 bbprotolib32)
-add_dependencies(taskhook32 bbproto32)
+target_link_libraries(taskhook32 version comctl32 ${BBPROTO32_LIBRARY})
+
 #set_property(TARGET taskhook32 PROPERTY FOLDER "bbTT/hooks")
 install(TARGETS taskhook32 RUNTIME DESTINATION .)
 if(MSVC)

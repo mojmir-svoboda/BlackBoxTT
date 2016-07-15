@@ -90,6 +90,7 @@ function(Build32on64 proj_name proj_dir proj_subdir)
 			${proj_name}32
 			CMAKE_GENERATOR ${GENERATOR_FOR_32}
       CMAKE_ARGS -DBB32on64=1 -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+      BINARY_DIR ${CMAKE_BINARY_DIR}/${proj_name}32
 			SOURCE_DIR	${${proj_name}32_PATH}
 			DOWNLOAD_COMMAND ""
 		)
@@ -100,7 +101,11 @@ endfunction()
 # bbproto + asn1
 add_definitions("-DASSUMESTDTYPES") # asn1: use types from cstdint 
 add_definitions("-DUSE_CXX_ALLOCATOR")
+if (OPTION_RUN_ASN1C)
 include_directories(${CMAKE_BINARY_DIR}/bbproto)
+else (OPTION_RUN_ASN1C)
+  include_directories(${CMAKE_SOURCE_DIR}/bbproto/generated)
+endif (OPTION_RUN_ASN1C)
 # rc reader
 add_subdirectory(crazyrc)
 set_target_properties(libcrazyrc PROPERTIES FOLDER "bbTT") 
