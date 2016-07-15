@@ -2,7 +2,6 @@ add_subdirectory(fnv)
 add_subdirectory(imgui)
 add_subdirectory(DirectXTex)
 add_subdirectory(yaml-cpp)
-add_subdirectory(liblfds7.0.0)
 
 if (OPTION_USE_TCL)
 	add_subdirectory(tcl8.6.4/win)

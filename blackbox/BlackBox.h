@@ -11,7 +11,6 @@
 #include <plugin/PluginManager.h>
 #include "blackbox_api.h"
 #include <bblibcompat/StyleStruct.h>
-struct lfds700_misc_prng_state;
 
 namespace bb {
 
@@ -27,7 +26,6 @@ namespace bb {
 		unsigned m_taskHookWM;
 		unsigned m_taskHook32on64WM;
 		HANDLE m_job;
-		std::unique_ptr<lfds700_misc_prng_state> m_lfdsState; 
 		bool m_inJob;
 		BlackBoxConfig m_config;
 		CommandLine m_cmdLine;
