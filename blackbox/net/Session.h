@@ -6,14 +6,12 @@
 #include <asio.hpp>
 #include <asio/ts/internet.hpp>
 #include <bbproto/decoder.h>
-#include "SessionQueue.h"
+#include "ResponseQueue.h"
 
 namespace bb {
 
 	struct Server;
-
-	template<class T>
-	struct SessionQueue;
+	struct ResponseQueue;
 
 	struct Session : std::enable_shared_from_this<Session>
 	{
@@ -24,7 +22,7 @@ namespace bb {
 		Asn1Allocator m_asn1Allocator;
 		asio::io_service::strand m_writeStrand;
 		SpinLock m_responseLock;
-		SessionQueue<std::unique_ptr<PendingCommand>> * m_responses;
+		ResponseQueue m_responses;
 		bool m_pendingWrite;
 
 		Session (Server * s, asio::io_context & io, asio::ip::tcp::socket socket);

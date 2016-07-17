@@ -9,6 +9,7 @@
 #include <bblib/logging.h>
 #include <bbproto/decoder.h>
 #include "commands.h"
+#include <boost/lockfree/spsc_queue.hpp>
 
 namespace bb {
 
@@ -18,10 +19,11 @@ namespace bb {
 		, m_socket(std::move(socket))
 		, m_responseLock()
 		, m_writeStrand(io)
+		, m_responses()
+		, m_pendingWrite(false)
 	{
 		TRACE_MSG(LL_DEBUG, CTX_BB | CTX_NET, "Server session @ 0x%x started, waiting for data", this);
 		m_asn1Allocator.resizeStorage(m_asn1Allocator.calcNextSize());
-		//m_responses.reserve(16);
 	}
 
 	void Session::Start ()
@@ -147,6 +149,9 @@ namespace bb {
 
 	void Session::DoWriteResponse ()
 	{
+		m_pendingWrite = true;
+
+
 	}
 }
 
