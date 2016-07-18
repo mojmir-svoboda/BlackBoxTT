@@ -8,7 +8,9 @@ include_directories(${CMAKE_SOURCE_DIR}/../../../blackbox)
 include_directories(${CMAKE_SOURCE_DIR}/../../../bblib)
 
 include("${CMAKE_SOURCE_DIR}/../../../build/FindReleaseAndDebug.cmake")
-FIND_RELEASE_AND_DEBUG(BBPROTO32 bbprotolib32.lib bbprotolib32.lib ${CMAKE_CURRENT_BINARY_DIR}/bbproto32/Release ${CMAKE_CURRENT_BINARY_DIR}/bbproto32/Debug)
+FIND_RELEASE_AND_DEBUG(BBPROTO32 bbprotolib32.lib bbprotolib32.lib ${CMAKE_CURRENT_BINARY_DIR}/../bbproto32/Release ${CMAKE_CURRENT_BINARY_DIR}/../bbproto32/Debug)
+message("taskhook32 using bbproto32: ${BBPROTO32}")
+message("taskhook32 using bbproto32: ${BBPROTO32_LIBRARY}")
 
 add_library(taskhook32 SHARED ../taskhook.cpp ${files})
 target_link_libraries(taskhook32 version comctl32 ${BBPROTO32_LIBRARY})
