@@ -13,12 +13,15 @@ namespace boost {
 namespace bb {
 	struct ResponseQueue
 	{
-		boost::lockfree::spsc_queue<std::unique_ptr<PendingCommand>, boost::lockfree::capacity<128>> * m_impl;
+		//boost::lockfree::spsc_queue<std::unique_ptr<PendingCommand>, boost::lockfree::capacity<128>> * m_impl;
+		boost::lockfree::spsc_queue<PendingCommand *, boost::lockfree::capacity<128>> * m_impl;
 
 		ResponseQueue ();
 		~ResponseQueue ();
-		bool Enqueue (std::unique_ptr<PendingCommand> cmd);
-		bool Dequeue (std::unique_ptr<PendingCommand> & cmd);
+		bool Enqueue (PendingCommand * cmd);
+		bool Dequeue (PendingCommand * & cmd);
+		//bool Enqueue(std::unique_ptr<PendingCommand> cmd);
+		//bool Dequeue(std::unique_ptr<PendingCommand> & cmd);
 	};
 
 }

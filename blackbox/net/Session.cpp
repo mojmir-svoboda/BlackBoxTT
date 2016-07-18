@@ -132,19 +132,28 @@ namespace bb {
 
 	bool Session::AddResponse (std::unique_ptr<PendingCommand> cmd)
 	{
-		m_writeStrand.post(
-				m_io, 
-				[this, cmd] ()
-				{
-					//m_responseLock.Lock();
-					bool const write_in_progress = !m_responses.empty();
-					m_responses.enqueue(std::move(cmd));
-					//m_responseLock.Unlock();
+		PendingCommand * p = cmd.get();
+		if (p)
+		{
+			asio::post(
+					m_writeStrand.wrap(
+					//[=, c = std::move(cmd)] ()
+					[this, p]()
+					{
+						if (m_responses.Enqueue(p))
+						{
+						}
+						else
+						{
+							delete p;
+						}
 
-					if (!write_in_progress)
-						DoWriteResponse ();
-				});
-
+						if (!m_pendingWrite)
+							DoWriteResponse ();
+					}));
+			cmd.release();
+		}
+		return false;
 	}
 
 	void Session::DoWriteResponse ()
