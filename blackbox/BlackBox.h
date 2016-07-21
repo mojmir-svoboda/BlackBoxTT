@@ -69,6 +69,8 @@ namespace bb {
 		void MakeSticky (HWND hwnd);
 		void RemoveSticky (HWND hwnd);
 		HWND GetHwnd ();
+		unsigned GetTaskHook32on64WM () const { return m_taskHook32on64WM; }
+		unsigned GetTaskHookWM () const { return m_taskHookWM; }
 		void * GetSettingPtr (int sn_index);
 		bool GetConfigDir (wchar_t * dir, size_t dir_sz) const;
 	};

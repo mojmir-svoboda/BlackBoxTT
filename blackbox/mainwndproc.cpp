@@ -19,46 +19,6 @@ BOOL CALLBACK taskEnumProc (HWND hwnd, LPARAM lParam)
 	return TRUE;
 }
 
-
-#include <strsafe.h>
-bool initTaskHook32on64 (HWND bb_hwnd, HANDLE job, bool pcs_in_job)
-{
-	TCHAR path[1024];
-	bb::getExePath(path, 1024);
-
-	TCHAR bb32_path[MAX_PATH * 2];
-	if (!bb::joinPath(path, bb::BlackBox::s_blackbox32Name, bb32_path, MAX_PATH * 2))
-	{
-		TRACE_MSG(LL_ERROR, CTX_BB | CTX_HOOK | CTX_INIT, "Cannot join dir=%s with fname=%s", path, bb::BlackBox::s_blackbox32Name);
-		return false;
-	}
-
-	TCHAR szCommand[MAX_PATH * 2];
-	if (SUCCEEDED(StringCchPrintf(szCommand, MAX_PATH * 2, TEXT("\"%s\" %I64d"), bb32_path, (INT64)(INT_PTR)bb_hwnd)))
-	{
-		PROCESS_INFORMATION pi = { 0 };
-		STARTUPINFO si = { 0 };
-		si.cb = sizeof(si);
-		DWORD const dwCreationFlags = job && pcs_in_job ? CREATE_BREAKAWAY_FROM_JOB : 0;
-
-		if ( ::CreateProcess(bb32_path, szCommand, NULL, NULL, TRUE, dwCreationFlags, NULL, NULL, &si, &pi))
-		{
-			if (job)
-			{
-				if (false == ::AssignProcessToJobObject(job, pi.hProcess))
-				{
-					TRACE_MSG(LL_ERROR, CTX_BB | CTX_HOOK | CTX_INIT, "SetInformationJobObject failed");
-				}
-			}
-
-			WaitForInputIdle(pi.hProcess, INFINITE);
-			return true;
-		}
-	}
-	return false;
-}
-
-
 LRESULT CALLBACK mainWndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	bb::BlackBox & bb = bb::BlackBox::Instance();
@@ -69,8 +29,8 @@ LRESULT CALLBACK mainWndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 		{
 			if (!bb.m_cmdLine.NoTaskHook())
 			{
-				//initTaskHook(hwnd);
-				initTaskHook32on64(hwnd, bb.GetJob(), bb.GetInJob());
+				initTaskHook(hwnd, bb.GetTaskHookWM());
+				initTaskHook32on64(bb::BlackBox::s_blackbox32Name, hwnd, bb.GetTaskHook32on64WM(), bb.GetJob(), bb.GetInJob());
 			}
 			if (!bb.m_cmdLine.NoTrayHook())
 			{
@@ -113,7 +73,7 @@ LRESULT CALLBACK mainWndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 
 		default:
 		{
-			if (uMsg == g_WM_TaskHook || uMsg == bb.m_taskHook32on64WM)
+			if (uMsg == bb.m_taskHookWM || uMsg == bb.m_taskHook32on64WM)
 			{
 				LRESULT const res = bb::BlackBox::Instance().GetTasks().UpdateFromTaskHook(wParam, lParam);
 				return res;

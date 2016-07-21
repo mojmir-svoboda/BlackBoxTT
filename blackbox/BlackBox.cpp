@@ -13,8 +13,10 @@
 #include <widgets/StyleEditor.h>
 #include <widgets/Plugins.h>
 #include <widgets/ControlPanel.h>
+#include <widgets/Tasks.h>
 #include <widgets/Debug.h>
 #include "utils_win32.h"
+#include "hooks/taskhook.h"
 
 LRESULT CALLBACK mainWndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -284,6 +286,8 @@ namespace bb {
 		ok &= m_cmdLine.Init();
 		ok &= LoadConfig();
 
+		m_taskHookWM = ::RegisterWindowMessage(c_taskHookName);
+		m_taskHook32on64WM = ::RegisterWindowMessage(c_taskHook32Name);
 		std::unique_ptr<Explorer> e(new Explorer);
 		m_explorer = std::move(e);
 
@@ -295,7 +299,6 @@ namespace bb {
 		ok &= m_gfx.Init();
 		ok &= m_tasks.Init(m_config.m_tasks);
 		ok &= m_explorer->Init();
-
 
 		SecondMon s = { 0 };
 		EnumDisplayMonitors(NULL, NULL, &MonitorEnumProc, reinterpret_cast<LPARAM>(&s));

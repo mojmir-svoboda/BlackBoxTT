@@ -6,14 +6,15 @@ add_definitions ("-D_UNICODE")
 #FIXME: the paths are bit messed, this is a hotfix
 include_directories(${CMAKE_SOURCE_DIR}/../../../blackbox)
 include_directories(${CMAKE_SOURCE_DIR}/../../../bblib)
+include_directories(${CMAKE_SOURCE_DIR}/../../../)
+include_directories(${CMAKE_SOURCE_DIR}/../../../3rd_party)
 
-include("${CMAKE_SOURCE_DIR}/../../../build/FindReleaseAndDebug.cmake")
-FIND_RELEASE_AND_DEBUG(BBPROTO32 bbprotolib32.lib bbprotolib32.lib ${CMAKE_CURRENT_BINARY_DIR}/../bbproto32/Release ${CMAKE_CURRENT_BINARY_DIR}/../bbproto32/Debug)
-message("taskhook32 using bbproto32: ${BBPROTO32}")
-message("taskhook32 using bbproto32: ${BBPROTO32_LIBRARY}")
+#message("taskhook32 using path: ${CMAKE_CURRENT_BINARY_DIR}/../bbproto32/${CMAKE_CFG_INTDIR}")
+#find_library(bbproto32_LIBRARY NAMES bbprotolib32 HINTS ${CMAKE_CURRENT_BINARY_DIR}/../bbproto32/Debug)
+#message("taskhook32 using bbproto32: ${bbproto32_LIBRARY}")
 
 add_library(taskhook32 SHARED ../taskhook.cpp ${files})
-target_link_libraries(taskhook32 version comctl32 ${BBPROTO32_LIBRARY})
+target_link_libraries(taskhook32 version comctl32 ${bbproto32_LIBRARY})
 
 #set_property(TARGET taskhook32 PROPERTY FOLDER "bbTT/hooks")
 install(TARGETS taskhook32 RUNTIME DESTINATION .)
