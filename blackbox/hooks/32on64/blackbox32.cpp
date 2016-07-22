@@ -106,7 +106,7 @@ bool initTaskHook32 (BB32CommandLine const & cli)
 
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pszCmdLine, int iCmdShow)
 {
-	system("pause");
+//	system("pause"); // @NOTE: uncomment to ease attaching of debugger to 32b process in 64b env
 	BB32CommandLine cli;
 	cli.Init();
 
