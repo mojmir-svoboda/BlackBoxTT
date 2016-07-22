@@ -30,6 +30,12 @@ namespace bb {
 					ImGui::Icon(icoid, ImColor(255, 255, 255, 255), ImColor(255, 255, 255, 128));
 					if (icoid.IsValid())
 						ImGui::SameLine();
+					else
+					{
+						// @TODO: assign color to hwnd?
+						ImGui::ColorButton(ImColor(255, 255, 255, 255));
+						ImGui::SameLine();
+					}
 					if (ImGui::Button(name.c_str()))
 					{
 						;
