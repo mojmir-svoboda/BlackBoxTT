@@ -262,15 +262,15 @@ namespace bb {
 		SecondMon * s = reinterpret_cast<SecondMon *>(dwData);
 		if (s->x0 == 0 && s->y0 == 0)
 		{
-			if (iMonitor.rcMonitor.left != 0 && iMonitor.rcMonitor.top != 0)
-			{
-				s->x0 = iMonitor.rcMonitor.left;
-				s->y0 = iMonitor.rcMonitor.top;
-				s->x1 = iMonitor.rcMonitor.right;
-				s->y1 = iMonitor.rcMonitor.bottom;
-				s->found = true;
-				return false; // abort enum
-			}
+			if (iMonitor.rcMonitor.left == 0 && iMonitor.rcMonitor.top == 0)
+				return true; // first monitor
+
+			s->x0 = iMonitor.rcMonitor.left;
+			s->y0 = iMonitor.rcMonitor.top;
+			s->x1 = iMonitor.rcMonitor.right;
+			s->y1 = iMonitor.rcMonitor.bottom;
+			s->found = true;
+			return false; // abort enum
 		}
 		return true;
 	}
