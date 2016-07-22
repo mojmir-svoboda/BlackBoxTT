@@ -3,7 +3,7 @@ rem this file is intended for usage from cmd.exe or from explorer (clicking on i
 
 pushd %~dp0
 
-set PATH=C:\Program Files (x86)\CMake\bin;%PATH%
+set PATH=C:\Program Files (x86)\CMake\bin;C:\Program Files\CMake\bin;%PATH%
 
 set MSCVER=14
 

@@ -5,6 +5,7 @@ cmake_minimum_required(VERSION 3.1)
 # create targets
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/asn1c.cmake")
 add_definitions("-DUSE_CXX_ALLOCATOR")
+add_definitions("-DUSE_INT64")
 
 set(ASN1_SOURCES
   asn_codecs_prim.c
@@ -101,11 +102,11 @@ set(GENERATED_SRC ${ASN1_SOURCES} ${TRACE_ASN1_SOURCES})
 
 set(ASN1_PROTOCOL_FILE ${CMAKE_CURRENT_SOURCE_DIR}/trace_proto.asn1)
 
-message("asn1c cmd: asn1c -gen-PER -S ${ASN1C_DATA} ${ASN1_PROTOCOL_FILE}")
+message("asn1c cmd: asn1c -gen-PER -fuse-int64 -S ${ASN1C_DATA} ${ASN1_PROTOCOL_FILE}")
 message("*** GENERATOR TEMPORARILY TURNED OFF *** uncomment to re-generate and suffer")
 #add_custom_command(
 #  OUTPUT ${GENERATED_SRC}
-#  COMMAND asn1c -gen-PER -S ${ASN1C_DATA} ${ASN1_PROTOCOL_FILE}
+#  COMMAND asn1c -gen-PER -fuse-int64 -S ${ASN1C_DATA} ${ASN1_PROTOCOL_FILE}
 #	DEPENDS trace_proto.asn1
 #)
 

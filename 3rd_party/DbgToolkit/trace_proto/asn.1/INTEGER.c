@@ -111,13 +111,13 @@ INTEGER__dump(Allocator * allocator, const asn_TYPE_descriptor_t *td, const INTE
 	char scratch[32];	/* Enough for 64-bit integer */
 	uint8_t *buf = st->buf;
 	uint8_t *buf_end = st->buf + st->size;
-	signed long value;
+	long_t value;
 	ssize_t wrote = 0;
 	char *p;
 	int ret;
 
 	if(specs && specs->field_unsigned)
-		ret = asn_INTEGER2ulong(st, (unsigned long *)&value);
+		ret = asn_INTEGER2ulong(st, (ulong_t *)&value);
 	else
 		ret = asn_INTEGER2long(st, &value);
 
@@ -270,16 +270,16 @@ INTEGER_map_enum2value(asn_INTEGER_specifics_t *specs, const char *lstart, const
 
 static int
 INTEGER__compar_value2enum(const void *kp, const void *am) {
-	long a = *(const long *)kp;
+	long_t a = *(const long_t *)kp;
 	const asn_INTEGER_enum_map_t *el = (const asn_INTEGER_enum_map_t *)am;
-	long b = el->nat_value;
+	long_t b = el->nat_value;
 	if(a < b) return -1;
 	else if(a == b) return 0;
 	else return 1;
 }
 
 const asn_INTEGER_enum_map_t *
-INTEGER_map_value2enum(asn_INTEGER_specifics_t *specs, long value) {
+INTEGER_map_value2enum(asn_INTEGER_specifics_t *specs, long_t value) {
 	int count = specs ? specs->map_count : 0;
 	if(!count) return 0;
 	return (asn_INTEGER_enum_map_t *)bsearch(&value, specs->value2enum,
@@ -307,8 +307,8 @@ INTEGER_st_prealloc(Allocator * allocator, INTEGER_t *st, int min_size) {
 static enum xer_pbd_rval
 INTEGER__xer_body_decode(Allocator * allocator, asn_TYPE_descriptor_t *td, void *sptr, const void *chunk_buf, size_t chunk_size) {
 	INTEGER_t *st = (INTEGER_t *)sptr;
-	long dec_value;
-	long hex_value = 0;
+	long_t dec_value;
+	long_t hex_value = 0;
 	const char *lp;
 	const char *lstart = (const char *)chunk_buf;
 	const char *lstop = lstart + chunk_size;
@@ -330,7 +330,7 @@ INTEGER__xer_body_decode(Allocator * allocator, asn_TYPE_descriptor_t *td, void 
 
 	if(chunk_size)
 		ASN_DEBUG("INTEGER body %ld 0x%2x..0x%2x",
-			(long)chunk_size, *lstart, lstop[-1]);
+			(long_t)chunk_size, *lstart, lstop[-1]);
 
 	if(INTEGER_st_prealloc(allocator, st, (chunk_size/3) + 1))
 		return XPBD_SYSTEM_FAILURE;
@@ -436,7 +436,7 @@ INTEGER__xer_body_decode(Allocator * allocator, asn_TYPE_descriptor_t *td, void 
 				lp = lstart - 1;
 				continue;
 			} else {
-				ASN_DEBUG("state %d at %ld", state, (long)(lp - lstart));
+				ASN_DEBUG("state %d at %ld", state, (long_t)(lp - lstart));
 				break;
 			}
 		/* [A-Fa-f] */
@@ -471,7 +471,7 @@ INTEGER__xer_body_decode(Allocator * allocator, asn_TYPE_descriptor_t *td, void 
 
 		/* Found extra non-numeric stuff */
 		ASN_DEBUG("INTEGER :: Found non-numeric 0x%2x at %ld",
-			lv, (long)(lp - lstart));
+			lv, (long_t)(lp - lstart));
 		state = ST_UNEXPECTED;
 		break;
 	}
@@ -600,11 +600,11 @@ INTEGER_decode_uper(Allocator * allocator, asn_codec_ctx_t *opt_codec_ctx, asn_T
 		/* #11.5.6 */
 		ASN_DEBUG("Integer with range %d bits", ct->range_bits);
 		if(ct->range_bits >= 0) {
-			if((size_t)ct->range_bits > 8 * sizeof(unsigned long))
+			if((size_t)ct->range_bits > 8 * sizeof(ulong_t))
 				_ASN_DECODE_FAILED;
 
 			if(specs && specs->field_unsigned) {
-				unsigned long uvalue;
+				ulong_t uvalue;
 				if(uper_get_constrained_whole_number(pd,
 					&uvalue, ct->range_bits))
 					_ASN_DECODE_STARVED;
@@ -614,7 +614,7 @@ INTEGER_decode_uper(Allocator * allocator, asn_codec_ctx_t *opt_codec_ctx, asn_T
 				if(asn_ulong2INTEGER(allocator, st, uvalue))
 					_ASN_DECODE_FAILED;
 			} else {
-				unsigned long svalue;
+				ulong_t svalue;
 				if(uper_get_constrained_whole_number(pd,
 					&svalue, ct->range_bits))
 					_ASN_DECODE_STARVED;
@@ -655,7 +655,7 @@ INTEGER_decode_uper(Allocator * allocator, asn_codec_ctx_t *opt_codec_ctx, asn_T
 		/*
 		 * TODO: replace by in-place arithmetics.
 		 */
-		long value;
+		long_t value;
 		if(asn_INTEGER2long(st, &value))
 			_ASN_DECODE_FAILED;
 		if(asn_long2INTEGER(allocator, st, value + ct->lower_bound))
@@ -674,8 +674,8 @@ INTEGER_encode_uper(Allocator * allocator, asn_TYPE_descriptor_t *td,
 	const uint8_t *buf;
 	const uint8_t *end;
 	asn_per_constraint_t *ct;
-	long value = 0;
-	unsigned long v = 0;
+	long_t value = 0;
+	ulong_t v = 0;
 
 	if(!st || st->size == 0) _ASN_ENCODE_FAILED;
 
@@ -687,16 +687,16 @@ INTEGER_encode_uper(Allocator * allocator, asn_TYPE_descriptor_t *td,
 	if(ct) {
 		int inext = 0;
 		if(specs && specs->field_unsigned) {
-			unsigned long uval;
+			ulong_t uval;
 			if(asn_INTEGER2ulong(st, &uval))
 				_ASN_ENCODE_FAILED;
 			/* Check proper range */
 			if(ct->flags & asn_per_constraint_s::APC_SEMI_CONSTRAINED) {
-				if(uval < (unsigned long)ct->lower_bound)
+				if(uval < (ulong_t)ct->lower_bound)
 					inext = 1;
 			} else if(ct->range_bits >= 0) {
-				if(uval < (unsigned long)ct->lower_bound
-				|| uval > (unsigned long)ct->upper_bound)
+				if(uval < (ulong_t)ct->lower_bound
+				|| uval > (ulong_t)ct->upper_bound)
 					inext = 1;
 			}
 			ASN_DEBUG("Value %lu (%02x/%d) lb %lu ub %lu %s",
@@ -763,10 +763,10 @@ INTEGER_encode_uper(Allocator * allocator, asn_TYPE_descriptor_t *td,
 #endif	/* ASN_DISABLE_PER_SUPPORT */
 
 int
-asn_INTEGER2long(const INTEGER_t *iptr, long *lptr) {
+asn_INTEGER2long(const INTEGER_t *iptr, long_t *lptr) {
 	uint8_t *b, *end;
 	size_t size;
-	long l;
+	long_t l;
 
 	/* Sanity checking */
 	if(!iptr || !iptr->buf || !lptr) {
@@ -779,11 +779,11 @@ asn_INTEGER2long(const INTEGER_t *iptr, long *lptr) {
 	size = iptr->size;
 	end = b + size;	/* Where to stop */
 
-	if(size > sizeof(long)) {
+	if(size > sizeof(long_t)) {
 		uint8_t *end1 = end - 1;
 		/*
 		 * Slightly more advanced processing,
-		 * able to >sizeof(long) bytes,
+		 * able to >sizeof(long_t) bytes,
 		 * when the actual value is small
 		 * (0x0000000000abcdef would yield a fine 0x00abcdef)
 		 */
@@ -797,8 +797,8 @@ asn_INTEGER2long(const INTEGER_t *iptr, long *lptr) {
 		}
 
 		size = end - b;
-		if(size > sizeof(long)) {
-			/* Still cannot fit the long */
+		if(size > sizeof(long_t)) {
+			/* Still cannot fit the long_t */
 			errno = ERANGE;
 			return -1;
 		}
@@ -823,9 +823,9 @@ asn_INTEGER2long(const INTEGER_t *iptr, long *lptr) {
 }
 
 int
-asn_INTEGER2ulong(const INTEGER_t *iptr, unsigned long *lptr) {
+asn_INTEGER2ulong(const INTEGER_t *iptr, ulong_t *lptr) {
 	uint8_t *b, *end;
-	unsigned long l;
+	ulong_t l;
 	size_t size;
 
 	if(!iptr || !iptr->buf || !lptr) {
@@ -838,9 +838,9 @@ asn_INTEGER2ulong(const INTEGER_t *iptr, unsigned long *lptr) {
 	end = b + size;
 
 	/* If all extra leading bytes are zeroes, ignore them */
-	for(; size > sizeof(unsigned long); b++, size--) {
+	for(; size > sizeof(ulong_t); b++, size--) {
 		if(*b) {
-			/* Value won't fit unsigned long */
+			/* Value won't fit ulong_t */
 			errno = ERANGE;
 			return -1;
 		}
@@ -855,7 +855,7 @@ asn_INTEGER2ulong(const INTEGER_t *iptr, unsigned long *lptr) {
 }
 
 int
-asn_ulong2INTEGER(Allocator * allocator, INTEGER_t *st, unsigned long value) {
+asn_ulong2INTEGER(Allocator * allocator, INTEGER_t *st, ulong_t value) {
 	uint8_t *buf;
 	uint8_t *end;
 	uint8_t *b;
@@ -869,7 +869,7 @@ asn_ulong2INTEGER(Allocator * allocator, INTEGER_t *st, unsigned long value) {
 
 	end = buf + (sizeof(value) + 1);
 	buf[0] = 0;
-	for(b = buf + 1, shr = (sizeof(long)-1)*8; b < end; shr -= 8, b++)
+	for(b = buf + 1, shr = (sizeof(long_t)-1)*8; b < end; shr -= 8, b++)
 		*b = (uint8_t)(value >> shr);
 
 	if(st->buf) CXX_ALLOC_WRAP FREEMEM(st->buf);
@@ -880,7 +880,7 @@ asn_ulong2INTEGER(Allocator * allocator, INTEGER_t *st, unsigned long value) {
 }
 
 int
-asn_long2INTEGER(Allocator * allocator, INTEGER_t *st, long value) {
+asn_long2INTEGER(Allocator * allocator, INTEGER_t *st, long_t value) {
 	uint8_t *buf, *bp;
 	uint8_t *p;
 	uint8_t *pstart;
@@ -938,7 +938,7 @@ asn_long2INTEGER(Allocator * allocator, INTEGER_t *st, long value) {
  * This function is going to be DEPRECATED soon.
  */
 enum asn_strtol_result_e
-asn_strtol(const char *str, const char *end, long *lp) {
+asn_strtol(const char *str, const char *end, long_t *lp) {
     const char *endp = end;
 
     switch(asn_strtol_lim(str, &endp, lp)) {
@@ -964,12 +964,17 @@ asn_strtol(const char *str, const char *end, long *lp) {
  * WARNING: This behavior is different from the standard strtol(3).
  */
 enum asn_strtol_result_e
-asn_strtol_lim(const char *str, const char **end, long *lp) {
+asn_strtol_lim(const char *str, const char **end, long_t *lp) {
 	int sign = 1;
-	long l;
+	long_t l;
 
-	const long upper_boundary = LONG_MAX / 10;
-	long last_digit_max = LONG_MAX % 10;
+#if defined USE_INT64
+	const long_t upper_boundary = LLONG_MAX / 10;
+	long_t last_digit_max = LLONG_MAX % 10;
+#else
+	const long_t upper_boundary = LONG_MAX / 10;
+	long_t last_digit_max = LONG_MAX % 10;
+#endif
 
 	if(str >= *end) return ASN_STRTOL_ERROR_INVAL;
 

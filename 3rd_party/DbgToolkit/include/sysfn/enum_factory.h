@@ -21,10 +21,10 @@
 	size_t enum_to_string_ln_##EnumType ()
 
 #define FACT_DECLARE_ENUM_FROM_STR(EnumType,ENUM_DEF)			\
-	EnumType enumFromString (char const * str);
+	EnumType enum_from_string_##EnumType (char const * str);
 
 #define FACT_DEFINE_ENUM_FROM_STR(EnumType,ENUM_DEF)			\
-	EnumType enumFrom_##EnumType (char const * str)				\
+	EnumType enum_from_string_##EnumType (char const * str)				\
 	{															\
 		ENUM_DEF(FACT_ENUM_STRCMP)								\
 		assert("Undefined string to enum conversion!");			\

@@ -42,6 +42,14 @@
 # define ASSUMESTDTYPES 1
 #endif
 #define	ssize_t		SSIZE_T
+#ifdef USE_INT64
+#include <stdint.h>
+typedef uint64_t ulong_t;
+typedef int64_t long_t;
+#else
+typedef unsigned long ulong_t;
+typedef signed long long_t;
+#endif
 #ifdef	ASSUMESTDTYPES	/* Standard types have been defined elsewhere */
 #	include <stdint.h>
 #else

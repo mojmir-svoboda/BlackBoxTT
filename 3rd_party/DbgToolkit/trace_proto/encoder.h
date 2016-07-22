@@ -33,7 +33,7 @@ namespace asn1 {
 	{
 		OCTET_STRING_t ostr;
 		ostr.buf = const_cast<unsigned char *>(reinterpret_cast<unsigned char const *>(raw_str));
-		ostr.size = ln;
+		ostr.size = static_cast<int>(ln);
 		return ostr;
 	}
 
@@ -41,7 +41,7 @@ namespace asn1 {
 	{
 		OCTET_STRING_t ostr;
 		ostr.buf = const_cast<unsigned char *>(reinterpret_cast<unsigned char const *>(raw_str));
-		ostr.size = strlen(raw_str);
+		ostr.size = static_cast<int>(strlen(raw_str));
 		return ostr;
 	}
 }

@@ -11,7 +11,7 @@ namespace asn1 {
 		assert(dict_sz <= 64);
 
 		Command_t command;
-		command.present = Command_PR_dict;
+		command.present = Command_PR_dict;	
 		command.choice.dict.type = type;
 
 		DictPair * asn1_dict_ptr = const_cast<DictPair *>(dict_ptr);

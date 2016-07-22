@@ -1,6 +1,6 @@
 #pragma once
 #include "encoder.h"
-#include <Command.h>
+#include <trace_proto/Command.h>
 
 namespace asn1 {
 

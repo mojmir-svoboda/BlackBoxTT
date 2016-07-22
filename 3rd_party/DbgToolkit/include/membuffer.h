@@ -70,6 +70,13 @@ struct MemBuffer : Base
 		return false;
 	}
 
+	bool canMoveEnd (size_t n) const
+	{
+		if (this->end() + n <= this->begin() + this->capacity())
+			return true;
+		return false;
+	}
+
 	void * Calloc (size_t count, size_t size)
 	{
 		return Malloc(count * size);

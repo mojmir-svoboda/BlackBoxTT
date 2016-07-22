@@ -265,9 +265,9 @@ uper_put_nsnnwn(Allocator * allocator, asn_per_outp_t *po, int n) {
 
 
 /* X.691-2008/11, #11.5.6 -> #11.3 */
-int uper_get_constrained_whole_number(asn_per_data_t *pd, unsigned long *out_value, int nbits) {
-	unsigned long lhalf;    /* Lower half of the number*/
-	long half;
+int uper_get_constrained_whole_number(asn_per_data_t *pd, ulong_t *out_value, int nbits) {
+	ulong_t lhalf;    /* Lower half of the number*/
+	long_t half;
 
 	if(nbits <= 31) {
 		half = per_get_few_bits(pd, nbits);

@@ -8,10 +8,10 @@
  * multiple of 8 bytes.
  */
 asn_dec_rval_t
-uper_decode_complete(Allocator * allocator, asn_codec_ctx_t *opt_codec_ctx, asn_TYPE_descriptor_t *td, void **sptr, const void *buffer, size_t size) {
+uper_decode_complete(asn_codec_ctx_t *opt_codec_ctx, asn_TYPE_descriptor_t *td, void **sptr, const void *buffer, size_t size) {
 	asn_dec_rval_t rval;
 
-	rval = uper_decode(allocator, opt_codec_ctx, td, sptr, buffer, size, 0, 0);
+	rval = uper_decode(opt_codec_ctx, td, sptr, buffer, size, 0, 0);
 	if(rval.consumed) {
 		/*
 		 * We've always given 8-aligned data,
