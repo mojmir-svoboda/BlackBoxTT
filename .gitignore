@@ -1,7 +1,7 @@
 # Compiled source #
 *.o
 *.obj
-*.dll
+*.dll:
 *.a
 *.lib:
 resource.res
