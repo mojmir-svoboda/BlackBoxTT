@@ -190,6 +190,17 @@ namespace bb {
 				TRACE_MSG(LL_ERROR, CTX_BB | CTX_CONFIG, "* failed to load tasks section");
 			}
 
+			WorkSpacesConfig ws_cfg;
+			if (loadWorkSpacesConfig(y_root, ws_cfg))
+			{
+				TRACE_MSG(LL_INFO, CTX_BB | CTX_CONFIG, "* loaded workspaces section");
+				m_config.m_wspaces = ws_cfg;
+			}
+			else
+			{
+				TRACE_MSG(LL_ERROR, CTX_BB | CTX_CONFIG, "* failed to load tasks section");
+			}
+
 			TrayConfig tray_cfg;
 			if (loadTrayConfig(y_root, tray_cfg))
 			{
@@ -298,6 +309,7 @@ namespace bb {
 		ok &= CreateBBWindow();
 		ok &= m_gfx.Init();
 		ok &= m_tasks.Init(m_config.m_tasks);
+		ok &= m_wspaces.Init(m_config.m_wspaces);
 		ok &= m_explorer->Init();
 
 		SecondMon s = { 0 };

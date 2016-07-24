@@ -4,24 +4,27 @@ BlackBox:
     - 'default'
   styleCycle:
 
-WorkSpaces:
-  - group: 'work'
+WorkGroups:
+  - name: 'work'
     hotkey: 'Alt + 1'
-    desktop:
-      x: 3
-      y: 2
-      names: [ 'a1', 'a2', 'a3', 'b1', 'b2', 'b3' ]
-      circularX: false
-      circularY: false
-  - group: 'net'
+    x: 3
+    y: 2
+    circularX: false
+    circularY: false
+    spaces:
+      - name: 'a1'
+      - name: 'b1'
+      - name: 'c1'
+      - name: 'a2'
+  - name: 'fun'
     hotkey: 'Alt + 2'
-    desktop:
-      x: 2
-      y: 1
-      names: [ 'a1', 'a2' ]
-      circularX: true
-      circularY: false
-  - group: 'misc'
+    x: 2
+    y: 1
+    circularX: true
+    circularY: false
+    spaces:
+      - name: '1'
+      - name: '2'
 
 Tasks:
   - window: '^Windows Shell Experience Host$'

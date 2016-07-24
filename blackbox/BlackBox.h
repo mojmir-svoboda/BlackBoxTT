@@ -1,6 +1,7 @@
 #pragma once
 #include <platform_win.h>
 #include "Tasks.h"
+#include "WorkSpaces.h"
 #include "Tray.h"
 #include "Explorer.h"
 #include "gfx/Gfx.h"
@@ -35,6 +36,7 @@ namespace bb {
 		std::unique_ptr<StyleStruct> m_style; /// legacy style
 		std::unique_ptr<Explorer> m_explorer;
 		Tasks m_tasks;
+		WorkSpaces m_wspaces;
 		Tray m_tray;
 		Gfx m_gfx;
 		PluginManager m_plugins;

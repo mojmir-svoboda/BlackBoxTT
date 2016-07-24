@@ -42,7 +42,8 @@ set(blackbox_SOURCES
 	TasksConfig_yaml.cpp
 	Tray.cpp
 	TrayConfig_yaml.cpp #BlackBoxConfig_yaml.cpp
-	#WorkSpacesConfig_yaml.cpp
+	WorkSpacesConfig_yaml.cpp
+	WorkSpaces.cpp
 	gfx/DX11.cpp
 	gfx/Gfx.cpp
 	gfx/GfxWindow.cpp
@@ -70,6 +71,7 @@ set (blackbox_HEADERS
 	TasksConfig.h
 	Tray.h
 	TrayConfig.h
+	WorkSpaces.h
 	utils_window.h
 	utils_yaml.h
 	gfx/DX11.h
