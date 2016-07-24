@@ -131,6 +131,7 @@ LRESULT Tasks::UpdateFromTaskHook (WPARAM wParam, LPARAM lParam)
 {
 	switch (wParam)
 	{
+		//case HCBT_CREATEWND:
 		case HSHELL_WINDOWCREATED:
 		{
 			m_lock.Lock();
@@ -139,6 +140,7 @@ LRESULT Tasks::UpdateFromTaskHook (WPARAM wParam, LPARAM lParam)
 			m_lock.Unlock();
 			break;
 		}
+		//case HCBT_DESTROYWND:
 		case HSHELL_WINDOWDESTROYED:
 		{
 			m_lock.Lock();
@@ -147,12 +149,13 @@ LRESULT Tasks::UpdateFromTaskHook (WPARAM wParam, LPARAM lParam)
 			m_lock.Unlock();
 			break;
 		}
-		case HSHELL_ACTIVATESHELLWINDOW:
-			break;
-		case HSHELL_WINDOWREPLACED:
-		{
-			break;
-		}
+// 		case HSHELL_ACTIVATESHELLWINDOW:
+// 			break;
+// 		case HSHELL_WINDOWREPLACED:
+// 		{
+// 			break;
+// 		}
+		//case HCBT_ACTIVATE:
 		case HSHELL_WINDOWACTIVATED:
 		{
 			m_lock.Lock();
@@ -176,6 +179,18 @@ LRESULT Tasks::UpdateFromTaskHook (WPARAM wParam, LPARAM lParam)
 		case HSHELL_TASKMAN:
 			//MessageManager_Send(BB_WINKEY, 0, 0);
 			break;
+// 		case HCBT_MINMAX:
+// 		{
+// 			break;
+// 		}
+// 		case HCBT_MOVESIZE:
+// 		{
+// 			break;
+// 		}
+// 		case HCBT_SETFOCUS:
+// 		{
+// 			break;
+// 		}
 	}
 	return 0;
 }
