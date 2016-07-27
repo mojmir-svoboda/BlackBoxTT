@@ -4,27 +4,33 @@ BlackBox:
     - 'default'
   styleCycle:
 
-WorkGroups:
-  - name: 'work'
-    hotkey: 'Alt + 1'
-    x: 3
-    y: 2
-    circularX: false
-    circularY: false
-    spaces:
-      - name: 'a1'
-      - name: 'b1'
-      - name: 'c1'
-      - name: 'a2'
-  - name: 'fun'
-    hotkey: 'Alt + 2'
-    x: 2
-    y: 1
-    circularX: true
-    circularY: false
-    spaces:
-      - name: '1'
-      - name: '2'
+WorkSpaces:
+  current: 'F'
+  init: 'F'
+  clusters:
+    - id: 'F'
+      label: 'fun'
+      hotkey: 'Alt + 1'
+      current: 'f2'
+      init: 'f1'
+      vertexlist:
+        - [ f1, f2, f3 ]
+      edgelist:
+        - 'f1 -> f2 -> f3 -> f1 [label="right"]'
+        - 'f3 -> f2 -> f1 -> f3 [label="left"]'
+    - id: 'W'
+      label: 'w0rk'
+      hotkey: 'Alt + 2'
+      current: 'b2'
+      init: 'a1'
+      vertexlist:
+        - [ a1, a2, a3 ]
+        - [ b1, b2, b3 ]
+        - [ c1, c2, c3 ]
+      edgelist:
+        - 'a1 -> a2 -> a3 [label="right"]'
+        - 'b1 -> b2 -> b3 [label="right"]'
+        - 'c1 -> c2 -> c3 [label="right"]'
 
 Tasks:
   - window: '^Windows Shell Experience Host$'

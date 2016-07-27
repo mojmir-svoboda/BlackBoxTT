@@ -3,71 +3,74 @@
 #include <yaml-cpp/yaml.h>
 #include "utils_yaml.h"
 
-namespace YAML {
-	template<>
-	struct convert<bb::WorkSpaceConfig>
-	{
-		static Node encode (bb::WorkSpaceConfig const & rhs)
-		{
-			Node node;
-			node.push_back(rhs.m_name);
-			return node;
-		}
+struct WorkGraphConfig
+{
+	bbstring m_id;
+	bbstring m_label;
+	bbstring m_hotkey;
+	bbstring m_currentVertexId;
+	bbstring m_initVertexId;
+	std::vector<std::string> m_verticesCfg;
+	std::vector<std::string> m_edgesCfg;
+};
 
-		static bool decode (Node const & node, bb::WorkSpaceConfig & rhs)
-		{
-			try
-			{
-				rhs.m_name = node["name"].as<bbstring>();
-			}
-			catch (std::regex_error const & e)
-			{
-				//err.what();
-				return false;
-			}
-			catch (std::exception const & e)
-			{
-				return false;
-			}
-			return true;
-		}
-	};
-}
+struct WorkSpacesConfig
+{
+	bbstring m_currentClusterId;
+	bbstring m_initClusterId;
+	std::vector<WorkGraphConfig> m_groups;
+	// cluster edges
+};
+
 
 namespace YAML {
 	template<>
-	struct convert<bb::WorkGroupConfig>
+	struct convert<bb::WorkGraphConfig>
 	{
-		static Node encode (bb::WorkGroupConfig const & rhs)
+		static Node encode (bb::WorkGraphConfig const & rhs)
 		{
 			Node node;
-			node.push_back(rhs.m_name);
-			node.push_back(rhs.m_x);
-			node.push_back(rhs.m_y);
-      node.push_back(rhs.m_wspaces);
+			node.push_back(rhs.m_id);
+			node.push_back(rhs.m_label);
+			node.push_back(rhs.m_hotkey);
+			node.push_back(rhs.m_currentVertexId);
+			node.push_back(rhs.m_initVertexId);
+			node.push_back(rhs.m_vertexlists);
+			node.push_back(rhs.m_edgelist);
 			return node;
 		}
 
-		static bool decode (Node const & node, bb::WorkGroupConfig & rhs)
+		static bool decode (Node const & node, bb::WorkGraphConfig & rhs)
 		{
 			try
 			{
-				rhs.m_name = node["name"].as<bbstring>();
-				rhs.m_hotkey = node["hotkey"].as<bbstring>();
-				rhs.m_x = node["x"].as<uint16_t>();
-				rhs.m_y = node["y"].as<uint16_t>();
+				rhs.m_id = node["id"].as<bbstring>();
+				if (node["label"])
+					rhs.m_label = node["label"].as<bbstring>();
+				if (node["hotkey"])
+					rhs.m_hotkey = node["hotkey"].as<bbstring>();
+				if (node["vertexlist"])
+					rhs.m_vertexlists = node["vertexlist"].as<std::vector<std::vector<std::string>>>();
+				if (node["edgelist"])
+					rhs.m_edgelist = node["edgelist"].as<std::vector<std::string>>();
+				if (node["current"])
+					rhs.m_currentVertexId = node["current"].as<bbstring>();
+				if (node["init"])
+					rhs.m_initVertexId = node["init"].as<bbstring>();
 
-        YAML::Node y_wspaces = node["spaces"];
-        if (y_wspaces)
-        {
-          int const n = y_wspaces.size();
-          for (int i = 0; i < n; ++i)
-          {
-            YAML::Node y_wspaces_i = y_wspaces[i];
-            bb::WorkSpaceConfig cfg = y_wspaces[i].as<bb::WorkSpaceConfig>();
-            rhs.m_wspaces.push_back(cfg);
-          }
-        }
+
+
+//         YAML::Node y_wspaces = node["spaces"];
+//         if (y_wspaces)
+//         {
+//           int const n = y_wspaces.size();
+//           for (int i = 0; i < n; ++i)
+//           {
+//             YAML::Node y_wspaces_i = y_wspaces[i];
+//             bb::WorkSpaceConfig cfg = y_wspaces[i].as<bb::WorkSpaceConfig>();
+//             rhs.m_wspaces.push_back(cfg);
+//           }
+//         }
 			}
 			catch (std::regex_error const & e)
 			{
@@ -85,23 +88,32 @@ namespace YAML {
 
 namespace bb {
 
-	bool loadWorkSpacesConfig (YAML::Node & y_root, WorkSpacesConfig & config)
+	bool loadWorkSpacesConfig (YAML::Node & y_root, WorkSpacesConfig & rhs)
 	{
 		try
 		{
 			if (y_root.IsNull())
 				return false;
 
-			YAML::Node y_wspaces = y_root["WorkGroups"]; // @TODO: unicode? utf8?
-			if (y_wspaces)
+			YAML::Node node = y_root["WorkSpaces"]; // @TODO: unicode? utf8?
+
+			if (node["current"])
+				rhs.m_currentClusterId = node["current"].as<bbstring>();
+			if (node["init"])
+				rhs.m_initClusterId = node["init"].as<bbstring>();
+			if (node["edgelist"])
+				rhs.m_edgelist = node["edgelist"].as<std::vector<std::string>>();
+
+			YAML::Node y_clusters = node["clusters"]; // @TODO: unicode? utf8?
+			if (y_clusters)
 			{
-				int const n = y_wspaces.size();
+				int const n = y_clusters.size();
 				//YAML::NodeType::value cst = y_tasks.Type();
 				for (int i = 0; i < n; ++i)
 				{
-					YAML::Node y_wspaces_i = y_wspaces[i];
-					bb::WorkGroupConfig cfg = y_wspaces_i.as<bb::WorkGroupConfig>();
-					config.m_groups.push_back(cfg);
+					YAML::Node y_clusters_i = y_clusters[i];
+					bb::WorkGraphConfig cfg = y_clusters_i.as<bb::WorkGraphConfig>();
+					rhs.m_clusters.push_back(cfg);
 				}
 			}
 		}
