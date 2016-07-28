@@ -5,12 +5,21 @@ namespace YAML { class Node; }
 
 namespace bb {
 
+	struct WorkSpaceConfig
+	{
+		uint32_t m_vertex;
+		bbstring m_id;
+		bbstring m_label;
+
+		uint32_t GetVertex () const { return m_vertex; }
+	};
+
 	struct WorkGraphConfig
 	{
 		bbstring m_id;
 		bbstring m_label;
-		std::vector<std::vector<std::string>> m_vertexlists;
-		std::vector<std::string> m_edgelist;
+		std::vector<std::vector<bbstring>> m_vertexlists;
+		std::vector<bbstring> m_edgelist;
 		bbstring m_hotkey;
 		bbstring m_currentVertexId;
 		bbstring m_initVertexId;

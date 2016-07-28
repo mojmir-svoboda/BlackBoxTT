@@ -43,6 +43,7 @@ set(blackbox_SOURCES
 	Tray.cpp
 	TrayConfig_yaml.cpp #BlackBoxConfig_yaml.cpp
 	WorkSpacesConfig_yaml.cpp
+	WorkSpacesGraph.cpp
 	WorkSpaces.cpp
 	gfx/DX11.cpp
 	gfx/Gfx.cpp

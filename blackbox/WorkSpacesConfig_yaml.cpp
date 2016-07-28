@@ -50,9 +50,9 @@ namespace YAML {
 				if (node["hotkey"])
 					rhs.m_hotkey = node["hotkey"].as<bbstring>();
 				if (node["vertexlist"])
-					rhs.m_vertexlists = node["vertexlist"].as<std::vector<std::vector<std::string>>>();
+					rhs.m_vertexlists = node["vertexlist"].as<std::vector<std::vector<bbstring>>>();
 				if (node["edgelist"])
-					rhs.m_edgelist = node["edgelist"].as<std::vector<std::string>>();
+					rhs.m_edgelist = node["edgelist"].as<std::vector<bbstring>>();
 				if (node["current"])
 					rhs.m_currentVertexId = node["current"].as<bbstring>();
 				if (node["init"])
