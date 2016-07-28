@@ -12,6 +12,7 @@ namespace bb {
 		bbstring m_label;
 
 		uint32_t GetVertex () const { return m_vertex; }
+		bbstring const & GetId () const { return m_id; }
 	};
 
 	struct WorkGraphConfig

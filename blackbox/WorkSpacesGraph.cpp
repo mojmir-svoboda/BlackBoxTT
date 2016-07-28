@@ -15,13 +15,13 @@ namespace bb {
 		}
 	};
 
-	WorkSpacesGraph::WorkSpacesGraph () : m_Graph() { }
+	WorkSpacesGraph::WorkSpacesGraph () : m_graph() { }
 
 	void WorkSpacesGraph::Clear ()
 	{
-		m_Vertices.clear();
-		m_Edges.clear();
-		m_Graph.Clear();
+		m_vertices.clear();
+		m_edges.clear();
+		m_graph.Clear();
 	}
 
 	/**@fn      CreateGraph
@@ -33,12 +33,12 @@ namespace bb {
 	{
 		// vertex size limited to 16bit (0-65535)
 		//assert(m_Vertices.Size() < std::numeric_limits<csr::vertex_t>::max());
-		//DoAssert(m_Edges.Size() < std::numeric_limits<csr::vertex_t>::max());
+		//assert(m_Edges.Size() < std::numeric_limits<csr::vertex_t>::max());
 
 		// compressed sparse row graph construction
 		VertexAdapter adapter;
-		std::sort(&m_Edges[0], &m_Edges[0] + m_Edges.size(), adapter); // sparse row format needs edges sorted by source vertex field
-		bool const res = m_Graph.Construct(m_Vertices.size(), m_Edges.size(), &m_Edges[0], adapter); // construct compressed sparse row format
+		std::sort(&m_edges[0], &m_edges[0] + m_edges.size(), adapter); // sparse row format needs edges sorted by source vertex field
+		bool const res = m_graph.Construct(m_vertices.size(), m_edges.size(), &m_edges[0], adapter); // construct compressed sparse row format
 		return res;
 	}
 
