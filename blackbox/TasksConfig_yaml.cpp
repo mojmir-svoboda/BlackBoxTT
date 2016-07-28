@@ -22,8 +22,8 @@ namespace YAML {
 			{
 				rhs.m_caption = node["window"].as<bbstring>();
 				rhs.m_caption_regex = bbregex(rhs.m_caption);
-				if (node["ignored"])
-					rhs.m_ignored = node["ignored"].as<bool>();
+				if (node["exclude"])
+					rhs.m_ignored = node["exclude"].as<bool>();
 				if (node["sticky"])
 					rhs.m_sticky = node["sticky"].as<bool>();
 			}

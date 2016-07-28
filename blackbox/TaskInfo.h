@@ -22,7 +22,7 @@ namespace bb {
 		bool		m_fullscreen;
 
 		bool		m_sticky; /// window is sticky
-		bool		m_ignored; /// window is present on screen, but not in task bar
+		bool		m_exclude; /// window is present on screen, but not in task bar
 
 		TaskInfo ()
 			: m_config(nullptr), m_hwnd(), m_icon(nullptr), m_wkspc(0), m_active(false), m_flashing(false), m_fullscreen(false)

@@ -34,7 +34,7 @@ WorkSpaces:
 
 Tasks:
   - window: '^Windows Shell Experience Host$'
-    ignored: true
+    exclude: true
   - window: '^Foo$'
 
 Menu:
