@@ -84,7 +84,6 @@ void Tasks::UpdateTaskInfo (TaskInfo * ti, bool force)
 		ti->m_icoLarge = lrg_id;
 	}
 
-	ti->m_wkspc = 0;
 	//ti->m_active = true;
 }
 
@@ -119,7 +118,7 @@ bool Tasks::AddTask (HWND hwnd)
 			}
 		}
 
-		TRACE_MSG(LL_DEBUG, CTX_BB, "+++ %ws i=%i", cap.c_str(), (ti_ptr->m_config ? ti_ptr->m_config->m_ignored : '0'));
+		TRACE_MSG(LL_DEBUG, CTX_BB, "+++ %ws e=%i i=%i", cap.c_str(), (ti_ptr->m_config ? ti_ptr->m_config->m_exclude : '0'), (ti_ptr->m_config ? ti_ptr->m_config->m_ignore : '0'));
 		m_tasks.push_back(std::move(ti_ptr));
 		return true;
 	}
@@ -193,6 +192,14 @@ LRESULT Tasks::UpdateFromTaskHook (WPARAM wParam, LPARAM lParam)
 // 		}
 	}
 	return 0;
+}
+
+void Tasks::HideTasksFromWorkSpace (bbstring const & wspace)
+{
+
+}
+void Tasks::ShowTasksFromWorkSpace (bbstring const & wspace)
+{
 }
 
 }

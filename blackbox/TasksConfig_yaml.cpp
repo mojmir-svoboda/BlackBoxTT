@@ -11,7 +11,9 @@ namespace YAML {
 		{
 			Node node;
 			node.push_back(rhs.m_caption);
-			node.push_back(rhs.m_ignored);
+			node.push_back(rhs.m_wspace);
+			node.push_back(rhs.m_exclude);
+			node.push_back(rhs.m_ignore);
 			node.push_back(rhs.m_sticky);
 			return node;
 		}
@@ -21,9 +23,13 @@ namespace YAML {
 			try
 			{
 				rhs.m_caption = node["window"].as<bbstring>();
+				if (node["workspace"])
+					rhs.m_wspace = node["workspace"].as<bbstring>();
 				rhs.m_caption_regex = bbregex(rhs.m_caption);
 				if (node["exclude"])
-					rhs.m_ignored = node["exclude"].as<bool>();
+					rhs.m_exclude = node["exclude"].as<bool>();
+				if (node["ignore"])
+					rhs.m_ignore = node["ignore"].as<bool>();
 				if (node["sticky"])
 					rhs.m_sticky = node["sticky"].as<bool>();
 			}

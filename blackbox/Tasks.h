@@ -37,5 +37,8 @@ namespace bb {
 		void MakeIgnored (HWND hwnd);
 		void RemoveIgnored (HWND hwnd);
 		bool IsIgnored (HWND hwnd);
+
+		void HideTasksFromWorkSpace (bbstring const & wspace);
+		void ShowTasksFromWorkSpace (bbstring const & wspace);
 	};
 }

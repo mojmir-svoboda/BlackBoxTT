@@ -1,7 +1,9 @@
 #include "WorkSpaces.h"
 #include "WorkSpacesConfig.h"
+#include "BlackBox.h"
 #include <bblib/logging.h>
 #include <regex>
+#include <tuple>
 namespace bb {
 
 	WorkSpaces::WorkSpaces ()
@@ -15,7 +17,122 @@ namespace bb {
 	{
 		TRACE_SCOPE(LL_INFO, CTX_BB | CTX_INIT);
 		m_config = config;
-		
+
+		bool ok = true;
+		ok &= CreateGraph();
+
+		if (m_config.m_currentClusterId.empty())
+		{
+			SetCurrentClusterId(m_config.m_initClusterId);
+		}
+
+		for (WorkGraphConfig & wg : m_config.m_clusters)
+		{
+			if (wg.m_currentVertexId.empty())
+				wg.m_currentVertexId = wg.m_initVertexId;
+		}
+		return ok;
+	}
+
+	void WorkSpaces::OnWindowCreated ()
+	{
+	}
+	void WorkSpaces::OnWindowDestroyed ()
+	{
+	}
+
+	bbstring const * WorkSpaces::GetCurrentVertexId () const
+	{
+		if (WorkGraphConfig const * cfg = FindClusterForVertex(GetCurrentClusterId()))
+		{
+			return &cfg->m_currentVertexId;
+		}
+		return nullptr;
+	}
+
+	void WorkSpaces::SetCurrentClusterId (bbstring const & id)
+	{
+		m_config.m_currentClusterId = id;
+	}
+
+	bool WorkSpaces::SetCurrentVertexId (bbstring const & vertex_id)
+	{
+		if (WorkGraphConfig * cfg = FindClusterForVertex(vertex_id))
+		{
+			cfg->m_currentVertexId = vertex_id;
+			return true;
+		}
+		return false;
+	}
+
+	WorkGraphConfig const * WorkSpaces::FindClusterForVertex (bbstring const & vertex_id) const
+	{
+		for (size_t i = 0, ie = m_config.m_clusters.size(); i < ie; ++i)
+			if (m_config.m_clusters[i].HasVertex(vertex_id))
+				return &m_config.m_clusters[i];
+		return nullptr;
+	}
+	WorkGraphConfig * WorkSpaces::FindClusterForVertex (bbstring const & vertex_id)
+	{
+		for (size_t i = 0, ie = m_config.m_clusters.size(); i < ie; ++i)
+			if (m_config.m_clusters[i].HasVertex(vertex_id))
+				return &m_config.m_clusters[i];
+		return nullptr;
+	}
+
+	WorkGraphConfig const * WorkSpaces::FindCluster (bbstring const & cluster_id) const
+	{
+		for (size_t i = 0, ie = m_config.m_clusters.size(); i < ie; ++i)
+			if (m_config.m_clusters[i].m_id == cluster_id)
+				return &m_config.m_clusters[i];
+		return nullptr;
+	}
+	WorkGraphConfig * WorkSpaces::FindCluster (bbstring const & cluster_id)
+	{
+		for (size_t i = 0, ie = m_config.m_clusters.size(); i < ie; ++i)
+			if (m_config.m_clusters[i].m_id == cluster_id)
+				return &m_config.m_clusters[i];
+		return nullptr;
+	}
+
+	bool WorkSpaces::SwitchVertex (bbstring const & new_vertex_id)
+	{
+		WorkGraphConfig * w0 = FindCluster(m_config.m_currentClusterId);
+		WorkGraphConfig * w1 = FindClusterForVertex(new_vertex_id);
+		if (w0 && w1)
+		{
+			bool const same_cluster = w0 == w1;
+			bbstring const & current_vertex_id = w0->m_currentVertexId;
+
+			BlackBox & bb = BlackBox::Instance();
+			bb.GetTasks().HideTasksFromWorkSpace(current_vertex_id);
+
+			if (w0 != w1)
+			{
+				//OnSwitchCluster if needed
+				SetCurrentClusterId(w1->m_id);
+			}
+
+			SetCurrentVertexId(new_vertex_id);
+			bb.GetTasks().ShowTasksFromWorkSpace(new_vertex_id);
+		}
+		return false;
+	}
+
+	bool WorkSpaces::SwitchVertexViaEdge (bbstring const & edge_property)
+	{
+		return false;
+	}
+
+	bool WorkSpaces::Done ()
+	{
+		TRACE_MSG(LL_INFO, CTX_BB, "Terminating workspaces");
+		ClearGraph();
+		return true;
+	}
+
+	bool WorkSpaces::CreateGraph ()
+	{
 		for (WorkGraphConfig & w : m_config.m_clusters)
 		{
 			for (auto const & vtxlist : w.m_vertexlists)
@@ -38,7 +155,7 @@ namespace bb {
 
 				try
 				{
-					std::wregex label_regex(L"(.+)\\[(.+)\\]");
+					std::wregex label_regex(L"(.+)\\[\\s*label\\s*=\\s*\"(.+)\"\\s*\\]");
 					std::wsmatch label_match;
 					if (std::regex_match(s, label_match, label_regex))
 					{
@@ -48,6 +165,7 @@ namespace bb {
 							std::wssub_match sub_match2 = label_match[2];
 							bbstring label = sub_match2.str();
 
+							// parse edge list
 							std::wssub_match sub_match1 = label_match[1];
 							bbstring edgelist = sub_match1.str();
 
@@ -76,7 +194,8 @@ namespace bb {
 
 								if (count == 2)
 								{
-									m_graph.m_edges.push_back(std::make_pair(ws[0], ws[1]));
+									size_t const n = m_graph.FindPropertyIndex(label);
+									m_graph.m_edges.push_back(std::make_tuple(ws[0], n, ws[1])); // src ---label_idx---> dst
 									ws[0] = ws[1];
 									count = 1;
 								}
@@ -110,20 +229,9 @@ namespace bb {
 		return graph_ok;
 	}
 
-	bool WorkSpaces::Done ()
-	{
-		TRACE_MSG(LL_INFO, CTX_BB, "Terminating workspaces");
-		ClearGraph();
-		return true;
-	}
-
-	bool WorkSpaces::CreateGraph ()
-	{
-		
-		return true;
-	}
-
 	void WorkSpaces::ClearGraph ()
 	{
+		m_graph.Clear();
 	}
+
 }

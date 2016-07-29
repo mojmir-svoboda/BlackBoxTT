@@ -24,6 +24,15 @@ namespace bb {
 		bbstring m_hotkey;
 		bbstring m_currentVertexId;
 		bbstring m_initVertexId;
+
+		bool HasVertex (bbstring const & vertex_id) const
+		{
+			for (auto const & outer : m_vertexlists)
+				for (bbstring const & v : outer)
+					if (v == vertex_id)
+						return true;
+			return false;
+		}
 	};
 
 	struct WorkSpacesConfig

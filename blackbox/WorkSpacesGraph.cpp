@@ -1,5 +1,6 @@
 #pragma once
 #include "WorkSpacesGraph.h"
+#include <tuple>
 
 namespace bb {
 
@@ -8,9 +9,10 @@ namespace bb {
 		csr::vertex_t get_vertex (WorkSpacesGraph::vertex_t const & v) const { return v->GetVertex(); }
 		// std::sorting
 		bool operator() (WorkSpacesGraph::vertex_t const & lhs, WorkSpacesGraph::vertex_t const & rhs) const { return get_vertex(lhs) < get_vertex(rhs); }
-		bool operator() (WorkSpacesGraph::edge_t const & lhs, WorkSpacesGraph::edge_t const & rhs) const {
-			csr::vertex_pair_t v0(get_vertex(lhs.first), get_vertex(lhs.second));
-			csr::vertex_pair_t v1(get_vertex(rhs.first), get_vertex(rhs.second));
+		bool operator() (WorkSpacesGraph::edge_t const & lhs, WorkSpacesGraph::edge_t const & rhs) const
+		{
+			csr::vertex_pair_t v0(get_vertex(std::get<0>(lhs)), get_vertex(std::get<2>(lhs)));
+			csr::vertex_pair_t v1(get_vertex(std::get<0>(rhs)), get_vertex(std::get<2>(rhs)));
 			return v0 < v1;
 		}
 	};

@@ -8,8 +8,9 @@ namespace bb {
 	{
 		typedef WorkSpaceConfig * vertex_t;
 		std::vector<std::unique_ptr<WorkSpaceConfig>> m_vertices;       /// vertices (objects) of the graph
-		typedef std::pair<vertex_t, vertex_t> edge_t;
+		typedef std::tuple<vertex_t, int, vertex_t> edge_t;  // vertex1 --- int_property --> vertex2
 		std::vector<edge_t> m_edges;            /// edges (dependencies) of the graph
+		std::vector<bbstring> m_edgeProps;
 		csr::SparseGraph m_graph;             /// compressed sparse row graph
 
 		WorkSpacesGraph ();
@@ -28,6 +29,16 @@ namespace bb {
 				}
 			}
 			return false;
+		}
+
+		/// prop created if not in container already
+		size_t FindPropertyIndex (bbstring const & s)
+		{
+			for (size_t i = 0, ie = m_edgeProps.size(); i < ie; ++i)
+				if (m_edgeProps[i] == s)
+					return i;
+			m_edgeProps.push_back(s);
+			return m_edgeProps.size() - 1;
 		}
 
 		/**@fn      CreateGraph

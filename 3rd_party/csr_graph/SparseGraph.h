@@ -12,9 +12,11 @@ namespace csr {
 	{
 		typedef std::vector<vertex_t> rowstart_t;
 		typedef std::vector<vertex_t> column_t;
+		typedef std::vector<int> edgeprops_t;
 
 		rowstart_t m_rowstart;
 		column_t   m_column;	// edge array (only target vertices of edges are stored)
+		edgeprops_t m_props;
 
 		/**@fn	  Construct
 		 * @brief create Compressed Sparse Row format from edge list
@@ -29,16 +31,18 @@ namespace csr {
 		{
 			m_rowstart.resize(n_vertices + 1);
 			m_column.reserve(n_edges);
+			m_props.reserve(n_edges);
 			vertex_t curr_edge = 0;
 			vertex_t curr_vtx_plus1 = 1;
 			m_rowstart[0] = 0;
 			for (size_t ei = 0; ei < n_edges; ++ei)
 			{
-				vertex_t const src = adapter.get_vertex(edges[ei].first);
-				vertex_t const tgt = adapter.get_vertex(edges[ei].second);
+				vertex_t const src = adapter.get_vertex(std::get<0>(edges[ei]));
+				vertex_t const tgt = adapter.get_vertex(std::get<2>(edges[ei]));
 				for (; curr_vtx_plus1 != src + 1; ++curr_vtx_plus1)
 					m_rowstart[curr_vtx_plus1] = curr_edge;
 				m_column.push_back(tgt);
+				m_props.push_back(std::get<1>(edges[ei]));
 				++curr_edge;
 			}
 
@@ -80,6 +84,7 @@ namespace csr {
 		}
 
 		vertex_t Target (EdgeDescriptor e) const { return m_column[e.m_idx]; }
+		int PropertyIndex (EdgeDescriptor e) const { return m_props[e.m_idx]; }
 		vertex_pair_t Vertices () const { return std::make_pair(0, NumVertices()); }
 		vertex_t NumVertices () const { return static_cast<vertex_t>(m_rowstart.size() - 1); }
 
@@ -87,6 +92,7 @@ namespace csr {
 		{
 			m_rowstart.clear();
 			m_column.clear();
+			m_props.clear();
 		}
 	};
 }
