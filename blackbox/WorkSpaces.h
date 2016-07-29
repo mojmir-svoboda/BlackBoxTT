@@ -13,6 +13,7 @@ namespace bb {
 		~WorkSpaces ();
 
 		bool Init (WorkSpacesConfig & config);
+		void InitClusterAndVertex ();
 		bool Done ();
 		bool CreateGraph ();
 		void ClearGraph ();

@@ -307,9 +307,9 @@ namespace bb {
 
 		Win32RegisterClass(s_blackboxClass, mainWndProc, 0);
 		ok &= CreateBBWindow();
+		ok &= m_wspaces.Init(m_config.m_wspaces);
 		ok &= m_gfx.Init();
 		ok &= m_tasks.Init(m_config.m_tasks);
-		ok &= m_wspaces.Init(m_config.m_wspaces);
 		ok &= m_explorer->Init();
 
 		SecondMon s = { 0 };

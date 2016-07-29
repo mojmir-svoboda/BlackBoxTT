@@ -20,7 +20,12 @@ namespace bb {
 
 		bool ok = true;
 		ok &= CreateGraph();
+		InitClusterAndVertex();
+		return ok;
+	}
 
+	void WorkSpaces::InitClusterAndVertex ()
+	{
 		if (m_config.m_currentClusterId.empty())
 		{
 			SetCurrentClusterId(m_config.m_initClusterId);
@@ -31,7 +36,6 @@ namespace bb {
 			if (wg.m_currentVertexId.empty())
 				wg.m_currentVertexId = wg.m_initVertexId;
 		}
-		return ok;
 	}
 
 	void WorkSpaces::OnWindowCreated ()
