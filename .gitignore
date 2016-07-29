@@ -10,3 +10,4 @@ _projects*
 # bbversion is generated:
 BlackboxZero/blackbox/bbversion.h
 BlackboxZero/build.ver
+.*.sw?
