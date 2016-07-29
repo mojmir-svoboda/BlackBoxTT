@@ -114,6 +114,9 @@ namespace bb {
 				ImGui::Separator();
 				for (Tasks::TaskInfoPtr const & t : tasks.m_tasks)
 				{
+					if (t->m_exclude)
+						continue;
+
 					std::string name;
 					codecvt_utf16_utf8(t->m_caption, name); // @TODO: perf!
 					IconId const icoid = t->m_icoSmall;
