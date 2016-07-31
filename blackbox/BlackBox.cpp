@@ -14,6 +14,7 @@
 #include <widgets/Plugins.h>
 #include <widgets/ControlPanel.h>
 #include <widgets/Tasks.h>
+#include <widgets/Pager.h>
 #include <widgets/Debug.h>
 #include "utils_win32.h"
 #include "hooks/taskhook.h"
@@ -320,21 +321,38 @@ namespace bb {
 		{
 			sx = s.x1;
 		}
-		GfxWindow * w0 = m_gfx.MkGuiWindow(sx - szx, s.y0, szx, szx, L"c0", L"w0");
+// 		GfxWindow * w0 = m_gfx.MkGuiWindow(sx - szx, s.y0, szx, szx, L"c0", L"w0");
+// 		{
+// 			w0->m_gui->m_enabled = true;
+// 			DebugWidget * w0wdg0 = new DebugWidget;
+// 			w0wdg0->m_enabled = true;
+// 			w0->GetGui()->AddWidget(w0wdg0);
+// 		}
+
+		{
+			GfxWindow * w1 = m_gfx.MkGuiWindow(0, 200, 800, 600, L"bbTasks", L"bbTasks");
+			w1->m_gui->m_enabled = true;
+			TasksWidget * w1wdg0 = new TasksWidget;
+			w1wdg0->m_enabled = true;
+			w1wdg0->m_horizontal = false;
+			w1->GetGui()->AddWidget(w1wdg0);
+		}
+
+		GfxWindow * w0 = m_gfx.MkGuiWindow(0, 0, 400, 200, L"bbPager", L"bbPager");
 		{
 			w0->m_gui->m_enabled = true;
-			DebugWidget * w0wdg0 = new DebugWidget;
+			PagerWidget * w0wdg0 = new PagerWidget;
 			w0wdg0->m_enabled = true;
 			w0->GetGui()->AddWidget(w0wdg0);
 		}
 
-		GfxWindow * w1 = m_gfx.MkGuiWindow(0, 200, 800, 600, L"bbStyleEditor", L"bbStyleEditor");
-		{
-			w1->m_gui->m_enabled = true;
-			StyleEditorWidget * w1wdg0 = new StyleEditorWidget;
-			w1wdg0->m_enabled = true;
-			w1->GetGui()->AddWidget(w1wdg0);
-		}
+// 		GfxWindow * w1 = m_gfx.MkGuiWindow(0, 200, 800, 600, L"bbStyleEditor", L"bbStyleEditor");
+// 		{
+// 			w1->m_gui->m_enabled = true;
+// 			StyleEditorWidget * w1wdg0 = new StyleEditorWidget;
+// 			w1wdg0->m_enabled = true;
+// 			w1->GetGui()->AddWidget(w1wdg0);
+// 		}
 
 		m_plugins.Init(m_config.m_plugins);
 		return ok;

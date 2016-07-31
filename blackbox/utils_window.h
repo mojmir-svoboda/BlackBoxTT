@@ -76,4 +76,89 @@ inline void removeWindowBorder (HWND hwnd)
 	}
 }
 
+inline void showWindow (HWND hwnd, bool show)
+{
+	::ShowWindow(hwnd, show ? SW_SHOW : SW_HIDE);
+}
+
+// inline void /*Workspaces::*/SwitchToWindow(HWND hwnd_app)
+// {
+// 	SwitchToThisWindow(hwnd_app, 1);
+// 	// 		HWND hwnd = GetLastActivePopup(GetRootWindow(hwnd_app));
+// 	// 		if (have_imp(pSwitchToThisWindow)) {
+// 	// 			// this one also restores the window, if it's iconic:
+// 	// 			pSwitchToThisWindow(hwnd, 1);
+// 	// 		}
+// 	// 		else {
+// 	// 			SetForegroundWindow(hwnd);
+// 	// 			if (IsIconic(hwnd))
+// 	// 				send_syscommand(hwnd, SC_RESTORE);
+// 	// 		}
+// }
+// 
+// inline void /*Workspaces::*/WS_BringToFront(HWND hwnd, bool to_current)
+// {
+// 	int windesk;
+// 
+// 	//CleanTasks();
+// 
+// 	// 		windesk = vwm_get_desk(hwnd);
+// 	// 		if (windesk != currentScreen)
+// 	// 		{
+// 	// 			if (false == to_current)
+// 	// 				switchToDesktop(windesk);
+// 	// 			else
+// 	// 				setDesktop(hwnd, currentScreen, false);
+// 	// 		}
+// 	SwitchToWindow(hwnd);
+// }
+// 
+// inline bool /*Workspaces::*/FocusTopWindow()
+// {
+// 	// 		HWND hw = get_top_window(currentScreen);
+// 	// 		if (hw) {
+// 	// 			SwitchToWindow(hw);
+// 	// 			return true;
+// 	// 		}
+// 	// 		SwitchToBBWnd();
+// 	return false;
+// }
+
+inline void focusWindow (HWND hwnd)
+{
+	// @TODO: if curr_ws != hwnd->ws ==> switch
+	SwitchToThisWindow(hwnd, 1);
+}
+
+inline void showInFromTaskBar (HWND hwnd, bool show)
+{
+	if (show)
+	{
+		long style = ::GetWindowLong(hwnd, GWL_STYLE);
+		style &= ~(WS_VISIBLE);    // this works - window become invisible 
+
+		style |= WS_EX_TOOLWINDOW;   // flags don't work - windows remains in taskbar
+		style &= ~(WS_EX_APPWINDOW);
+
+		::ShowWindow(hwnd, SW_HIDE); // hide the window
+		::SetWindowLong(hwnd, GWL_STYLE, style); // set the style
+		::ShowWindow(hwnd, SW_SHOW); // show the window for the new style to come into effect
+		::ShowWindow(hwnd, SW_HIDE); // hide the window so we can't see it
+	}
+	else
+	{
+		long style = ::GetWindowLong(hwnd, GWL_STYLE);
+		style &= ~(WS_VISIBLE);    // this works - window become invisible 
+
+		style |= WS_EX_TOOLWINDOW;   // flags don't work - windows remains in taskbar
+		style &= ~(WS_EX_APPWINDOW);
+
+		::ShowWindow(hwnd, SW_HIDE); // hide the window
+		::SetWindowLong(hwnd, GWL_STYLE, style); // set the style
+		::ShowWindow(hwnd, SW_SHOW); // show the window for the new style to come into effect
+		::ShowWindow(hwnd, SW_HIDE); // hide the window so we can't see it
+	}
+}
+
+
 }

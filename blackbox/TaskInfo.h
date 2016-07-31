@@ -23,13 +23,13 @@ namespace bb {
 
 		bool		m_sticky; /// window is sticky
 		bool		m_exclude; /// window is ignored by blackbox (metro shit usually)
-		bool		m_ignored; /// window is present on screen, but not in task bar
+		bool		m_ignore; /// window is present on screen, but not in task bar
 
 		TaskInfo ()
-			: m_config(nullptr), m_hwnd(), m_icon(nullptr), m_active(false), m_flashing(false), m_fullscreen(false)
+			: m_config(nullptr), m_hwnd(), m_icon(nullptr), m_active(false), m_flashing(false), m_fullscreen(false), m_sticky(false), m_exclude(false), m_ignore(false)
 		{ }
 		TaskInfo (HWND hwnd)
-			: m_config(nullptr), m_hwnd(hwnd), m_icon(nullptr), m_active(false), m_flashing(false), m_fullscreen(false)
+			: m_config(nullptr), m_hwnd(hwnd), m_icon(nullptr), m_active(false), m_flashing(false), m_fullscreen(false), m_sticky(false), m_exclude(false), m_ignore(false)
 		{ }
 	};
 

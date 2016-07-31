@@ -33,6 +33,24 @@ namespace bb {
 						return true;
 			return false;
 		}
+
+		uint32_t MaxColCount () const
+		{
+			uint32_t c = 0;
+			for (auto const & outer : m_vertexlists)
+			{
+				uint32_t const o_n = static_cast<uint32_t>(outer.size());
+				if (o_n > c)
+					c = o_n;
+			}
+			return c;
+		}
+
+		uint32_t MaxRowCount () const
+		{
+			uint32_t const n = static_cast<uint32_t>(m_vertexlists.size());
+			return n;
+		}
 	};
 
 	struct WorkSpacesConfig

@@ -47,7 +47,7 @@ namespace bb {
 
 	bbstring const * WorkSpaces::GetCurrentVertexId () const
 	{
-		if (WorkGraphConfig const * cfg = FindClusterForVertex(GetCurrentClusterId()))
+		if (WorkGraphConfig const * cfg = FindCluster(GetCurrentClusterId()))
 		{
 			return &cfg->m_currentVertexId;
 		}

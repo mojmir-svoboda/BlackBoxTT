@@ -109,15 +109,25 @@ bool Tasks::AddTask (HWND hwnd)
 		UpdateTaskInfo(ti_ptr.get(), true);
 		bbstring const & cap = ti_ptr->m_caption;
 
+		bbstring const * current_ws = BlackBox::Instance().GetWorkSpaces().GetCurrentVertexId();
+
 		for (size_t i = 0, ie = m_config.m_tasks.size(); i < ie; ++i)
 		{
 			TaskConfig & c = m_config.m_tasks[i];
 			if (c.MatchCaption(cap))
 			{
 				ti_ptr->m_config = &c;
+				ti_ptr->m_wspace = c.m_wspace;
+				if (current_ws)
+				{
+					bool const show = c.m_wspace == *current_ws;
+					showWindow(ti_ptr->m_hwnd, show);
+				}
 			}
 		}
 
+		if (current_ws && ti_ptr->m_wspace.empty())
+			ti_ptr->m_wspace = *current_ws;
 		TRACE_MSG(LL_DEBUG, CTX_BB, "+++ %ws e=%i i=%i", cap.c_str(), (ti_ptr->m_config ? ti_ptr->m_config->m_exclude : '0'), (ti_ptr->m_config ? ti_ptr->m_config->m_ignore : '0'));
 		m_tasks.push_back(std::move(ti_ptr));
 		return true;

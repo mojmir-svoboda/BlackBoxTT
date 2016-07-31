@@ -56,6 +56,7 @@ set(blackbox_SOURCES
 	widgets/Debug.cpp
 	widgets/Tasks.cpp
 	widgets/Tray.cpp
+	widgets/Pager.cpp
 	Menu/Menu.cpp
 	bind/bind.cpp
 	plugin/PluginManager.cpp
@@ -91,6 +92,7 @@ set (blackbox_HEADERS
 	widgets/Debug.cpp
 	widgets/Tasks.cpp
 	widgets/Tray.cpp
+	widgets/Pager.h
 	plugin/plugin.h
 	plugin/PluginManager.h
 	plugin/PluginConfig.h

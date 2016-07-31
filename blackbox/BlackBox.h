@@ -61,6 +61,8 @@ namespace bb {
 		bool GetInJob () const { return m_inJob; }
 		Tasks & GetTasks () { return m_tasks; }
 		Tasks const & GetTasks () const { return m_tasks; }
+		WorkSpaces & GetWorkSpaces() { return m_wspaces; }
+		WorkSpaces const & GetWorkSpaces() const { return m_wspaces; }
 		Tray & GetTray () { return m_tray; }
 		Tray const & GetTray () const { return m_tray; }
 		Gfx & GetGfx () { return m_gfx; }
