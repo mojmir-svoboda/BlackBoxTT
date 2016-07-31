@@ -8,7 +8,7 @@
 #include "Command.h"
 
 static asn_per_constraints_t asn_PER_type_Command_constr_1 GCC_NOTUSED = {
-	{ asn_per_constraint_s::APC_CONSTRAINED,	 2,  2,  0,  2 }	/* (0..2) */,
+	{ asn_per_constraint_s::APC_CONSTRAINED,	 1,  1,  0,  1 }	/* (0..1) */,
 	{ asn_per_constraint_s::APC_UNCONSTRAINED,	-1, -1,  0,  0 },
 	0, 0	/* No PER value map */
 };
@@ -22,29 +22,19 @@ static asn_TYPE_member_t asn_MBR_Command_1[] = {
 		0,
 		"bbhwnd"
 		},
-	{ ATF_NOFLAGS, 0, offsetof(struct Command, choice.bb32wm),
+	{ ATF_NOFLAGS, 0, offsetof(struct Command, choice.bbcmd),
 		(ASN_TAG_CLASS_CONTEXT | (1 << 2)),
 		-1,	/* IMPLICIT tag at current level */
-		&asn_DEF_BB32WMMsg,
+		&asn_DEF_BBCmd,
 		0,	/* Defer constraints checking to the member type */
 		0,	/* No PER visible constraints */
 		0,
-		"bb32wm"
-		},
-	{ ATF_NOFLAGS, 0, offsetof(struct Command, choice.bb32wmack),
-		(ASN_TAG_CLASS_CONTEXT | (2 << 2)),
-		-1,	/* IMPLICIT tag at current level */
-		&asn_DEF_BB32WMMsgAck,
-		0,	/* Defer constraints checking to the member type */
-		0,	/* No PER visible constraints */
-		0,
-		"bb32wmack"
+		"bbcmd"
 		},
 };
 static const asn_TYPE_tag2member_t asn_MAP_Command_tag2el_1[] = {
     { (ASN_TAG_CLASS_CONTEXT | (0 << 2)), 0, 0, 0 }, /* bbhwnd */
-    { (ASN_TAG_CLASS_CONTEXT | (1 << 2)), 1, 0, 0 }, /* bb32wm */
-    { (ASN_TAG_CLASS_CONTEXT | (2 << 2)), 2, 0, 0 } /* bb32wmack */
+    { (ASN_TAG_CLASS_CONTEXT | (1 << 2)), 1, 0, 0 } /* bbcmd */
 };
 static asn_CHOICE_specifics_t asn_SPC_Command_specs_1 = {
 	sizeof(struct Command),
@@ -52,7 +42,7 @@ static asn_CHOICE_specifics_t asn_SPC_Command_specs_1 = {
 	offsetof(struct Command, present),
 	sizeof(((struct Command *)0)->present),
 	asn_MAP_Command_tag2el_1,
-	3,	/* Count of tags in the map */
+	2,	/* Count of tags in the map */
 	0,
 	-1	/* Extensions start */
 };
@@ -75,7 +65,7 @@ asn_TYPE_descriptor_t asn_DEF_Command = {
 	0,	/* No tags (count) */
 	&asn_PER_type_Command_constr_1,
 	asn_MBR_Command_1,
-	3,	/* Elements count */
+	2,	/* Elements count */
 	&asn_SPC_Command_specs_1	/* Additional specs */
 };
 

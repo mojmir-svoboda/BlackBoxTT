@@ -32,4 +32,5 @@ namespace asn1 {
 
 namespace bb {
 	size_t encode_bb32wm (char * buff, size_t buff_ln, unsigned wm);
+	size_t encode_bbcmd (char * buff, size_t buff_ln, unsigned wm);
 }

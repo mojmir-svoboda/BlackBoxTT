@@ -7,20 +7,15 @@ BEGIN
 
 Command ::= CHOICE {
 	bbhwnd BBHwndMsg,
-	bb32wm BB32WMMsg,
-	bb32wmack BB32WMMsgAck
+	bbcmd BBCmd
 }
 
 BBHwndMsg ::= SEQUENCE {
 	hwnd    INTEGER
 }
 
-BB32WMMsg ::= SEQUENCE {
-	wmmsg   INTEGER
-}
-
-BB32WMMsgAck ::= SEQUENCE {
-	bbhwnd   INTEGER
+BBCmd ::= SEQUENCE {
+	cmd    OCTET STRING
 }
 
 END

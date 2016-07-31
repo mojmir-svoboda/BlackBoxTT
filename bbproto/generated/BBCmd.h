@@ -5,34 +5,34 @@
  * 	`asn1c -gen-PER -fuse-int64 -S`
  */
 
-#ifndef	_BB32WMMsgAck_H_
-#define	_BB32WMMsgAck_H_
+#ifndef	_BBCmd_H_
+#define	_BBCmd_H_
 
 
 #include <asn_application.h>
 
 /* Including external dependencies */
-#include <NativeInteger.h>
+#include <OCTET_STRING.h>
 #include <constr_SEQUENCE.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* BB32WMMsgAck */
-typedef struct BB32WMMsgAck {
-	int64_t	 bbhwnd;
+/* BBCmd */
+typedef struct BBCmd {
+	OCTET_STRING_t	 cmd;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
-} BB32WMMsgAck_t;
+} BBCmd_t;
 
 /* Implementation */
-extern asn_TYPE_descriptor_t asn_DEF_BB32WMMsgAck;
+extern asn_TYPE_descriptor_t asn_DEF_BBCmd;
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif	/* _BB32WMMsgAck_H_ */
+#endif	/* _BBCmd_H_ */
 #include <asn_internal.h>

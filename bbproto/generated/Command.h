@@ -13,8 +13,7 @@
 
 /* Including external dependencies */
 #include "BBHwndMsg.h"
-#include "BB32WMMsg.h"
-#include "BB32WMMsgAck.h"
+#include "BBCmd.h"
 #include <constr_CHOICE.h>
 
 #ifdef __cplusplus
@@ -25,8 +24,7 @@ extern "C" {
 typedef enum Command_PR {
 	Command_PR_NOTHING,	/* No components present */
 	Command_PR_bbhwnd,
-	Command_PR_bb32wm,
-	Command_PR_bb32wmack
+	Command_PR_bbcmd
 } Command_PR;
 
 /* Command */
@@ -34,8 +32,7 @@ typedef struct Command {
 	Command_PR present;
 	union Command_u {
 		BBHwndMsg_t	 bbhwnd;
-		BB32WMMsg_t	 bb32wm;
-		BB32WMMsgAck_t	 bb32wmack;
+		BBCmd_t	 bbcmd;
 	} choice;
 	
 	/* Context for parsing across buffer boundaries */
