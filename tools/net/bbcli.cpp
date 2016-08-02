@@ -142,18 +142,14 @@ int main (int argc, char * argv[])
 
     std::thread t([&io](){ io.run(); });
 
-		char msg[256];
-		size_t const n = bb::encode_bb32wm(msg, 256, 0x12345678);
-		c.Write(msg, n);
 
     //char line[chat_message::max_body_length + 1];
-		char line[16384];
-    while (std::cin.getline(line, 16384))
+		wchar_t line[1024];
+    while (std::wcin.getline(line, 1024))
     {
-      //msg.body_length(std::strlen(line));
-      //std::memcpy(msg.body(), line, msg.body_length());
-      //msg.encode_header();
-      //c.write(msg);
+			char msg[1024];
+			size_t const n = bb::encode_bbcmd(msg, 1024, line);
+			c.Write(msg, n);
     }
 
     c.close();

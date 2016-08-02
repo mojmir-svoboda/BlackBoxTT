@@ -28,9 +28,24 @@ namespace asn1 {
 		}
 		virtual void  FREEMEM(void * mem) override { }
 	};
+
+	inline OCTET_STRING_t mkOctetStringRaw (char const * raw_str, size_t ln)
+	{
+		OCTET_STRING_t ostr;
+		ostr.buf = const_cast<unsigned char *>(reinterpret_cast<unsigned char const *>(raw_str));
+		ostr.size = static_cast<int>(ln);
+		return ostr;
+	}
+
+	inline OCTET_STRING_t mkOctetString (char const * raw_str)
+	{
+		OCTET_STRING_t ostr;
+		ostr.buf = const_cast<unsigned char *>(reinterpret_cast<unsigned char const *>(raw_str));
+		ostr.size = static_cast<int>(strlen(raw_str));
+		return ostr;
+	}
 }
 
 namespace bb {
-	size_t encode_bb32wm (char * buff, size_t buff_ln, unsigned wm);
 	size_t encode_bbcmd (char * buff, size_t buff_ln, unsigned wm);
 }
