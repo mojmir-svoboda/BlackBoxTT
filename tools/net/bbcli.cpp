@@ -143,13 +143,16 @@ int main (int argc, char * argv[])
     std::thread t([&io](){ io.run(); });
 
 
-    //char line[chat_message::max_body_length + 1];
-		wchar_t line[1024];
-    while (std::wcin.getline(line, 1024))
+		wchar_t line[4096];
+    while (std::wcin.getline(line, 4096))
     {
-			char msg[1024];
-			size_t const n = bb::encode_bbcmd(msg, 1024, line);
-			c.Write(msg, n);
+			char msg[16384];
+			size_t const line_ln = wcslen(line);
+			if (line_ln > 0)
+			{
+				size_t const n = bb::encode_bbcmd(msg, 16384, line, line_ln);
+				c.Write(msg, n);
+			}
     }
 
     c.close();
@@ -159,6 +162,5 @@ int main (int argc, char * argv[])
   {
     std::cerr << "Exception: " << e.what() << "\n";
   }
-
   return 0;
 }

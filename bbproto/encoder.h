@@ -29,7 +29,7 @@ namespace asn1 {
 		virtual void  FREEMEM(void * mem) override { }
 	};
 
-	inline OCTET_STRING_t mkOctetStringRaw (char const * raw_str, size_t ln)
+	inline OCTET_STRING_t mkOctetString (char const * raw_str, size_t ln)
 	{
 		OCTET_STRING_t ostr;
 		ostr.buf = const_cast<unsigned char *>(reinterpret_cast<unsigned char const *>(raw_str));
@@ -47,5 +47,5 @@ namespace asn1 {
 }
 
 namespace bb {
-	size_t encode_bbcmd (char * buff, size_t buff_ln, unsigned wm);
+	size_t encode_bbcmd (char * buff, size_t buff_ln, wchar_t const * bbcmd, size_t bbcmdln);
 }

@@ -479,11 +479,17 @@ namespace bb {
   {
     switch (request->GetType())
     {
-			case E_CommandType::e_bb32wm:
+// 			case E_CommandType::e_bb32wm:
+// 			{
+// 				Command_bb32wm const * const r = static_cast<Command_bb32wm const *>(request.get());
+// 				m_taskHook32on64WM = r->m_bb32wm;
+// 				return std::unique_ptr<Command>(new Command_bb32wm_ack(m_hwnd));
+// 			}
+			case E_CommandType::e_bbcmd:
 			{
-				Command_bb32wm const * const r = static_cast<Command_bb32wm const *>(request.get());
-				m_taskHook32on64WM = r->m_bb32wm;
-				return std::unique_ptr<Command>(new Command_bb32wm_ack(m_hwnd));
+				Command_bbcmd const * const r = static_cast<Command_bbcmd const *>(request.get());
+				//handle cmd
+				return std::unique_ptr<Command>();
 			}
       default:
       {

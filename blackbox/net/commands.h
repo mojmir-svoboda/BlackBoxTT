@@ -3,6 +3,7 @@
 #include <platform_win.h>
 #include <memory>
 #include <bbstring.h>
+#include <bblib/codecvt.h>
 struct DecodedCommand;
 
 namespace bb {
@@ -17,7 +18,13 @@ namespace bb {
   {
     bbstring m_bbcmd;
 
-		Command_bbcmd (wchar_t const * b, size_t ln) : m_bbcmd(b, ln) { }
+		Command_bbcmd (char const * b, size_t ln)
+		{
+			size_t const sz = bb::codecvt_utf8_utf16_dst_size(b, ln);
+			wchar_t * const bbcmd_u16 = static_cast<wchar_t *>(alloca(sz * sizeof(wchar_t)));
+			size_t const bbcmd_u16_ln = bb::codecvt_utf8_utf16(b, ln, bbcmd_u16, sz);
+			m_bbcmd = std::move(bbstring(bbcmd_u16, bbcmd_u16_ln));
+		}
 		virtual ~Command_bbcmd () { }
 		virtual E_CommandType GetType () const override { return E_CommandType::e_bbcmd; }
   };
