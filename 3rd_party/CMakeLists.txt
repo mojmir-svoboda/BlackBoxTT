@@ -1,5 +1,6 @@
 add_subdirectory(fnv)
 add_subdirectory(imgui)
+add_subdirectory(s7)
 add_subdirectory(DirectXTex)
 add_subdirectory(yaml-cpp)
 
