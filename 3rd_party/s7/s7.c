@@ -286,7 +286,9 @@
 #else
   /* in Snd these are in mus-config.h */
   #ifndef MUS_CONFIG_H_LOADED
-    #define snprintf _snprintf 
+		#if _MSC_VER < 1900
+			#define snprintf _snprintf 
+		#endif
     #if _MSC_VER > 1200
       #define _CRT_SECURE_NO_DEPRECATE 1
       #define _CRT_NONSTDC_NO_DEPRECATE 1
@@ -11110,11 +11112,11 @@ static bool is_NaN(s7_double x) {return(x != x);}
   static bool is_inf(s7_double x) {return((x == x) && (is_NaN(x - x)));}  /* Another possibility: (x * 0) != 0 */
 
   /* in MS C, we need to provide inverse hyperbolic trig funcs and cbrt */
-  static double asinh(double x) {return(log(x + sqrt(1.0 + x * x)));}
-  static double acosh(double x) {return(log(x + sqrt(x * x - 1.0)));}
+  //static double asinh(double x) {return(log(x + sqrt(1.0 + x * x)));}
+  //static double acosh(double x) {return(log(x + sqrt(x * x - 1.0)));}
   /* perhaps less prone to numerical troubles (untested): 2.0 * log(sqrt(0.5 * (x + 1.0)) + sqrt(0.5 * (x - 1.0))) */
-  static double atanh(double x) {return(log((1.0 + x) / (1.0 - x)) / 2.0);}
-  static double cbrt(double x) {if (x >= 0.0) return(pow(x, 1.0 / 3.0)); return(-pow(-x, 1.0 / 3.0));}
+  //static double atanh(double x) {return(log((1.0 + x) / (1.0 - x)) / 2.0);}
+  //static double cbrt(double x) {if (x >= 0.0) return(pow(x, 1.0 / 3.0)); return(-pow(-x, 1.0 / 3.0));}
 #endif /* windows */
 #endif /* sun */
 
