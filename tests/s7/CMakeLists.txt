@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.6)
+project(s7test)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../3rd_party/s7 ${CMAKE_CURRENT_BINARY_DIR}/s7)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../3rd_party/s7)
+#add_subdirectory(../../3rd_pary/s7)
+add_executable(s7test test.cpp)
+target_link_libraries(s7test s7)
