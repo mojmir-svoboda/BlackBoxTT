@@ -17,6 +17,7 @@ namespace bb {
 	struct Command_bbcmd : Command
   {
     bbstring m_bbcmd;
+		std::string m_rawcmd;
 
 		Command_bbcmd (char const * b, size_t ln)
 		{
@@ -24,6 +25,7 @@ namespace bb {
 			wchar_t * const bbcmd_u16 = static_cast<wchar_t *>(alloca(sz * sizeof(wchar_t)));
 			size_t const bbcmd_u16_ln = bb::codecvt_utf8_utf16(b, ln, bbcmd_u16, sz);
 			m_bbcmd = std::move(bbstring(bbcmd_u16, bbcmd_u16_ln));
+			m_rawcmd = std::string(b, ln);
 		}
 		virtual ~Command_bbcmd () { }
 		virtual E_CommandType GetType () const override { return E_CommandType::e_bbcmd; }

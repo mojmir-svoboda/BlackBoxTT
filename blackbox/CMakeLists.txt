@@ -31,6 +31,9 @@ Build32on64(blackbox hooks "32on64") # NOTE: this is not blackbox, but blackbox3
 add_subdirectory(net)
 set_target_properties(net PROPERTIES FOLDER "bbTT") 
 
+# bb interpreter
+add_subdirectory(scheme)
+
 set(blackbox_SOURCES
 	mainwndproc.cpp
 	CommandLine.cpp
@@ -122,6 +125,7 @@ target_link_libraries(blackbox dwmapi)
 target_link_libraries(blackbox d3d11)
 target_link_libraries(blackbox d3dcompiler)
 target_link_libraries(blackbox net)
+target_link_libraries(blackbox scheme)
 target_link_libraries(blackbox bbprotolib)
 target_link_libraries(blackbox libcrazyrc)
 if(OPTION_USE_TRACE)

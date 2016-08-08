@@ -9,6 +9,7 @@
 #include <bblib/logging.h>
 #include <crazyrc/rc.h>
 #include <net/Server.h>
+#include <scheme/Scheme.h>
 #include <net/commands.h>
 #include <widgets/StyleEditor.h>
 #include <widgets/Plugins.h>
@@ -297,6 +298,7 @@ namespace bb {
 		ok &= mkJobObject(m_job, m_inJob);
 		ok &= m_cmdLine.Init();
 		ok &= LoadConfig();
+		ok &= m_scheme.Init(m_config.m_scheme);
 
 		m_taskHookWM = ::RegisterWindowMessage(c_taskHookName);
 		m_taskHook32on64WM = ::RegisterWindowMessage(c_taskHook32Name);
@@ -304,7 +306,6 @@ namespace bb {
 		m_explorer = std::move(e);
 
 		rc::init();
-		ok &= m_server.Init(m_config.m_server);
 
 		Win32RegisterClass(s_blackboxClass, mainWndProc, 0);
 		ok &= CreateBBWindow();
@@ -354,7 +355,8 @@ namespace bb {
 // 			w1->GetGui()->AddWidget(w1wdg0);
 // 		}
 
-		m_plugins.Init(m_config.m_plugins);
+		ok &= m_plugins.Init(m_config.m_plugins);
+		ok &= m_server.Init(m_config.m_server);
 		return ok;
 	}
 
@@ -362,12 +364,13 @@ namespace bb {
 	{
 		TRACE_SCOPE_MSG(LL_INFO, CTX_BB, "Terminating BB");
 		bool ok = true;
+		ok &= m_server.Done();
+		ok &= m_scheme.Done();
 		ok &= m_plugins.Done();
 		ok &= m_tasks.Done();
 		ok &= m_gfx.Done();
 		ok &= m_tray.Done();
 		ok &= m_explorer->Done();
-		ok &= m_server.Done();
 
 		::DestroyWindow(m_hwnd);
 		m_hwnd = nullptr;
@@ -488,7 +491,8 @@ namespace bb {
 			case E_CommandType::e_bbcmd:
 			{
 				Command_bbcmd const * const r = static_cast<Command_bbcmd const *>(request.get());
-				//handle cmd
+				char response[4096];
+				m_scheme.Eval(r->m_rawcmd.c_str(), response, 4096);
 				return std::unique_ptr<Command>();
 			}
       default:

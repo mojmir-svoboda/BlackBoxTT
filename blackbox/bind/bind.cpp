@@ -1,5 +1,6 @@
 #include "bind.h"
 #include <BlackBox.h>
+#include <bblib/codecvt.h>
 
 extern "C" {
 
@@ -39,5 +40,17 @@ extern "C" {
 		return bb->GetConfigDir(dir, dir_sz);
 	}
 
+	BB_API void SetCurrentVertexId (char const * vertex)
+	{
+		bb::BlackBox * const bb = getBlackBoxInstanceRW();
+
+		size_t const ln = strlen(vertex);
+		size_t const sz = bb::codecvt_utf8_utf16_dst_size(vertex, ln);
+		wchar_t * const bbcmd_u16 = static_cast<wchar_t *>(alloca(sz * sizeof(wchar_t)));
+		size_t const bbcmd_u16_ln = bb::codecvt_utf8_utf16(vertex, ln, bbcmd_u16, sz);
+		bbstring b(bbcmd_u16, bbcmd_u16_ln);
+
+		bb->GetWorkSpaces().SetCurrentVertexId(b);
+	}
 }
 

@@ -5,7 +5,7 @@
 #include <iostream>
 #include <bbproto/Header.h>
 #include <bbproto/encoder.h>
-
+#include "CommandLine.h"
 // test
 #include <bbproto/encode_bb32wm.h>
 
@@ -132,28 +132,43 @@ int main (int argc, char * argv[])
 {
   try
   {
-		char const * argv1 = argc == 3 ? argv[1] : "127.0.0.1";
-		char const * argv2 = argc == 3 ? argv[2] : "13199";
+		bb::CommandLine cli;
+		cli.Init();
     asio::io_context io;
 
 		asio::ip::tcp::resolver resolver(io);
-    auto endpoints = resolver.resolve(argv1, argv2);
+		std::string p = std::to_string(cli.Port());
+    auto endpoints = resolver.resolve(cli.Host().c_str(), p.c_str());
     Client c(io, endpoints);
 
     std::thread t([&io](){ io.run(); });
 
-
-		wchar_t line[4096];
-    while (std::wcin.getline(line, 4096))
-    {
+		std::string const cmd = cli.Cmd();
+		if (!cmd.empty())
+		{
 			char msg[16384];
-			size_t const line_ln = wcslen(line);
-			if (line_ln > 0)
+			size_t const cmd_ln = cli.Cmd().size();
+			if (cmd_ln > 0)
 			{
-				size_t const n = bb::encode_bbcmd(msg, 16384, line, line_ln);
+				size_t const n = bb::encode_bbcmd(msg, 16384, cli.Cmd().c_str(), cmd_ln);
 				c.Write(msg, n);
 			}
-    }
+		}
+		else
+		{
+			wchar_t line[4096];
+			// interactive shell
+			while (std::wcin.getline(line, 4096))
+			{
+				char msg[16384];
+				size_t const line_ln = wcslen(line);
+				if (line_ln > 0)
+				{
+					size_t const n = bb::encode_bbcmd(msg, 16384, line, line_ln);
+					c.Write(msg, n);
+				}
+			}
+		}
 
     c.close();
     t.join();

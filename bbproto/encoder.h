@@ -48,4 +48,5 @@ namespace asn1 {
 
 namespace bb {
 	size_t encode_bbcmd (char * buff, size_t buff_ln, wchar_t const * bbcmd, size_t bbcmdln);
+	size_t encode_bbcmd (char * buff, size_t buff_ln, char const * bbcmd, size_t bbcmdln);
 }

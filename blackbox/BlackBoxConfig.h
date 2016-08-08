@@ -1,6 +1,7 @@
 #pragma once
 #include "TasksConfig.h"
 #include "TrayConfig.h"
+#include "scheme/SchemeConfig.h"
 #include "WorkSpacesConfig.h"
 #include "net/ServerConfig.h"
 #include "plugin/PluginsConfig.h"
@@ -40,6 +41,7 @@ namespace bb {
 		WorkSpacesConfig m_wspaces;
 		PluginsConfig m_plugins;
 		ServerConfig m_server;
+		SchemeConfig m_scheme;
 	};
 }
 

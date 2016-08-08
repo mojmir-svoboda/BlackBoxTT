@@ -7,6 +7,7 @@
 #include "gfx/Gfx.h"
 #include "CommandLine.h"
 #include <net/Server.h>
+#include <scheme/Scheme.h>
 #include <VersionHelpers.h>
 #include "BlackBoxConfig.h"
 #include <plugin/PluginManager.h>
@@ -30,6 +31,7 @@ namespace bb {
 		bool m_inJob;
 		BlackBoxConfig m_config;
 		CommandLine m_cmdLine;
+    Scheme m_scheme;
 		Server m_server;
 
 		std::unique_ptr<StyleStruct> m_defaultStyle; /// legacy style

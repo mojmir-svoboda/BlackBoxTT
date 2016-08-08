@@ -14,5 +14,8 @@ extern "C" {
 	BB_API /*API_EXPORT */void* GetSettingPtr (int sn_index);
 
 	BB_API bool bbGetConfigDir (wchar_t * dir, size_t dir_sz);
+
+	//BB_API void SetCurrentVertexId (wchar_t const * vertex);
+	BB_API void SetCurrentVertexId (char const * vertex);
 }
 

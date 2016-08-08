@@ -1,7 +1,7 @@
 project(bbcli)
 
-set(bbcli_SOURCES bbcli.cpp)
-set(bbcli_HEADERS)
+set(bbcli_SOURCES bbcli.cpp CommandLine.cpp)
+set(bbcli_HEADERS CommandLine.h)
 
 add_executable(bbcli ${bbcli_SOURCES} ${bbcli_HEADERS})
 target_link_libraries(bbcli bbprotolib)
