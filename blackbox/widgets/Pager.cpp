@@ -5,10 +5,30 @@
 
 namespace bb {
 
+	PagerWidget::PagerWidget ()
+	{
+		m_tasks.reserve(64);
+	}
+
+	void PagerWidget::UpdateTasks ()
+	{
+		m_tasks.clear();
+
+		Tasks & tasks = BlackBox::Instance().GetTasks();
+		tasks.m_lock.Lock();
+		for (Tasks::TaskInfoPtr & t : tasks.m_tasks)
+		{
+			if (t)
+				m_tasks.emplace_back(t);
+		}
+		tasks.m_lock.Unlock();
+	}
+
 	void PagerWidget::DrawUI ()
 	{
 		WorkSpaces const & ws = BlackBox::Instance().GetWorkSpaces();
-		Tasks & tasks = BlackBox::Instance().GetTasks();
+
+		UpdateTasks();
 
 		bbstring const & cluster_id = ws.GetCurrentClusterId();
 		if (WorkGraphConfig const * wg = ws.FindCluster(cluster_id))
@@ -21,7 +41,6 @@ namespace bb {
 			ImGui::Columns(cols, "mixed");
 			ImGui::Separator();
 
-			tasks.m_lock.Lock();
 			for (uint32_t c = 0; c < cols; ++c)
 			{
 				for (uint32_t r = 0; r < rows; ++r)
@@ -31,22 +50,22 @@ namespace bb {
 					codecvt_utf16_utf8(vertex_id, idu8); // @TODO: perf!
 
 					if (ImGui::Button(idu8.c_str()))
-					{
+					{ 
 						// bacha tady sem pod zamkem
 						/*switchworkspace*/;
 					}
 
 					int tmp = 0;
-					for (Tasks::TaskInfoPtr & t : tasks.m_tasks)
+					for (PagerTaskInfo & t : m_tasks)
 					{
 						if (++tmp % 4)
 							ImGui::SameLine();
-						if (t->m_exclude)
+						if (t.m_exclude)
 							continue;
 
-						if (t->m_wspace == vertex_id)
+						if (t.m_wspace == vertex_id)
 						{
-							IconId const icoid = t->m_icoSmall;
+							IconId const icoid = t.m_icoSmall;
 							ImGui::Icon(icoid, ImColor(255, 255, 255, 255), ImColor(255, 255, 255, 128));
 							if (!icoid.IsValid())
 							{
@@ -58,7 +77,6 @@ namespace bb {
 				}
 				ImGui::NextColumn();
 			}
-			tasks.m_lock.Unlock();
 		}
 	}
 

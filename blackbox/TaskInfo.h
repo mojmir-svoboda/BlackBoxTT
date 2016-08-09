@@ -8,29 +8,37 @@ namespace bb {
 
 	struct TaskInfo
 	{
-		TaskConfig * m_config;
-		HWND		m_hwnd;
-		HICON		m_icon;
-		IconId	m_icoSmall;
-		IconId	m_icoLarge;
-		bbstring m_wspace;
-		bbstring m_caption;
-		//bbstring m_tag;
+		TaskConfig * m_config { nullptr };
+		HWND		m_hwnd        { nullptr };
+		HICON		m_icon        { nullptr };
+		IconId	m_icoSmall    { };
+		IconId	m_icoLarge    { };
+		bool		m_active      { false };
+		bool		m_flashing    { false };
+		bool		m_fullscreen  { false };
 
-		bool		m_active;
-		bool		m_flashing;
-		bool		m_fullscreen;
+		bool		m_sticky      { false }; /// window is sticky
+		bool		m_exclude     { false }; /// window is ignored by blackbox (metro shit usually)
+		bool		m_ignore      { false }; /// window is present on screen, but not in task bar
 
-		bool		m_sticky; /// window is sticky
-		bool		m_exclude; /// window is ignored by blackbox (metro shit usually)
-		bool		m_ignore; /// window is present on screen, but not in task bar
+		enum : size_t { e_wspaceLenMax = 64 };
+		wchar_t m_wspace[e_wspaceLenMax] = { 0 };
+		enum : size_t { e_captionLenMax = 512 };
+		wchar_t m_caption[e_captionLenMax] = { 0 };
 
-		TaskInfo ()
-			: m_config(nullptr), m_hwnd(), m_icon(nullptr), m_active(false), m_flashing(false), m_fullscreen(false), m_sticky(false), m_exclude(false), m_ignore(false)
-		{ }
 		TaskInfo (HWND hwnd)
-			: m_config(nullptr), m_hwnd(hwnd), m_icon(nullptr), m_active(false), m_flashing(false), m_fullscreen(false), m_sticky(false), m_exclude(false), m_ignore(false)
+			: m_hwnd(hwnd)
 		{ }
+
+		void SetWorkSpace (wchar_t const * s)
+		{
+			wcsncpy(m_wspace, s, e_wspaceLenMax);
+		}
+
+		void SetCaption (wchar_t const * s)
+		{
+			wcsncpy(m_caption, s, e_captionLenMax);
+		}
 	};
 
 }

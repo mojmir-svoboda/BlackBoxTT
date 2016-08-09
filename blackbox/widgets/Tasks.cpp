@@ -6,83 +6,71 @@
 
 namespace bb {
 
+	TasksWidget::TasksWidget ()
+	{
+		m_tasks.reserve(64);
+	}
+
+	void TasksWidget::UpdateTasks ()
+	{
+		m_tasks.clear();
+
+		Tasks & tasks = BlackBox::Instance().GetTasks();
+		tasks.m_lock.Lock();
+		for (Tasks::TaskInfoPtr & t : tasks.m_tasks)
+		{
+			m_tasks.emplace_back(*t);
+		}
+		tasks.m_lock.Unlock();
+	}
+
+
 	void TasksWidget::DrawUI ()
 	{
+		UpdateTasks();
 		// useless windows
 		// Store hwnd == WinStore.Mobile.exe process
 		// Get Started hwnd == WhatsNew.Store.exe
 
 			////////////////////////////////////////////////////////////////////////////////////////////////////
 			////////////////////////////////////////////////////////////////////////////////////////////////////
-			// temporary task list
 			Tasks & tasks = BlackBox::Instance().GetTasks();
-			tasks.m_lock.Lock();
-			//if (ImGui::TreeNode("Tasks", "%s", "tasks"))
-			{
-				std::string name2;
-				if (tasks.m_active)
-				{
-					codecvt_utf16_utf8(tasks.m_active->m_caption, name2); // @TODO: perf!
-					ImGui::Button(name2.c_str());
-				}
-				ImGui::Separator();
-				for (Tasks::TaskInfoPtr & t : tasks.m_tasks)
-				{
-					if (t->m_exclude)
-						continue;
+      std::string name2;
+//				if (tasks.m_active)
+//				{
+//					codecvt_utf16_utf8(tasks.m_active->m_caption, name2); // @TODO: perf!
+//					ImGui::Button(name2.c_str());
+//				}
+      ImGui::Separator();
+      for (TaskInfo & t : m_tasks)
+      {
+        if (t.m_exclude)
+          continue;
 
-					std::string name;
-					codecvt_utf16_utf8(t->m_caption, name); // @TODO: perf!
-					IconId const icoid = t->m_icoSmall;
-					ImGui::Icon(icoid, ImColor(255, 255, 255, 255), ImColor(255, 255, 255, 128));
-					if (!icoid.IsValid())
-					{
-						// @TODO: assign color to hwnd?
-						ImGui::ColorButton(ImColor(0, 0, 128, 255));
-					}
-					ImGui::SameLine();
+        char name[TaskInfo::e_captionLenMax];
+        codecvt_utf16_utf8(t.m_caption, name, TaskInfo::e_captionLenMax);
+        IconId const icoid = t.m_icoSmall;
+        ImGui::Icon(icoid, ImColor(255, 255, 255, 255), ImColor(255, 255, 255, 128));
+        if (!icoid.IsValid())
+        {
+          // @TODO: assign color to hwnd?
+          ImGui::ColorButton(ImColor(0, 0, 128, 255));
+        }
+        ImGui::SameLine();
 
-					if (ImGui::Button("i"))
-					{
-						if (t->m_ignore)
-						{
-							tasks.m_ignored.push_back(std::move(t));
-							showInFromTaskBar(t->m_hwnd, true);
-							t->m_ignore = false;
-						}
-						else
-						{
-							showInFromTaskBar(t->m_hwnd, false);
-							t->m_ignore = true;
-						}
-					}
+        if (ImGui::Button("i"))
+        {
+          tasks.MakeIgnored(t.m_hwnd);
+        }
 
-					ImGui::SameLine();
+        ImGui::SameLine();
 
-					if (ImGui::Button(name.c_str()))
-					{
-						focusWindow(t->m_hwnd);
-// 						if (t->m_ignored)
-// 						{
-// 							showInFromTaskBar(t->m_hwnd, true);
-// 							t->m_ignored = false;
-// 						}
-// 						else
-// 						{
-// 							showInFromTaskBar(t->m_hwnd, false);
-// 							t->m_ignored = true;
-// 						}
-					}
-				}
-				//ImGui::TreePop();
-
-
-				if (ImGui::TreeNode("Ignored", "%s", "ignored"))
-				{
-					ImGui::TreePop();
-				}
-			}
-			tasks.m_lock.Unlock();
+        if (ImGui::Button(name))
+        {
+          tasks.Focus(t.m_hwnd);
+        }
+      }
+      //ImGui::TreePop();
 	}
 
 }

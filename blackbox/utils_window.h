@@ -29,13 +29,10 @@ inline bool isAppWindow (HWND hwnd)
 }
 
 
-inline void getWindowText (HWND hwnd, std::wstring & str)
+inline void getWindowText (HWND hwnd, wchar_t * str, size_t n)
 {
-	WCHAR wbuf[1024];
-	wbuf[0] = 0;
-	::GetWindowTextW(hwnd, wbuf, 1024);
-	std::wstring ws(wbuf);
-	str = std::move(ws);
+	str[0] = '\0';
+	::GetWindowTextW(hwnd, str, n);
 }
 
 // update frame:

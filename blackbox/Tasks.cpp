@@ -58,7 +58,7 @@ bool Tasks::RmTask (HWND hwnd)
 		TaskInfoPtr & ti = m_tasks[i];
 		if (ti->m_hwnd == hwnd)
 		{
-			TRACE_MSG(LL_DEBUG, CTX_BB, "--- %ws", ti->m_caption.c_str());
+			TRACE_MSG(LL_DEBUG, CTX_BB, "--- %ws", ti->m_caption);
 			if (ti.get() == m_active)
 				m_active = nullptr;
 			m_tasks.erase(m_tasks.begin() + i);
@@ -70,8 +70,8 @@ bool Tasks::RmTask (HWND hwnd)
 
 void Tasks::UpdateTaskInfo (TaskInfo * ti, bool force)
 {
-	if (force || ti->m_caption.empty())
-		getWindowText(ti->m_hwnd, ti->m_caption);
+	if (force || wcslen(ti->m_caption))
+		getWindowText(ti->m_hwnd, ti->m_caption, sizeof(ti->m_caption) / sizeof(*ti->m_caption));
 	if (force || nullptr == ti->m_icon)
 	{
 		HICON lrg = getTaskIconLarge(ti->m_hwnd);
@@ -117,7 +117,7 @@ bool Tasks::AddTask (HWND hwnd)
 			if (c.MatchCaption(cap))
 			{
 				ti_ptr->m_config = &c;
-				ti_ptr->m_wspace = c.m_wspace;
+				ti_ptr->SetWorkSpace(c.m_wspace.c_str());
 				if (current_ws)
 				{
 					bool const show = c.m_wspace == *current_ws;
@@ -126,8 +126,8 @@ bool Tasks::AddTask (HWND hwnd)
 			}
 		}
 
-		if (current_ws && ti_ptr->m_wspace.empty())
-			ti_ptr->m_wspace = *current_ws;
+		if (current_ws && wcslen(ti_ptr->m_wspace) == 0)
+			ti_ptr->SetWorkSpace(current_ws->c_str());
 		TRACE_MSG(LL_DEBUG, CTX_BB, "+++ %ws e=%i i=%i", cap.c_str(), (ti_ptr->m_config ? ti_ptr->m_config->m_exclude : '0'), (ti_ptr->m_config ? ti_ptr->m_config->m_ignore : '0'));
 		m_tasks.push_back(std::move(ti_ptr));
 		return true;
@@ -172,7 +172,7 @@ LRESULT Tasks::UpdateFromTaskHook (WPARAM wParam, LPARAM lParam)
 			if (TaskInfo * ti = FindTask(hwnd))
 			{
 				m_active = ti;
-				TRACE_MSG(LL_DEBUG, CTX_BB, " *  %ws", ti->m_caption.c_str());
+				TRACE_MSG(LL_DEBUG, CTX_BB, " *  %ws", ti->m_caption);
 			}
 			m_lock.Unlock();
 			break;
@@ -210,6 +210,40 @@ void Tasks::HideTasksFromWorkSpace (bbstring const & wspace)
 }
 void Tasks::ShowTasksFromWorkSpace (bbstring const & wspace)
 {
+}
+
+void Tasks::MakeIgnored (HWND hwnd)
+{
+	for (TaskInfoPtr & ti : m_tasks)
+	{
+		if (ti->m_hwnd == hwnd)
+		{
+			showInFromTaskBar(ti->m_hwnd, false);
+			ti->m_ignore = true;
+			m_ignored.push_back(std::move(ti));
+		}
+	}
+}
+// void Tasks::MakeIgnored (wchar_t const * caption)
+// {
+// }
+
+void Tasks::RemoveIgnored (HWND hwnd)
+{
+	for (TaskInfoPtr & ti : m_ignored)
+	{
+		if (ti->m_hwnd == hwnd)
+		{
+			showInFromTaskBar(ti->m_hwnd, true);
+			ti->m_ignore = false;
+		}
+	}
+	
+}
+
+void Tasks::Focus (HWND hwnd)
+{
+	focusWindow(hwnd);
 }
 
 }
