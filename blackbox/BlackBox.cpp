@@ -322,13 +322,13 @@ namespace bb {
 		{
 			sx = s.x1;
 		}
-// 		GfxWindow * w0 = m_gfx.MkGuiWindow(sx - szx, s.y0, szx, szx, L"c0", L"w0");
-// 		{
-// 			w0->m_gui->m_enabled = true;
-// 			DebugWidget * w0wdg0 = new DebugWidget;
-// 			w0wdg0->m_enabled = true;
-// 			w0->GetGui()->AddWidget(w0wdg0);
-// 		}
+//		GfxWindow * w0 = m_gfx.MkGuiWindow(sx - szx, s.y0, szx, szx, L"c0", L"w0");
+//		{
+//			w0->m_gui->m_enabled = true;
+//			DebugWidget * w0wdg0 = new DebugWidget;
+//			w0wdg0->m_enabled = true;
+//			w0->GetGui()->AddWidget(w0wdg0);
+//		}
 
 		{
 			GfxWindow * w1 = m_gfx.MkGuiWindow(0, 200, 800, 600, L"bbTasks", L"bbTasks");
@@ -347,13 +347,13 @@ namespace bb {
 			w0->GetGui()->AddWidget(w0wdg0);
 		}
 
-// 		GfxWindow * w1 = m_gfx.MkGuiWindow(0, 200, 800, 600, L"bbStyleEditor", L"bbStyleEditor");
-// 		{
-// 			w1->m_gui->m_enabled = true;
-// 			StyleEditorWidget * w1wdg0 = new StyleEditorWidget;
-// 			w1wdg0->m_enabled = true;
-// 			w1->GetGui()->AddWidget(w1wdg0);
-// 		}
+//		GfxWindow * w1 = m_gfx.MkGuiWindow(0, 200, 800, 600, L"bbStyleEditor", L"bbStyleEditor");
+//		{
+//			w1->m_gui->m_enabled = true;
+//			StyleEditorWidget * w1wdg0 = new StyleEditorWidget;
+//			w1wdg0->m_enabled = true;
+//			w1->GetGui()->AddWidget(w1wdg0);
+//		}
 
 		ok &= m_plugins.Init(m_config.m_plugins);
 		ok &= m_server.Init(m_config.m_server);
@@ -440,13 +440,6 @@ namespace bb {
 			}
 
 			m_gfx.Done();
-
-//				if (GetMessage(&msg, NULL, 0, 0) <= 0)
-//					break;
-//				//dbg_printf("hwnd %x, msg %d wp %x lp %x", msg.hwnd, msg.message, msg.wParam, msg.lParam);
-//				TranslateMessage(&msg);
-//				DispatchMessage(&msg);
-//			}
 		}
 		/* On crash: gather windows, then pass it to the OS */
 		__except (on_crash_handler(), EXCEPTION_CONTINUE_SEARCH)
@@ -478,33 +471,23 @@ namespace bb {
 		m_server.DispatchResponses();
 	}
 
-  std::unique_ptr<Command> BlackBox::HandleServerMessage (std::unique_ptr<Command> const & request)
-  {
-    switch (request->GetType())
-    {
-// 			case E_CommandType::e_bb32wm:
-// 			{
-// 				Command_bb32wm const * const r = static_cast<Command_bb32wm const *>(request.get());
-// 				m_taskHook32on64WM = r->m_bb32wm;
-// 				return std::unique_ptr<Command>(new Command_bb32wm_ack(m_hwnd));
-// 			}
+	std::unique_ptr<Command> BlackBox::HandleServerMessage (std::unique_ptr<Command> const & request)
+	{
+		switch (request->GetType())
+		{
 			case E_CommandType::e_bbcmd:
 			{
 				Command_bbcmd const * const r = static_cast<Command_bbcmd const *>(request.get());
 				char response[4096];
 				m_scheme.Eval(r->m_rawcmd.c_str(), response, 4096);
 				return std::unique_ptr<Command>();
+//				return std::unique_ptr<Command>(new Command_bbcmd_ack(m_hwnd));
 			}
-      default:
-      {
-        TRACE_MSG(LL_ERROR, CTX_BB | CTX_NET, "Unknown command");
-        return nullptr;
-      }
-    }
-  }
-
-// 	std::unique_ptr<Command> BlackBox::HandleServerMessage (std::unique_ptr<Command> const & request)
-// 	{
-// 		
-// 	}
+			default:
+			{
+				TRACE_MSG(LL_ERROR, CTX_BB | CTX_NET, "Unknown command");
+				return nullptr;
+			}
+		}
+	}
 }

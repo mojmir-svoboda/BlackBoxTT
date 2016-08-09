@@ -9,7 +9,7 @@ namespace bb {
 		{
 			//TRACE_MSG(LL_INFO, CTX_BB | CTX_INIT, "bbcli: Initializing command line");
 			std::string version; // @TODO: replace by bbversion
-      m_cmdLine.reset(new TCLAP::CmdLine("bbcli for BlackBox for Windows", ' ', version));
+			m_cmdLine.reset(new TCLAP::CmdLine("bbcli for BlackBox for Windows", ' ', version));
 			if (m_cmdLine)
 			{
 				m_cmdLine->setExceptionHandling(false);

@@ -8,13 +8,13 @@ namespace bb {
 		TCLAP::ValueArg<std::string> m_cmd;
 		TCLAP::ValueArg<std::string> m_host;
 		TCLAP::ValueArg<int> m_port;
-    std::unique_ptr<TCLAP::CmdLine> m_cmdLine;
+		std::unique_ptr<TCLAP::CmdLine> m_cmdLine;
 
 		CommandLine ()
-      : m_cmd("c", "command", "Run command on server", false, "", "scheme command")
-      , m_host("a", "addr", "Specify addr", false, "127.0.0.1", "ip addr")
-      , m_port("p", "port", "Specify port", false, 13199, "tcp port")
-    { }
+			: m_cmd("c", "command", "Run command on server", false, "", "scheme command")
+			, m_host("a", "addr", "Specify addr", false, "127.0.0.1", "ip addr")
+			, m_port("p", "port", "Specify port", false, 13199, "tcp port")
+		{ }
 
 		bool Init ();
 		bool Done ();
