@@ -430,6 +430,7 @@ namespace bb {
 
 				m_gfx.NewFrame();
 
+				m_tasks.Update();
 				HandleServerMessages();
 
 				if (!m_cmdLine.NoTrayHook())

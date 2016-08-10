@@ -64,6 +64,7 @@ set(blackbox_SOURCES
 	bind/bind.cpp
 	plugin/PluginManager.cpp
 	plugin/PluginsConfig_yaml.cpp
+	utils_recover.cpp
 )
 
 set (blackbox_HEADERS
@@ -78,6 +79,7 @@ set (blackbox_HEADERS
 	TrayConfig.h
 	WorkSpaces.h
 	utils_window.h
+	utils_recover.h
 	utils_yaml.h
 	gfx/DX11.h
 	gfx/Gfx.h

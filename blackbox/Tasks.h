@@ -15,6 +15,7 @@ namespace bb {
 		TasksConfig m_config;
 		std::vector<TaskInfoPtr> m_tasks;
 		std::vector<TaskInfoPtr> m_ignored;
+		std::vector<TaskInfoPtr> m_otherWS;
 		TaskInfo * m_active;
 
 		Tasks ();
@@ -31,6 +32,7 @@ namespace bb {
 		bool AddTask (HWND hwnd);
 
 		LRESULT UpdateFromTaskHook (WPARAM wParam, LPARAM lParam);
+		void Update ();
 
 		void MakeSticky (HWND hwnd);
 		void REemoveSticky (HWND hwnd);
