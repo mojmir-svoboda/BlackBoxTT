@@ -102,20 +102,6 @@ void Tasks::EnumTasks ()
 	m_lock.Unlock();
 }
 
-// void Tasks::SendWindowToWorkSpace (TaskInfoPtr & ti, bool show)
-// {
-// 	if (show)
-// 	{
-// 		// rm from otherws
-// 
-// 	}
-// 	else
-// 	{
-// 		m_otherWS.push_back(std::move(ti));
-// 	}
-// 	::ShowWindow(hwnd, show ? SW_SHOW : SW_HIDE);
-// }
-
 bool Tasks::AddTask (HWND hwnd)
 {
 	if (TaskInfo * ti = FindTask(hwnd))
@@ -138,21 +124,27 @@ bool Tasks::AddTask (HWND hwnd)
 			{
 				ti_ptr->m_config = &c;
 				ti_ptr->SetWorkSpace(c.m_wspace.c_str());
-				if (current_ws)
-				{
-					bool const show = c.m_wspace == *current_ws;
-					SendWindowToWorkSpace(ti_ptr->m_hwnd, show);
-				}
 				// if ignored
 				// if sticky
+				break;
 			}
-		}
 
-		if (current_ws && wcslen(ti_ptr->m_wspace) == 0)
-			ti_ptr->SetWorkSpace(current_ws->c_str());
-		TRACE_MSG(LL_DEBUG, CTX_BB, "+++ %ws e=%i i=%i", cap.c_str(), (ti_ptr->m_config ? ti_ptr->m_config->m_exclude : '0'), (ti_ptr->m_config ? ti_ptr->m_config->m_ignore : '0'));
-		m_tasks.push_back(std::move(ti_ptr));
-		return true;
+			if (current_ws && wcslen(ti_ptr->m_wspace) == 0)
+				ti_ptr->SetWorkSpace(current_ws->c_str());
+			bool const is_current_ws = *current_ws == ti_ptr->m_wspace;
+			TRACE_MSG(LL_DEBUG, CTX_BB, "+++ %ws e=%i i=%i", cap.c_str(), (ti_ptr->m_config ? ti_ptr->m_config->m_exclude : '0'), (ti_ptr->m_config ? ti_ptr->m_config->m_ignore : '0'));
+
+			if (is_current_ws)
+			{
+				m_tasks.push_back(std::move(ti_ptr));
+			}
+			else
+			{
+				m_otherWS.push_back(std::move(ti_ptr));
+				::ShowWindow(hwnd, SW_HIDE);
+			}
+			return true;
+		}
 	}
 }
 
@@ -243,7 +235,12 @@ void Tasks::MakeIgnored (HWND hwnd)
 	{
 		if (ti && ti->m_hwnd == hwnd)
 		{
-			showInFromTaskBar(ti->m_hwnd, false);
+			//showInFromTaskBar(ti->m_hwnd, false);
+
+			::ShowWindow(hwnd, SW_HIDE);
+			::SetWindowLongPtr(hwnd, GWL_EXSTYLE, WS_EX_TOOLWINDOW);
+			::ShowWindow(hwnd, SW_SHOW);
+
 			ti->m_ignore = true;
 			TRACE_MSG(LL_DEBUG, CTX_BB, "make task ignored hwnd=%x", ti->m_hwnd);
 			m_ignored.push_back(std::move(ti));
@@ -260,7 +257,15 @@ void Tasks::RemoveIgnored (HWND hwnd)
 	{
 		if (ti && ti->m_hwnd == hwnd)
 		{
-			showInFromTaskBar(ti->m_hwnd, true);
+			LONG_PTR const flags = GetWindowLongPtr(hwnd, GWL_EXSTYLE);
+			if (WS_EX_TOOLWINDOW & flags)
+			{
+				::ShowWindow(hwnd, SW_HIDE);
+				::SetWindowLongPtr(hwnd, GWL_EXSTYLE, WS_EX_APPWINDOW);
+				::ShowWindow(hwnd, SW_SHOW);
+			}
+
+			//showInFromTaskBar(ti->m_hwnd, true);
 			ti->m_ignore = false;
 		}
 	}
