@@ -35,7 +35,7 @@ namespace bb {
 		void Update ();
 
 		void MakeSticky (HWND hwnd);
-		void REemoveSticky (HWND hwnd);
+		void RemoveSticky (HWND hwnd);
 		bool IsSticky (HWND hwnd);
 		void MakeIgnored (HWND hwnd);
 		//void MakeIgnored (wchar_t const * caption);
