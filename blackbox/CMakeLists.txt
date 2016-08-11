@@ -58,7 +58,7 @@ set(blackbox_SOURCES
 	widgets/ControlPanelWidget.cpp
 	widgets/DebugWidget.cpp
 	widgets/TasksWidget.cpp
-  widgets/RecoverWindowsWidget.cpp
+	widgets/RecoverWindowsWidget.cpp
 	widgets/TrayWidget.cpp
 	widgets/PagerWidget.cpp
 	Menu/Menu.cpp
@@ -97,7 +97,7 @@ set (blackbox_HEADERS
 	widgets/ControlPanelWidget.h
 	widgets/DebugWidget.h
 	widgets/TasksWidget.h
-  widgets/RecoverWindowsWidget.h
+	widgets/RecoverWindowsWidget.h
 	widgets/TrayWidget.h
 	widgets/PagerWidget.h
 	plugin/plugin.h

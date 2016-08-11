@@ -14,6 +14,7 @@
 #include <widgets/StyleEditorWidget.h>
 #include <widgets/PluginsWidget.h>
 #include <widgets/ControlPanelWidget.h>
+#include <widgets/RecoverWindowsWidget.h>
 #include <widgets/TasksWidget.h>
 #include <widgets/PagerWidget.h>
 #include <widgets/DebugWidget.h>
@@ -346,6 +347,14 @@ namespace bb {
 			w0wdg0->m_enabled = true;
 			w0->GetGui()->AddWidget(w0wdg0);
 		}
+		{
+			GfxWindow * w2 = m_gfx.MkGuiWindow(0, 200, 600, 600, L"bbRecoverWindows", L"bbRecoverWindows");
+			w2->m_gui->m_enabled = true;
+			RecoverWindowsWidget * w2wdg0 = new RecoverWindowsWidget;
+			w2wdg0->m_enabled = true;
+			w2->GetGui()->AddWidget(w2wdg0);
+		}
+
 
 //		GfxWindow * w1 = m_gfx.MkGuiWindow(0, 200, 800, 600, L"bbStyleEditor", L"bbStyleEditor");
 //		{

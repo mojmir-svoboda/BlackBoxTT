@@ -1,5 +1,5 @@
 /* ==========================================================================
-This file is part of the bbLean source code
+This file is part of the bb source code
 Copyright © 2001-2003 The Blackbox for Windows Development Team
 Copyright © 2004-2009 grischka
 Copyright © 2015-2016 mojmir
@@ -13,7 +13,7 @@ static BOOL CALLBACK recoverWindowEnumProc (HWND hwnd, LPARAM lParam);
 
 namespace bb {
 
-	int GetAppByWindow (HWND hwnd, wchar_t * name, size_t n)
+	size_t getAppByWindow (HWND hwnd, wchar_t * name, size_t n)
 	{
 		name[0] = '\0';
 
@@ -21,14 +21,13 @@ namespace bb {
 		::GetWindowThreadProcessId(hwnd, &pid); // determine the process id of the window handle
 
 		HANDLE const hPr0 = ::OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
-		wchar_t modname[1024];
 		if (hPr0)
 		{
 			HMODULE hMod = nullptr;
 			DWORD cbNeeded = 0;
 			if (::EnumProcessModules(hPr0, &hMod, sizeof(hMod), &cbNeeded))
 			{
-				::GetModuleBaseName(hPr0, hMod, modname, 1024);
+				::GetModuleBaseName(hPr0, hMod, name, n);
 			}
 			::CloseHandle(hPr0);
 		}
@@ -93,15 +92,12 @@ static BOOL CALLBACK recoverWindowEnumProc (HWND hwnd, LPARAM lParam)
 		wchar_t classname[512];
 		classname[0] = 0;
 		GetClassName(hwnd, classname, 256);
-		
-		bb::GetAppByWindow(hwnd, appname, 512);
-
+	
 		if (params->m_size < params->m_capacity)
 		{
 			size_t const idx = params->m_size++;
 			params->m_data[idx].m_hwnd = hwnd;
 			params->m_data[idx].m_visible = FALSE != ::IsWindowVisible(hwnd);
-			wcsncpy(params->m_data[idx].m_appName, appname, 512);
 			wcsncpy(params->m_data[idx].m_caption, windowtext, 512);
 		}
 		else
