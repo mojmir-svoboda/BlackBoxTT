@@ -53,13 +53,14 @@ set(blackbox_SOURCES
 	gfx/GfxWindow.cpp
 	gfx/IconCache.cpp
 	gfx/Gui.cpp
-	widgets/Plugins.cpp
-	widgets/StyleEditor.cpp
-	widgets/ControlPanel.cpp
-	widgets/Debug.cpp
-	widgets/Tasks.cpp
-	widgets/Tray.cpp
-	widgets/Pager.cpp
+	widgets/PluginsWidget.cpp
+	widgets/StyleEditorWidget.cpp
+	widgets/ControlPanelWidget.cpp
+	widgets/DebugWidget.cpp
+	widgets/TasksWidget.cpp
+  widgets/RecoverWindowsWidget.cpp
+	widgets/TrayWidget.cpp
+	widgets/PagerWidget.cpp
 	Menu/Menu.cpp
 	bind/bind.cpp
 	plugin/PluginManager.cpp
@@ -91,13 +92,14 @@ set (blackbox_HEADERS
 	gfx/imgui.h
 	gfx/utils_gdi.h
 	gfx/utils_imgui.h
-	widgets/Plugins.h
-	widgets/StyleEditor.h
-	widgets/ControlPanel.h
-	widgets/Debug.cpp
-	widgets/Tasks.cpp
-	widgets/Tray.cpp
-	widgets/Pager.h
+	widgets/PluginsWidget.h
+	widgets/StyleEditorWidget.h
+	widgets/ControlPanelWidget.h
+	widgets/DebugWidget.h
+	widgets/TasksWidget.h
+  widgets/RecoverWindowsWidget.h
+	widgets/TrayWidget.h
+	widgets/PagerWidget.h
 	plugin/plugin.h
 	plugin/PluginManager.h
 	plugin/PluginConfig.h

@@ -1,4 +1,4 @@
-#include "Pager.h"
+#include "PagerWidget.h"
 #include <blackbox/BlackBox.h>
 #include <blackbox/gfx/utils_imgui.h>
 #include <bblib/codecvt.h>
@@ -15,12 +15,14 @@ namespace bb {
 		m_tasks.clear();
 
 		Tasks & tasks = BlackBox::Instance().GetTasks();
+
 		tasks.m_lock.Lock();
 		for (Tasks::TaskInfoPtr & t : tasks.m_tasks)
-		{
 			if (t)
 				m_tasks.emplace_back(t);
-		}
+		for (Tasks::TaskInfoPtr & t : tasks.m_otherWS)
+			if (t)
+				m_tasks.emplace_back(t);
 		tasks.m_lock.Unlock();
 	}
 
@@ -51,14 +53,13 @@ namespace bb {
 
 					if (ImGui::Button(idu8.c_str()))
 					{ 
-						// bacha tady sem pod zamkem
-						/*switchworkspace*/;
+						BlackBox::Instance().GetWorkSpaces().SetCurrentVertexId(vertex_id);
 					}
 
 					int tmp = 0;
 					for (PagerTaskInfo & t : m_tasks)
 					{
-						if (++tmp % 4)
+						if (tmp++ % 4)
 							ImGui::SameLine();
 						if (t.m_exclude)
 							continue;

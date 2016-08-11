@@ -1,3 +1,9 @@
+/* ==========================================================================
+This file is part of the bbLean source code
+Copyright © 2001-2003 The Blackbox for Windows Development Team
+Copyright © 2004-2009 grischka
+Copyright © 2015-2016 mojmir
+========================================================================== */
 #include "utils_recover.h"
 #include <platform_win.h>
 #include <Psapi.h>

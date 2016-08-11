@@ -11,12 +11,12 @@
 #include <net/Server.h>
 #include <scheme/Scheme.h>
 #include <net/commands.h>
-#include <widgets/StyleEditor.h>
-#include <widgets/Plugins.h>
-#include <widgets/ControlPanel.h>
-#include <widgets/Tasks.h>
-#include <widgets/Pager.h>
-#include <widgets/Debug.h>
+#include <widgets/StyleEditorWidget.h>
+#include <widgets/PluginsWidget.h>
+#include <widgets/ControlPanelWidget.h>
+#include <widgets/TasksWidget.h>
+#include <widgets/PagerWidget.h>
+#include <widgets/DebugWidget.h>
 #include "utils_win32.h"
 #include "hooks/taskhook.h"
 
