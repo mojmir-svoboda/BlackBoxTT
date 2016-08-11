@@ -517,7 +517,6 @@ namespace bb
 	void Gui::RenderImGui ()
 	{
 		ImDrawData * draw_data = ImGui::GetDrawData();
-		DX11 * m_dx11 = bb::BlackBox::Instance().m_gfx.m_dx11;
 
 		// Create and grow vertex/index buffers if needed
 		if (!m_pVB || m_VertexBufferSize < draw_data->TotalVtxCount)

@@ -105,10 +105,13 @@ namespace bb {
 
 	void Gfx::Render ()
 	{
-		m_iconCache.Update();
-		for (GfxWindowPtr & w : m_windows)
+		if (IsReady())
 		{
-			w->Render();
+			m_iconCache.Update();
+			for (GfxWindowPtr & w : m_windows)
+			{
+				w->Render();
+			}
 		}
 	}
 
