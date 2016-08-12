@@ -128,23 +128,23 @@ bool Tasks::AddTask (HWND hwnd)
 				// if sticky
 				break;
 			}
-
-			if (current_ws && wcslen(ti_ptr->m_wspace) == 0)
-				ti_ptr->SetWorkSpace(current_ws->c_str());
-			bool const is_current_ws = *current_ws == ti_ptr->m_wspace;
-			TRACE_MSG(LL_DEBUG, CTX_BB, "+++ %ws e=%i i=%i", cap.c_str(), (ti_ptr->m_config ? ti_ptr->m_config->m_exclude : '0'), (ti_ptr->m_config ? ti_ptr->m_config->m_ignore : '0'));
-
-			if (is_current_ws)
-			{
-				m_tasks.push_back(std::move(ti_ptr));
-			}
-			else
-			{
-				m_otherWS.push_back(std::move(ti_ptr));
-				::ShowWindow(hwnd, SW_HIDE);
-			}
-			return true;
 		}
+
+		if (current_ws && wcslen(ti_ptr->m_wspace) == 0)
+			ti_ptr->SetWorkSpace(current_ws->c_str());
+		bool const is_current_ws = *current_ws == ti_ptr->m_wspace;
+		TRACE_MSG(LL_DEBUG, CTX_BB, "+++ %ws e=%i i=%i", cap.c_str(), (ti_ptr->m_config ? ti_ptr->m_config->m_exclude : '0'), (ti_ptr->m_config ? ti_ptr->m_config->m_ignore : '0'));
+
+		if (is_current_ws)
+		{
+			m_tasks.push_back(std::move(ti_ptr));
+		}
+		else
+		{
+			m_otherWS.push_back(std::move(ti_ptr));
+			::ShowWindow(hwnd, SW_HIDE);
+		}
+		return true;
 	}
 }
 
