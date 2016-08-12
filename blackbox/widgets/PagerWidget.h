@@ -4,17 +4,10 @@
 
 namespace bb {
 
-	struct PagerTaskInfo : TaskInfo
-	{
-		PagerTaskInfo (Tasks::TaskInfoPtr const & p)
-			: TaskInfo(*p.get())
-		{ }
-	};
-
 	struct PagerWidget : GuiWidget
 	{
 		bool m_horizontal;
-		std::vector<PagerTaskInfo> m_tasks;
+		std::vector<TaskInfo> m_tasks;
 
 		PagerWidget ();
 		virtual ~PagerWidget () { }

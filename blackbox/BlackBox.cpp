@@ -21,8 +21,6 @@
 #include "utils_win32.h"
 #include "hooks/taskhook.h"
 
-LRESULT CALLBACK mainWndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
 extern "C"
 {
 	bb::BlackBox const * getBlackBoxInstance ()
@@ -135,6 +133,8 @@ void setDefaultValuesTo (StyleStruct & s)
 }
 
 namespace bb {
+
+	LRESULT CALLBACK mainWndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	BlackBox & BlackBox::Instance ()
 	{

@@ -10,14 +10,7 @@
 #include <utils_paths.h>
 #include <bblib/logging.h>
 
-BOOL CALLBACK taskEnumProc (HWND hwnd, LPARAM lParam)
-{
-	if (bb::isAppWindow(hwnd))
-	{
-		bb::BlackBox::Instance().GetTasks().AddTask(hwnd);
-	}
-	return TRUE;
-}
+namespace bb {
 
 LRESULT CALLBACK mainWndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -85,3 +78,4 @@ LRESULT CALLBACK mainWndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 	return 0;
 }
 
+}

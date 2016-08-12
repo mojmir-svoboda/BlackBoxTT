@@ -16,13 +16,7 @@ namespace bb {
 		m_tasks.clear();
 
 		Tasks & tasks = BlackBox::Instance().GetTasks();
-		tasks.m_lock.Lock();
-		for (Tasks::TaskInfoPtr & t : tasks.m_tasks)
-		{
-			if (t)
-				m_tasks.emplace_back(*t);
-		}
-		tasks.m_lock.Unlock();
+		tasks.MkDataCopy(e_Active, m_tasks);
 	}
 
 

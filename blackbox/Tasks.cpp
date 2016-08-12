@@ -6,8 +6,7 @@
 #include "logging.h"
 #include "BlackBox.h"
 #include <cassert>
-
-BOOL CALLBACK taskEnumProc (HWND hwnd, LPARAM lParam);
+#include <limits>
 
 namespace bb {
 
@@ -25,9 +24,9 @@ bool Tasks::Init (TasksConfig & config)
 {
 	TRACE_SCOPE(LL_INFO, CTX_BB | CTX_INIT);
 	m_config = config;
-	m_tasks.reserve(128);
-	m_ignored.reserve(32);
-	m_otherWS.reserve(128);
+	m_tasks[TaskState::e_Active].reserve(128);
+	m_tasks[TaskState::e_Ignored].reserve(32);
+	m_tasks[TaskState::e_OtherWS].reserve(128);
 
 	EnumTasks();
 	return true;
@@ -36,38 +35,58 @@ bool Tasks::Init (TasksConfig & config)
 bool Tasks::Done ()
 {
 	TRACE_MSG(LL_INFO, CTX_BB, "Terminating tasks");
-	m_tasks.clear();
-	m_ignored.clear();
-	m_otherWS.clear();
+	m_tasks[TaskState::e_Active].clear();
+	m_tasks[TaskState::e_Ignored].clear();
+	m_tasks[TaskState::e_OtherWS].clear();
 	return true;
 }
 
-TaskInfo * Tasks::FindTask (HWND hwnd)
+void Tasks::MkDataCopy (TaskState ts, std::vector<TaskInfo> & p)
 {
-	for (TaskInfoPtr & ti : m_tasks)
-		if (ti && ti->m_hwnd == hwnd)
-			return ti.get();
-	return nullptr;
+	m_lock.Lock();
+
+	for (TaskInfoPtr & t : m_tasks[ts])
+		if (t)
+			p.emplace_back(*t.get());
+
+	m_lock.Unlock();
 }
-TaskInfo const * Tasks::FindTask (HWND hwnd) const
+
+bool Tasks::FindTask (HWND hwnd, TaskState & state, size_t & idx)
 {
-	for (TaskInfoPtr const & ti : m_tasks)
-		if (ti && ti->m_hwnd == hwnd)
-			return ti.get();
-	return nullptr;
+	return static_cast<Tasks const &>(*this).FindTask(hwnd, state, idx);
+}
+bool Tasks::FindTask (HWND hwnd, TaskState & state, size_t & idx) const
+{
+	for (size_t s = 0; s < m_tasks.size(); ++s)
+		for (size_t i = 0, ie = m_tasks[s].size(); i < ie; ++i)
+			if (m_tasks[s][i] && m_tasks[s][i]->m_hwnd == hwnd)
+			{
+				state = static_cast<TaskState>(s);
+				idx = i;
+				return true;
+			}
+	state = max_enum_value;
+	idx = c_invalidIndex;
+	return false;
 }
 
 bool Tasks::RmTask (HWND hwnd)
 {
-	for (size_t i = 0, ie = m_tasks.size(); i < ie; ++i)
+	TaskState ts = TaskState::max_enum_value;
+	size_t idx = c_invalidIndex;
+	if (FindTask(hwnd, ts, idx))
 	{
-		TaskInfoPtr & ti = m_tasks[i];
-		if (ti && ti->m_hwnd == hwnd)
+		TaskInfoPtr & ti_ptr = m_tasks[ts][idx];
+		if (ti_ptr && ti_ptr->m_hwnd == hwnd)
 		{
-			TRACE_MSG(LL_DEBUG, CTX_BB, "--- %ws", ti->m_caption);
-			if (ti.get() == m_active)
+			TRACE_MSG(LL_DEBUG, CTX_BB, "--- %ws", ti_ptr->m_caption);
+			if (ti_ptr.get() == m_active)
+			{
 				m_active = nullptr;
-			m_tasks.erase(m_tasks.begin() + i);
+			}
+			if (ts == e_Active)
+				m_tasks[ts].erase(m_tasks[ts].begin() + idx);
 			return true;
 		}
 	}
@@ -93,20 +112,30 @@ void Tasks::UpdateTaskInfo (TaskInfo * ti, bool force)
 	//ti->m_active = true;
 }
 
+BOOL CALLBACK taskEnumProc(HWND hwnd, LPARAM lParam)
+{
+	if (bb::isAppWindow(hwnd))
+	{
+		bb::BlackBox::Instance().GetTasks().AddTask(hwnd);
+	}
+	return TRUE;
+}
 
 void Tasks::EnumTasks ()
 {
 	TRACE_SCOPE(LL_VERBOSE, CTX_BB);
 	m_lock.Lock();
-	EnumWindows(taskEnumProc, 0);
+	EnumWindows(taskEnumProc, (LPARAM)this);
 	m_lock.Unlock();
 }
 
 bool Tasks::AddTask (HWND hwnd)
 {
-	if (TaskInfo * ti = FindTask(hwnd))
+	TaskState ts = TaskState::max_enum_value;
+	size_t idx = c_invalidIndex;
+	if (FindTask(hwnd, ts, idx))
 	{
-		UpdateTaskInfo(ti, true);
+		UpdateTaskInfo(m_tasks[ts][idx].get(), true);
 		return false;
 	}
 	else
@@ -137,18 +166,48 @@ bool Tasks::AddTask (HWND hwnd)
 
 		if (is_current_ws)
 		{
-			m_tasks.push_back(std::move(ti_ptr));
+			if (ti_ptr->m_config && ti_ptr->m_config->m_ignore)
+				m_tasks[e_Ignored].push_back(std::move(ti_ptr));
+			else
+				m_tasks[e_Active].push_back(std::move(ti_ptr));
 		}
 		else
 		{
-			m_otherWS.push_back(std::move(ti_ptr));
+			m_tasks[e_OtherWS].push_back(std::move(ti_ptr));
 			::ShowWindow(hwnd, SW_HIDE);
 		}
 		return true;
 	}
 }
 
-LRESULT update (WPARAM wParam, LPARAM lParam);
+//LRESULT update (WPARAM wParam, LPARAM lParam);
+
+void Tasks::OnHookWindowCreated (HWND hwnd)
+{
+	m_lock.Lock();
+	AddTask(hwnd);
+	m_lock.Unlock();
+}
+
+void Tasks::OnHookWindowDestroyed (HWND hwnd)
+{
+	m_lock.Lock();
+	bool const removed0 = RmTask(hwnd);
+	m_lock.Unlock();
+}
+
+void Tasks::OnHookWindowActivated (HWND hwnd)
+{
+	m_lock.Lock();
+	TaskState ts = TaskState::max_enum_value;
+	size_t idx = c_invalidIndex;
+	if (FindTask(hwnd, ts, idx))
+	{
+		m_active = m_tasks[ts][idx].get();
+		TRACE_MSG(LL_DEBUG, CTX_BB, " *  %ws", m_active->m_caption);
+	}
+	m_lock.Unlock();
+}
 
 LRESULT Tasks::UpdateFromTaskHook (WPARAM wParam, LPARAM lParam)
 {
@@ -158,21 +217,15 @@ LRESULT Tasks::UpdateFromTaskHook (WPARAM wParam, LPARAM lParam)
 		//case HCBT_CREATEWND:
 		case HSHELL_WINDOWCREATED:
 		{
-			m_lock.Lock();
 			HWND const hwnd = reinterpret_cast<HWND>(lParam);
-			AddTask(hwnd);
-			m_lock.Unlock();
+			OnHookWindowCreated(hwnd);
 			break;
 		}
 		//case HCBT_DESTROYWND:
 		case HSHELL_WINDOWDESTROYED:
 		{
-			m_lock.Lock();
 			HWND const hwnd = reinterpret_cast<HWND>(lParam);
-			bool const removed0 = RmTask(hwnd);
-//			bool const removed1 = RmIgnored(hwnd);
-//			bool const removed2 = RmOtherWS(hwnd);
-			m_lock.Unlock();
+			OnHookWindowDestroyed(hwnd);
 			break;
 		}
 // 		case HSHELL_ACTIVATESHELLWINDOW:
@@ -184,14 +237,8 @@ LRESULT Tasks::UpdateFromTaskHook (WPARAM wParam, LPARAM lParam)
 		//case HCBT_ACTIVATE:
 		case HSHELL_WINDOWACTIVATED:
 		{
-			m_lock.Lock();
 			HWND const hwnd = reinterpret_cast<HWND>(lParam);
-			if (TaskInfo * ti = FindTask(hwnd))
-			{
-				m_active = ti;
-				TRACE_MSG(LL_DEBUG, CTX_BB, " *  %ws", ti->m_caption);
-			}
-			m_lock.Unlock();
+			OnHookWindowActivated(hwnd);
 			break;
 		}
 		case HSHELL_GETMINRECT:
@@ -223,29 +270,37 @@ LRESULT Tasks::UpdateFromTaskHook (WPARAM wParam, LPARAM lParam)
 
 void Tasks::HideTasksFromWorkSpace (bbstring const & wspace)
 {
-
+	m_lock.Lock();
+	m_lock.Unlock();
 }
 void Tasks::ShowTasksFromWorkSpace (bbstring const & wspace)
 {
+	m_lock.Lock();
+	m_lock.Unlock();
 }
 
 void Tasks::MakeIgnored (HWND hwnd)
 {
-	for (TaskInfoPtr & ti : m_tasks)
+	m_lock.Lock();
+
+	TaskState ts = TaskState::max_enum_value;
+	size_t idx = c_invalidIndex;
+	if (FindTask(hwnd, ts, idx))
 	{
-		if (ti && ti->m_hwnd == hwnd)
-		{
-			//showInFromTaskBar(ti->m_hwnd, false);
+		TaskInfoPtr & ti_ptr = m_tasks[ts][idx];
 
-			::ShowWindow(hwnd, SW_HIDE);
-			::SetWindowLongPtr(hwnd, GWL_EXSTYLE, WS_EX_TOOLWINDOW);
-			::ShowWindow(hwnd, SW_SHOW);
+		//showInFromTaskBar(ti->m_hwnd, false); --> does not work @TODO @FIXMe
+		::ShowWindow(hwnd, SW_HIDE);
+		::SetWindowLongPtr(hwnd, GWL_EXSTYLE, WS_EX_TOOLWINDOW);
+		::ShowWindow(hwnd, SW_SHOW);
 
-			ti->m_ignore = true;
-			TRACE_MSG(LL_DEBUG, CTX_BB, "make task ignored hwnd=%x", ti->m_hwnd);
-			m_ignored.push_back(std::move(ti));
-		}
+		ti_ptr->m_ignore = true;
+		TRACE_MSG(LL_DEBUG, CTX_BB, "make task ignored hwnd=%x", ti_ptr->m_hwnd);
+		if (ts != e_Ignored)
+			m_tasks[e_Ignored].push_back(std::move(ti_ptr));
 	}
+
+	m_lock.Unlock();
 }
 // void Tasks::MakeIgnored (wchar_t const * caption)
 // {
@@ -253,7 +308,9 @@ void Tasks::MakeIgnored (HWND hwnd)
 
 void Tasks::RemoveIgnored (HWND hwnd)
 {
-	for (TaskInfoPtr & ti : m_ignored)
+	m_lock.Lock();
+
+	for (TaskInfoPtr & ti : m_tasks[e_Ignored])
 	{
 		if (ti && ti->m_hwnd == hwnd)
 		{
@@ -270,6 +327,7 @@ void Tasks::RemoveIgnored (HWND hwnd)
 		}
 	}
 	
+	m_lock.Unlock();
 }
 
 void Tasks::Focus (HWND hwnd)
@@ -279,13 +337,20 @@ void Tasks::Focus (HWND hwnd)
 
 void Tasks::Update ()
 {
-	for (TaskInfoPtr & ti : m_ignored)
-	{
-		if (ti)
-		{
-			UpdateTaskInfo(ti.get(), true);
-		}
-	}
+	m_lock.Lock();
+
+	//ten update je nakej rozbitej
+		;
+	;
+	;
+	if (1)
+	;
+// 	for (size_t s = 0; s < m_tasks.size(); ++s)
+// 		for (size_t i = 0, ie = m_tasks[s].size(); i < ie; ++i)
+// 			if (m_tasks[s][i])
+// 				UpdateTaskInfo(m_tasks[s][i].get(), true);
+
+	m_lock.Unlock();
 }
 
 }

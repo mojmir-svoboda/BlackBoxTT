@@ -15,15 +15,8 @@ namespace bb {
 		m_tasks.clear();
 
 		Tasks & tasks = BlackBox::Instance().GetTasks();
-
-		tasks.m_lock.Lock();
-		for (Tasks::TaskInfoPtr & t : tasks.m_tasks)
-			if (t)
-				m_tasks.emplace_back(t);
-		for (Tasks::TaskInfoPtr & t : tasks.m_otherWS)
-			if (t)
-				m_tasks.emplace_back(t);
-		tasks.m_lock.Unlock();
+		tasks.MkDataCopy(e_Active, m_tasks);
+		tasks.MkDataCopy(e_OtherWS, m_tasks);
 	}
 
 	void PagerWidget::DrawUI ()
@@ -57,7 +50,7 @@ namespace bb {
 					}
 
 					int tmp = 0;
-					for (PagerTaskInfo & t : m_tasks)
+					for (TaskInfo & t : m_tasks)
 					{
 						if (tmp++ % 4)
 							ImGui::SameLine();
