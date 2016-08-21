@@ -79,6 +79,7 @@ namespace bb {
 		unsigned GetTaskHookWM () const { return m_taskHookWM; }
 		void * GetSettingPtr (int sn_index);
 		bool GetConfigDir (wchar_t * dir, size_t dir_sz) const;
+		bool WorkSpacesSetCurrentVertexId (bbstring const & vertex_id);
 	};
 }
 

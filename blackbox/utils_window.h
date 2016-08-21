@@ -131,29 +131,40 @@ inline void showInFromTaskBar (HWND hwnd, bool show)
 {
 	if (show)
 	{
-		long style = ::GetWindowLong(hwnd, GWL_STYLE);
-		style &= ~(WS_VISIBLE);    // this works - window become invisible 
+		LONG_PTR const flags = GetWindowLongPtr(hwnd, GWL_EXSTYLE);
+		if (WS_EX_TOOLWINDOW & flags)
+		{
+			::ShowWindow(hwnd, SW_HIDE);
+			::SetWindowLongPtr(hwnd, GWL_EXSTYLE, WS_EX_APPWINDOW);
+			::ShowWindow(hwnd, SW_SHOW);
+		}
 
-		style |= WS_EX_TOOLWINDOW;   // flags don't work - windows remains in taskbar
-		style &= ~(WS_EX_APPWINDOW);
-
-		::ShowWindow(hwnd, SW_HIDE); // hide the window
-		::SetWindowLong(hwnd, GWL_STYLE, style); // set the style
-		::ShowWindow(hwnd, SW_SHOW); // show the window for the new style to come into effect
-		::ShowWindow(hwnd, SW_HIDE); // hide the window so we can't see it
+// 		long style = ::GetWindowLong(hwnd, GWL_STYLE);
+// 		style &= ~(WS_VISIBLE);    // this works - window become invisible 
+// 
+// 		style |= WS_EX_TOOLWINDOW;   // flags don't work - windows remains in taskbar
+// 		style &= ~(WS_EX_APPWINDOW);
+// 
+// 		::ShowWindow(hwnd, SW_HIDE); // hide the window
+// 		::SetWindowLong(hwnd, GWL_STYLE, style); // set the style
+// 		::ShowWindow(hwnd, SW_SHOW); // show the window for the new style to come into effect
+// 		::ShowWindow(hwnd, SW_HIDE); // hide the window so we can't see it
 	}
 	else
 	{
-		long style = ::GetWindowLong(hwnd, GWL_STYLE);
-		style &= ~(WS_VISIBLE);    // this works - window become invisible 
-
-		style |= WS_EX_TOOLWINDOW;   // flags don't work - windows remains in taskbar
-		style &= ~(WS_EX_APPWINDOW);
-
-		::ShowWindow(hwnd, SW_HIDE); // hide the window
-		::SetWindowLong(hwnd, GWL_STYLE, style); // set the style
-		::ShowWindow(hwnd, SW_SHOW); // show the window for the new style to come into effect
-		::ShowWindow(hwnd, SW_HIDE); // hide the window so we can't see it
+		::ShowWindow(hwnd, SW_HIDE);
+		::SetWindowLongPtr(hwnd, GWL_EXSTYLE, WS_EX_TOOLWINDOW);
+		::ShowWindow(hwnd, SW_SHOW);
+// 		long style = ::GetWindowLong(hwnd, GWL_STYLE);
+// 		style &= ~(WS_VISIBLE);    // this works - window become invisible 
+// 
+// 		style |= WS_EX_TOOLWINDOW;   // flags don't work - windows remains in taskbar
+// 		style &= ~(WS_EX_APPWINDOW);
+// 
+// 		::ShowWindow(hwnd, SW_HIDE); // hide the window
+// 		::SetWindowLong(hwnd, GWL_STYLE, style); // set the style
+// 		::ShowWindow(hwnd, SW_SHOW); // show the window for the new style to come into effect
+// 		::ShowWindow(hwnd, SW_HIDE); // hide the window so we can't see it
 	}
 }
 

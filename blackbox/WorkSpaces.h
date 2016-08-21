@@ -23,6 +23,7 @@ namespace bb {
 
 		void SetCurrentClusterId (bbstring const & id);
 		bool SetCurrentVertexId (bbstring const & id);
+		bool CanSetCurrentVertexId (bbstring const & id) const;
 
 		bbstring const & GetCurrentClusterId () const { return m_config.m_currentClusterId; }
 		bbstring const * GetCurrentVertexId () const;

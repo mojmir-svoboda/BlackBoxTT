@@ -82,7 +82,9 @@ namespace bb {
 		TRACE_MSG(LL_INFO, CTX_BB | CTX_GFX, "Created new gui @ 0x%x wname=%ws", gui, wname);
 		HWND hwnd = MkWindow(static_cast<void *>(gui), x, y, w, h, clname, wname);
 		GfxWindow * res = MkGfxWindow(hwnd, gui, clname, wname);
+
 		::ShowWindow(hwnd, SW_SHOW);
+		showInFromTaskBar(hwnd, false);
 		return res;
 	}
 

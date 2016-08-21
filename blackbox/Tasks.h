@@ -9,6 +9,7 @@
 
 namespace bb {
 
+	struct GfxWindow;
 	BOOL CALLBACK taskEnumProc (HWND hwnd, LPARAM lParam);
 	LRESULT CALLBACK mainWndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -25,6 +26,7 @@ namespace bb {
 	{
 		friend BOOL taskEnumProc(HWND hwnd, LPARAM lParam);
 		friend LRESULT mainWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+		friend struct BlackBox;
 
 		size_t const c_invalidIndex = std::numeric_limits<size_t>::max();
 		SpinLock m_lock;
@@ -44,8 +46,7 @@ namespace bb {
 		bool Done ();
 
 		void MkDataCopy (TaskState ts, std::vector<TaskInfo> & p);
-		void HideTasksFromWorkSpace (bbstring const & wspace);
-		void ShowTasksFromWorkSpace (bbstring const & wspace);
+		void SwitchWorkSpace (bbstring const & src, bbstring const & dst);
 		void MakeSticky (HWND hwnd);
 		void RemoveSticky (HWND hwnd);
 		bool IsSticky (HWND hwnd);
@@ -59,9 +60,11 @@ namespace bb {
 		bool FindTask (HWND hwnd, TaskState & state, size_t & idx);
 		bool FindTask (HWND hwnd, TaskState & state, size_t & idx) const;
 		bool RmTask (HWND hwnd);
-		void UpdateTaskInfo (TaskInfo * ti, bool force_update);
+		void UpdateTaskInfoCaption (TaskInfo * ti);
+		void UpdateTaskInfo (TaskInfo * ti);
 		void EnumTasks ();
 		bool AddTask (HWND hwnd);
+		bool AddWidgetTask (GfxWindow * w);
 
 		LRESULT UpdateFromTaskHook (WPARAM wParam, LPARAM lParam);
 		void OnHookWindowCreated (HWND hwnd);

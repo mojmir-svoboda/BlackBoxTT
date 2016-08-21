@@ -48,5 +48,22 @@ namespace bb {
 		return false;
 	}
 
+	bool BlackBox::WorkSpacesSetCurrentVertexId (bbstring const & vertex_id)
+	{
+		WorkSpaces & ws = m_wspaces;
+
+		bbstring const & cluster_id = ws.GetCurrentClusterId();
+		if (WorkGraphConfig const * wg = ws.FindCluster(cluster_id))
+		{
+			bbstring const & curr_ws = wg->m_currentVertexId;
+			if (ws.CanSetCurrentVertexId(vertex_id))
+			{
+				ws.SetCurrentVertexId(vertex_id);
+				m_tasks.SwitchWorkSpace(curr_ws, vertex_id);
+			}
+		}
+		return false;
+	}
+
 }
 

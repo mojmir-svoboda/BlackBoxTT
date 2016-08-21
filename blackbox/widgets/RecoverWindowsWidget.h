@@ -7,6 +7,8 @@ namespace bb {
 	struct RecoverWindowsWidget : GuiWidget
 	{
 		std::vector<TaskInfo> m_tasks;
+		std::vector<size_t> m_order;
+		std::vector<bbstring> m_exenames;
 
 		RecoverWindowsWidget ();
 		virtual ~RecoverWindowsWidget () { }

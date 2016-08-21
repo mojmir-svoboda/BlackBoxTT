@@ -40,7 +40,7 @@ extern "C" {
 		return bb->GetConfigDir(dir, dir_sz);
 	}
 
-	BB_API void SetCurrentVertexId (char const * vertex)
+	BB_API void WorkSpacesSetCurrentVertexId (char const * vertex)
 	{
 		bb::BlackBox * const bb = getBlackBoxInstanceRW();
 
@@ -50,7 +50,7 @@ extern "C" {
 		size_t const bbcmd_u16_ln = bb::codecvt_utf8_utf16(vertex, ln, bbcmd_u16, sz);
 		bbstring b(bbcmd_u16, bbcmd_u16_ln);
 
-		bb->GetWorkSpaces().SetCurrentVertexId(b);
+		bb->WorkSpacesSetCurrentVertexId(b);
 	}
 }
 

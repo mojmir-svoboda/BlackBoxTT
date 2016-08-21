@@ -10,11 +10,14 @@ namespace bb {
 	RecoverWindowsWidget::RecoverWindowsWidget ()
 	{
 		m_tasks.reserve(64);
+		m_order.reserve(64);
 	}
 
 	void RecoverWindowsWidget::UpdateData ()
 	{
 		m_tasks.clear();
+		m_order.clear();
+		m_exenames.clear();
 
 		std::unique_ptr<ProcessWindows[]> pw(new ProcessWindows[512]);
 		size_t const n = enumerateProcessHandles(pw.get(), 512);
@@ -28,8 +31,23 @@ namespace bb {
 				TaskInfo ti(pwi.m_hwnd);
 				ti.SetCaption(pwi.m_caption);
 				m_tasks.emplace_back(ti);
+				m_order.push_back(i);
+				wchar_t appnamew[512] = { 0 };
+				getAppByWindow(ti.m_hwnd, appnamew, 512);
+				m_exenames.push_back(bbstring(appnamew));
 			}
 		}
+
+		struct sort_fn
+		{
+		private:
+			std::vector<bbstring> & m_src;
+		public:
+			sort_fn (std::vector<bbstring> & src) : m_src(src) {}
+			bool operator() (int i, int j) const { return m_src[i] < m_src[j]; }
+		};
+
+		std::sort(m_order.begin(), m_order.end(), sort_fn(m_exenames));
 	}
 
 
@@ -40,35 +58,32 @@ namespace bb {
 
 		Tasks & tasks = BlackBox::Instance().GetTasks();
 
-    for (TaskInfo & t : m_tasks)
+    for (size_t i = 0, ie = m_order.size(); i < ie; ++i)
     {
-      if (t.m_exclude)
+			TaskInfo & ti = m_tasks[m_order[i]];
+      if (ti.m_exclude)
         continue;
 
-      char name[TaskInfo::e_captionLenMax];
-      codecvt_utf16_utf8(t.m_caption, name, TaskInfo::e_captionLenMax);
+			if (i > 0 && m_exenames[m_order[i]] != m_exenames[m_order[i - 1]])
+				ImGui::Separator();
 
-			bool const is_visible = ::IsWindowVisible(t.m_hwnd);
+			bool const is_visible = ::IsWindowVisible(ti.m_hwnd);
 			bool chk = is_visible;
-			if (ImGui::Checkbox(name, &chk))
+			ImGui::PushID(i);
+			char appname[768];
+			codecvt_utf16_utf8(m_exenames[m_order[i]], appname, 768);
+			if (ImGui::Checkbox(appname, &chk))
 			{
 				if (chk)
-					showWindow(t.m_hwnd, true);
+					showWindow(ti.m_hwnd, true);
 				else
-					showWindow(t.m_hwnd, false);
+					showWindow(ti.m_hwnd, false);
 			}
-			ImGui::SameLine();
-			ImGui::Separator();
+			ImGui::PopID();
 
-			wchar_t appnamew[512] = { 0 };
-			
-			getAppByWindow(t.m_hwnd, appnamew, 512);
-			//HANDLE * h = GetWindowLongPtrW(t.m_hwnd, GWLP_HINSTANCE);
-			//GetModuleFileNameEx
-
-			char appname[768];
-			codecvt_utf16_utf8(appnamew, appname, 768);
-			ImGui::Text(appname);
+      char name[TaskInfo::e_captionLenMax];
+      codecvt_utf16_utf8(ti.m_caption, name, TaskInfo::e_captionLenMax);
+			ImGui::Text(name);
     }
 	}
 

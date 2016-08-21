@@ -28,7 +28,10 @@ namespace bb {
 		bbstring const & cluster_id = ws.GetCurrentClusterId();
 		if (WorkGraphConfig const * wg = ws.FindCluster(cluster_id))
 		{
-			ImGui::Text("Cluster: %s", cluster_id.c_str());
+			char curr_ws_u8[TaskInfo::e_wspaceLenMax];
+			codecvt_utf16_utf8(wg->m_currentVertexId, curr_ws_u8, TaskInfo::e_wspaceLenMax);
+
+			ImGui::Text("%s %s", cluster_id.c_str(), curr_ws_u8);
 
 			uint32_t const rows = wg->MaxRowCount();
 			uint32_t const cols = wg->MaxColCount();
@@ -41,18 +44,18 @@ namespace bb {
 				for (uint32_t r = 0; r < rows; ++r)
 				{
 					bbstring const & vertex_id = wg->m_vertexlists[r][c];
-					std::string idu8;
-					codecvt_utf16_utf8(vertex_id, idu8); // @TODO: perf!
+					char idu8[TaskInfo::e_wspaceLenMax];
+					codecvt_utf16_utf8(vertex_id, idu8, TaskInfo::e_wspaceLenMax);
 
-					if (ImGui::Button(idu8.c_str()))
+					if (ImGui::Button(idu8))
 					{ 
-						BlackBox::Instance().GetWorkSpaces().SetCurrentVertexId(vertex_id);
+						BlackBox::Instance().WorkSpacesSetCurrentVertexId(vertex_id);
 					}
 
 					int tmp = 0;
 					for (TaskInfo & t : m_tasks)
 					{
-						if (tmp++ % 4)
+						if (++tmp % 3)
 							ImGui::SameLine();
 						if (t.m_exclude)
 							continue;

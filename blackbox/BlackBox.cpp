@@ -330,9 +330,17 @@ namespace bb {
 //			w0wdg0->m_enabled = true;
 //			w0->GetGui()->AddWidget(w0wdg0);
 //		}
+		GfxWindow * w0 = m_gfx.MkGuiWindow(0, 0, 200, 200, L"bbPager", L"bbPager");
+		{
+			w0->m_gui->m_enabled = true;
+			PagerWidget * w0wdg0 = new PagerWidget;
+			w0wdg0->m_enabled = true;
+			w0->GetGui()->AddWidget(w0wdg0);
+			m_tasks.AddWidgetTask(w0);
+		}
 
 		{
-			GfxWindow * w1 = m_gfx.MkGuiWindow(0, 200, 800, 600, L"bbTasks", L"bbTasks");
+			GfxWindow * w1 = m_gfx.MkGuiWindow(0, 200, 200, 600, L"bbTasks", L"bbTasks");
 			w1->m_gui->m_enabled = true;
 			TasksWidget * w1wdg0 = new TasksWidget;
 			w1wdg0->m_enabled = true;
@@ -340,15 +348,8 @@ namespace bb {
 			w1->GetGui()->AddWidget(w1wdg0);
 		}
 
-		GfxWindow * w0 = m_gfx.MkGuiWindow(0, 0, 400, 200, L"bbPager", L"bbPager");
 		{
-			w0->m_gui->m_enabled = true;
-			PagerWidget * w0wdg0 = new PagerWidget;
-			w0wdg0->m_enabled = true;
-			w0->GetGui()->AddWidget(w0wdg0);
-		}
-		{
-			GfxWindow * w2 = m_gfx.MkGuiWindow(0, 200, 600, 600, L"bbRecoverWindows", L"bbRecoverWindows");
+			GfxWindow * w2 = m_gfx.MkGuiWindow(0, 800, 400, 600, L"bbRecoverWindows", L"bbRecoverWindows");
 			w2->m_gui->m_enabled = true;
 			RecoverWindowsWidget * w2wdg0 = new RecoverWindowsWidget;
 			w2wdg0->m_enabled = true;

@@ -69,6 +69,13 @@ namespace bb {
 		return false;
 	}
 
+	bool WorkSpaces::CanSetCurrentVertexId (bbstring const & vertex_id) const
+	{
+		if (WorkGraphConfig const * const cfg = FindClusterForVertex(vertex_id))
+			return true;
+		return false;
+	}
+
 	WorkGraphConfig const * WorkSpaces::FindClusterForVertex (bbstring const & vertex_id) const
 	{
 		for (size_t i = 0, ie = m_config.m_clusters.size(); i < ie; ++i)
@@ -109,7 +116,6 @@ namespace bb {
 			bbstring const & current_vertex_id = w0->m_currentVertexId;
 
 			BlackBox & bb = BlackBox::Instance();
-			bb.GetTasks().HideTasksFromWorkSpace(current_vertex_id);
 
 			if (w0 != w1)
 			{
@@ -118,7 +124,8 @@ namespace bb {
 			}
 
 			SetCurrentVertexId(new_vertex_id);
-			bb.GetTasks().ShowTasksFromWorkSpace(new_vertex_id);
+			bb.GetTasks().SwitchWorkSpace(current_vertex_id, new_vertex_id);
+			//bb.GetTasks().ShowTasksFromWorkSpace(new_vertex_id);
 		}
 		return false;
 	}

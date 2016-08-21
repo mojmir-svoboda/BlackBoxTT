@@ -92,20 +92,28 @@ bool Tasks::RmTask (HWND hwnd)
 	}
 	return false;
 }
-
-void Tasks::UpdateTaskInfo (TaskInfo * ti, bool force)
+void Tasks::UpdateTaskInfoCaption (TaskInfo * ti)
 {
-	if (force || wcslen(ti->m_caption) == 0)
-		getWindowText(ti->m_hwnd, ti->m_caption, sizeof(ti->m_caption) / sizeof(*ti->m_caption));
-	if (force || nullptr == ti->m_icon)
+	getWindowText(ti->m_hwnd, ti->m_caption, sizeof(ti->m_caption) / sizeof(*ti->m_caption));
+}
+
+void Tasks::UpdateTaskInfo (TaskInfo * ti)
+{
+	UpdateTaskInfoCaption(ti);
+
+	if (!ti->m_icoSmall.IsValid())
+	{
+		HICON sml = getTaskIconSmall(ti->m_hwnd);
+		IconId sml_id;
+		BlackBox::Instance().m_gfx.AddIconToCache(ti->m_caption, sml, sml_id);
+		ti->m_icoSmall = sml_id;
+	}
+
+	if (!ti->m_icoLarge.IsValid())
 	{
 		HICON lrg = getTaskIconLarge(ti->m_hwnd);
-		HICON sml = getTaskIconSmall(ti->m_hwnd);
-		IconId lrg_id, sml_id;
-		BlackBox::Instance().m_gfx.AddIconToCache(ti->m_caption, sml, sml_id);
+		IconId lrg_id;
 		BlackBox::Instance().m_gfx.AddIconToCache(ti->m_caption, lrg, lrg_id);
-		//get_window_icon(ti->m_val, &tl->icon);
-		ti->m_icoSmall = sml_id;
 		ti->m_icoLarge = lrg_id;
 	}
 
@@ -129,22 +137,45 @@ void Tasks::EnumTasks ()
 	m_lock.Unlock();
 }
 
+bool Tasks::AddWidgetTask (GfxWindow * w)
+{
+	TaskState ts = TaskState::max_enum_value;
+	size_t idx = c_invalidIndex;
+	if (FindTask(w->m_hwnd, ts, idx))
+	{
+		ended here, too tired now
+	}
+	return true;
+}
+
 bool Tasks::AddTask (HWND hwnd)
 {
+	bbstring const * current_ws = BlackBox::Instance().GetWorkSpaces().GetCurrentVertexId();
+
 	TaskState ts = TaskState::max_enum_value;
 	size_t idx = c_invalidIndex;
 	if (FindTask(hwnd, ts, idx))
 	{
-		UpdateTaskInfo(m_tasks[ts][idx].get(), true);
+		TaskInfoPtr & ti_ptr = m_tasks[ts][idx];
+		UpdateTaskInfo(ti_ptr.get());
+
+		if (current_ws)
+			ti_ptr->SetWorkSpace(current_ws->c_str());
+
+		if (ti_ptr->m_config && ti_ptr->m_config->m_ignore)
+			m_tasks[e_Ignored].push_back(std::move(ti_ptr));
+		else
+			m_tasks[e_Active].push_back(std::move(ti_ptr));
+
+		m_tasks[ts].erase(m_tasks[ts].begin() + idx);
+
 		return false;
 	}
 	else
 	{
 		TaskInfoPtr ti_ptr(new TaskInfo(hwnd));
-		UpdateTaskInfo(ti_ptr.get(), true);
+		UpdateTaskInfo(ti_ptr.get());
 		bbstring const & cap = ti_ptr->m_caption;
-
-		bbstring const * current_ws = BlackBox::Instance().GetWorkSpaces().GetCurrentVertexId();
 
 		for (size_t i = 0, ie = m_config.m_tasks.size(); i < ie; ++i)
 		{
@@ -268,14 +299,46 @@ LRESULT Tasks::UpdateFromTaskHook (WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-void Tasks::HideTasksFromWorkSpace (bbstring const & wspace)
+void Tasks::SwitchWorkSpace (bbstring const & src, bbstring const & dst)
 {
 	m_lock.Lock();
-	m_lock.Unlock();
-}
-void Tasks::ShowTasksFromWorkSpace (bbstring const & wspace)
-{
-	m_lock.Lock();
+
+	for (TaskInfoPtr & t : m_tasks[e_Active])
+		if (t)
+		{
+			if (t->m_sticky)
+				continue;
+
+			if (t->m_wspace != dst)
+			{
+				m_tasks[e_OtherWS].push_back(std::move(t));
+				continue;
+			}
+		}
+
+	for (TaskInfoPtr & t : m_tasks[e_Ignored])
+		if (t)
+		{
+			if (t->m_sticky)
+				continue;
+
+			if (t->m_wspace != dst)
+			{
+				m_tasks[e_OtherWS].push_back(std::move(t));
+				continue;
+			}
+		}
+
+	for (TaskInfoPtr & t : m_tasks[e_OtherWS])
+		if (t)
+		{
+			if (t->m_wspace == dst)
+			{
+				m_tasks[e_Active].push_back(std::move(t));
+				continue;
+			}
+		}
+
 	m_lock.Unlock();
 }
 
@@ -289,10 +352,7 @@ void Tasks::MakeIgnored (HWND hwnd)
 	{
 		TaskInfoPtr & ti_ptr = m_tasks[ts][idx];
 
-		//showInFromTaskBar(ti->m_hwnd, false); --> does not work @TODO @FIXMe
-		::ShowWindow(hwnd, SW_HIDE);
-		::SetWindowLongPtr(hwnd, GWL_EXSTYLE, WS_EX_TOOLWINDOW);
-		::ShowWindow(hwnd, SW_SHOW);
+		showInFromTaskBar(ti_ptr->m_hwnd, false);
 
 		ti_ptr->m_ignore = true;
 		TRACE_MSG(LL_DEBUG, CTX_BB, "make task ignored hwnd=%x", ti_ptr->m_hwnd);
@@ -314,15 +374,7 @@ void Tasks::RemoveIgnored (HWND hwnd)
 	{
 		if (ti && ti->m_hwnd == hwnd)
 		{
-			LONG_PTR const flags = GetWindowLongPtr(hwnd, GWL_EXSTYLE);
-			if (WS_EX_TOOLWINDOW & flags)
-			{
-				::ShowWindow(hwnd, SW_HIDE);
-				::SetWindowLongPtr(hwnd, GWL_EXSTYLE, WS_EX_APPWINDOW);
-				::ShowWindow(hwnd, SW_SHOW);
-			}
-
-			//showInFromTaskBar(ti->m_hwnd, true);
+			showInFromTaskBar(ti->m_hwnd, true);
 			ti->m_ignore = false;
 		}
 	}
@@ -339,16 +391,10 @@ void Tasks::Update ()
 {
 	m_lock.Lock();
 
-	//ten update je nakej rozbitej
-		;
-	;
-	;
-	if (1)
-	;
-// 	for (size_t s = 0; s < m_tasks.size(); ++s)
-// 		for (size_t i = 0, ie = m_tasks[s].size(); i < ie; ++i)
-// 			if (m_tasks[s][i])
-// 				UpdateTaskInfo(m_tasks[s][i].get(), true);
+	for (size_t s = 0; s < m_tasks.size(); ++s)
+		for (size_t i = 0, ie = m_tasks[s].size(); i < ie; ++i)
+			if (m_tasks[s][i])
+				UpdateTaskInfoCaption(m_tasks[s][i].get());
 
 	m_lock.Unlock();
 }
