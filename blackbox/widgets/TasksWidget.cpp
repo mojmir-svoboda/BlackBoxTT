@@ -39,7 +39,7 @@ namespace bb {
     ImGui::Separator();
     for (TaskInfo & t : m_tasks)
     {
-      if (t.m_exclude)
+      if (t.m_config && t.m_config->m_exclude)
         continue;
 
       char name[TaskInfo::e_captionLenMax];

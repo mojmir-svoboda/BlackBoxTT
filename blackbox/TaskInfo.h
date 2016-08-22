@@ -13,13 +13,6 @@ namespace bb {
 		HICON		m_icon        { nullptr };
 		IconId	m_icoSmall    { };
 		IconId	m_icoLarge    { };
-		bool		m_active      { false };
-		bool		m_flashing    { false };
-		bool		m_fullscreen  { false };
-
-		bool		m_sticky      { false }; /// window is sticky
-		bool		m_exclude     { false }; /// window is ignored by blackbox (metro shit usually)
-		bool		m_ignore      { false }; /// window is present on screen, but not in task bar
 
 		enum : size_t { e_wspaceLenMax = 64 };
 		wchar_t m_wspace[e_wspaceLenMax] = { 0 };

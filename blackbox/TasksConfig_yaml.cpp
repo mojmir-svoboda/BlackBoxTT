@@ -64,8 +64,9 @@ namespace bb {
 				for (int i = 0; i < n; ++i)
 				{
 					YAML::Node y_tasks_i = y_tasks[i];
-					bb::TaskConfig cfg = y_tasks[i].as<bb::TaskConfig>();
-					config.m_tasks.push_back(cfg);
+					bb::TaskConfig tmp = y_tasks[i].as<bb::TaskConfig>();
+					std::unique_ptr<TaskConfig> tc(new TaskConfig(tmp));
+					config.m_tasks.push_back(std::move(tc));
 
 					//YAML::NodeType::value cst = y_tasks_i.Type();
 					//					std::string s = y_tasks_i["window"].as<std::string>();

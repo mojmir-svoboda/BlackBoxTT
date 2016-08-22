@@ -182,15 +182,14 @@ namespace bb {
 //			if (y_bb)
 //			{
 //			}
-			TasksConfig tasks_cfg;
-			if (loadTasksConfig(y_root, tasks_cfg))
+			if (loadTasksConfig(y_root, m_config.m_tasks))
 			{
 				TRACE_MSG(LL_INFO, CTX_BB | CTX_CONFIG, "* loaded tasks section");
-				m_config.m_tasks = tasks_cfg;
 			}
 			else
 			{
 				TRACE_MSG(LL_ERROR, CTX_BB | CTX_CONFIG, "* failed to load tasks section");
+				m_config.m_tasks.clear();
 			}
 
 			WorkSpacesConfig ws_cfg;

@@ -9,17 +9,11 @@ namespace bb {
 		bbstring m_caption;
 		bbstring m_wspace;
 		bbregex m_caption_regex;
-		bool m_exclude;
-		bool m_ignore;
-		bool m_sticky;
+		bool m_exclude { false };
+		bool m_ignore { false };
+		bool m_sticky { false };
 
-		TaskConfig ()
-			: m_exclude(false)
-			, m_ignore(false)
-			, m_sticky(false)
-		{ }
-
-		bool MatchCaption (bbstring const & str)
+		bool MatchCaption (bbstring const & str) const
 		{
 			return regex_match(str, m_caption_regex);
 		}

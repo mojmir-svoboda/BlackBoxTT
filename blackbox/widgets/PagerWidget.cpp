@@ -57,7 +57,7 @@ namespace bb {
 					{
 						if (++tmp % 3)
 							ImGui::SameLine();
-						if (t.m_exclude)
+						if (t.m_config && t.m_config->m_exclude)
 							continue;
 
 						if (t.m_wspace == vertex_id)

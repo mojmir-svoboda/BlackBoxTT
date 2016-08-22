@@ -23,7 +23,7 @@ Tasks::~Tasks()
 bool Tasks::Init (TasksConfig & config)
 {
 	TRACE_SCOPE(LL_INFO, CTX_BB | CTX_INIT);
-	m_config = config;
+	m_config = &config;
 	m_tasks[TaskState::e_Active].reserve(128);
 	m_tasks[TaskState::e_Ignored].reserve(32);
 	m_tasks[TaskState::e_OtherWS].reserve(128);
@@ -143,9 +143,54 @@ bool Tasks::AddWidgetTask (GfxWindow * w)
 	size_t idx = c_invalidIndex;
 	if (FindTask(w->m_hwnd, ts, idx))
 	{
-		ended here, too tired now
+		TaskInfoPtr & ti_ptr = m_tasks[ts][idx];
+		if (ti_ptr->m_config)
+		{
+			// already exists
+		}
 	}
-	return true;
+	else
+	{
+		TaskConfig * cfg = FindTaskConfig(w->m_wName);
+		if (!cfg)
+		{
+			cfg = MakeTaskConfig(w->m_hwnd);
+			cfg->m_sticky = true;
+		}
+	}
+	return false;
+}
+
+TaskConfig * Tasks::FindTaskConfig (bbstring const & cap)
+{
+	return const_cast<TaskConfig *>(const_cast<const Tasks *>(this)->FindTaskConfig(cap));
+}
+
+TaskConfig const * Tasks::FindTaskConfig (bbstring const & cap) const
+{
+	for (size_t i = 0, ie = m_config->m_tasks.size(); i < ie; ++i)
+	{
+		TaskConfig const * c = m_config->m_tasks[i].get();
+		if (c->MatchCaption(cap))
+		{
+			return c;
+		}
+	}
+	return nullptr;
+}
+
+TaskConfig * Tasks::MakeTaskConfig (HWND hwnd)
+{
+	std::unique_ptr<TaskConfig> tc(new TaskConfig);
+	
+	wchar_t cap[TaskInfo::e_captionLenMax];
+	getWindowText(hwnd, cap, TaskInfo::e_captionLenMax);
+	tc->m_caption = std::move(bbstring(cap));
+	if (bbstring const * current_ws = BlackBox::Instance().GetWorkSpaces().GetCurrentVertexId())
+		tc->m_wspace = *current_ws;
+	m_config->m_tasks.push_back(std::move(tc));
+
+	return m_config->m_tasks.back().get();
 }
 
 bool Tasks::AddTask (HWND hwnd)
@@ -177,22 +222,22 @@ bool Tasks::AddTask (HWND hwnd)
 		UpdateTaskInfo(ti_ptr.get());
 		bbstring const & cap = ti_ptr->m_caption;
 
-		for (size_t i = 0, ie = m_config.m_tasks.size(); i < ie; ++i)
+		TaskConfig * c = FindTaskConfig(cap);
+		bool is_sticky = false;
+		if (c)
 		{
-			TaskConfig & c = m_config.m_tasks[i];
-			if (c.MatchCaption(cap))
-			{
-				ti_ptr->m_config = &c;
-				ti_ptr->SetWorkSpace(c.m_wspace.c_str());
-				// if ignored
-				// if sticky
-				break;
-			}
+			ti_ptr->m_config = c;
+			ti_ptr->SetWorkSpace(c->m_wspace.c_str());
+			is_sticky = c->m_sticky;
+			// if ignored
+			// if sticky
 		}
 
 		if (current_ws && wcslen(ti_ptr->m_wspace) == 0)
 			ti_ptr->SetWorkSpace(current_ws->c_str());
-		bool const is_current_ws = *current_ws == ti_ptr->m_wspace;
+
+		bool const same_ws = *current_ws == ti_ptr->m_wspace;
+		bool const is_current_ws =  same_ws || is_sticky;
 		TRACE_MSG(LL_DEBUG, CTX_BB, "+++ %ws e=%i i=%i", cap.c_str(), (ti_ptr->m_config ? ti_ptr->m_config->m_exclude : '0'), (ti_ptr->m_config ? ti_ptr->m_config->m_ignore : '0'));
 
 		if (is_current_ws)
@@ -306,7 +351,7 @@ void Tasks::SwitchWorkSpace (bbstring const & src, bbstring const & dst)
 	for (TaskInfoPtr & t : m_tasks[e_Active])
 		if (t)
 		{
-			if (t->m_sticky)
+			if (t->m_config && t->m_config->m_sticky)
 				continue;
 
 			if (t->m_wspace != dst)
@@ -319,7 +364,7 @@ void Tasks::SwitchWorkSpace (bbstring const & src, bbstring const & dst)
 	for (TaskInfoPtr & t : m_tasks[e_Ignored])
 		if (t)
 		{
-			if (t->m_sticky)
+			if (t->m_config && t->m_config->m_sticky)
 				continue;
 
 			if (t->m_wspace != dst)
@@ -354,7 +399,11 @@ void Tasks::MakeIgnored (HWND hwnd)
 
 		showInFromTaskBar(ti_ptr->m_hwnd, false);
 
-		ti_ptr->m_ignore = true;
+		if (nullptr == ti_ptr->m_config)
+			ti_ptr->m_config = MakeTaskConfig(hwnd);
+
+		ti_ptr->m_config->m_ignore = true;
+
 		TRACE_MSG(LL_DEBUG, CTX_BB, "make task ignored hwnd=%x", ti_ptr->m_hwnd);
 		if (ts != e_Ignored)
 			m_tasks[e_Ignored].push_back(std::move(ti_ptr));
@@ -370,12 +419,13 @@ void Tasks::RemoveIgnored (HWND hwnd)
 {
 	m_lock.Lock();
 
-	for (TaskInfoPtr & ti : m_tasks[e_Ignored])
+	for (TaskInfoPtr & ti_ptr : m_tasks[e_Ignored])
 	{
-		if (ti && ti->m_hwnd == hwnd)
+		if (ti_ptr && ti_ptr->m_hwnd == hwnd)
 		{
-			showInFromTaskBar(ti->m_hwnd, true);
-			ti->m_ignore = false;
+			showInFromTaskBar(ti_ptr->m_hwnd, true);
+			if (ti_ptr->m_config)
+				ti_ptr->m_config->m_ignore = false;
 		}
 	}
 	
