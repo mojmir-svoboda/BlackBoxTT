@@ -12,8 +12,8 @@ namespace YAML {
 			Node node;
 			node.push_back(rhs.m_caption);
 			node.push_back(rhs.m_wspace);
-			node.push_back(rhs.m_exclude);
-			node.push_back(rhs.m_ignore);
+			node.push_back(rhs.m_bbtasks);
+			node.push_back(rhs.m_taskman);
 			node.push_back(rhs.m_sticky);
 			return node;
 		}
@@ -26,10 +26,10 @@ namespace YAML {
 				if (node["workspace"])
 					rhs.m_wspace = node["workspace"].as<bbstring>();
 				rhs.m_caption_regex = bbregex(rhs.m_caption);
-				if (node["exclude"])
-					rhs.m_exclude = node["exclude"].as<bool>();
-				if (node["ignore"])
-					rhs.m_ignore = node["ignore"].as<bool>();
+				if (node["bbtasks"])
+					rhs.m_bbtasks = node["bbtasks"].as<bool>();
+				if (node["taskman"])
+					rhs.m_taskman = node["taskman"].as<bool>();
 				if (node["sticky"])
 					rhs.m_sticky = node["sticky"].as<bool>();
 			}

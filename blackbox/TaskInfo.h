@@ -10,7 +10,7 @@ namespace bb {
 	{
 		TaskConfig * m_config { nullptr };
 		HWND		m_hwnd        { nullptr };
-		HICON		m_icon        { nullptr };
+		bool		m_uwp					{ false };
 		IconId	m_icoSmall    { };
 		IconId	m_icoLarge    { };
 

@@ -31,6 +31,7 @@ namespace bb {
 		void Update ();
 		bool IsFull () const { return m_end >= m_nx * m_ny; }
 		bool Get (uint32_t index, ImTextureID & texid, ImVec2 & uv0, ImVec2 & uv1) const;
+		bool Find (bbstring const & name, IconId & id) const;
 	};
 
 	struct IconSlabs
@@ -39,6 +40,7 @@ namespace bb {
 
 		bool AddIconToSlab (bbstring const & name, BITMAP const & b, uint8_t * buff, size_t buffsz, IconId & id);
 		void Update ();
+		bool Find (bbstring const & name, IconId & id) const;
 	};
 
 
@@ -48,6 +50,7 @@ namespace bb {
 		slabs_t m_slabs;
 
 		bool Add (bbstring const & name, HICON ico, IconId & id);
+		bool Find (bbstring const & name, IconId & id) const;
 		bool GetSlab (IconId id, IconSlab const * & icon_slab) const;
 		void Update ();
 	};

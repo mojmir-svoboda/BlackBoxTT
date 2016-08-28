@@ -36,6 +36,17 @@ namespace bb {
 		return true;
 	}
 
+	bool IconSlab::Find (bbstring const & name, IconId & id) const
+	{
+		for (size_t i = 0, ie = m_names.size(); i < ie; ++i)
+			if (m_names[i] == name)
+			{
+				id.m_index = i;
+				return true;
+			}
+		return false;
+	}
+
 	bool IconSlab::AddIconToSlab (bbstring const & name, BITMAP const & b, uint8_t * buff, size_t buffsz, IconId & id)
 	{
 		if (IsFull())
@@ -130,6 +141,28 @@ namespace bb {
 	{
 		for (auto & it : m_slabs)
 			it.Update();
+	}
+
+	bool IconSlabs::Find (bbstring const & name, IconId & id) const
+	{
+		for (size_t s = 0, se = m_slabs.size(); s < se; ++s)
+			if (m_slabs[s].Find(name, id))
+			{
+				id.m_slab = s;
+				return true;
+			}
+		return false;
+	}
+
+	bool IconCache::Find (bbstring const & name, IconId & id) const
+	{
+		for (auto & it : m_slabs)
+			if (it.second->Find(name, id))
+			{
+				id.m_size = it.first;
+				return true;
+			}
+		return false;
 	}
 
 	bool IconCache::Add (bbstring const & name, HICON ico, IconId & id)

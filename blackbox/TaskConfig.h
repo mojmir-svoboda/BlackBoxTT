@@ -9,8 +9,8 @@ namespace bb {
 		bbstring m_caption;
 		bbstring m_wspace;
 		bbregex m_caption_regex;
-		bool m_exclude { false };
-		bool m_ignore { false };
+		bool m_bbtasks { true }; /// task is not ignored by blackbox tasks subsystem
+		bool m_taskman { true }; /// task is not ignored by windows native taskman
 		bool m_sticky { false };
 
 		bool MatchCaption (bbstring const & str) const

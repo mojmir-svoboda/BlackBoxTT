@@ -2,6 +2,8 @@
 #include "Tasks.h"
 #include "TaskInfo.h"
 #include "utils_window.h"
+#include "utils_recover.h"
+#include "utils_uwp.h"
 #include "gfx/utils_gdi.h"
 #include "logging.h"
 #include "BlackBox.h"
@@ -13,6 +15,7 @@ namespace bb {
 Tasks::Tasks ()
 	: m_active(nullptr)
 {
+	m_taskEnumStorage.reserve(256);
 }
 
 Tasks::~Tasks()
@@ -25,10 +28,11 @@ bool Tasks::Init (TasksConfig & config)
 	TRACE_SCOPE(LL_INFO, CTX_BB | CTX_INIT);
 	m_config = &config;
 	m_tasks[TaskState::e_Active].reserve(128);
-	m_tasks[TaskState::e_Ignored].reserve(32);
+	m_tasks[TaskState::e_TaskManIgnored].reserve(32);
+	m_tasks[TaskState::e_BBIgnored].reserve(32);
 	m_tasks[TaskState::e_OtherWS].reserve(128);
 
-	EnumTasks();
+	Update();
 	return true;
 }
 
@@ -36,7 +40,8 @@ bool Tasks::Done ()
 {
 	TRACE_MSG(LL_INFO, CTX_BB, "Terminating tasks");
 	m_tasks[TaskState::e_Active].clear();
-	m_tasks[TaskState::e_Ignored].clear();
+	m_tasks[TaskState::e_TaskManIgnored].clear();
+	m_tasks[TaskState::e_BBIgnored].clear();
 	m_tasks[TaskState::e_OtherWS].clear();
 	return true;
 }
@@ -97,44 +102,53 @@ void Tasks::UpdateTaskInfoCaption (TaskInfo * ti)
 	getWindowText(ti->m_hwnd, ti->m_caption, sizeof(ti->m_caption) / sizeof(*ti->m_caption));
 }
 
-void Tasks::UpdateTaskInfo (TaskInfo * ti)
+void Tasks::AddTaskInfo (TaskInfo * ti)
 {
+	ti->m_uwp = bb::isUWPWindow(ti->m_hwnd);
 	UpdateTaskInfoCaption(ti);
 
 	if (!ti->m_icoSmall.IsValid())
 	{
-		HICON sml = getTaskIconSmall(ti->m_hwnd);
-		IconId sml_id;
-		BlackBox::Instance().m_gfx.AddIconToCache(ti->m_caption, sml, sml_id);
-		ti->m_icoSmall = sml_id;
+		wchar_t tmp[512];
+		if (size_t const n = getAppByWindow(ti->m_hwnd, tmp, 512))
+		{
+			bbstring name(tmp);
+
+			IconId id;
+			if (BlackBox::Instance().m_gfx.FindIconInCache(name, id))
+			{
+				ti->m_icoSmall = id;
+			}
+			else
+			{
+				if (ti->m_uwp)
+				{
+
+				}
+				else
+				{
+					if (HICON sml = getTaskIconSmall(ti->m_hwnd))
+					{
+						IconId sml_id;
+						BlackBox::Instance().m_gfx.AddIconToCache(name, sml, sml_id);
+						ti->m_icoSmall = sml_id;
+					}
+				}
+			}
+		}
 	}
 
 	if (!ti->m_icoLarge.IsValid())
 	{
-		HICON lrg = getTaskIconLarge(ti->m_hwnd);
-		IconId lrg_id;
-		BlackBox::Instance().m_gfx.AddIconToCache(ti->m_caption, lrg, lrg_id);
-		ti->m_icoLarge = lrg_id;
+// 		if (HICON lrg = getTaskIconLarge(ti->m_hwnd))
+// 		{
+// 			IconId lrg_id;
+// 			BlackBox::Instance().m_gfx.AddIconToCache(ti->m_caption, lrg, lrg_id);
+// 			ti->m_icoLarge = lrg_id;
+// 		}
 	}
 
 	//ti->m_active = true;
-}
-
-BOOL CALLBACK taskEnumProc(HWND hwnd, LPARAM lParam)
-{
-	if (bb::isAppWindow(hwnd))
-	{
-		bb::BlackBox::Instance().GetTasks().AddTask(hwnd);
-	}
-	return TRUE;
-}
-
-void Tasks::EnumTasks ()
-{
-	TRACE_SCOPE(LL_VERBOSE, CTX_BB);
-	m_lock.Lock();
-	EnumWindows(taskEnumProc, (LPARAM)this);
-	m_lock.Unlock();
 }
 
 bool Tasks::AddWidgetTask (GfxWindow * w)
@@ -202,16 +216,21 @@ bool Tasks::AddTask (HWND hwnd)
 	if (FindTask(hwnd, ts, idx))
 	{
 		TaskInfoPtr & ti_ptr = m_tasks[ts][idx];
-		UpdateTaskInfo(ti_ptr.get());
+		UpdateTaskInfoCaption(ti_ptr.get());
 
 		if (current_ws)
 			ti_ptr->SetWorkSpace(current_ws->c_str());
 
-		if (ti_ptr->m_config && ti_ptr->m_config->m_ignore)
-			m_tasks[e_Ignored].push_back(std::move(ti_ptr));
-		else
-			m_tasks[e_Active].push_back(std::move(ti_ptr));
+		TaskState ts_new = e_Active;
+		if (ti_ptr->m_config)
+		{
+			if (!ti_ptr->m_config->m_taskman)
+				ts_new = e_TaskManIgnored;
+			else if (!ti_ptr->m_config->m_bbtasks)
+				ts_new = e_BBIgnored;
+		}
 
+		m_tasks[ts_new].push_back(std::move(ti_ptr));
 		m_tasks[ts].erase(m_tasks[ts].begin() + idx);
 
 		return false;
@@ -219,7 +238,7 @@ bool Tasks::AddTask (HWND hwnd)
 	else
 	{
 		TaskInfoPtr ti_ptr(new TaskInfo(hwnd));
-		UpdateTaskInfo(ti_ptr.get());
+		AddTaskInfo(ti_ptr.get());
 		bbstring const & cap = ti_ptr->m_caption;
 
 		TaskConfig * c = FindTaskConfig(cap);
@@ -238,14 +257,20 @@ bool Tasks::AddTask (HWND hwnd)
 
 		bool const same_ws = *current_ws == ti_ptr->m_wspace;
 		bool const is_current_ws =  same_ws || is_sticky;
-		TRACE_MSG(LL_DEBUG, CTX_BB, "+++ %ws e=%i i=%i", cap.c_str(), (ti_ptr->m_config ? ti_ptr->m_config->m_exclude : '0'), (ti_ptr->m_config ? ti_ptr->m_config->m_ignore : '0'));
+		TRACE_MSG(LL_DEBUG, CTX_BB, "+++ %ws e=%i i=%i", cap.c_str(), (ti_ptr->m_config ? ti_ptr->m_config->m_bbtasks : '0'), (ti_ptr->m_config ? ti_ptr->m_config->m_taskman : '0'));
 
 		if (is_current_ws)
 		{
-			if (ti_ptr->m_config && ti_ptr->m_config->m_ignore)
-				m_tasks[e_Ignored].push_back(std::move(ti_ptr));
-			else
-				m_tasks[e_Active].push_back(std::move(ti_ptr));
+			TaskState ts_new = e_Active;
+			if (ti_ptr->m_config)
+			{
+				if (!ti_ptr->m_config->m_taskman)
+					ts_new = e_TaskManIgnored;
+				else if (!ti_ptr->m_config->m_bbtasks)
+					ts_new = e_BBIgnored;
+			}
+
+			m_tasks[ts_new].push_back(std::move(ti_ptr));
 		}
 		else
 		{
@@ -256,13 +281,66 @@ bool Tasks::AddTask (HWND hwnd)
 	}
 }
 
-//LRESULT update (WPARAM wParam, LPARAM lParam);
+void Tasks::Update ()
+{
+	m_lock.Lock();
+
+	// @NOTE: this update probably costs some performance, but UWP apps do
+	// not trigger hook events when window created
+	// (and also triggers destroy hook too late)
+	m_taskEnumStorage.clear();
+	EnumWindows(taskEnumProc, (LPARAM)&m_taskEnumStorage);
+
+	for (size_t n = 0; n < m_taskEnumStorage.size(); ++n)
+	{
+		AddTask(m_taskEnumStorage[n]);
+	}
+
+	for (size_t s = 0; s < m_tasks.size(); ++s)
+	{
+		if (s == e_OtherWS)
+			continue; // do not delete tasks on other wspaces
+
+		for (size_t i = 0, ie = m_tasks[s].size(); i < ie; ++i)
+			if (m_tasks[s][i])
+			{
+				bool found = false;
+				for (size_t n = 0; n < m_taskEnumStorage.size(); ++n)
+					if (m_tasks[s][i]->m_hwnd == m_taskEnumStorage[n])
+						found = true;
+				if (!found)
+					m_tasks[s][i].reset();
+			}
+	}
+
+	// @TOD:
+	for (size_t s = 0; s < m_tasks.size(); ++s)
+		for (size_t i = 0, ie = m_tasks[s].size(); i < ie; ++i)
+			if (m_tasks[s][i])
+				UpdateTaskInfoCaption(m_tasks[s][i].get());
+
+	m_lock.Unlock();
+}
+
+BOOL CALLBACK taskEnumProc (HWND hwnd, LPARAM lParam)
+{
+	if (std::vector<HWND> * storage = reinterpret_cast<std::vector<HWND> *>(lParam))
+	{
+		if (bb::isAppWindow(hwnd))
+			storage->push_back(hwnd);
+	}
+	return TRUE;
+}
 
 void Tasks::OnHookWindowCreated (HWND hwnd)
 {
-	m_lock.Lock();
-	AddTask(hwnd);
-	m_lock.Unlock();
+	bool const is_app_win = bb::isAppWindow(hwnd);
+	if (is_app_win)
+	{
+		m_lock.Lock();
+		AddTask(hwnd);
+		m_lock.Unlock();
+	}
 }
 
 void Tasks::OnHookWindowDestroyed (HWND hwnd)
@@ -304,12 +382,21 @@ LRESULT Tasks::UpdateFromTaskHook (WPARAM wParam, LPARAM lParam)
 			OnHookWindowDestroyed(hwnd);
 			break;
 		}
-// 		case HSHELL_ACTIVATESHELLWINDOW:
-// 			break;
-// 		case HSHELL_WINDOWREPLACED:
-// 		{
-// 			break;
-// 		}
+		case HSHELL_ACTIVATESHELLWINDOW:
+			break;
+		
+		case HSHELL_ENDTASK:
+			break;
+		case HSHELL_WINDOWREPLACING:
+			break;
+		case HSHELL_WINDOWREPLACED:
+		{
+			break;
+		}
+		case HSHELL_MONITORCHANGED:
+		{
+			break;
+		}
 		//case HCBT_ACTIVATE:
 		case HSHELL_WINDOWACTIVATED:
 		{
@@ -361,7 +448,7 @@ void Tasks::SwitchWorkSpace (bbstring const & src, bbstring const & dst)
 			}
 		}
 
-	for (TaskInfoPtr & t : m_tasks[e_Ignored])
+	for (TaskInfoPtr & t : m_tasks[e_TaskManIgnored])
 		if (t)
 		{
 			if (t->m_config && t->m_config->m_sticky)
@@ -387,7 +474,7 @@ void Tasks::SwitchWorkSpace (bbstring const & src, bbstring const & dst)
 	m_lock.Unlock();
 }
 
-void Tasks::MakeIgnored (HWND hwnd)
+void Tasks::SetTaskManIgnored (HWND hwnd)
 {
 	m_lock.Lock();
 
@@ -402,51 +489,74 @@ void Tasks::MakeIgnored (HWND hwnd)
 		if (nullptr == ti_ptr->m_config)
 			ti_ptr->m_config = MakeTaskConfig(hwnd);
 
-		ti_ptr->m_config->m_ignore = true;
+		ti_ptr->m_config->m_taskman = false;
 
 		TRACE_MSG(LL_DEBUG, CTX_BB, "make task ignored hwnd=%x", ti_ptr->m_hwnd);
-		if (ts != e_Ignored)
-			m_tasks[e_Ignored].push_back(std::move(ti_ptr));
+		if (ts != e_TaskManIgnored)
+			m_tasks[e_TaskManIgnored].push_back(std::move(ti_ptr));
 	}
 
 	m_lock.Unlock();
 }
-// void Tasks::MakeIgnored (wchar_t const * caption)
-// {
-// }
 
-void Tasks::RemoveIgnored (HWND hwnd)
+void Tasks::UnsetTaskManIgnored (HWND hwnd)
 {
 	m_lock.Lock();
 
-	for (TaskInfoPtr & ti_ptr : m_tasks[e_Ignored])
+	for (TaskInfoPtr & ti_ptr : m_tasks[e_TaskManIgnored])
 	{
 		if (ti_ptr && ti_ptr->m_hwnd == hwnd)
 		{
 			showInFromTaskBar(ti_ptr->m_hwnd, true);
 			if (ti_ptr->m_config)
-				ti_ptr->m_config->m_ignore = false;
+				ti_ptr->m_config->m_taskman = true;
 		}
 	}
 	
 	m_lock.Unlock();
 }
 
-void Tasks::Focus (HWND hwnd)
-{
-	focusWindow(hwnd);
-}
-
-void Tasks::Update ()
+void Tasks::SetBBTasksIgnored (HWND hwnd)
 {
 	m_lock.Lock();
 
-	for (size_t s = 0; s < m_tasks.size(); ++s)
-		for (size_t i = 0, ie = m_tasks[s].size(); i < ie; ++i)
-			if (m_tasks[s][i])
-				UpdateTaskInfoCaption(m_tasks[s][i].get());
+	TaskState ts = TaskState::max_enum_value;
+	size_t idx = c_invalidIndex;
+	if (FindTask(hwnd, ts, idx))
+	{
+		TaskInfoPtr & ti_ptr = m_tasks[ts][idx];
+
+		if (nullptr == ti_ptr->m_config)
+			ti_ptr->m_config = MakeTaskConfig(hwnd);
+
+		ti_ptr->m_config->m_bbtasks = false;
+
+		TRACE_MSG(LL_DEBUG, CTX_BB, "bbtasks ignores hwnd=%x", ti_ptr->m_hwnd);
+	}
 
 	m_lock.Unlock();
+}
+
+void Tasks::UnsetBBTasksIgnored (HWND hwnd)
+{
+	m_lock.Lock();
+
+// 	for (TaskInfoPtr & ti_ptr : m_tasks[e_Active])
+// 	{
+// 		if (ti_ptr && ti_ptr->m_hwnd == hwnd)
+// 		{
+// 			if (ti_ptr->m_config)
+// 				ti_ptr->m_config->m_taskman = true;
+// 		}
+// 	}
+// 	
+	m_lock.Unlock();
+}
+
+
+void Tasks::Focus (HWND hwnd)
+{
+	focusWindow(hwnd);
 }
 
 }

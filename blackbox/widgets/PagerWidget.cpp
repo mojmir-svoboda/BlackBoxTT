@@ -36,7 +36,7 @@ namespace bb {
 			uint32_t const rows = wg->MaxRowCount();
 			uint32_t const cols = wg->MaxColCount();
 
-			ImGui::Columns(cols, "mixed");
+			ImGui::Columns(cols, "mixed", true);
 			ImGui::Separator();
 
 			for (uint32_t c = 0; c < cols; ++c)
@@ -55,19 +55,30 @@ namespace bb {
 					int tmp = 0;
 					for (TaskInfo & t : m_tasks)
 					{
-						if (++tmp % 3)
-							ImGui::SameLine();
-						if (t.m_config && t.m_config->m_exclude)
-							continue;
-
+// 						if (t.m_config && t.m_config->m_bbtasks)
+// 							continue;
 						if (t.m_wspace == vertex_id)
 						{
+							if (++tmp % 2)
+								ImGui::SameLine();
+
+							Tasks & tasks = BlackBox::Instance().GetTasks();
 							IconId const icoid = t.m_icoSmall;
-							ImGui::Icon(icoid, ImColor(255, 255, 255, 255), ImColor(255, 255, 255, 128));
 							if (!icoid.IsValid())
 							{
 								// @TODO: assign color to hwnd?
-								ImGui::ColorButton(ImColor(0, 0, 128, 255));
+								if (ImGui::ColorButton(ImColor(0, 0, 128, 255)))
+								{
+									tasks.Focus(t.m_hwnd);
+								}
+							}
+							else
+							{
+								int framing = -1;
+								if (ImGui::IconButton(icoid, ImColor(255, 255, 255, 255), ImColor(255, 255, 255, 128), framing))
+								{
+									tasks.Focus(t.m_hwnd);
+								}
 							}
 						}
 					}

@@ -61,7 +61,7 @@ namespace bb {
     for (size_t i = 0, ie = m_order.size(); i < ie; ++i)
     {
 			TaskInfo & ti = m_tasks[m_order[i]];
-			if (ti.m_config && ti.m_config->m_exclude)
+			if (ti.m_config && ti.m_config->m_bbtasks)
         continue;
 
 			if (i > 0 && m_exenames[m_order[i]] != m_exenames[m_order[i - 1]])

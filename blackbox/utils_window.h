@@ -1,14 +1,37 @@
 #pragma once
 #include <platform_win.h>
+#include <utils_dwm.h>
 
 namespace bb {
+
+inline void getWindowText (HWND hwnd, wchar_t * str, size_t n)
+{
+	str[0] = '\0';
+	::GetWindowTextW(hwnd, str, n);
+}
 
 inline bool isAppWindow (HWND hwnd)
 {
 	if (!IsWindow(hwnd))
 		return false;
 
-	if (WS_VISIBLE != (::GetWindowLongPtr(hwnd, GWL_STYLE) & (WS_CHILD | WS_VISIBLE | WS_DISABLED)))
+	//dbg
+	//TCHAR name[256] = {0}; getWindowText(hwnd, name, 256);
+	//TCHAR clname[256] = { 0 }; ::GetClassName(hwnd, clname, 256);
+
+	if (isUWPWindow(hwnd))
+	{
+		if (isUWPWindowCloaked(hwnd))
+			return false;
+
+		if (::IsWindowVisible(hwnd))
+			return true;
+		else
+			return false;
+	}
+
+	LONG_PTR const style = ::GetWindowLongPtr(hwnd, GWL_STYLE);
+	if (WS_VISIBLE != (style & (WS_CHILD | WS_VISIBLE | WS_DISABLED)))
 		return false;
 
 	if (WS_EX_TOOLWINDOW == (::GetWindowLongPtr(hwnd, GWL_EXSTYLE) & (WS_EX_TOOLWINDOW | WS_EX_APPWINDOW)))
@@ -28,12 +51,6 @@ inline bool isAppWindow (HWND hwnd)
 	return true;
 }
 
-
-inline void getWindowText (HWND hwnd, wchar_t * str, size_t n)
-{
-	str[0] = '\0';
-	::GetWindowTextW(hwnd, str, n);
-}
 
 // update frame:
 //        SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOOWNERZORDER);
@@ -77,49 +94,6 @@ inline void showWindow (HWND hwnd, bool show)
 {
 	::ShowWindow(hwnd, show ? SW_SHOW : SW_HIDE);
 }
-
-// inline void /*Workspaces::*/SwitchToWindow(HWND hwnd_app)
-// {
-// 	SwitchToThisWindow(hwnd_app, 1);
-// 	// 		HWND hwnd = GetLastActivePopup(GetRootWindow(hwnd_app));
-// 	// 		if (have_imp(pSwitchToThisWindow)) {
-// 	// 			// this one also restores the window, if it's iconic:
-// 	// 			pSwitchToThisWindow(hwnd, 1);
-// 	// 		}
-// 	// 		else {
-// 	// 			SetForegroundWindow(hwnd);
-// 	// 			if (IsIconic(hwnd))
-// 	// 				send_syscommand(hwnd, SC_RESTORE);
-// 	// 		}
-// }
-// 
-// inline void /*Workspaces::*/WS_BringToFront(HWND hwnd, bool to_current)
-// {
-// 	int windesk;
-// 
-// 	//CleanTasks();
-// 
-// 	// 		windesk = vwm_get_desk(hwnd);
-// 	// 		if (windesk != currentScreen)
-// 	// 		{
-// 	// 			if (false == to_current)
-// 	// 				switchToDesktop(windesk);
-// 	// 			else
-// 	// 				setDesktop(hwnd, currentScreen, false);
-// 	// 		}
-// 	SwitchToWindow(hwnd);
-// }
-// 
-// inline bool /*Workspaces::*/FocusTopWindow()
-// {
-// 	// 		HWND hw = get_top_window(currentScreen);
-// 	// 		if (hw) {
-// 	// 			SwitchToWindow(hw);
-// 	// 			return true;
-// 	// 		}
-// 	// 		SwitchToBBWnd();
-// 	return false;
-// }
 
 inline void focusWindow (HWND hwnd)
 {

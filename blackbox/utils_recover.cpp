@@ -27,7 +27,7 @@ namespace bb {
 			DWORD cbNeeded = 0;
 			if (::EnumProcessModules(hPr0, &hMod, sizeof(hMod), &cbNeeded))
 			{
-				::GetModuleBaseName(hPr0, hMod, name, n);
+				::GetModuleFileNameEx(hPr0, hMod, name, n);
 			}
 			::CloseHandle(hPr0);
 		}

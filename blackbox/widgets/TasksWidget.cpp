@@ -39,7 +39,7 @@ namespace bb {
     ImGui::Separator();
     for (TaskInfo & t : m_tasks)
     {
-      if (t.m_config && t.m_config->m_exclude)
+      if (t.m_config && t.m_config->m_bbtasks)
         continue;
 
       char name[TaskInfo::e_captionLenMax];
@@ -56,8 +56,13 @@ namespace bb {
 			ImGui::PushID(t.m_hwnd);
       if (ImGui::Button("i"))
       {
-        tasks.MakeIgnored(t.m_hwnd);
+        tasks.SetTaskManIgnored(t.m_hwnd);
       }
+			ImGui::SameLine();
+			if (ImGui::Button("e"))
+			{
+				tasks.SetBBTasksIgnored(t.m_hwnd);
+			}
 			ImGui::PopID();
 
       ImGui::SameLine();

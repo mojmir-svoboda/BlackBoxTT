@@ -36,6 +36,10 @@ namespace bb {
 		{
 			return m_iconCache.Add(name, ico, id);
 		}
+		bool FindIconInCache (bbstring const & name, IconId & id) const
+		{
+			return m_iconCache.Find(name, id);
+		}
 		//void OnResize (unsigned w, unsigned h);
 	};
 

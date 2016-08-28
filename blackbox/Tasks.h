@@ -16,7 +16,8 @@ namespace bb {
 	enum TaskState : unsigned
 	{
 			e_Active		/// task is in active state (current workspace, not ignored)
-		, e_Ignored		/// task is ignored by user (and task manager)
+		, e_TaskManIgnored		/// task is ignored by user (and task manager)
+		, e_BBIgnored		/// task is ignored by user (and blackbox)
 		, e_OtherWS		/// task is currently on another workspace
 		, max_enum_value		/// do not use this as index, please
 	};
@@ -35,6 +36,7 @@ namespace bb {
 		using ptrs_it = ptrs_t::iterator;
 		using ptrs_cit = ptrs_t::const_iterator;
 		std::array<ptrs_t, max_enum_value> m_tasks;
+		std::vector<HWND> m_taskEnumStorage;
 		TaskInfo * m_active;
 
 	public:
@@ -47,13 +49,15 @@ namespace bb {
 
 		void MkDataCopy (TaskState ts, std::vector<TaskInfo> & p);
 		void SwitchWorkSpace (bbstring const & src, bbstring const & dst);
-		void MakeSticky (HWND hwnd);
-		void RemoveSticky (HWND hwnd);
+		void SetSticky (HWND hwnd);
+		void UnsetSticky (HWND hwnd);
 		bool IsSticky (HWND hwnd);
-		void MakeIgnored (HWND hwnd);
-		//void MakeIgnored (wchar_t const * caption);
-		void RemoveIgnored (HWND hwnd);
-		bool IsIgnored (HWND hwnd);
+		void SetTaskManIgnored (HWND hwnd);
+		void UnsetTaskManIgnored (HWND hwnd);
+		bool IsTaskManIgnored (HWND hwnd);
+		void SetBBTasksIgnored(HWND hwnd);
+		void UnsetBBTasksIgnored(HWND hwnd);
+		bool IsBBTasksIgnored(HWND hwnd);
 		void Focus (HWND hwnd);
 
 	protected:
@@ -64,8 +68,7 @@ namespace bb {
 		TaskConfig * MakeTaskConfig (HWND hwnd);
 		bool RmTask (HWND hwnd);
 		void UpdateTaskInfoCaption (TaskInfo * ti);
-		void UpdateTaskInfo (TaskInfo * ti);
-		void EnumTasks ();
+		void AddTaskInfo (TaskInfo * ti);
 		bool AddTask (HWND hwnd);
 		bool AddWidgetTask (GfxWindow * w);
 

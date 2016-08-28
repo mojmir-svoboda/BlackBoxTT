@@ -23,7 +23,7 @@ namespace ImGui
 			return false;
 		}
 	}
-	inline bool IconButton (bb::IconId id, const ImVec4 & tint_col = ImVec4(1, 1, 1, 1), const ImVec4 & border_col = ImVec4(0, 0, 0, 0))
+	inline bool IconButton (bb::IconId id, const ImVec4 & tint_col = ImVec4(1, 1, 1, 1), const ImVec4 & border_col = ImVec4(0, 0, 0, 0), int framing = -1)
 	{
 		bb::IconSlab const * slab = nullptr;
 		if (bb::BlackBox::Instance().GetGfx().m_iconCache.GetSlab(id, slab))
@@ -34,7 +34,7 @@ namespace ImGui
 			ImTextureID texid = nullptr;
 			if (slab->Get(id.m_index, texid, uv0, uv1))
 			{
-				return ImGui::ImageButton(texid, sz, uv0, uv1, -1, tint_col, border_col);
+				return ImGui::ImageButton(texid, sz, uv0, uv1, framing, tint_col, border_col);
 			}
 			return false;
 		}
