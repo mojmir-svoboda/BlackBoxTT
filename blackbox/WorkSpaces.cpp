@@ -28,13 +28,29 @@ namespace bb {
 	{
 		if (m_config.m_currentClusterId.empty())
 		{
-			SetCurrentClusterId(m_config.m_initClusterId);
+			if (m_config.m_clusters.size())
+			{
+				SetCurrentClusterId(m_config.m_clusters[0].m_id);
+			}
+			else
+			{
+				// @TODO: error
+			}
 		}
 
 		for (WorkGraphConfig & wg : m_config.m_clusters)
 		{
 			if (wg.m_currentVertexId.empty())
-				wg.m_currentVertexId = wg.m_initVertexId;
+			{
+				if (wg.m_vertexlists.size() > 0 && wg.m_vertexlists[0].size())
+				{
+					wg.m_currentVertexId = wg.m_vertexlists[0][0];
+				}
+				else
+				{
+					// @TODO: error
+				}
+			}
 		}
 	}
 

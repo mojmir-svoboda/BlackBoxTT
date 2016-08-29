@@ -9,7 +9,6 @@ struct WorkGraphConfig
 	bbstring m_label;
 	bbstring m_hotkey;
 	bbstring m_currentVertexId;
-	bbstring m_initVertexId;
 	std::vector<std::string> m_verticesCfg;
 	std::vector<std::string> m_edgesCfg;
 };
@@ -34,7 +33,6 @@ namespace YAML {
 			node.push_back(rhs.m_label);
 			node.push_back(rhs.m_hotkey);
 			node.push_back(rhs.m_currentVertexId);
-			node.push_back(rhs.m_initVertexId);
 			node.push_back(rhs.m_vertexlists);
 			node.push_back(rhs.m_edgelist);
 			return node;
@@ -55,9 +53,6 @@ namespace YAML {
 					rhs.m_edgelist = node["edgelist"].as<std::vector<bbstring>>();
 				if (node["current"])
 					rhs.m_currentVertexId = node["current"].as<bbstring>();
-				if (node["init"])
-					rhs.m_initVertexId = node["init"].as<bbstring>();
-
 
 
 //         YAML::Node y_wspaces = node["spaces"];
@@ -99,8 +94,6 @@ namespace bb {
 
 			if (node["current"])
 				rhs.m_currentClusterId = node["current"].as<bbstring>();
-			if (node["init"])
-				rhs.m_initClusterId = node["init"].as<bbstring>();
 			if (node["edgelist"])
 				rhs.m_edgelist = node["edgelist"].as<std::vector<std::string>>();
 

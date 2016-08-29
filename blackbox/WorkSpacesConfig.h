@@ -23,7 +23,6 @@ namespace bb {
 		std::vector<bbstring> m_edgelist;
 		bbstring m_hotkey;
 		bbstring m_currentVertexId;
-		bbstring m_initVertexId;
 
 		bool HasVertex (bbstring const & vertex_id) const
 		{
@@ -56,7 +55,6 @@ namespace bb {
 	struct WorkSpacesConfig
 	{
 		bbstring m_currentClusterId;
-		bbstring m_initClusterId;
     std::vector<WorkGraphConfig> m_clusters;
 		std::vector<std::string> m_edgelist;
 		// cluster edges
