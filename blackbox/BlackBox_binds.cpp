@@ -74,17 +74,12 @@ namespace bb {
 		{
 			bbstring const & curr_ws = wg->m_currentVertexId;
 
-			if (ws.CanSwitchVertexViaEdge(edge_property))
+			bbstring new_vertex_id;
+			if (ws.CanSwitchVertexViaEdge(edge_property, new_vertex_id))
 			{
-				bbstring new_vertex_id;
-				if (ws.SwitchVertexViaEdge(edge_property, new_vertex_id))
-				{
-					if (bbstring const * new_curr_ws = ws.GetCurrentVertexId())
-					{
-						m_tasks.SwitchWorkSpace(curr_ws, *new_curr_ws);
-						return true;
-					}
-				}
+				ws.SetCurrentVertexId(new_vertex_id);
+				m_tasks.SwitchWorkSpace(curr_ws, new_vertex_id);
+				return true;
 			}
 		}
 		return false;

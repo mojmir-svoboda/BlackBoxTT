@@ -24,7 +24,7 @@ namespace bb {
 		void SetCurrentClusterId (bbstring const & id);
 		bool SetCurrentVertexId (bbstring const & id);
 		bool CanSetCurrentVertexId (bbstring const & id) const;
-		bool CanSwitchVertexViaEdge (bbstring const & edge_id) const;
+		bool CanSwitchVertexViaEdge (bbstring const & edge_id, bbstring & target_vertex_id) const;
 
 		bbstring const & GetCurrentClusterId () const { return m_config.m_currentClusterId; }
 		bbstring const * GetCurrentVertexId () const;

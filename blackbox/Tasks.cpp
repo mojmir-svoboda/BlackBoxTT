@@ -285,7 +285,10 @@ void Tasks::Update ()
 {
 	m_lock.Lock();
 
-	//@TODO: clear empty unique_ptrs
+	// clear empty unique_ptrs
+	for (size_t s = 0; s < m_tasks.size(); ++s)
+		m_tasks[s].erase(std::remove_if(m_tasks[s].begin(), m_tasks[s].end(),
+			[] (TaskInfoPtr const & ti_ptr) { return ti_ptr.get() == nullptr; }), m_tasks[s].end());
 
 	// @NOTE: this update probably costs some performance, but UWP apps do
 	// not trigger hook events when window created
@@ -520,6 +523,47 @@ void Tasks::UnsetTaskManIgnored (HWND hwnd)
 	
 	m_lock.Unlock();
 }
+
+void Tasks::SetSticky (HWND hwnd)
+{
+	m_lock.Lock();
+
+	TaskState ts = TaskState::max_enum_value;
+	size_t idx = c_invalidIndex;
+	if (FindTask(hwnd, ts, idx))
+	{
+		TaskInfoPtr & ti_ptr = m_tasks[ts][idx];
+
+		if (nullptr == ti_ptr->m_config)
+			ti_ptr->m_config = MakeTaskConfig(hwnd);
+
+		ti_ptr->m_config->m_sticky = true;
+
+		TRACE_MSG(LL_DEBUG, CTX_BB, "make task sticky hwnd=%x", ti_ptr->m_hwnd);
+//		if (ts == e_OtherWS)
+//			m_tasks[e_Active].push_back(std::move(ti_ptr));
+	}
+
+	m_lock.Unlock();
+}
+
+void Tasks::UnsetSticky (HWND hwnd)
+{
+	TaskState ts = TaskState::max_enum_value;
+	size_t idx = c_invalidIndex;
+	if (FindTask(hwnd, ts, idx))
+	{
+		TaskInfoPtr & ti_ptr = m_tasks[ts][idx];
+
+		if (nullptr == ti_ptr->m_config)
+			ti_ptr->m_config = MakeTaskConfig(hwnd);
+
+		ti_ptr->m_config->m_sticky = false;
+	}
+	
+	m_lock.Unlock();
+}
+
 
 void Tasks::SetBBTasksIgnored (HWND hwnd)
 {

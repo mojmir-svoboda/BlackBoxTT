@@ -34,7 +34,7 @@ namespace bb {
 		template<class IdT>
 		bool FindVertexIndex (IdT const & id, csr::vertex_t & vtx_id) const
 		{
-			for (size_t i = 0, ie = m_edgeProps.size(); i < ie; ++i)
+			for (size_t i = 0, ie = m_vertices.size(); i < ie; ++i)
 			{
 				if (m_vertices[i]->GetId() == id)
 				{

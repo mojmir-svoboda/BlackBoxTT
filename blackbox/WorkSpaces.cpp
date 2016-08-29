@@ -122,32 +122,36 @@ namespace bb {
 		return nullptr;
 	}
 
-	bool WorkSpaces::CanSwitchVertexViaEdge (bbstring const & edge_id) const
+	bool WorkSpaces::CanSwitchVertexViaEdge (bbstring const & edge_id, bbstring & target_vertex_id) const
 	{
 		WorkGraphConfig const * const w0 = FindCluster(m_config.m_currentClusterId);
-		//WorkGraphConfig * w1 = FindClusterForVertex(new_vertex_id);
 		if (w0)
 		{
 			bbstring const & current_vertex_id = w0->m_currentVertexId;
 				
 			csr::vertex_t idx = 0;
-			if (m_graph.FindVertexIndex(current_vertex_id, idx))
+			if (m_graph.FindVertexIndex(current_vertex_id, idx)) // @NOTE: O(N) can be avoided @TODO @FIXME
 			{
 				auto edges = m_graph.m_graph.OutEdges(idx);
-				//m_column[m_rowstart[i]], m_column[[m_rowstart[i] + 1], ..., m_column[[i + 1]].
+				//for (uint16_t i = edges.first.m_idx; i < edges.second.m_idx; ++i)
 
-
+				csr::vertex_t const v_row_start = m_graph.m_graph.m_rowstart[idx];
+				csr::vertex_t const next_row_start = m_graph.m_graph.m_rowstart[idx + 1];
+				csr::vertex_t const next_row_end = std::max(v_row_start, next_row_start);
+				for (uint16_t i = v_row_start; i < next_row_end; ++i)
 				{
-					int n = m_graph.m_graph.PropertyIndex(*edges.first);
+					csr::vertex_t target = m_graph.m_graph.m_column[i];
+					int n = m_graph.m_graph.m_props[i];
+					bbstring const & name = m_graph.m_edgeProps[n];
+
+					if (name == edge_id)
+					{
+						target_vertex_id = m_graph.m_vertices[target]->m_id;
+						return true;
+					}
 				}
 			}
 		}
-
-		return false;
-	}
-
-	bool WorkSpaces::SwitchVertexViaEdge (bbstring const & edge_property, bbstring & target_vertex_id)
-	{
 
 		return false;
 	}

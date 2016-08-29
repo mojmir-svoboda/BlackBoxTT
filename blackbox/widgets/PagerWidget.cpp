@@ -75,10 +75,37 @@ namespace bb {
 							else
 							{
 								int framing = -1;
-								if (ImGui::IconButton(icoid, ImColor(255, 255, 255, 255), ImColor(255, 255, 255, 128), framing))
+								ImGui::PushID(t.m_hwnd);
+								bool const clkd = ImGui::IconButton(icoid, ImColor(255, 255, 255, 255), ImColor(255, 255, 255, 128), framing);
+								if (ImGui::BeginPopupContextItem(""))
+								{
+									bool is_sticky = t.m_config && t.m_config->m_sticky;
+									if (ImGui::Selectable(is_sticky ? "UnStick" : "Stick"))
+									{
+										if (is_sticky)
+											tasks.UnsetSticky(t.m_hwnd);
+										else
+											tasks.SetSticky(t.m_hwnd);
+									}
+
+									bool skip_taskman = t.m_config && t.m_config->m_taskman == false;
+									if (ImGui::Selectable(skip_taskman ? "back to TaskMan" : "rm from TaskMan"))
+									{
+										if (skip_taskman)
+											tasks.UnsetTaskManIgnored(t.m_hwnd);
+										else
+											tasks.SetTaskManIgnored(t.m_hwnd);
+									}
+
+									if (ImGui::Button("Close Menu"))
+										ImGui::CloseCurrentPopup();
+									ImGui::EndPopup();
+								}
+								if (clkd)
 								{
 									tasks.Focus(t.m_hwnd);
 								}
+								ImGui::PopID();
 							}
 						}
 					}
