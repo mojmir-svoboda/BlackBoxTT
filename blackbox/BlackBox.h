@@ -79,7 +79,15 @@ namespace bb {
 		unsigned GetTaskHookWM () const { return m_taskHookWM; }
 		void * GetSettingPtr (int sn_index);
 		bool GetConfigDir (wchar_t * dir, size_t dir_sz) const;
+
+		/**@fn WorkSpacesSetCurrentVertexId
+		 * @brief finds vertex_id in the graph and switches to it. no edge from current is required.
+		 **/
 		bool WorkSpacesSetCurrentVertexId (bbstring const & vertex_id);
+		/**@fn WorkSpacesSwitchVertexViaEdge
+		 * @brief uses edge with 'edge_property' to go from current vertex to destination vertex
+		 **/
+		bool WorkSpacesSwitchVertexViaEdge (bbstring const & edge_property);
 	};
 }
 

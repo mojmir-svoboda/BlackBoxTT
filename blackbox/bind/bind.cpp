@@ -48,9 +48,23 @@ extern "C" {
 		size_t const sz = bb::codecvt_utf8_utf16_dst_size(vertex, ln);
 		wchar_t * const bbcmd_u16 = static_cast<wchar_t *>(alloca(sz * sizeof(wchar_t)));
 		size_t const bbcmd_u16_ln = bb::codecvt_utf8_utf16(vertex, ln, bbcmd_u16, sz);
-		bbstring b(bbcmd_u16, bbcmd_u16_ln);
+		bbstring vertex_id(bbcmd_u16, bbcmd_u16_ln);
 
-		bb->WorkSpacesSetCurrentVertexId(b);
+		bb->WorkSpacesSetCurrentVertexId(vertex_id);
 	}
+
+	BB_API void SwitchVertexViaEdge (char const * vertex)
+	{
+		bb::BlackBox * const bb = getBlackBoxInstanceRW();
+
+		size_t const ln = strlen(vertex);
+		size_t const sz = bb::codecvt_utf8_utf16_dst_size(vertex, ln);
+		wchar_t * const bbcmd_u16 = static_cast<wchar_t *>(alloca(sz * sizeof(wchar_t)));
+		size_t const bbcmd_u16_ln = bb::codecvt_utf8_utf16(vertex, ln, bbcmd_u16, sz);
+		bbstring edge_id(bbcmd_u16, bbcmd_u16_ln);
+
+		bb->WorkSpacesSwitchVertexViaEdge(edge_id);
+	}
+	
 }
 

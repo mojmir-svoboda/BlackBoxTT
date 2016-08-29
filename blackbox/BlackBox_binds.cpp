@@ -65,5 +65,28 @@ namespace bb {
 		return false;
 	}
 
+	bool BlackBox::WorkSpacesSwitchVertexViaEdge (bbstring const & edge_property)
+	{
+		WorkSpaces & ws = m_wspaces;
+
+		bbstring const & cluster_id = ws.GetCurrentClusterId();
+		if (WorkGraphConfig const * wg = ws.FindCluster(cluster_id))
+		{
+			bbstring const & curr_ws = wg->m_currentVertexId;
+
+			if (ws.CanSwitchVertexViaEdge(edge_property))
+			{
+				ws.SwitchVertexViaEdge(edge_property);
+
+				if (bbstring const * new_curr_ws = ws.GetCurrentVertexId())
+				{
+					m_tasks.SwitchWorkSpace(curr_ws, *new_curr_ws);
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 }
 

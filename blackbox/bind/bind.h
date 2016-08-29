@@ -17,5 +17,6 @@ extern "C" {
 
 	//BB_API void SetCurrentVertexId (wchar_t const * vertex);
 	BB_API void SetCurrentVertexId (char const * vertex);
+	BB_API void SwitchVertexViaEdge (char const * edge);
 }
 
