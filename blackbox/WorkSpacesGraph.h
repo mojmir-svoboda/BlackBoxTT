@@ -31,6 +31,20 @@ namespace bb {
 			return false;
 		}
 
+		template<class IdT>
+		bool FindVertexIndex (IdT const & id, csr::vertex_t & vtx_id) const
+		{
+			for (size_t i = 0, ie = m_edgeProps.size(); i < ie; ++i)
+			{
+				if (m_vertices[i]->GetId() == id)
+				{
+					vtx_id = static_cast<csr::vertex_t>(i);
+					return true;
+				}
+			}
+			return false;
+		}
+
 		/// prop created if not in container already
 		size_t FindPropertyIndex (bbstring const & s)
 		{

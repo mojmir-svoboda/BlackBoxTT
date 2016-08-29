@@ -122,32 +122,33 @@ namespace bb {
 		return nullptr;
 	}
 
-	bool WorkSpaces::SwitchVertex (bbstring const & new_vertex_id)
+	bool WorkSpaces::CanSwitchVertexViaEdge (bbstring const & edge_id) const
 	{
-		WorkGraphConfig * w0 = FindCluster(m_config.m_currentClusterId);
-		WorkGraphConfig * w1 = FindClusterForVertex(new_vertex_id);
-		if (w0 && w1)
+		WorkGraphConfig const * const w0 = FindCluster(m_config.m_currentClusterId);
+		//WorkGraphConfig * w1 = FindClusterForVertex(new_vertex_id);
+		if (w0)
 		{
-			bool const same_cluster = w0 == w1;
 			bbstring const & current_vertex_id = w0->m_currentVertexId;
-
-			BlackBox & bb = BlackBox::Instance();
-
-			if (w0 != w1)
+				
+			csr::vertex_t idx = 0;
+			if (m_graph.FindVertexIndex(current_vertex_id, idx))
 			{
-				//OnSwitchCluster if needed
-				SetCurrentClusterId(w1->m_id);
-			}
+				auto edges = m_graph.m_graph.OutEdges(idx);
+				//m_column[m_rowstart[i]], m_column[[m_rowstart[i] + 1], ..., m_column[[i + 1]].
 
-			SetCurrentVertexId(new_vertex_id);
-			bb.GetTasks().SwitchWorkSpace(current_vertex_id, new_vertex_id);
-			//bb.GetTasks().ShowTasksFromWorkSpace(new_vertex_id);
+
+				{
+					int n = m_graph.m_graph.PropertyIndex(*edges.first);
+				}
+			}
 		}
+
 		return false;
 	}
 
-	bool WorkSpaces::SwitchVertexViaEdge (bbstring const & edge_property)
+	bool WorkSpaces::SwitchVertexViaEdge (bbstring const & edge_property, bbstring & target_vertex_id)
 	{
+
 		return false;
 	}
 

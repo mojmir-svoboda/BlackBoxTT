@@ -33,8 +33,7 @@ namespace bb {
 		WorkGraphConfig * FindCluster (bbstring const & cluster_id);
 		WorkGraphConfig * FindClusterForVertex(bbstring const & vertex_id);
 
-		bool SwitchVertex (bbstring const & vertex_id);
-		bool SwitchVertexViaEdge (bbstring const & edge_property);
+		bool SwitchVertexViaEdge (bbstring const & edge_property, bbstring & target_vertex_id);
 
 		void OnSwitchFromVertex (bbstring const & old_vertex_id, bbstring const & new_vertex_id);
 	};
