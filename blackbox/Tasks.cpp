@@ -218,21 +218,21 @@ bool Tasks::AddTask (HWND hwnd)
 		TaskInfoPtr & ti_ptr = m_tasks[ts][idx];
 		UpdateTaskInfoCaption(ti_ptr.get());
 
-		if (current_ws)
+		if (current_ws && ti_ptr->m_config && ti_ptr->m_config->m_sticky)
 			ti_ptr->SetWorkSpace(current_ws->c_str());
 
-		TaskState ts_new = e_Active;
-		if (ti_ptr->m_config)
-		{
-			if (!ti_ptr->m_config->m_taskman)
-				ts_new = e_TaskManIgnored;
-			else if (!ti_ptr->m_config->m_bbtasks)
-				ts_new = e_BBIgnored;
-		}
-
-		m_tasks[ts_new].push_back(std::move(ti_ptr));
-		m_tasks[ts].erase(m_tasks[ts].begin() + idx);
-
+// 		TaskState ts_new = e_Active;
+// 		if (ti_ptr->m_config)
+// 		{
+// 			if (!ti_ptr->m_config->m_taskman)
+// 				ts_new = e_TaskManIgnored;
+// 			else if (!ti_ptr->m_config->m_bbtasks)
+// 				ts_new = e_BBIgnored;
+// 		}
+// 
+// 		m_tasks[ts_new].push_back(std::move(ti_ptr));
+// 		m_tasks[ts].erase(m_tasks[ts].begin() + idx);
+// 
 		return false;
 	}
 	else
@@ -284,6 +284,8 @@ bool Tasks::AddTask (HWND hwnd)
 void Tasks::Update ()
 {
 	m_lock.Lock();
+
+	//@TODO: clear empty unique_ptrs
 
 	// @NOTE: this update probably costs some performance, but UWP apps do
 	// not trigger hook events when window created
@@ -443,6 +445,7 @@ void Tasks::SwitchWorkSpace (bbstring const & src, bbstring const & dst)
 
 			if (t->m_wspace != dst)
 			{
+				::ShowWindow(t->m_hwnd, SW_HIDE);
 				m_tasks[e_OtherWS].push_back(std::move(t));
 				continue;
 			}
@@ -456,6 +459,7 @@ void Tasks::SwitchWorkSpace (bbstring const & src, bbstring const & dst)
 
 			if (t->m_wspace != dst)
 			{
+				::ShowWindow(t->m_hwnd, SW_HIDE);
 				m_tasks[e_OtherWS].push_back(std::move(t));
 				continue;
 			}
@@ -466,6 +470,7 @@ void Tasks::SwitchWorkSpace (bbstring const & src, bbstring const & dst)
 		{
 			if (t->m_wspace == dst)
 			{
+				::ShowWindow(t->m_hwnd, SW_SHOW);
 				m_tasks[e_Active].push_back(std::move(t));
 				continue;
 			}
