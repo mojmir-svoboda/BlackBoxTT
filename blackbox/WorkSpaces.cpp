@@ -18,7 +18,11 @@ namespace bb {
 		TRACE_SCOPE(LL_INFO, CTX_BB | CTX_INIT);
 		m_config = config;
 
+		std::unique_ptr<VirtualDesktopManager> v(new VirtualDesktopManager);
+		m_vdm = std::move(v);
+
 		bool ok = true;
+		ok &= m_vdm->Init();
 		ok &= CreateGraph();
 		InitClusterAndVertex();
 		return ok;
@@ -160,11 +164,22 @@ namespace bb {
 	{
 		TRACE_MSG(LL_INFO, CTX_BB, "Terminating workspaces");
 		ClearGraph();
+		m_vdm->Done();
+		m_vdm.release();
 		return true;
 	}
 
 	bool WorkSpaces::CreateGraph ()
 	{
+// 		for (WorkGraphConfig & w : m_config.m_clusters)
+// 		{
+// 			if (w.m_auto)
+// 			{
+// 				w.m_vertexlists.push_back(m_vdm->m_desktops);
+// 			}
+// 		}
+// 
+
 		for (WorkGraphConfig & w : m_config.m_clusters)
 		{
 			for (auto const & vtxlist : w.m_vertexlists)
@@ -183,8 +198,6 @@ namespace bb {
 		{
 			for (bbstring const & s : w.m_edgelist)
 			{
-				//'f1 -> f2 -> f3 -> f1 [label="right"]'
-
 				try
 				{
 					std::wregex label_regex(L"(.+)\\[\\s*label\\s*=\\s*\"(.+)\"\\s*\\]");

@@ -19,9 +19,9 @@ namespace bb {
 	{
 		bbstring m_id;
 		bbstring m_label;
+		bool m_auto { false };
 		std::vector<std::vector<bbstring>> m_vertexlists;
 		std::vector<bbstring> m_edgelist;
-		bbstring m_hotkey;
 		bbstring m_currentVertexId;
 
 		bool HasVertex (bbstring const & vertex_id) const

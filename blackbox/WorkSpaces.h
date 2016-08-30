@@ -1,6 +1,7 @@
 #pragma once
 #include "WorkSpacesConfig.h"
 #include "WorkSpacesGraph.h"
+#include "VirtualDesktopManager.h"
 
 namespace bb {
 
@@ -8,6 +9,7 @@ namespace bb {
   {
     WorkSpacesConfig m_config;
 		WorkSpacesGraph m_graph;
+		std::unique_ptr<VirtualDesktopManager> m_vdm;
 
 		WorkSpaces ();
 		~WorkSpaces ();

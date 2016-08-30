@@ -4,7 +4,6 @@
 #include "WorkSpaces.h"
 #include "Tray.h"
 #include "Explorer.h"
-#include "VirtualDesktopManager.h"
 #include "gfx/Gfx.h"
 #include "CommandLine.h"
 #include <net/Server.h>
@@ -38,7 +37,6 @@ namespace bb {
 		std::unique_ptr<StyleStruct> m_defaultStyle; /// legacy style
 		std::unique_ptr<StyleStruct> m_style; /// legacy style
 		std::unique_ptr<Explorer> m_explorer;
-		std::unique_ptr<VirtualDesktopManager> m_vdm;
 		Tasks m_tasks;
 		WorkSpaces m_wspaces;
 		Tray m_tray;

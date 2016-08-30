@@ -151,7 +151,6 @@ namespace bb {
 		, m_defaultStyle(new StyleStruct)
 		, m_style()
 		, m_explorer()
-		, m_vdm()
 	{
 		setDefaultValuesTo(*m_defaultStyle.get());
 	}
@@ -305,14 +304,11 @@ namespace bb {
 		m_taskHook32on64WM = ::RegisterWindowMessage(c_taskHook32Name);
 		std::unique_ptr<Explorer> e(new Explorer);
 		m_explorer = std::move(e);
-		std::unique_ptr<VirtualDesktopManager> v(new VirtualDesktopManager);
-		m_vdm = std::move(v);
 
 		rc::init();
 
 		Win32RegisterClass(s_blackboxClass, mainWndProc, 0);
 		ok &= CreateBBWindow();
-		ok &= m_vdm->Init();
 		ok &= m_wspaces.Init(m_config.m_wspaces);
 		ok &= m_gfx.Init();
 		ok &= m_tasks.Init(m_config.m_tasks);
@@ -384,7 +380,6 @@ namespace bb {
 		ok &= m_gfx.Done();
 		ok &= m_tray.Done();
 		ok &= m_explorer->Done();
-		ok &= m_vdm->Done();
 
 		::DestroyWindow(m_hwnd);
 		m_hwnd = nullptr;

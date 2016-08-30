@@ -36,81 +36,84 @@ namespace bb {
 			uint32_t const rows = wg->MaxRowCount();
 			uint32_t const cols = wg->MaxColCount();
 
-			ImGui::Columns(cols, "mixed", true);
-			ImGui::Separator();
-
-			for (uint32_t c = 0; c < cols; ++c)
+			if (cols && rows)
 			{
-				for (uint32_t r = 0; r < rows; ++r)
+				ImGui::Columns(cols, "mixed", true);
+				ImGui::Separator();
+
+				for (uint32_t c = 0; c < cols; ++c)
 				{
-					bbstring const & vertex_id = wg->m_vertexlists[r][c];
-					char idu8[TaskInfo::e_wspaceLenMax];
-					codecvt_utf16_utf8(vertex_id, idu8, TaskInfo::e_wspaceLenMax);
-
-					if (ImGui::Button(idu8))
-					{ 
-						BlackBox::Instance().WorkSpacesSetCurrentVertexId(vertex_id);
-					}
-
-					int tmp = 0;
-					for (TaskInfo & t : m_tasks)
+					for (uint32_t r = 0; r < rows; ++r)
 					{
-// 						if (t.m_config && t.m_config->m_bbtasks)
-// 							continue;
-						if (t.m_wspace == vertex_id)
+						bbstring const & vertex_id = wg->m_vertexlists[r][c];
+						char idu8[TaskInfo::e_wspaceLenMax];
+						codecvt_utf16_utf8(vertex_id, idu8, TaskInfo::e_wspaceLenMax);
+
+						if (ImGui::Button(idu8))
+						{ 
+							BlackBox::Instance().WorkSpacesSetCurrentVertexId(vertex_id);
+						}
+
+						int tmp = 0;
+						for (TaskInfo & t : m_tasks)
 						{
-							if (++tmp % 2)
-								ImGui::SameLine();
-
-							Tasks & tasks = BlackBox::Instance().GetTasks();
-							IconId const icoid = t.m_icoSmall;
-							if (!icoid.IsValid())
+	// 						if (t.m_config && t.m_config->m_bbtasks)
+	// 							continue;
+							if (t.m_wspace == vertex_id)
 							{
-								// @TODO: assign color to hwnd?
-								if (ImGui::ColorButton(ImColor(0, 0, 128, 255)))
-								{
-									tasks.Focus(t.m_hwnd);
-								}
-							}
-							else
-							{
-								int framing = -1;
-								ImGui::PushID(t.m_hwnd);
-								bool const clkd = ImGui::IconButton(icoid, ImColor(255, 255, 255, 255), ImColor(255, 255, 255, 128), framing);
-								if (ImGui::BeginPopupContextItem(""))
-								{
-									bool is_sticky = t.m_config && t.m_config->m_sticky;
-									if (ImGui::Selectable(is_sticky ? "UnStick" : "Stick"))
-									{
-										if (is_sticky)
-											tasks.UnsetSticky(t.m_hwnd);
-										else
-											tasks.SetSticky(t.m_hwnd);
-									}
+								if (++tmp % 2)
+									ImGui::SameLine();
 
-									bool skip_taskman = t.m_config && t.m_config->m_taskman == false;
-									if (ImGui::Selectable(skip_taskman ? "back to TaskMan" : "rm from TaskMan"))
-									{
-										if (skip_taskman)
-											tasks.UnsetTaskManIgnored(t.m_hwnd);
-										else
-											tasks.SetTaskManIgnored(t.m_hwnd);
-									}
-
-									if (ImGui::Button("Close Menu"))
-										ImGui::CloseCurrentPopup();
-									ImGui::EndPopup();
-								}
-								if (clkd)
+								Tasks & tasks = BlackBox::Instance().GetTasks();
+								IconId const icoid = t.m_icoSmall;
+								if (!icoid.IsValid())
 								{
-									tasks.Focus(t.m_hwnd);
+									// @TODO: assign color to hwnd?
+									if (ImGui::ColorButton(ImColor(0, 0, 128, 255)))
+									{
+										tasks.Focus(t.m_hwnd);
+									}
 								}
-								ImGui::PopID();
+								else
+								{
+									int framing = -1;
+									ImGui::PushID(t.m_hwnd);
+									bool const clkd = ImGui::IconButton(icoid, ImColor(255, 255, 255, 255), ImColor(255, 255, 255, 128), framing);
+									if (ImGui::BeginPopupContextItem(""))
+									{
+										bool is_sticky = t.m_config && t.m_config->m_sticky;
+										if (ImGui::Selectable(is_sticky ? "UnStick" : "Stick"))
+										{
+											if (is_sticky)
+												tasks.UnsetSticky(t.m_hwnd);
+											else
+												tasks.SetSticky(t.m_hwnd);
+										}
+
+										bool skip_taskman = t.m_config && t.m_config->m_taskman == false;
+										if (ImGui::Selectable(skip_taskman ? "back to TaskMan" : "rm from TaskMan"))
+										{
+											if (skip_taskman)
+												tasks.UnsetTaskManIgnored(t.m_hwnd);
+											else
+												tasks.SetTaskManIgnored(t.m_hwnd);
+										}
+
+										if (ImGui::Button("Close Menu"))
+											ImGui::CloseCurrentPopup();
+										ImGui::EndPopup();
+									}
+									if (clkd)
+									{
+										tasks.Focus(t.m_hwnd);
+									}
+									ImGui::PopID();
+								}
 							}
 						}
 					}
+					ImGui::NextColumn();
 				}
-				ImGui::NextColumn();
 			}
 		}
 	}

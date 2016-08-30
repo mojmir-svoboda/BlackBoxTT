@@ -21,8 +21,9 @@ namespace bb {
 		IVirtualDesktopManagerInternal * m_vdmi { nullptr };
 		IVirtualDesktopManager * m_vdm { nullptr };
 		std::vector<GUID> m_desktops;
+		std::vector<std::pair<GUID, GUID>> m_edges;
 
-		bool GetAdjacentDesktop (AdjacentDesktop const & dir, GUID & adj_desk);
+		bool GetAdjacentDesktop (GUID desk, AdjacentDesktop const & dir, GUID & adj_desk);
 		bool GetCurrentDesktop (GUID & adj_desk);
 		void UpdateDesktops ();
 	};

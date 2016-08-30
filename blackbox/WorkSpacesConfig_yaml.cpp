@@ -3,25 +3,6 @@
 #include <yaml-cpp/yaml.h>
 #include "utils_yaml.h"
 
-struct WorkGraphConfig
-{
-	bbstring m_id;
-	bbstring m_label;
-	bbstring m_hotkey;
-	bbstring m_currentVertexId;
-	std::vector<std::string> m_verticesCfg;
-	std::vector<std::string> m_edgesCfg;
-};
-
-struct WorkSpacesConfig
-{
-	bbstring m_currentClusterId;
-	bbstring m_initClusterId;
-	std::vector<WorkGraphConfig> m_groups;
-	// cluster edges
-};
-
-
 namespace YAML {
 	template<>
 	struct convert<bb::WorkGraphConfig>
@@ -31,7 +12,7 @@ namespace YAML {
 			Node node;
 			node.push_back(rhs.m_id);
 			node.push_back(rhs.m_label);
-			node.push_back(rhs.m_hotkey);
+			node.push_back(rhs.m_auto);
 			node.push_back(rhs.m_currentVertexId);
 			node.push_back(rhs.m_vertexlists);
 			node.push_back(rhs.m_edgelist);
@@ -45,8 +26,8 @@ namespace YAML {
 				rhs.m_id = node["id"].as<bbstring>();
 				if (node["label"])
 					rhs.m_label = node["label"].as<bbstring>();
-				if (node["hotkey"])
-					rhs.m_hotkey = node["hotkey"].as<bbstring>();
+				if (node["auto"])
+					rhs.m_auto = node["auto"].as<bool>();
 				if (node["vertexlist"])
 					rhs.m_vertexlists = node["vertexlist"].as<std::vector<std::vector<bbstring>>>();
 				if (node["edgelist"])
