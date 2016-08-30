@@ -41,6 +41,7 @@ set(blackbox_SOURCES
 	BlackBoxConfig.cpp
 	BlackBox_binds.cpp
 	Explorer.cpp
+	VirtualDesktopManager.cpp
 	Tasks.cpp
 	TasksConfig_yaml.cpp
 	Tray.cpp
@@ -66,6 +67,7 @@ set(blackbox_SOURCES
 	plugin/PluginManager.cpp
 	plugin/PluginsConfig_yaml.cpp
 	utils_recover.cpp
+	utils_vdm.cpp
 )
 
 set (blackbox_HEADERS
@@ -73,6 +75,7 @@ set (blackbox_HEADERS
 	BlackBoxConfig.h
 	CommandLine.h
 	Explorer.h
+	VirtualDesktopManager.h
 	Tasks.h
 	TaskConfig.h
 	TasksConfig.h
@@ -82,6 +85,7 @@ set (blackbox_HEADERS
 	utils_window.h
 	utils_recover.h
 	utils_yaml.h
+	utils_vdm.h
 	gfx/DX11.h
 	gfx/Gfx.h
 	gfx/GfxWindow.h
