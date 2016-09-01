@@ -30,6 +30,8 @@ namespace bb {
 		bool CanSwitchVertexViaEdge (bbstring const & edge_id, bbstring & target_vertex_id) const;
 		bool SwitchDesktop (bbstring const & vertex_id);
 		bool IsVertexVDM (bbstring const & vertex_id) const;
+		bool IsVertexVDM (bbstring const & vertex_id, size_t & idx) const;
+		GUID GetVertexGUID (size_t idx) const;
 
 		bbstring const & GetCurrentClusterId () const { return m_config.m_currentClusterId; }
 		bbstring const * GetCurrentVertexId () const;
@@ -37,10 +39,6 @@ namespace bb {
 		WorkGraphConfig const * FindClusterForVertex (bbstring const & vertex_id) const;
 		WorkGraphConfig * FindCluster (bbstring const & cluster_id);
 		WorkGraphConfig * FindClusterForVertex(bbstring const & vertex_id);
-
-		//bool SwitchVertexViaEdge (bbstring const & edge_property, bbstring & target_vertex_id);
-
-		//void OnSwitchFromVertex (bbstring const & old_vertex_id, bbstring const & new_vertex_id);
 
 		bool AssignWorkSpace (HWND hwnd, bbstring & vertex_id);
 	};

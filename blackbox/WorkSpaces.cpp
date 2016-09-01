@@ -85,7 +85,16 @@ namespace bb {
 	{
 		size_t idx = 0;
 		return m_vdm->FindDesktop(vertex_id, idx);
-	}	
+	}
+	bool WorkSpaces::IsVertexVDM (bbstring const & vertex_id, size_t & idx) const
+	{
+		return m_vdm->FindDesktop(vertex_id, idx);
+	}
+
+	GUID WorkSpaces::GetVertexGUID (size_t idx) const
+	{
+		return m_vdm->m_desktops[idx];
+	}
 
 	bool WorkSpaces::SwitchDesktop (bbstring const & vertex_id)
 	{

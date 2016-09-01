@@ -9,6 +9,7 @@
 #include "BlackBox.h"
 #include <cassert>
 #include <limits>
+#include "VirtualDesktopManager.h"
 
 namespace bb {
 
@@ -660,8 +661,14 @@ bool Tasks::MoveWindowToVertex (HWND hwnd, bbstring const & vertex_id)
 			else
 			{
 				m_tasks[e_OtherWS].push_back(std::move(ti_ptr));
-				if (!m_wspaces.IsVertexVDM(vertex_id))
+				size_t vdm_idx = 0;
+				if (!m_wspaces.IsVertexVDM(vertex_id, vdm_idx))
 					::ShowWindow(hwnd, SW_HIDE);
+				else
+				{
+					GUID const & vdm_guid = m_wspaces.GetVertexGUID(vdm_idx);
+					m_wspaces.m_vdm->MoveWindowToDesktop(hwnd, vdm_guid);
+				}
 			}
 		}
 	}

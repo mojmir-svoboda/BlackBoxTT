@@ -23,6 +23,7 @@ namespace bb {
 
 	protected:
 		friend struct WorkSpaces;
+		friend class Tasks;
 		IVirtualDesktopManagerInternal * m_vdmi { nullptr };
 		IVirtualDesktopManager * m_vdm { nullptr };
 		std::vector<GUID> m_desktops;
@@ -36,6 +37,7 @@ namespace bb {
 		bool FindDesktop (GUID const & guid, size_t & idx);
 		bool FindDesktopIndex (HWND hwnd, size_t & idx);
 		bool SwitchDesktop (GUID const & g);
+		bool MoveWindowToDesktop (HWND hwnd, GUID const & guid);
 	};
 
 }

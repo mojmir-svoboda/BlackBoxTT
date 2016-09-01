@@ -95,6 +95,11 @@ namespace bb {
 		return true;
 	}
 
+	bool VirtualDesktopManager::MoveWindowToDesktop (HWND hwnd, GUID const & guid)
+	{
+		return m_vdm->MoveWindowToDesktop(hwnd, guid);
+	}
+
 	bool VirtualDesktopManager::SwitchDesktop (GUID const & g)
 	{
 		IVirtualDesktop * ivd = nullptr;
