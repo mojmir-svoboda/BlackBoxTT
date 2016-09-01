@@ -2,12 +2,13 @@
 #include "WorkSpacesConfig.h"
 #include "WorkSpacesGraph.h"
 #include "VirtualDesktopManager.h"
+#include <platform_win.h>
 
 namespace bb {
 
-  struct WorkSpaces
-  {
-    WorkSpacesConfig m_config;
+	struct WorkSpaces
+	{
+		WorkSpacesConfig m_config;
 		WorkSpacesGraph m_graph;
 		std::unique_ptr<VirtualDesktopManager> m_vdm;
 
@@ -27,6 +28,8 @@ namespace bb {
 		bool SetCurrentVertexId (bbstring const & id);
 		bool CanSetCurrentVertexId (bbstring const & id) const;
 		bool CanSwitchVertexViaEdge (bbstring const & edge_id, bbstring & target_vertex_id) const;
+		bool SwitchDesktop (bbstring const & vertex_id);
+		bool IsVertexVDM (bbstring const & vertex_id) const;
 
 		bbstring const & GetCurrentClusterId () const { return m_config.m_currentClusterId; }
 		bbstring const * GetCurrentVertexId () const;
@@ -35,8 +38,10 @@ namespace bb {
 		WorkGraphConfig * FindCluster (bbstring const & cluster_id);
 		WorkGraphConfig * FindClusterForVertex(bbstring const & vertex_id);
 
-		bool SwitchVertexViaEdge (bbstring const & edge_property, bbstring & target_vertex_id);
+		//bool SwitchVertexViaEdge (bbstring const & edge_property, bbstring & target_vertex_id);
 
-		void OnSwitchFromVertex (bbstring const & old_vertex_id, bbstring const & new_vertex_id);
+		//void OnSwitchFromVertex (bbstring const & old_vertex_id, bbstring const & new_vertex_id);
+
+		bool AssignWorkSpace (HWND hwnd, bbstring & vertex_id);
 	};
 }

@@ -59,6 +59,7 @@ namespace bb {
 		void UnsetBBTasksIgnored(HWND hwnd);
 		bool IsBBTasksIgnored(HWND hwnd);
 		void Focus (HWND hwnd);
+		HWND GetActiveTask () const;
 
 	protected:
 		bool FindTask (HWND hwnd, TaskState & state, size_t & idx);

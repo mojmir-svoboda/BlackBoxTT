@@ -67,7 +67,7 @@ namespace bb {
 			if (i > 0 && m_exenames[m_order[i]] != m_exenames[m_order[i - 1]])
 				ImGui::Separator();
 
-			bool const is_visible = ::IsWindowVisible(ti.m_hwnd);
+			bool const is_visible = ::IsWindowVisible(ti.m_hwnd) == TRUE;
 			bool chk = is_visible;
 			ImGui::PushID(i);
 			char appname[768];

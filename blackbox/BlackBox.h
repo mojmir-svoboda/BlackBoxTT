@@ -70,6 +70,8 @@ namespace bb {
 		Gfx & GetGfx () { return m_gfx; }
 		Gfx const & GetGfx () const { return m_gfx; }
 
+		HWND FindTopLevelWindow () const;
+
 		// binds
 		void Quit (uint32_t arg);
 		void MakeSticky (HWND hwnd);
@@ -88,6 +90,10 @@ namespace bb {
 		 * @brief uses edge with 'edge_property' to go from current vertex to destination vertex
 		 **/
 		bool WorkSpacesSwitchVertexViaEdge (bbstring const & edge_property);
+		/**@fn MaximizeTopWindow
+		 * @param [in] vertical
+		 **/
+		void MaximizeTopWindow (bool vertical);
 	};
 }
 

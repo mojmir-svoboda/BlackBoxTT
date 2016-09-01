@@ -142,5 +142,87 @@ inline void showInFromTaskBar (HWND hwnd, bool show)
 	}
 }
 
+// from bblean
+inline LRESULT sendSysCommand (HWND hwnd, WPARAM SC_XXX)
+{
+	DWORD_PTR dwResult = 0;
+	::SendMessageTimeout(hwnd, WM_SYSCOMMAND, SC_XXX, 0, SMTO_ABORTIFHUNG|SMTO_NORMAL, 1000, &dwResult);
+	return dwResult;
+}
+
+inline void getRect (HWND hwnd, RECT * rp)
+{
+	GetWindowRect(hwnd, rp);
+	if (WS_CHILD & GetWindowLongPtr(hwnd, GWL_STYLE))
+	{
+		HWND pw = GetParent(hwnd);
+		ScreenToClient(pw, (LPPOINT)&rp->left);
+		ScreenToClient(pw, (LPPOINT)&rp->right);
+	}
+}
+
+inline bool checkForRestore (HWND hwnd)
+{
+	WINDOWPLACEMENT wp;
+
+	if (FALSE == ::IsZoomed(hwnd))
+		return false;
+	sendSysCommand(hwnd, SC_RESTORE);
+
+	// restore the default maxPos (necessary when it was V-max'd or H-max'd)
+	wp.length = sizeof wp;
+	::GetWindowPlacement(hwnd, &wp);
+	wp.ptMaxPosition.x = wp.ptMaxPosition.y = -1;
+	::SetWindowPlacement(hwnd, &wp);
+	return true;
+}
+
+inline void windowSetPos (HWND hwnd, RECT rc)
+{
+	int const width = rc.right - rc.left;
+	int const height = rc.bottom - rc.top;
+	SetWindowPos(hwnd, NULL, rc.left, rc.top, width, height, SWP_NOZORDER|SWP_NOACTIVATE);
+}
+
+inline void growWindow (HWND hwnd, bool v)
+{
+	RECT r1, r2;
+
+	if (checkForRestore(hwnd))
+		return;
+	getRect(hwnd, &r1);
+	::LockWindowUpdate(hwnd);
+	sendSysCommand(hwnd, SC_MAXIMIZE);
+	getRect(hwnd, &r2);
+	if (v)
+		r1.top = r2.top, r1.bottom = r2.bottom;
+	else
+		r1.left = r2.left, r1.right = r2.right;
+	windowSetPos(hwnd, r1);
+	::LockWindowUpdate(NULL);
+}
+
+inline void maximizeWindow (HWND hwnd, bool vertical)
+{
+	LONG_PTR style = GetWindowLongPtr(hwnd, GWL_STYLE);
+	if (0 == (WS_MAXIMIZEBOX & style))
+		return;
+
+	RECT r1, r2;
+
+	if (checkForRestore(hwnd))
+		return;
+	getRect(hwnd, &r1);
+	LockWindowUpdate(hwnd);
+	sendSysCommand(hwnd, SC_MAXIMIZE);
+	getRect(hwnd, &r2);
+	if (vertical)
+		r1.top = r2.top, r1.bottom = r2.bottom;
+	else
+		r1.left = r2.left, r1.right = r2.right;
+	windowSetPos(hwnd, r1);
+	LockWindowUpdate(NULL);
+}
+
 
 }

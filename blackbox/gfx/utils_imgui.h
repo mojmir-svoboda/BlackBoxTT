@@ -22,6 +22,7 @@ namespace ImGui
 			}
 			return false;
 		}
+		return false;
 	}
 	inline bool IconButton (bb::IconId id, const ImVec4 & tint_col = ImVec4(1, 1, 1, 1), const ImVec4 & border_col = ImVec4(0, 0, 0, 0), int framing = -1)
 	{
@@ -38,6 +39,7 @@ namespace ImGui
 			}
 			return false;
 		}
+		return false;
 	}
 
 	// Play it nice with Windows users. Notepad in 2015 still doesn't display text data with Unix-style \n.

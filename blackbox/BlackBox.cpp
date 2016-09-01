@@ -500,4 +500,14 @@ namespace bb {
 			}
 		}
 	}
+
+	HWND BlackBox::FindTopLevelWindow () const
+	{
+		HWND hwnd = ::GetForegroundWindow();
+		if (NULL == hwnd)
+		{
+			return m_tasks.GetActiveTask();
+		}
+		return hwnd;
+	}
 }

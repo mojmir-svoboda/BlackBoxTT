@@ -61,7 +61,7 @@ namespace bb {
 	// 							continue;
 							if (t.m_wspace == vertex_id)
 							{
-								if (++tmp % 2)
+								if (tmp++ % 3 != 0)
 									ImGui::SameLine();
 
 								Tasks & tasks = BlackBox::Instance().GetTasks();

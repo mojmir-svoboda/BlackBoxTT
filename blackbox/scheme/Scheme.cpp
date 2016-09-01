@@ -28,7 +28,7 @@ s7_pointer bind_SetCurrentVertexId (s7_scheme * sc, s7_pointer args)
 	return s7_wrong_type_arg_error(sc, "SetCurrentVertexId", 1, s7_car(args), "utf8 string");
 }
 
-s7_pointer bind_SwitchVertexViaEdge(s7_scheme * sc, s7_pointer args)
+s7_pointer bind_SwitchVertexViaEdge (s7_scheme * sc, s7_pointer args)
 {
 	if (s7_is_string(s7_car(args)))
 	{
@@ -42,6 +42,27 @@ s7_pointer bind_SwitchVertexViaEdge(s7_scheme * sc, s7_pointer args)
 
 		bb::BlackBox * const bb = getBlackBoxInstanceRW();
 		bb->WorkSpacesSwitchVertexViaEdge(edge_id);
+
+		return s7_nil(sc);
+	}
+	return s7_wrong_type_arg_error(sc, "SetCurrentVertexId", 1, s7_car(args), "utf8 string");
+}
+
+s7_pointer bind_MaximizeTopWindow (s7_scheme * sc, s7_pointer args)
+{
+	if (s7_is_string(s7_car(args)))
+	{
+		char const * param = s7_string(s7_car(args));
+
+		size_t const ln = strlen(param);
+		size_t const sz = bb::codecvt_utf8_utf16_dst_size(param, ln);
+		wchar_t * const param_u16 = static_cast<wchar_t *>(alloca(sz * sizeof(wchar_t)));
+		size_t const param_u16_ln = bb::codecvt_utf8_utf16(param, ln, param_u16, sz);
+		bbstring p(param_u16, param_u16_ln);
+
+		bb::BlackBox * const bb = getBlackBoxInstanceRW();
+		bool vertical = p == L"vertical";
+		bb->MaximizeTopWindow(vertical);
 
 		return s7_nil(sc);
 	}
@@ -68,6 +89,7 @@ namespace bb {
 
 		s7_define_function(m_scheme, "SetCurrentVertexId", bind_SetCurrentVertexId, 1, 0, false, "(SetCurrentVertexId vertex_id_string) Sets WorkSpace Graph to specified VertexId");
 		s7_define_function(m_scheme, "SwitchVertexViaEdge", bind_SwitchVertexViaEdge, 1, 0, false, "(SwitchVertexViaEdge edge_id_string) Switch WorkSpace via edge to destination vertex_id");
+		s7_define_function(m_scheme, "MaximizeTopWindow", bind_MaximizeTopWindow, 1, 0, false, "(SwitchVertexViaEdge edge_id_string) Switch WorkSpace via edge to destination vertex_id");
 		//s7_define_function(s7, "add1", add1, 1, 0, false, "(add1 int) adds 1 to int");
 /* add the function "add1" to the interpreter.
 *		1, 0, false -> one required arg,

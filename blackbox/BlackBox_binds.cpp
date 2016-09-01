@@ -1,5 +1,6 @@
 #include "BlackBox.h"
 #include <bblib/utils_paths.h>
+#include "utils_window.h"
 
 namespace bb {
 
@@ -55,7 +56,7 @@ namespace bb {
 		bbstring const & cluster_id = ws.GetCurrentClusterId();
 		if (WorkGraphConfig const * wg = ws.FindCluster(cluster_id))
 		{
-			bbstring const & curr_ws = wg->m_currentVertexId;
+			bbstring const curr_ws = wg->m_currentVertexId;
 			if (ws.CanSetCurrentVertexId(vertex_id))
 			{
 				ws.SetCurrentVertexId(vertex_id);
@@ -72,7 +73,7 @@ namespace bb {
 		bbstring const & cluster_id = ws.GetCurrentClusterId();
 		if (WorkGraphConfig const * wg = ws.FindCluster(cluster_id))
 		{
-			bbstring const & curr_ws = wg->m_currentVertexId;
+			bbstring const curr_ws = wg->m_currentVertexId;
 
 			bbstring new_vertex_id;
 			if (ws.CanSwitchVertexViaEdge(edge_property, new_vertex_id))
@@ -83,6 +84,12 @@ namespace bb {
 			}
 		}
 		return false;
+	}
+
+	void BlackBox::MaximizeTopWindow (bool vertical)
+	{
+		if (HWND hwnd = FindTopLevelWindow())
+			maximizeWindow(hwnd, vertical);
 	}
 
 }

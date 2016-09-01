@@ -1,14 +1,49 @@
-+!Right::
+; # = Win  ! = Alt  ^ = Control  + = Shift
+
++!h::
+   Run, c:\bb_devel\bbcli.exe -c "(SwitchVertexViaEdge ""left"")"
+Return
++!j::
+   Run, c:\bb_devel\bbcli.exe -c "(SwitchVertexViaEdge ""down"")"
+Return
++!k::
+   Run, c:\bb_devel\bbcli.exe -c "(SwitchVertexViaEdge ""up"")"
+Return
++!l::
    Run, c:\bb_devel\bbcli.exe -c "(SwitchVertexViaEdge ""right"")"
 Return
 
-+!Left::
-   Run, c:\bb_devel\bbcli.exe -c "(SwitchVertexViaEdge ""left"")"
+!F1::
+   Run, c:\bb_devel\bbcli.exe -c "(SetCurrentVertexId ""Desktop 1"")"
+Return
+!F2::
+   Run, c:\bb_devel\bbcli.exe -c "(SetCurrentVertexId ""Desktop 2"")"
 Return
 
-!F1::
-   Run, c:\bb_devel\bbcli.exe -c "(SetCurrentVertexId ""f1"")"
++!Left::
+   Run, c:\bb_devel\bbcli.exe -c "(MoveWindowToVertexViaEdge ""left"")"
 Return
++!Down::
+   Run, c:\bb_devel\bbcli.exe -c "(MoveWindowToVertexViaEdge ""down"")"
+Return
++!Up::
+   Run, c:\bb_devel\bbcli.exe -c "(MoveWindowToVertexViaEdge ""up"")"
+Return
++!Right::
+   Run, c:\bb_devel\bbcli.exe -c "(MoveWindowToVertexViaEdge ""right"")"
+Return
+
+^!h::
+   Run, c:\bb_devel\bbcli.exe -c "(MaximizeTopWindow ""horizontal"")"
+Return
+^!j::
+   Run, c:\bb_devel\bbcli.exe -c "(MaximizeTopWindow ""vertical"")"
+Return
+^!m::
+   Run, c:\bb_devel\bbcli.exe -c "(MaximizeTopWindow ""both"")"
+Return
+
+; ---------------------------------------------------------------------------------------
 
 +!e::
    Run, Explorer.exe

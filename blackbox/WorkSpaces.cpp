@@ -22,7 +22,9 @@ namespace bb {
 		m_vdm = std::move(v);
 
 		bool ok = true;
-		ok &= m_vdm->Init();
+		size_t const l = m_graph.FindPropertyIndex(L"left");
+		size_t const r = m_graph.FindPropertyIndex(L"right");
+		ok &= m_vdm->Init(l, r);
 		ok &= CreateGraph();
 		InitClusterAndVertex();
 		return ok;
@@ -77,6 +79,23 @@ namespace bb {
 	void WorkSpaces::SetCurrentClusterId (bbstring const & id)
 	{
 		m_config.m_currentClusterId = id;
+	}
+
+	bool WorkSpaces::IsVertexVDM (bbstring const & vertex_id) const
+	{
+		size_t idx = 0;
+		return m_vdm->FindDesktop(vertex_id, idx);
+	}	
+
+	bool WorkSpaces::SwitchDesktop (bbstring const & vertex_id)
+	{
+		size_t idx = 0;
+		if (m_vdm->FindDesktop(vertex_id, idx))
+		{
+			m_vdm->SwitchDesktop(m_vdm->m_desktops[idx]);
+			return true;
+		}
+		return false;
 	}
 
 	bool WorkSpaces::SetCurrentVertexId (bbstring const & vertex_id)
@@ -171,14 +190,42 @@ namespace bb {
 
 	bool WorkSpaces::CreateGraph ()
 	{
-// 		for (WorkGraphConfig & w : m_config.m_clusters)
-// 		{
-// 			if (w.m_auto)
-// 			{
-// 				w.m_vertexlists.push_back(m_vdm->m_desktops);
-// 			}
-// 		}
-// 
+		// setup VDM first
+		for (WorkGraphConfig & w : m_config.m_clusters)
+		{
+			if (w.m_auto)
+			{
+				w.m_vertexlists.push_back(std::vector<bbstring>());
+
+				for (size_t i = 0, ie = m_vdm->m_names.size(); i < ie; ++i)
+				{
+					bbstring const & v = m_vdm->m_names[i];
+					w.m_vertexlists[0].push_back(v);
+
+					std::unique_ptr<WorkSpaceConfig> ws(new WorkSpaceConfig);
+					ws->m_id = v;
+					ws->m_label = v;
+					ws->m_isVDM = true;
+					ws->m_idxVDM = i;
+					ws->m_vertex = m_graph.m_vertices.size();
+					m_graph.m_vertices.push_back(std::move(ws));
+				}
+
+				WorkSpaceConfig * wspace = nullptr;
+				for (auto const & e : m_vdm->m_edges)
+				{
+					WorkSpaceConfig * ws[2] = { 0 };
+					uint32_t const src = std::get<0>(e);
+					uint32_t const ep =  std::get<1>(e);
+					uint32_t const dst = std::get<2>(e);
+					if (m_graph.FindVertex(m_vdm->m_names[src], ws[0]) && m_graph.FindVertex(m_vdm->m_names[dst], ws[1]))
+					{
+						unsigned count = 0;
+						m_graph.m_edges.push_back(std::make_tuple(ws[0], ep, ws[1])); // src ---label_idx---> dst
+					}
+				}
+			}
+		}
 
 		for (WorkGraphConfig & w : m_config.m_clusters)
 		{
@@ -277,6 +324,23 @@ namespace bb {
 	void WorkSpaces::ClearGraph ()
 	{
 		m_graph.Clear();
+	}
+
+	bool WorkSpaces::AssignWorkSpace (HWND hwnd, bbstring & vertex_id)
+	{
+		size_t idx = 0;
+		if (m_vdm->FindDesktopIndex(hwnd, idx))
+		{
+			vertex_id = m_vdm->m_names[idx];
+			return true;
+		}
+
+		if (bbstring const * current_ws = GetCurrentVertexId())
+		{
+			vertex_id = *current_ws;
+			return true;
+		}
+		return false;
 	}
 
 }

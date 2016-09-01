@@ -7,9 +7,11 @@ namespace bb {
 
 	struct WorkSpaceConfig
 	{
-		uint32_t m_vertex;
+		uint32_t m_vertex { 0 };
 		bbstring m_id;
 		bbstring m_label;
+		uint32_t m_idxVDM { 0 };
+		bool m_isVDM { false };
 
 		uint32_t GetVertex () const { return m_vertex; }
 		bbstring const & GetId () const { return m_id; }
@@ -55,7 +57,7 @@ namespace bb {
 	struct WorkSpacesConfig
 	{
 		bbstring m_currentClusterId;
-    std::vector<WorkGraphConfig> m_clusters;
+		std::vector<WorkGraphConfig> m_clusters;
 		std::vector<std::string> m_edgelist;
 		// cluster edges
 	};

@@ -10,7 +10,7 @@ inline bool mkJobObject (HANDLE & job, bool & in_job)
 		TRACE_MSG(LL_ERROR, CTX_BB | CTX_HOOK | CTX_INIT, "IsProcessInJob failed");
 		return false;
 	}
-	in_job = isProcessInJob;
+	in_job = isProcessInJob == TRUE;
 	job = ::CreateJobObject(NULL, NULL);
 	if (job == nullptr)
 	{

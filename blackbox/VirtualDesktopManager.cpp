@@ -50,8 +50,11 @@ namespace bb {
 
 	VirtualDesktopManager::VirtualDesktopManager () { }
 
-	bool VirtualDesktopManager::Init ()
+	bool VirtualDesktopManager::Init (size_t l, size_t r)
 	{
+		m_left = l;
+		m_right = r;
+
 		IServiceProvider * isvc = nullptr;
 		if (!SUCCEEDED(::CoCreateInstance(CLSID_ImmersiveShell, NULL, CLSCTX_LOCAL_SERVER, __uuidof(IServiceProvider), (PVOID*)&isvc)))
 			return false;
@@ -69,22 +72,47 @@ namespace bb {
 		m_vdm = ivdm;
 		m_vdmi = ivdmi;
 
-		UpdateDesktops();
+		UpdateDesktopGraph();
 		return true;
 	}
 
 	bool VirtualDesktopManager::Done ()
 	{
+		m_desktops.clear();
+		m_names.clear();
+		m_edges.clear();
+
 		if (m_vdmi)
+		{
 			m_vdmi->Release();
+			m_vdmi = nullptr;
+		}
 		if (m_vdm)
+		{
 			m_vdm->Release();
+			m_vdm = nullptr;
+		}
 		return true;
 	}
 
-	void VirtualDesktopManager::UpdateDesktops ()
+	bool VirtualDesktopManager::SwitchDesktop (GUID const & g)
+	{
+		IVirtualDesktop * ivd = nullptr;
+		GUID g0 = g;
+		if (SUCCEEDED(m_vdmi->FindDesktop(&g0, &ivd)))
+		{
+			scope_guard_t on_exit_ivd = mkScopeGuard(std::mem_fun(&IVirtualDesktop::Release), ivd);
+			if (SUCCEEDED(m_vdmi->SwitchDesktop(ivd)))
+				return true;
+		}
+		return false;
+	}
+
+	void VirtualDesktopManager::UpdateDesktopGraph ()
 	{
 		m_desktops.clear();
+		m_names.clear();
+		m_edges.clear();
 
 		IObjectArray * iobjarr = nullptr;
 		if (SUCCEEDED(m_vdmi->GetDesktops(&iobjarr)))
@@ -105,6 +133,9 @@ namespace bb {
 					if (SUCCEEDED(ivd->GetID(&id)))
 					{
 						m_desktops.push_back(id);
+						bbstring name(L"Desktop ");
+						name += std::to_wstring(m_desktops.size());
+						m_names.push_back(name);
 					}
 				}
 			}
@@ -114,11 +145,39 @@ namespace bb {
 		{
 			GUID const & g0 = m_desktops[i];
 			GUID g1;
+			size_t j = 0;
 			if (GetAdjacentDesktop(g0, AdjacentDesktop::LeftDirection, g1))
-				m_edges.push_back(std::make_pair(g1, g0));
+				if (FindDesktop(g1, j))
+					m_edges.push_back(std::make_tuple(i, m_left, j));
 			if (GetAdjacentDesktop(g0, AdjacentDesktop::RightDirection, g1))
-				m_edges.push_back(std::make_pair(g0, g1));
+				if (FindDesktop(g1, j))
+					m_edges.push_back(std::make_tuple(i, m_right, j));
 		}
+	}
+
+	bool VirtualDesktopManager::FindDesktop (bbstring const & name, size_t & idx)
+	{
+		for (size_t i = 0, ie = m_names.size(); i < ie; ++i)
+		{
+			if (m_names[i] == name)
+			{
+				idx = i;
+				return true;
+			}
+		}
+		return false;
+	}
+	bool VirtualDesktopManager::FindDesktop (GUID const & guid, size_t & idx)
+	{
+		for (size_t i = 0, ie = m_names.size(); i < ie; ++i)
+		{
+			if (m_desktops[i] == guid)
+			{
+				idx = i;
+				return true;
+			}
+		}
+		return false;
 	}
 
 	bool VirtualDesktopManager::GetCurrentDesktop (GUID & desk)
@@ -151,7 +210,7 @@ namespace bb {
 			{
 				scope_guard_t on_exit_ivd_adj = mkScopeGuard(std::mem_fun(&IVirtualDesktop::Release), ivd_adj);
 
- 				if (SUCCEEDED(ivd_adj->GetID(&id)))
+				if (SUCCEEDED(ivd_adj->GetID(&id)))
 				{
 					adj_desk = id;
 					return true;
@@ -161,5 +220,12 @@ namespace bb {
 		return false;
 	}
 
+	bool VirtualDesktopManager::FindDesktopIndex (HWND hwnd, size_t & idx)
+	{
+		GUID g = { 0 };
+		if (SUCCEEDED(m_vdm->GetWindowDesktopId(hwnd, &g)))
+			return FindDesktop(g, idx);
+		return false;
+	}
 
 }
