@@ -49,6 +49,8 @@ set(blackbox_SOURCES
 	WorkSpacesConfig_yaml.cpp
 	WorkSpacesGraph.cpp
 	WorkSpaces.cpp
+	WidgetsConfig_yaml.cpp
+	Widgets.cpp
 	gfx/DX11.cpp
 	gfx/Gfx.cpp
 	gfx/GfxWindow.cpp
@@ -82,6 +84,9 @@ set (blackbox_HEADERS
 	Tray.h
 	TrayConfig.h
 	WorkSpaces.h
+	WidgetConfig.h
+	WidgetsConfig.h
+	Widgets.h
 	utils_window.h
 	utils_recover.h
 	utils_yaml.h

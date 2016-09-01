@@ -10,6 +10,38 @@ inline void getWindowText (HWND hwnd, wchar_t * str, size_t n)
 	::GetWindowTextW(hwnd, str, n);
 }
 
+// BOOL IsAltTabWindow(HWND hwnd)
+// {
+// 	TITLEBARINFO ti;
+// 	HWND hwndTry, hwndWalk = NULL;
+// 
+// 	if (!IsWindowVisible(hwnd))
+// 		return FALSE;
+// 
+// 	hwndTry = GetAncestor(hwnd, GA_ROOTOWNER);
+// 	while (hwndTry != hwndWalk)
+// 	{
+// 		hwndWalk = hwndTry;
+// 		hwndTry = GetLastActivePopup(hwndWalk);
+// 		if (IsWindowVisible(hwndTry))
+// 			break;
+// 	}
+// 	if (hwndWalk != hwnd)
+// 		return FALSE;
+// 
+// 	// the following removes some task tray programs and "Program Manager"
+// 	ti.cbSize = sizeof(ti);
+// 	GetTitleBarInfo(hwnd, &ti);
+// 	if (ti.rgstate[0] & STATE_SYSTEM_INVISIBLE)
+// 		return FALSE;
+// 
+// 	// Tool windows should not be displayed either, these do not appear in the
+// 	// task bar.
+// 	if (GetWindowLong(hwnd, GWL_EXSTYLE) & WS_EX_TOOLWINDOW)
+// 		return FALSE;
+// 
+// 	return TRUE;
+//
 inline bool isAppWindow (HWND hwnd)
 {
 	if (!IsWindow(hwnd))
@@ -224,5 +256,32 @@ inline void maximizeWindow (HWND hwnd, bool vertical)
 	LockWindowUpdate(NULL);
 }
 
+struct SecondMon
+{
+	int x0, y0, x1, y1;
+	bool found;
+};
+
+inline BOOL CALLBACK MonitorEnumProc (HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData)
+{
+	MONITORINFOEX iMonitor;
+	iMonitor.cbSize = sizeof(MONITORINFOEX);
+	GetMonitorInfo(hMonitor, &iMonitor);
+
+	SecondMon * s = reinterpret_cast<SecondMon *>(dwData);
+	if (s->x0 == 0 && s->y0 == 0)
+	{
+		if (iMonitor.rcMonitor.left == 0 && iMonitor.rcMonitor.top == 0)
+			return true; // first monitor
+
+		s->x0 = iMonitor.rcMonitor.left;
+		s->y0 = iMonitor.rcMonitor.top;
+		s->x1 = iMonitor.rcMonitor.right;
+		s->y1 = iMonitor.rcMonitor.bottom;
+		s->found = true;
+		return false; // abort enum
+	}
+	return true;
+}
 
 }

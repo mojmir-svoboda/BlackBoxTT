@@ -12,8 +12,9 @@
 
 namespace bb {
 
-Tasks::Tasks ()
+Tasks::Tasks (WorkSpaces & wspaces)
 	: m_active(nullptr)
+	, m_wspaces(wspaces)
 {
 	m_taskEnumStorage.reserve(256);
 }
@@ -29,7 +30,6 @@ bool Tasks::Init (TasksConfig & config)
 	m_config = &config;
 	m_tasks[TaskState::e_Active].reserve(128);
 	m_tasks[TaskState::e_TaskManIgnored].reserve(32);
-	m_tasks[TaskState::e_BBIgnored].reserve(32);
 	m_tasks[TaskState::e_OtherWS].reserve(128);
 
 	Update();
@@ -41,7 +41,6 @@ bool Tasks::Done ()
 	TRACE_MSG(LL_INFO, CTX_BB, "Terminating tasks");
 	m_tasks[TaskState::e_Active].clear();
 	m_tasks[TaskState::e_TaskManIgnored].clear();
-	m_tasks[TaskState::e_BBIgnored].clear();
 	m_tasks[TaskState::e_OtherWS].clear();
 	return true;
 }
@@ -83,7 +82,7 @@ bool Tasks::RmTask (HWND hwnd)
 	if (FindTask(hwnd, ts, idx))
 	{
 		TaskInfoPtr & ti_ptr = m_tasks[ts][idx];
-		if (ti_ptr && ti_ptr->m_hwnd == hwnd)
+		if (ti_ptr)
 		{
 			TRACE_MSG(LL_DEBUG, CTX_BB, "--- %ws", ti_ptr->m_caption);
 			if (ti_ptr.get() == m_active)
@@ -200,7 +199,7 @@ TaskConfig * Tasks::MakeTaskConfig (HWND hwnd)
 	wchar_t cap[TaskInfo::e_captionLenMax];
 	getWindowText(hwnd, cap, TaskInfo::e_captionLenMax);
 	tc->m_caption = std::move(bbstring(cap));
-	BlackBox::Instance().GetWorkSpaces().AssignWorkSpace(hwnd, tc->m_wspace);
+	m_wspaces.AssignWorkSpace(hwnd, tc->m_wspace);
 	m_config->m_tasks.push_back(std::move(tc));
 
 	return m_config->m_tasks.back().get();
@@ -208,8 +207,6 @@ TaskConfig * Tasks::MakeTaskConfig (HWND hwnd)
 
 bool Tasks::AddTask (HWND hwnd)
 {
-	WorkSpaces & wspaces = BlackBox::Instance().GetWorkSpaces();
-
 	TaskState ts = TaskState::max_enum_value;
 	size_t idx = c_invalidIndex;
 	if (FindTask(hwnd, ts, idx))
@@ -252,10 +249,10 @@ bool Tasks::AddTask (HWND hwnd)
 		}
 
 		bbstring vertex_id;
-		wspaces.AssignWorkSpace(ti_ptr->m_hwnd, vertex_id);
+		m_wspaces.AssignWorkSpace(ti_ptr->m_hwnd, vertex_id);
 		ti_ptr->SetWorkSpace(vertex_id.c_str());
 
-		bbstring const * current_ws = wspaces.GetCurrentVertexId();
+		bbstring const * current_ws = m_wspaces.GetCurrentVertexId();
 		bool const same_ws = *current_ws == ti_ptr->m_wspace;
 		bool const is_current_ws =	same_ws || is_sticky;
 		TRACE_MSG(LL_DEBUG, CTX_BB, "+++ %ws e=%i i=%i", cap.c_str(), (ti_ptr->m_config ? ti_ptr->m_config->m_bbtasks : '0'), (ti_ptr->m_config ? ti_ptr->m_config->m_taskman : '0'));
@@ -267,8 +264,6 @@ bool Tasks::AddTask (HWND hwnd)
 			{
 				if (!ti_ptr->m_config->m_taskman)
 					ts_new = e_TaskManIgnored;
-				else if (!ti_ptr->m_config->m_bbtasks)
-					ts_new = e_BBIgnored;
 			}
 
 			m_tasks[ts_new].push_back(std::move(ti_ptr));
@@ -276,7 +271,7 @@ bool Tasks::AddTask (HWND hwnd)
 		else
 		{
 			m_tasks[e_OtherWS].push_back(std::move(ti_ptr));
-			if (!wspaces.IsVertexVDM(vertex_id))
+			if (!m_wspaces.IsVertexVDM(vertex_id))
 				::ShowWindow(hwnd, SW_HIDE);
 		}
 		return true;
@@ -440,9 +435,8 @@ LRESULT Tasks::UpdateFromTaskHook (WPARAM wParam, LPARAM lParam)
 
 void Tasks::SwitchWorkSpace (bbstring const & src_vertex_id, bbstring const & dst_vertex_id)
 {
-	WorkSpaces & wspaces = BlackBox::Instance().GetWorkSpaces();
-	bool const src_is_vdm = wspaces.IsVertexVDM(src_vertex_id);
-	bool const dst_is_vdm = wspaces.IsVertexVDM(dst_vertex_id);
+	bool const src_is_vdm = m_wspaces.IsVertexVDM(src_vertex_id);
+	bool const dst_is_vdm = m_wspaces.IsVertexVDM(dst_vertex_id);
 
 	if (src_vertex_id == dst_vertex_id)
 		return;
@@ -494,7 +488,7 @@ void Tasks::SwitchWorkSpace (bbstring const & src_vertex_id, bbstring const & ds
 	m_lock.Unlock();
 
 	if (dst_is_vdm)
-		wspaces.SwitchDesktop(dst_vertex_id);
+		m_wspaces.SwitchDesktop(dst_vertex_id);
 }
 
 void Tasks::SetTaskManIgnored (HWND hwnd)
@@ -633,6 +627,46 @@ HWND Tasks::GetActiveTask () const
 	}
 	m_lock.Unlock();
 	return hwnd;
+}
+
+bool Tasks::MoveWindowToVertex (HWND hwnd, bbstring const & vertex_id)
+{
+	m_lock.Lock();
+	TaskState ts = TaskState::max_enum_value;
+	size_t idx = c_invalidIndex;
+	if (FindTask(hwnd, ts, idx))
+	{
+		TaskInfoPtr & ti_ptr = m_tasks[ts][idx];
+		if (ti_ptr)
+		{
+			ti_ptr->SetWorkSpace(vertex_id.c_str());
+
+			bbstring const * current_ws = m_wspaces.GetCurrentVertexId();
+			bool const same_ws = *current_ws == ti_ptr->m_wspace;
+			bool const is_sticky = ti_ptr->m_config ? ti_ptr->m_config->m_sticky : false;
+			bool const is_current_ws = same_ws || is_sticky;
+
+			if (is_current_ws)
+			{
+				TaskState ts_new = e_Active;
+				if (ti_ptr->m_config)
+				{
+					if (!ti_ptr->m_config->m_taskman)
+						ts_new = e_TaskManIgnored;
+				}
+
+				m_tasks[ts_new].push_back(std::move(ti_ptr));
+			}
+			else
+			{
+				m_tasks[e_OtherWS].push_back(std::move(ti_ptr));
+				if (!m_wspaces.IsVertexVDM(vertex_id))
+					::ShowWindow(hwnd, SW_HIDE);
+			}
+		}
+	}
+	m_lock.Unlock();
+	return true;
 }
 
 }

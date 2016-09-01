@@ -21,16 +21,16 @@ Return
 Return
 
 +!Left::
-   Run, c:\bb_devel\bbcli.exe -c "(MoveWindowToVertexViaEdge ""left"")"
+   Run, c:\bb_devel\bbcli.exe -c "(MoveTopWindowToVertexViaEdge ""left"")"
 Return
 +!Down::
-   Run, c:\bb_devel\bbcli.exe -c "(MoveWindowToVertexViaEdge ""down"")"
+   Run, c:\bb_devel\bbcli.exe -c "(MoveTopWindowToVertexViaEdge ""down"")"
 Return
 +!Up::
-   Run, c:\bb_devel\bbcli.exe -c "(MoveWindowToVertexViaEdge ""up"")"
+   Run, c:\bb_devel\bbcli.exe -c "(MoveTopWindowToVertexViaEdge ""up"")"
 Return
 +!Right::
-   Run, c:\bb_devel\bbcli.exe -c "(MoveWindowToVertexViaEdge ""right"")"
+   Run, c:\bb_devel\bbcli.exe -c "(MoveTopWindowToVertexViaEdge ""right"")"
 Return
 
 ^!h::

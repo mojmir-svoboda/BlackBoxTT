@@ -4,6 +4,16 @@ BlackBox:
     - 'default'
   styleCycle:
 
+Widgets:
+  - widget: 'QuickBar'
+    show: true
+  - widget: 'Pager'
+    show: true
+  - widget: 'Tasks'
+    show: false
+  - widget: 'RecoverWindows'
+    show: false
+
 WorkSpaces:
   current: 'F'
   clusters:

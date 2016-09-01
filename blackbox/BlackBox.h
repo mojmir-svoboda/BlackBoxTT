@@ -1,6 +1,7 @@
 #pragma once
 #include <platform_win.h>
 #include "Tasks.h"
+#include "Widgets.h"
 #include "WorkSpaces.h"
 #include "Tray.h"
 #include "Explorer.h"
@@ -37,8 +38,9 @@ namespace bb {
 		std::unique_ptr<StyleStruct> m_defaultStyle; /// legacy style
 		std::unique_ptr<StyleStruct> m_style; /// legacy style
 		std::unique_ptr<Explorer> m_explorer;
-		Tasks m_tasks;
 		WorkSpaces m_wspaces;
+		Tasks m_tasks;
+		Widgets m_widgets;
 		Tray m_tray;
 		Gfx m_gfx;
 		PluginManager m_plugins;
@@ -82,6 +84,8 @@ namespace bb {
 		void * GetSettingPtr (int sn_index);
 		bool GetConfigDir (wchar_t * dir, size_t dir_sz) const;
 
+		bool FindTargetVertexViaEdge (bbstring const & edge_property, bbstring & dst_vertex_id) const;
+		bool MoveTopWindowToVertexViaEdge (bbstring const & edge_property);
 		/**@fn WorkSpacesSetCurrentVertexId
 		 * @brief finds vertex_id in the graph and switches to it. no edge from current is required.
 		 **/

@@ -6,6 +6,7 @@
 #include "SpinLock.h"
 #include "TaskInfo.h"
 #include "TasksConfig.h"
+#include "WorkSpaces.h"
 
 namespace bb {
 
@@ -17,7 +18,6 @@ namespace bb {
 	{
 			e_Active		/// task is in active state (current workspace, not ignored)
 		, e_TaskManIgnored		/// task is ignored by user (and task manager)
-		, e_BBIgnored		/// task is ignored by user (and blackbox)
 		, e_OtherWS		/// task is currently on another workspace
 		, max_enum_value		/// do not use this as index, please
 	};
@@ -27,7 +27,7 @@ namespace bb {
 	{
 		friend BOOL taskEnumProc(HWND hwnd, LPARAM lParam);
 		friend LRESULT mainWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-		friend struct BlackBox;
+		friend struct BlackBox; friend struct Widgets;
 
 		size_t const c_invalidIndex = std::numeric_limits<size_t>::max();
 		SpinLock m_lock;
@@ -38,9 +38,10 @@ namespace bb {
 		std::array<ptrs_t, max_enum_value> m_tasks;
 		std::vector<HWND> m_taskEnumStorage;
 		TaskInfo * m_active;
+		WorkSpaces & m_wspaces;
 
 	public:
-		Tasks ();
+		Tasks (WorkSpaces & wspaces);
 		~Tasks ();
 
 		bool Init (TasksConfig & config);
@@ -49,6 +50,7 @@ namespace bb {
 
 		void MkDataCopy (TaskState ts, std::vector<TaskInfo> & p);
 		void SwitchWorkSpace (bbstring const & src, bbstring const & dst);
+		bool MoveWindowToVertex (HWND hwnd, bbstring const & vertex_id);
 		void SetSticky (HWND hwnd);
 		void UnsetSticky (HWND hwnd);
 		bool IsSticky (HWND hwnd);

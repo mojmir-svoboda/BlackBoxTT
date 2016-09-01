@@ -11,13 +11,6 @@
 #include <net/Server.h>
 #include <scheme/Scheme.h>
 #include <net/commands.h>
-#include <widgets/StyleEditorWidget.h>
-#include <widgets/PluginsWidget.h>
-#include <widgets/ControlPanelWidget.h>
-#include <widgets/RecoverWindowsWidget.h>
-#include <widgets/TasksWidget.h>
-#include <widgets/PagerWidget.h>
-#include <widgets/DebugWidget.h>
 #include "utils_win32.h"
 #include "hooks/taskhook.h"
 
@@ -151,6 +144,8 @@ namespace bb {
 		, m_defaultStyle(new StyleStruct)
 		, m_style()
 		, m_explorer()
+		, m_tasks(m_wspaces)
+		, m_widgets(m_tasks, m_gfx)
 	{
 		setDefaultValuesTo(*m_defaultStyle.get());
 	}
@@ -178,10 +173,6 @@ namespace bb {
 			{
 				return false;
 			}
-//			YAML::Node y_bb = y_root["BlackBox"]; // @TODO: unicode? utf8?
-//			if (y_bb)
-//			{
-//			}
 			if (loadTasksConfig(y_root, m_config.m_tasks))
 			{
 				TRACE_MSG(LL_INFO, CTX_BB | CTX_CONFIG, "* loaded tasks section");
@@ -190,6 +181,15 @@ namespace bb {
 			{
 				TRACE_MSG(LL_ERROR, CTX_BB | CTX_CONFIG, "* failed to load tasks section");
 				m_config.m_tasks.clear();
+			}
+			if (loadWidgetsConfig(y_root, m_config.m_widgets))
+			{
+				TRACE_MSG(LL_INFO, CTX_BB | CTX_CONFIG, "* loaded widgets section");
+			}
+			else
+			{
+				TRACE_MSG(LL_ERROR, CTX_BB | CTX_CONFIG, "* failed to load widgets section");
+				m_config.m_widgets.clear();
 			}
 
 			WorkSpacesConfig ws_cfg;
@@ -260,33 +260,7 @@ namespace bb {
 	}
 
 
-	struct SecondMon
-	{
-		int x0, y0, x1, y1;
-		bool found;
-	};
 
-	BOOL CALLBACK MonitorEnumProc (HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData)
-	{
-		MONITORINFOEX iMonitor;
-		iMonitor.cbSize = sizeof(MONITORINFOEX);
-		GetMonitorInfo(hMonitor, &iMonitor);
-
-		SecondMon * s = reinterpret_cast<SecondMon *>(dwData);
-		if (s->x0 == 0 && s->y0 == 0)
-		{
-			if (iMonitor.rcMonitor.left == 0 && iMonitor.rcMonitor.top == 0)
-				return true; // first monitor
-
-			s->x0 = iMonitor.rcMonitor.left;
-			s->y0 = iMonitor.rcMonitor.top;
-			s->x1 = iMonitor.rcMonitor.right;
-			s->y1 = iMonitor.rcMonitor.bottom;
-			s->found = true;
-			return false; // abort enum
-		}
-		return true;
-	}
 
 	bool BlackBox::Init (HINSTANCE hmi)
 	{
@@ -313,57 +287,7 @@ namespace bb {
 		ok &= m_gfx.Init();
 		ok &= m_tasks.Init(m_config.m_tasks);
 		ok &= m_explorer->Init();
-
-		SecondMon s = { 0 };
-		EnumDisplayMonitors(NULL, NULL, &MonitorEnumProc, reinterpret_cast<LPARAM>(&s));
-		int const szx = 128;
-		int sx = szx;
-		if (s.found)
-		{
-			sx = s.x1;
-		}
-//		GfxWindow * w0 = m_gfx.MkGuiWindow(sx - szx, s.y0, szx, szx, L"c0", L"w0");
-//		{
-//			w0->m_gui->m_enabled = true;
-//			DebugWidget * w0wdg0 = new DebugWidget;
-//			w0wdg0->m_enabled = true;
-//			w0->GetGui()->AddWidget(w0wdg0);
-//		}
-		GfxWindow * w0 = m_gfx.MkGuiWindow(0, 0, 200, 200, L"bbPager", L"bbPager");
-		{
-			w0->m_gui->m_enabled = true;
-			PagerWidget * w0wdg0 = new PagerWidget;
-			w0wdg0->m_enabled = true;
-			w0->GetGui()->AddWidget(w0wdg0);
-			m_tasks.AddWidgetTask(w0);
-		}
-
-		{
-			GfxWindow * w1 = m_gfx.MkGuiWindow(0, 200, 200, 600, L"bbTasks", L"bbTasks");
-			w1->m_gui->m_enabled = true;
-			TasksWidget * w1wdg0 = new TasksWidget;
-			w1wdg0->m_enabled = true;
-			w1wdg0->m_horizontal = false;
-			w1->GetGui()->AddWidget(w1wdg0);
-		}
-
-		{
-			GfxWindow * w2 = m_gfx.MkGuiWindow(0, 800, 400, 600, L"bbRecoverWindows", L"bbRecoverWindows");
-			w2->m_gui->m_enabled = true;
-			RecoverWindowsWidget * w2wdg0 = new RecoverWindowsWidget;
-			w2wdg0->m_enabled = true;
-			w2->GetGui()->AddWidget(w2wdg0);
-		}
-
-
-//		GfxWindow * w1 = m_gfx.MkGuiWindow(0, 200, 800, 600, L"bbStyleEditor", L"bbStyleEditor");
-//		{
-//			w1->m_gui->m_enabled = true;
-//			StyleEditorWidget * w1wdg0 = new StyleEditorWidget;
-//			w1wdg0->m_enabled = true;
-//			w1->GetGui()->AddWidget(w1wdg0);
-//		}
-
+		ok &= m_widgets.Init(m_config.m_widgets);
 		ok &= m_plugins.Init(m_config.m_plugins);
 		ok &= m_server.Init(m_config.m_server);
 		return ok;

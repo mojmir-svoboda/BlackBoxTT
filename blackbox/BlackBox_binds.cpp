@@ -51,15 +51,12 @@ namespace bb {
 
 	bool BlackBox::WorkSpacesSetCurrentVertexId (bbstring const & vertex_id)
 	{
-		WorkSpaces & ws = m_wspaces;
-
-		bbstring const & cluster_id = ws.GetCurrentClusterId();
-		if (WorkGraphConfig const * wg = ws.FindCluster(cluster_id))
+		if (bbstring const * curr_vtx_id = m_wspaces.GetCurrentVertexId())
 		{
-			bbstring const curr_ws = wg->m_currentVertexId;
-			if (ws.CanSetCurrentVertexId(vertex_id))
+			bbstring const curr_ws = *curr_vtx_id;
+			if (m_wspaces.CanSetCurrentVertexId(vertex_id))
 			{
-				ws.SetCurrentVertexId(vertex_id);
+				m_wspaces.SetCurrentVertexId(vertex_id);
 				m_tasks.SwitchWorkSpace(curr_ws, vertex_id);
 			}
 		}
@@ -68,21 +65,15 @@ namespace bb {
 
 	bool BlackBox::WorkSpacesSwitchVertexViaEdge (bbstring const & edge_property)
 	{
-		WorkSpaces & ws = m_wspaces;
-
-		bbstring const & cluster_id = ws.GetCurrentClusterId();
-		if (WorkGraphConfig const * wg = ws.FindCluster(cluster_id))
-		{
-			bbstring const curr_ws = wg->m_currentVertexId;
-
-			bbstring new_vertex_id;
-			if (ws.CanSwitchVertexViaEdge(edge_property, new_vertex_id))
+		bbstring new_vertex_id;
+		if (FindTargetVertexViaEdge(edge_property, new_vertex_id))
+			if (bbstring const * curr_vtx_id = m_wspaces.GetCurrentVertexId())
 			{
-				ws.SetCurrentVertexId(new_vertex_id);
+				bbstring const curr_ws = *curr_vtx_id;
+				m_wspaces.SetCurrentVertexId(new_vertex_id);
 				m_tasks.SwitchWorkSpace(curr_ws, new_vertex_id);
 				return true;
 			}
-		}
 		return false;
 	}
 
@@ -90,6 +81,26 @@ namespace bb {
 	{
 		if (HWND hwnd = FindTopLevelWindow())
 			maximizeWindow(hwnd, vertical);
+	}
+
+	bool BlackBox::FindTargetVertexViaEdge (bbstring const & edge_property, bbstring & dst_vertex_id) const
+	{
+		if (m_wspaces.CanSwitchVertexViaEdge(edge_property, dst_vertex_id))
+			return true;
+		return false;
+	}
+	bool BlackBox::MoveTopWindowToVertexViaEdge (bbstring const & edge_property)
+	{
+		bbstring new_vertex_id;
+		if (HWND hwnd = FindTopLevelWindow())
+			if (FindTargetVertexViaEdge(edge_property, new_vertex_id))
+				if (bbstring const * curr_vtx_id = m_wspaces.GetCurrentVertexId())
+				{
+					bbstring const curr_ws = *curr_vtx_id;
+					m_tasks.MoveWindowToVertex(hwnd, new_vertex_id);
+					return true;
+				}
+		return false;
 	}
 
 }
