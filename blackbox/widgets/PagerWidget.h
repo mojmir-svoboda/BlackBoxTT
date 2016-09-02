@@ -13,6 +13,7 @@ namespace bb {
 		virtual ~PagerWidget () { }
 		virtual void DrawUI () override;
 		virtual char const * GetName () override { return "Pager"; }
+		virtual wchar_t const * GetNameW () override { return L"Pager"; }
 
 		void UpdateTasks ();
 	};

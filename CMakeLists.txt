@@ -125,7 +125,8 @@ add_subdirectory(tools)
 
 # installation
 set(main_CONFIGS
-	cfg/blackbox.yaml
+	etc/blackbox.yaml
+	etc/blackbox.ahk
 )
 
 if(OPTION_DEVEL)

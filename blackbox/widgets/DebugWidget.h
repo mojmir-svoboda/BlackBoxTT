@@ -8,6 +8,7 @@ namespace bb {
 		virtual ~DebugWidget () { }
 		virtual void DrawUI () override;
 		virtual char const * GetName () override { return "Debug"; }
+		virtual wchar_t const * GetNameW () override { return L"Debug"; }
 	};
 
 }

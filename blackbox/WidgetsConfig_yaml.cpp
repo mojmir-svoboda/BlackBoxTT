@@ -10,7 +10,13 @@ namespace YAML {
 		static Node encode (bb::WidgetConfig const & rhs)
 		{
 			Node node;
+			node.push_back(rhs.m_widget);
+			node.push_back(rhs.m_x);
+			node.push_back(rhs.m_y);
+			node.push_back(rhs.m_w);
+			node.push_back(rhs.m_h);
 			node.push_back(rhs.m_show);
+			node.push_back(rhs.m_vertical);
 			return node;
 		}
 
@@ -18,8 +24,19 @@ namespace YAML {
 		{
 			try
 			{
+				rhs.m_widget = node["widget"].as<bbstring>();
+				if (node["x"])
+					rhs.m_x = node["x"].as<unsigned>();
+				if (node["y"])
+					rhs.m_y = node["y"].as<unsigned>();
+				if (node["w"])
+					rhs.m_w = node["w"].as<unsigned>();
+				if (node["h"])
+					rhs.m_h = node["h"].as<unsigned>();
 				if (node["show"])
 					rhs.m_show = node["show"].as<bool>();
+				if (node["vertical"])
+					rhs.m_vertical = node["vertical"].as<bool>();
 			}
 			catch (std::exception const & e)
 			{

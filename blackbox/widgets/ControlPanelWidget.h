@@ -7,7 +7,8 @@ namespace bb {
 	{
 		virtual ~ControlPanelWidget () { }
 		virtual void DrawUI () override;
-		virtual char const * GetName () override { return "Ctrl"; }
+		virtual char const * GetName () override { return "ControlPanel"; }
+		virtual wchar_t const * GetNameW () override { return L"ControlPanel"; }
 	};
 
 }

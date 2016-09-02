@@ -49,13 +49,13 @@ set(blackbox_SOURCES
 	WorkSpacesConfig_yaml.cpp
 	WorkSpacesGraph.cpp
 	WorkSpaces.cpp
-	WidgetsConfig_yaml.cpp
-	Widgets.cpp
 	gfx/DX11.cpp
 	gfx/Gfx.cpp
 	gfx/GfxWindow.cpp
 	gfx/IconCache.cpp
 	gfx/Gui.cpp
+	WidgetsConfig_yaml.cpp
+	Widgets.cpp
 	widgets/PluginsWidget.cpp
 	widgets/StyleEditorWidget.cpp
 	widgets/ControlPanelWidget.cpp
@@ -64,6 +64,7 @@ set(blackbox_SOURCES
 	widgets/RecoverWindowsWidget.cpp
 	widgets/TrayWidget.cpp
 	widgets/PagerWidget.cpp
+	widgets/QuickBarWidget.cpp
 	Menu/Menu.cpp
 	bind/bind.cpp
 	plugin/PluginManager.cpp
@@ -109,6 +110,7 @@ set (blackbox_HEADERS
 	widgets/RecoverWindowsWidget.h
 	widgets/TrayWidget.h
 	widgets/PagerWidget.h
+	widgets/QuickBarWidget.h
 	plugin/plugin.h
 	plugin/PluginManager.h
 	plugin/PluginConfig.h

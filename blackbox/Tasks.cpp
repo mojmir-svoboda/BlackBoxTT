@@ -676,4 +676,19 @@ bool Tasks::MoveWindowToVertex (HWND hwnd, bbstring const & vertex_id)
 	return true;
 }
 
+bool Tasks::OnSwitchDesktopVDM (bbstring const & src_vertex_id, bbstring const & dst_vertex_id)
+{
+	if (bbstring const * curr = m_wspaces.GetCurrentVertexId())
+	{
+		if (*curr == dst_vertex_id)
+			return false; // already there
+
+		m_wspaces.SetCurrentVertexId(dst_vertex_id);
+		SwitchWorkSpace(src_vertex_id, dst_vertex_id);
+		return true;
+	}
+	return false;
+}
+
+
 }

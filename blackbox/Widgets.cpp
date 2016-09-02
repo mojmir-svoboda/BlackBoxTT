@@ -7,7 +7,10 @@
 #include <widgets/TasksWidget.h>
 #include <widgets/PagerWidget.h>
 #include <widgets/DebugWidget.h>
+#include <widgets/QuickBarWidget.h>
+#include <widgets/TrayWidget.h>
 #include "utils_window.h"
+#include <array>
 
 namespace bb {
 
@@ -36,49 +39,30 @@ bool Widgets::Init (WidgetsConfig & config)
 	{
 		sx = s.x1;
 	}
-//		GfxWindow * w0 = m_gfx.MkGuiWindow(sx - szx, s.y0, szx, szx, L"c0", L"w0");
-//		{
-//			w0->m_gui->m_enabled = true;
-//			DebugWidget * w0wdg0 = new DebugWidget;
-//			w0wdg0->m_enabled = true;
-//			w0->GetGui()->AddWidget(w0wdg0);
-//		}
-	GfxWindow * w0 = m_gfx.MkGuiWindow(0, 0, 200, 200, L"bbPager", L"bbPager");
+
+	
+	for (size_t i = 0, ie = config.m_widgets.size(); i < ie; ++i)
 	{
-		w0->m_gui->m_enabled = true;
-		PagerWidget * w0wdg0 = new PagerWidget;
-		w0wdg0->m_enabled = true;
-		w0->GetGui()->AddWidget(w0wdg0);
-		m_tasks.AddWidgetTask(w0);
+		// hey piggy...
+		if (config.m_widgets[i]->m_widget == L"Pager")
+			MkWidget<PagerWidget>(*config.m_widgets[i]);
+		if (config.m_widgets[i]->m_widget == L"QuickBar")
+			MkWidget<QuickBarWidget>(*config.m_widgets[i]);
+		if (config.m_widgets[i]->m_widget == L"Tasks")
+			MkWidget<TasksWidget>(*config.m_widgets[i]);
+		if (config.m_widgets[i]->m_widget == L"ControlPanel")
+			MkWidget<ControlPanelWidget>(*config.m_widgets[i]);
+		if (config.m_widgets[i]->m_widget == L"RecoverWindows")
+			MkWidget<RecoverWindowsWidget>(*config.m_widgets[i]);
+		if (config.m_widgets[i]->m_widget == L"Debug")
+			MkWidget<DebugWidget>(*config.m_widgets[i]);
+		if (config.m_widgets[i]->m_widget == L"Plugins")
+			MkWidget<PluginsWidget>(*config.m_widgets[i]);
+		if (config.m_widgets[i]->m_widget == L"StyleEditor")
+			MkWidget<StyleEditorWidget>(*config.m_widgets[i]);
+		if (config.m_widgets[i]->m_widget == L"Tray")
+			MkWidget<TrayWidget>(*config.m_widgets[i]);
 	}
-
-	{
-		GfxWindow * w1 = m_gfx.MkGuiWindow(0, 200, 200, 600, L"bbTasks", L"bbTasks");
-		w1->m_gui->m_enabled = true;
-		TasksWidget * w1wdg0 = new TasksWidget;
-		w1wdg0->m_enabled = true;
-		w1wdg0->m_horizontal = false;
-		w1->GetGui()->AddWidget(w1wdg0);
-	}
-
-	{
-		GfxWindow * w2 = m_gfx.MkGuiWindow(0, 800, 400, 600, L"bbRecoverWindows", L"bbRecoverWindows");
-		w2->m_gui->m_enabled = true;
-		RecoverWindowsWidget * w2wdg0 = new RecoverWindowsWidget;
-		w2wdg0->m_enabled = true;
-		w2->GetGui()->AddWidget(w2wdg0);
-	}
-
-
-//		GfxWindow * w1 = m_gfx.MkGuiWindow(0, 200, 800, 600, L"bbStyleEditor", L"bbStyleEditor");
-//		{
-//			w1->m_gui->m_enabled = true;
-//			StyleEditorWidget * w1wdg0 = new StyleEditorWidget;
-//			w1wdg0->m_enabled = true;
-//			w1->GetGui()->AddWidget(w1wdg0);
-//		}
-
-
 	return true;
 }
 

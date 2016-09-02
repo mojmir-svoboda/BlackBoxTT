@@ -49,8 +49,6 @@ namespace bb {
 		bool Done ();
 
 		void MkDataCopy (TaskState ts, std::vector<TaskInfo> & p);
-		void SwitchWorkSpace (bbstring const & src, bbstring const & dst);
-		bool MoveWindowToVertex (HWND hwnd, bbstring const & vertex_id);
 		void SetSticky (HWND hwnd);
 		void UnsetSticky (HWND hwnd);
 		bool IsSticky (HWND hwnd);
@@ -63,6 +61,9 @@ namespace bb {
 		void Focus (HWND hwnd);
 		HWND GetActiveTask () const;
 
+		void SwitchWorkSpace (bbstring const & src, bbstring const & dst);
+		bool MoveWindowToVertex (HWND hwnd, bbstring const & vertex_id);
+		bool OnSwitchDesktopVDM (bbstring const & src_vertex_id, bbstring const & dst_vertex_id);
 	protected:
 		bool FindTask (HWND hwnd, TaskState & state, size_t & idx);
 		bool FindTask (HWND hwnd, TaskState & state, size_t & idx) const;
@@ -79,6 +80,5 @@ namespace bb {
 		void OnHookWindowCreated (HWND hwnd);
 		void OnHookWindowDestroyed (HWND hwnd);
 		void OnHookWindowActivated (HWND hwnd);
-
 	};
 }

@@ -24,6 +24,7 @@ namespace bb {
 	protected:
 		friend struct WorkSpaces;
 		friend class Tasks;
+		friend struct VirtualDesktopNotification;
 		IVirtualDesktopManagerInternal * m_vdmi { nullptr };
 		IVirtualDesktopManager * m_vdm { nullptr };
 		std::vector<GUID> m_desktops;

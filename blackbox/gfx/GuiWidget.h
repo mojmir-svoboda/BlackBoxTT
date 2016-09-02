@@ -13,6 +13,7 @@ namespace bb
 		virtual ~GuiWidget () { }
 		virtual void DrawUI () { }
 		virtual char const * GetName () = 0;
+		virtual wchar_t const * GetNameW () = 0;
 	};
 }
 

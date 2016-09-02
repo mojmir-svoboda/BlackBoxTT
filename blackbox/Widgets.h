@@ -19,6 +19,18 @@ namespace bb {
 
 		bool Init (WidgetsConfig & config);
 		bool Done ();
+
+		template<class T>
+		T * MkWidget (WidgetConfig const & cfg)
+		{
+			T * t = new T;
+			GfxWindow * win = m_gfx.MkGuiWindow(cfg.m_x, cfg.m_y, cfg.m_w, cfg.m_h, t->GetNameW(), t->GetNameW());
+			win->m_gui->m_enabled = cfg.m_show;
+			t->m_enabled = cfg.m_show;
+			win->GetGui()->AddWidget(t);
+			m_tasks.AddWidgetTask(win);
+			return t;
+		}
 	};
 
 }

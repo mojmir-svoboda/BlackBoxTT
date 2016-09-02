@@ -3,6 +3,7 @@
 #include <bblib/ScopeGuard.h>
 #include <memory>
 #include <functional>
+#include <BlackBox.h>
 
 /*
 MIDL_INTERFACE("a5cd92ff-29be-454c-8d04-d82879fb3f1b")
@@ -50,6 +51,98 @@ namespace bb {
 
 	VirtualDesktopManager::VirtualDesktopManager () { }
 
+	struct VirtualDesktopNotification : IVirtualDesktopNotification
+	{
+		VirtualDesktopManager & m_vdm;
+		VirtualDesktopNotification (VirtualDesktopManager & vdm) : m_vdm(vdm) { }
+		virtual HRESULT STDMETHODCALLTYPE VirtualDesktopCreated (IVirtualDesktop * pDesktop) override;
+		virtual HRESULT STDMETHODCALLTYPE VirtualDesktopDestroyBegin (IVirtualDesktop * pDesktopDestroyed, IVirtualDesktop * pDesktopFallback) override;
+		virtual HRESULT STDMETHODCALLTYPE VirtualDesktopDestroyFailed (IVirtualDesktop * pDesktopDestroyed, IVirtualDesktop * pDesktopFallback) override;
+		virtual HRESULT STDMETHODCALLTYPE VirtualDesktopDestroyed (IVirtualDesktop * pDesktopDestroyed, IVirtualDesktop * pDesktopFallback) override;
+		virtual HRESULT STDMETHODCALLTYPE ViewVirtualDesktopChanged (IApplicationView * pView) override;
+		virtual HRESULT STDMETHODCALLTYPE CurrentVirtualDesktopChanged (IVirtualDesktop * pDesktopOld, IVirtualDesktop * pDesktopNew) override;
+
+		ULONG m_count { 0 };
+		virtual HRESULT STDMETHODCALLTYPE QueryInterface (REFIID riid, void ** ppvObject) override
+		{
+			if (!ppvObject)
+				return E_INVALIDARG;
+			*ppvObject = nullptr;
+
+			if (riid == IID_IUnknown || riid == IID_IVirtualDesktopNotification)
+			{
+				// Increment the reference count and return the pointer.
+				*ppvObject = (LPVOID)this;
+				AddRef();
+				return S_OK;
+			}
+			return E_NOINTERFACE;
+		}
+		virtual ULONG STDMETHODCALLTYPE AddRef () override
+		{
+			return InterlockedIncrement(&m_count);
+		}
+
+		virtual ULONG STDMETHODCALLTYPE Release () override
+		{
+			ULONG result = InterlockedDecrement(&m_count);
+			if (result == 0)
+				delete this;
+			return result;
+		}
+
+	};
+
+	HRESULT VirtualDesktopNotification::VirtualDesktopCreated (IVirtualDesktop * pDesktop)
+	{
+		return S_OK;
+	}
+	HRESULT VirtualDesktopNotification::VirtualDesktopDestroyBegin (IVirtualDesktop * pDesktopDestroyed, IVirtualDesktop * pDesktopFallback)
+	{
+		return S_OK;
+	}
+	HRESULT VirtualDesktopNotification::VirtualDesktopDestroyFailed (IVirtualDesktop * pDesktopDestroyed, IVirtualDesktop * pDesktopFallback)
+	{
+		return S_OK;
+	}
+	HRESULT VirtualDesktopNotification::VirtualDesktopDestroyed (IVirtualDesktop * pDesktopDestroyed, IVirtualDesktop * pDesktopFallback)
+	{
+		return S_OK;
+	}
+	HRESULT VirtualDesktopNotification::ViewVirtualDesktopChanged (IApplicationView * pView)
+	{
+		return S_OK;
+	}
+	HRESULT VirtualDesktopNotification::CurrentVirtualDesktopChanged (IVirtualDesktop * pDesktopOld, IVirtualDesktop * pDesktopNew)
+	{
+		// @TODO @PERF @FIXME .. how to get guid from IVirtualDesktp?
+		IVirtualDesktop * pd[2] = { pDesktopOld, pDesktopNew };
+		size_t idx[2] = { 0 };
+		size_t found = 0;
+		for (size_t i = 0; i < 2; ++i)
+		{
+			for (size_t j = 0, je = m_vdm.m_desktops.size(); j < je; ++j)
+			{
+				IVirtualDesktop * ivd = nullptr;
+				GUID g = { 0 };
+				if (SUCCEEDED(m_vdm.m_vdmi->FindDesktop(&m_vdm.m_desktops[j], &ivd)))
+				{
+					scope_guard_t on_exit_ivd = mkScopeGuard(std::mem_fun(&IVirtualDesktop::Release), ivd);
+					if (ivd == pd[i])
+					{
+						idx[i] = j;
+						++found;
+					}
+				}
+				else
+					return S_FALSE;
+			}
+		}
+		if (found == 2)
+			bb::BlackBox::Instance().GetTasks().OnSwitchDesktopVDM(m_vdm.m_names[idx[0]], m_vdm.m_names[idx[1]]);
+		return S_OK;
+	}
+
 	bool VirtualDesktopManager::Init (size_t l, size_t r)
 	{
 		m_left = l;
@@ -67,6 +160,16 @@ namespace bb {
 
 		IVirtualDesktopManagerInternal * ivdmi = nullptr;
 		if (!SUCCEEDED(isvc->QueryService(CLSID_VirtualDesktopAPI_Unknown, &ivdmi)))
+			return false;
+
+		VirtualDesktopNotification * n = new VirtualDesktopNotification(*this);
+
+		IVirtualDesktopNotificationService * notif_svc = nullptr;
+		if (!SUCCEEDED(isvc->QueryService(CLSID_IVirtualNotificationService, &notif_svc)))
+			return false;
+
+		DWORD cookie = 0;
+		if (!SUCCEEDED(notif_svc->Register(n, &cookie)))
 			return false;
 
 		m_vdm = ivdm;

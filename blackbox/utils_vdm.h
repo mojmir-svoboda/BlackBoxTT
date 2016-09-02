@@ -7,6 +7,7 @@ CLSID const CLSID_ImmersiveShell = { 0xC2F03A33, 0x21F5, 0x47FA, 0xB4, 0xBB, 0x1
 CLSID const CLSID_VirtualDesktopManagerInternal = { 0xC2F03A33, 0x21F5, 0x47FA, 0xB4, 0xBB, 0x15, 0x63, 0x62, 0xA2, 0xF2, 0x39 };
 IID const IID_IVirtualDesktopManagerInternal = { 0xEF9F1A6C, 0xD3CC, 0x4358, 0xB7, 0x12, 0xF8, 0x4B, 0x63, 0x5B, 0xEB, 0xE7 };
 CLSID const CLSID_IVirtualNotificationService = { 0xA501FDEC, 0x4A09, 0x464C, 0xAE, 0x4E, 0x1B, 0x9C, 0x21, 0xB8, 0x49, 0x18 };
+IID const IID_IVirtualDesktopNotification = { 0xC179334C, 0x4295, 0x40D3,{ 0xBE, 0xA1, 0xC6, 0x54, 0xD9, 0x65, 0x60, 0x5A }};
 CLSID const CLSID_VirtualDesktopAPI_Unknown = { 0xC5E0CDCA, 0x7B6E, 0x41B2, 0x9F, 0xC4, 0xD9, 0x39, 0x75, 0xCC, 0x46, 0x7B };
 
 struct IApplicationView : public IUnknown { };
@@ -26,9 +27,9 @@ EXTERN_C const IID IID_IVirtualDesktopManagerInternal;
 // 10130
 //MIDL_INTERFACE("EF9F1A6C-D3CC-4358-B712-F84B635BEBE7")
 // 10240
-//MIDL_INTERFACE("AF8DA486-95BB-4460-B3B7-6E7A6B2962B5")
+MIDL_INTERFACE("AF8DA486-95BB-4460-B3B7-6E7A6B2962B5")
 // 10536
-MIDL_INTERFACE("f31574d6-b682-4cdc-bd56-1827860abec6")
+//MIDL_INTERFACE("f31574d6-b682-4cdc-bd56-1827860abec6")
 IVirtualDesktopManagerInternal : public IUnknown
 {
 public:

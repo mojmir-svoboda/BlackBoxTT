@@ -14,6 +14,7 @@ namespace bb {
 		virtual ~RecoverWindowsWidget () { }
 		virtual void DrawUI () override;
 		virtual char const * GetName () override { return "RecoverWindows"; }
+		virtual wchar_t const * GetNameW () override { return L"RecoverWindows"; }
 
 		void UpdateData ();
 	};

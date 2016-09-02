@@ -5,6 +5,7 @@
 #include "Gui.h"
 #include "IconCache.h"
 #include "GfxWindow.h"
+#include <WidgetConfig.h>
 
 namespace bb {
 

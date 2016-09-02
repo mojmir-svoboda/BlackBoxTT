@@ -14,6 +14,7 @@ namespace bb {
 		virtual ~TasksWidget () { }
 		virtual void DrawUI () override;
 		virtual char const * GetName () override { return "Tasks"; }
+		virtual wchar_t const * GetNameW () override { return L"Tasks"; }
 
 		void UpdateTasks ();
 	};
