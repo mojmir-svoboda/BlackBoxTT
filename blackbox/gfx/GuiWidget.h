@@ -2,14 +2,16 @@
 #include <imgui/imgui.h>
 #include <platform_win.h>
 #include <vector>
+#include <WidgetConfig.h>
 
 namespace bb
 {
 	struct GuiWidget
 	{
-		bool m_enabled;
+		WidgetConfig & m_config;
+		HWND m_hwnd { nullptr };
 
-		GuiWidget () : m_enabled(false) { }
+		GuiWidget (WidgetConfig & cfg) : m_config(cfg) { }
 		virtual ~GuiWidget () { }
 		virtual void DrawUI () { }
 		virtual char const * GetName () = 0;

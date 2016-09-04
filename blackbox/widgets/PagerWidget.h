@@ -9,7 +9,7 @@ namespace bb {
 		bool m_horizontal;
 		std::vector<TaskInfo> m_tasks;
 
-		PagerWidget ();
+		PagerWidget (WidgetConfig & cfg);
 		virtual ~PagerWidget () { }
 		virtual void DrawUI () override;
 		virtual char const * GetName () override { return "Pager"; }

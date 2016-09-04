@@ -49,22 +49,11 @@ namespace bb
 		if (!m_enabled)
 			return;
 
-		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiSetCond_Always);
-
-		ImVec2 const & display = ImGui::GetIO().DisplaySize;
-		ImGui::SetNextWindowSize(display, ImGuiSetCond_Always);
-
-		char name[256];
-		codecvt_utf16_utf8(m_name, name, 256);
-		ImGui::Begin(name, &m_enabled, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+		for (GuiWidget * w : m_widgets)
 		{
-			for (GuiWidget * w : m_widgets)
-			{
-				if (w->m_enabled)
-					w->DrawUI();
-			}
+			if (w->m_config.m_show)
+				w->DrawUI();
 		}
-		ImGui::End();
 	}
 
 	void Gui::FeedInput ()

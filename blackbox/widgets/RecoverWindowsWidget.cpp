@@ -7,7 +7,8 @@
 
 namespace bb {
 
-	RecoverWindowsWidget::RecoverWindowsWidget ()
+	RecoverWindowsWidget::RecoverWindowsWidget (WidgetConfig & cfg)
+		: GuiWidget(cfg)
 	{
 		m_tasks.reserve(64);
 		m_order.reserve(64);
@@ -56,6 +57,15 @@ namespace bb {
 		if (ImGui::Button("Update Window List"))
 			UpdateData();
 
+		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiSetCond_Always);
+
+		ImVec2 const & display = ImGui::GetIO().DisplaySize;
+		ImGui::SetNextWindowSize(display, ImGuiSetCond_Always);
+
+		char name[256];
+		codecvt_utf16_utf8(GetNameW(), name, 256);
+		ImGui::Begin(name, &m_config.m_show, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+
 		Tasks & tasks = BlackBox::Instance().GetTasks();
 
     for (size_t i = 0, ie = m_order.size(); i < ie; ++i)
@@ -85,6 +95,7 @@ namespace bb {
       codecvt_utf16_utf8(ti.m_caption, name, TaskInfo::e_captionLenMax);
 			ImGui::Text(name);
     }
+		ImGui::End();
 	}
 
 }

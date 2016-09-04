@@ -75,7 +75,7 @@ namespace bb {
 		return m_windows.back().get();
 	}
 
-	GfxWindow * Gfx::MkGuiWindow (int x, int y, int w, int h, wchar_t const * clname, wchar_t const * wname)
+	GfxWindow * Gfx::MkGuiWindow (int x, int y, int w, int h, wchar_t const * clname, wchar_t const * wname, bool show)
 	{
 		TRACE_SCOPE(LL_INFO, CTX_BB | CTX_GFX);
 		Gui * gui = new Gui;
@@ -83,7 +83,7 @@ namespace bb {
 		HWND hwnd = MkWindow(static_cast<void *>(gui), x, y, w, h, clname, wname);
 		GfxWindow * res = MkGfxWindow(hwnd, gui, clname, wname);
 
-		::ShowWindow(hwnd, SW_SHOW);
+		::ShowWindow(hwnd, show ? SW_SHOW : SW_HIDE);
 		showInFromTaskBar(hwnd, false);
 		return res;
 	}

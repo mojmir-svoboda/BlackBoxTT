@@ -5,6 +5,7 @@ namespace bb {
 
 	struct DebugWidget : GuiWidget
 	{
+		DebugWidget (WidgetConfig & cfg) : GuiWidget(cfg) { }
 		virtual ~DebugWidget () { }
 		virtual void DrawUI () override;
 		virtual char const * GetName () override { return "Debug"; }

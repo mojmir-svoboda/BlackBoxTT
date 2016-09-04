@@ -25,7 +25,7 @@ namespace bb {
 		void NewFrame ();
 		bool Done ();
 
-		GfxWindow * MkGuiWindow (int x, int y, int w, int h, wchar_t const * clname, wchar_t const * wname);
+		GfxWindow * MkGuiWindow (int x, int y, int w, int h, wchar_t const * clname, wchar_t const * wname, bool show);
 		HWND MkWindow (void * gui, int x, int y, int w, int h, wchar_t const * clname, wchar_t const * wname);
 		GfxWindow * MkGfxWindow (HWND hwnd, Gui * gui, wchar_t const * clname, wchar_t const * wname);
 		GfxWindow * GetGfxWindow (size_t n) { return m_windows[n].get(); }

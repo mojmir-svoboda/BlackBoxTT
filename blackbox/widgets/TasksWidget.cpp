@@ -6,7 +6,8 @@
 
 namespace bb {
 
-	TasksWidget::TasksWidget ()
+	TasksWidget::TasksWidget (WidgetConfig & cfg) 
+		: GuiWidget(cfg)
 	{
 		m_tasks.reserve(64);
 	}
@@ -23,12 +24,16 @@ namespace bb {
 	void TasksWidget::DrawUI ()
 	{
 		UpdateTasks();
-		// useless windows
-		// Store hwnd == WinStore.Mobile.exe process
-		// Get Started hwnd == WhatsNew.Store.exe
 
-			////////////////////////////////////////////////////////////////////////////////////////////////////
-			////////////////////////////////////////////////////////////////////////////////////////////////////
+		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiSetCond_Always);
+
+		ImVec2 const & display = ImGui::GetIO().DisplaySize;
+		ImGui::SetNextWindowSize(display, ImGuiSetCond_Always);
+
+		char name[256];
+		codecvt_utf16_utf8(GetNameW(), name, 256);
+		ImGui::Begin(name, &m_config.m_show, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+
 		Tasks & tasks = BlackBox::Instance().GetTasks();
 //      std::string name2;
 //				if (tasks.m_active)
@@ -97,6 +102,7 @@ namespace bb {
 // 				tasks.Focus(t.m_hwnd);
 // 			}
 // 		}
+		ImGui::End();
 	}
 
 }

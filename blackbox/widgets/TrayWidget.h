@@ -5,6 +5,7 @@ namespace bb {
 
 	struct TrayWidget : GuiWidget
 	{
+		TrayWidget (WidgetConfig & cfg) : GuiWidget(cfg) { }
 		virtual ~TrayWidget () { }
 		virtual void DrawUI () override;
 		virtual char const * GetName () override { return "Tray"; }

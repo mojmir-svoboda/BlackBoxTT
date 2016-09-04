@@ -17,6 +17,7 @@ namespace YAML {
 			node.push_back(rhs.m_h);
 			node.push_back(rhs.m_show);
 			node.push_back(rhs.m_vertical);
+			node.push_back(rhs.m_titlebar);
 			return node;
 		}
 
@@ -37,6 +38,8 @@ namespace YAML {
 					rhs.m_show = node["show"].as<bool>();
 				if (node["vertical"])
 					rhs.m_vertical = node["vertical"].as<bool>();
+				if (node["titlebar"])
+					rhs.m_titlebar = node["titlebar"].as<bool>();
 			}
 			catch (std::exception const & e)
 			{

@@ -10,7 +10,7 @@ namespace bb {
 		std::vector<size_t> m_order;
 		std::vector<bbstring> m_exenames;
 
-		RecoverWindowsWidget ();
+		RecoverWindowsWidget (WidgetConfig & cfg);
 		virtual ~RecoverWindowsWidget () { }
 		virtual void DrawUI () override;
 		virtual char const * GetName () override { return "RecoverWindows"; }

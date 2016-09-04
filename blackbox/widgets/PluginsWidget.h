@@ -5,6 +5,7 @@ namespace bb {
 
   struct PluginsWidget : GuiWidget
   {
+		PluginsWidget (WidgetConfig & cfg) : GuiWidget(cfg) { }
 		virtual ~PluginsWidget () { }
 		virtual void DrawUI () { }
 		virtual char const * GetName () { return "Plugins"; }

@@ -10,7 +10,7 @@ namespace bb {
 
 		bool m_horizontal;
 
-		TasksWidget ();
+		TasksWidget (WidgetConfig & cfg);
 		virtual ~TasksWidget () { }
 		virtual void DrawUI () override;
 		virtual char const * GetName () override { return "Tasks"; }

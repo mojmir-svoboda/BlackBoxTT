@@ -7,7 +7,7 @@ namespace bb {
 	{
 		bool m_horizontal;
 
-		QuickBarWidget ();
+		QuickBarWidget (WidgetConfig & cfg);
 		virtual ~QuickBarWidget () { }
 		virtual void DrawUI () override;
 		virtual char const * GetName () override { return "QuickBar"; }

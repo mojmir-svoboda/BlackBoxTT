@@ -5,6 +5,7 @@ namespace bb {
 
 	struct ControlPanelWidget : GuiWidget
 	{
+		ControlPanelWidget (WidgetConfig & cfg) : GuiWidget(cfg) { }
 		virtual ~ControlPanelWidget () { }
 		virtual void DrawUI () override;
 		virtual char const * GetName () override { return "ControlPanel"; }
