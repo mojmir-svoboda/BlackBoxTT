@@ -1,5 +1,6 @@
 #include "BlackBox.h"
 #include <bblib/utils_paths.h>
+#include <bblib/logging.h>
 #include "utils_window.h"
 
 namespace bb {
