@@ -139,7 +139,9 @@ namespace bb {
 			}
 		}
 		if (found == 2)
+		{
 			bb::BlackBox::Instance().GetTasks().OnSwitchDesktopVDM(m_vdm.m_names[idx[0]], m_vdm.m_names[idx[1]]);
+		}
 		return S_OK;
 	}
 

@@ -78,6 +78,7 @@ namespace bb {
 
 	void WorkSpaces::SetCurrentClusterId (bbstring const & id)
 	{
+		TRACE_MSG(LL_DEBUG, CTX_BB | CTX_WSPACE, "Set wspace vertex: %ws", id.c_str());
 		m_config.m_currentClusterId = id;
 	}
 
@@ -101,6 +102,7 @@ namespace bb {
 		size_t idx = 0;
 		if (m_vdm->FindDesktop(vertex_id, idx))
 		{
+			TRACE_MSG(LL_DEBUG, CTX_BB | CTX_WSPACE, "VDM switch to vertex: %ws", vertex_id.c_str());
 			m_vdm->SwitchDesktop(m_vdm->m_desktops[idx]);
 			return true;
 		}
@@ -190,7 +192,7 @@ namespace bb {
 
 	bool WorkSpaces::Done ()
 	{
-		TRACE_MSG(LL_INFO, CTX_BB, "Terminating workspaces");
+		TRACE_MSG(LL_INFO, CTX_BB | CTX_WSPACE, "Terminating workspaces");
 		ClearGraph();
 		m_vdm->Done();
 		m_vdm.release();
@@ -199,6 +201,7 @@ namespace bb {
 
 	bool WorkSpaces::CreateGraph ()
 	{
+		TRACE_MSG(LL_INFO, CTX_BB | CTX_WSPACE, "Creating workspace graph...");
 		// setup VDM first
 		for (WorkGraphConfig & w : m_config.m_clusters)
 		{
@@ -217,6 +220,7 @@ namespace bb {
 					ws->m_isVDM = true;
 					ws->m_idxVDM = i;
 					ws->m_vertex = m_graph.m_vertices.size();
+					TRACE_MSG(LL_DEBUG, CTX_BB | CTX_WSPACE, "Found VDM vertex: %ws", v.c_str());
 					m_graph.m_vertices.push_back(std::move(ws));
 				}
 
@@ -231,6 +235,7 @@ namespace bb {
 					{
 						unsigned count = 0;
 						m_graph.m_edges.push_back(std::make_tuple(ws[0], ep, ws[1])); // src ---label_idx---> dst
+						TRACE_MSG(LL_DEBUG, CTX_BB | CTX_WSPACE, "Found edge: %ws --> %ws", ws[0]->m_id.c_str(), ws[1]->m_id.c_str());
 					}
 				}
 			}
@@ -247,6 +252,7 @@ namespace bb {
 					ws->m_label = s;
 					ws->m_vertex = m_graph.m_vertices.size();
 					m_graph.m_vertices.push_back(std::move(ws));
+					TRACE_MSG(LL_DEBUG, CTX_BB | CTX_WSPACE, "Found config vertex: %ws", s.c_str());
 				}
 			}
 		}
@@ -297,6 +303,7 @@ namespace bb {
 								{
 									size_t const n = m_graph.FindPropertyIndex(label);
 									m_graph.m_edges.push_back(std::make_tuple(ws[0], n, ws[1])); // src ---label_idx---> dst
+									TRACE_MSG(LL_DEBUG, CTX_BB | CTX_WSPACE, "Found edge: %ws --> %ws", ws[0]->m_id.c_str(), ws[1]->m_id.c_str());
 									ws[0] = ws[1];
 									count = 1;
 								}
@@ -327,6 +334,7 @@ namespace bb {
 		}
 
 		bool const graph_ok = m_graph.CreateGraph();
+		TRACE_MSG(graph_ok ? LL_INFO : LL_ERROR, CTX_BB | CTX_WSPACE, "Creating workspace graph... ", graph_ok ? "ok" : "error");
 		return graph_ok;
 	}
 

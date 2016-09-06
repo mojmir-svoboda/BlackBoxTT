@@ -441,6 +441,7 @@ void Tasks::SwitchWorkSpace (bbstring const & src_vertex_id, bbstring const & ds
 
 	if (src_vertex_id == dst_vertex_id)
 		return;
+	TRACE_MSG(LL_DEBUG, CTX_BB | CTX_WSPACE, "SwitchWorkSpace %ws --> %ws", src_vertex_id.c_str(), dst_vertex_id.c_str());
 
 	m_lock.Lock();
 
@@ -632,6 +633,8 @@ HWND Tasks::GetActiveTask () const
 
 bool Tasks::MoveWindowToVertex (HWND hwnd, bbstring const & vertex_id)
 {
+	TRACE_MSG(LL_DEBUG, CTX_BB | CTX_WSPACE, "Move hwnd to vertex: %ws", vertex_id.c_str());
+
 	m_lock.Lock();
 	TaskState ts = TaskState::max_enum_value;
 	size_t idx = c_invalidIndex;
@@ -678,6 +681,7 @@ bool Tasks::MoveWindowToVertex (HWND hwnd, bbstring const & vertex_id)
 
 bool Tasks::OnSwitchDesktopVDM (bbstring const & src_vertex_id, bbstring const & dst_vertex_id)
 {
+	TRACE_MSG(LL_DEBUG, CTX_BB | CTX_WSPACE, "VDM desktop changed: %ws --> %ws", src_vertex_id.c_str(), dst_vertex_id.c_str());
 	if (bbstring const * curr = m_wspaces.GetCurrentVertexId())
 	{
 		if (*curr == dst_vertex_id)

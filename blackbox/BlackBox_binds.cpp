@@ -51,6 +51,7 @@ namespace bb {
 
 	bool BlackBox::WorkSpacesSetCurrentVertexId (bbstring const & vertex_id)
 	{
+		TRACE_MSG(LL_DEBUG, CTX_BB | CTX_WSPACE | CTX_BIND, "WorkSpacesSetCurrentVertexId: %ws", vertex_id.c_str());
 		if (bbstring const * curr_vtx_id = m_wspaces.GetCurrentVertexId())
 		{
 			bbstring const curr_ws = *curr_vtx_id;
@@ -65,6 +66,7 @@ namespace bb {
 
 	bool BlackBox::WorkSpacesSwitchVertexViaEdge (bbstring const & edge_property)
 	{
+		TRACE_MSG(LL_DEBUG, CTX_BB | CTX_WSPACE | CTX_BIND, "WorkSpacesSwitchVertexViaEdge edge=%ws", edge_property.c_str());
 		bbstring new_vertex_id;
 		if (FindTargetVertexViaEdge(edge_property, new_vertex_id))
 			if (bbstring const * curr_vtx_id = m_wspaces.GetCurrentVertexId())
@@ -79,6 +81,7 @@ namespace bb {
 
 	void BlackBox::MaximizeTopWindow (bool vertical)
 	{
+		TRACE_MSG(LL_DEBUG, CTX_BB | CTX_WSPACE | CTX_BIND, "MaximizeTopWindow vertical=%i", vertical);
 		if (HWND hwnd = FindTopLevelWindow())
 			maximizeWindow(hwnd, vertical);
 	}
@@ -91,6 +94,7 @@ namespace bb {
 	}
 	bool BlackBox::MoveTopWindowToVertexViaEdge (bbstring const & edge_property)
 	{
+		TRACE_MSG(LL_DEBUG, CTX_BB | CTX_WSPACE | CTX_BIND, "MoveTopWindowToVertexViaEdge edge=%ws", edge_property.c_str());
 		bbstring new_vertex_id;
 		if (HWND hwnd = FindTopLevelWindow())
 			if (FindTargetVertexViaEdge(edge_property, new_vertex_id))
