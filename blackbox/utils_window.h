@@ -236,15 +236,33 @@ inline void growWindow (HWND hwnd, bool v)
 
 inline void maximizeWindow (HWND hwnd, bool vertical)
 {
-	LONG_PTR style = GetWindowLongPtr(hwnd, GWL_STYLE);
+	LONG_PTR style = ::GetWindowLongPtr(hwnd, GWL_STYLE);
 	if (0 == (WS_MAXIMIZEBOX & style))
 		return;
 
 	RECT r1, r2;
 
+// 	HMONITOR hmon = ::MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+// 	MONITORINFO target;
+// 	target.cbSize = sizeof(MONITORINFO);
+// 	::GetMonitorInfo(hmon, &target);
+// 
+// 	getRect(hwnd, &r1);
+// 	if (vertical)
+// 	{
+// 		r1.top = target.rcWork.top;
+// 		r1.bottom = target.rcWork.bottom;
+// 	}
+// 	else
+// 	{
+// 		r1.left = target.rcWork.left;
+// 		r1.right = target.rcWork.right;
+// 	}
+
 	if (checkForRestore(hwnd))
 		return;
 	getRect(hwnd, &r1);
+	showWindow(hwnd, false);
 	LockWindowUpdate(hwnd);
 	sendSysCommand(hwnd, SC_MAXIMIZE);
 	getRect(hwnd, &r2);
@@ -254,6 +272,7 @@ inline void maximizeWindow (HWND hwnd, bool vertical)
 		r1.left = r2.left, r1.right = r2.right;
 	windowSetPos(hwnd, r1);
 	LockWindowUpdate(NULL);
+	showWindow(hwnd, true);
 }
 
 struct SecondMon
