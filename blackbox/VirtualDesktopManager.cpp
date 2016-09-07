@@ -59,6 +59,7 @@ namespace bb {
 
 	HRESULT VirtualDesktopNotification::VirtualDesktopCreated (IVirtualDesktop * pDesktop)
 	{
+		bb::BlackBox::Instance().GetWorkSpaces().OnGraphConfigurationChanged();
 		return S_OK;
 	}
 	HRESULT VirtualDesktopNotification::VirtualDesktopDestroyBegin (IVirtualDesktop * pDesktopDestroyed, IVirtualDesktop * pDesktopFallback)
@@ -71,6 +72,7 @@ namespace bb {
 	}
 	HRESULT VirtualDesktopNotification::VirtualDesktopDestroyed (IVirtualDesktop * pDesktopDestroyed, IVirtualDesktop * pDesktopFallback)
 	{
+		bb::BlackBox::Instance().GetWorkSpaces().OnGraphConfigurationChanged();
 		return S_OK;
 	}
 	HRESULT VirtualDesktopNotification::ViewVirtualDesktopChanged (IApplicationView * pView)

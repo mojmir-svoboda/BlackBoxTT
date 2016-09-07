@@ -46,7 +46,19 @@ namespace bb {
 
 		for (WorkGraphConfig & wg : m_config.m_clusters)
 		{
-			if (wg.m_currentVertexId.empty())
+			if (wg.m_auto)
+			{
+				GUID g = {0};
+				if (m_vdm->GetCurrentDesktop(g))
+				{
+					size_t idx = 0;
+					if (m_vdm->FindDesktop(g, idx))
+					{
+						wg.m_currentVertexId = m_vdm->m_names[idx];
+					}
+				}
+			}
+			else if (wg.m_currentVertexId.empty())
 			{
 				if (wg.m_vertexlists.size() > 0 && wg.m_vertexlists[0].size())
 				{
@@ -65,6 +77,11 @@ namespace bb {
 	}
 	void WorkSpaces::OnWindowDestroyed ()
 	{
+	}
+	void WorkSpaces::OnGraphConfigurationChanged ()
+	{
+		m_vdm->UpdateDesktopGraph();
+		RecreateGraph();
 	}
 
 	bbstring const * WorkSpaces::GetCurrentVertexId () const
@@ -334,13 +351,32 @@ namespace bb {
 		}
 
 		bool const graph_ok = m_graph.CreateGraph();
-		TRACE_MSG(graph_ok ? LL_INFO : LL_ERROR, CTX_BB | CTX_WSPACE, "Creating workspace graph... ", graph_ok ? "ok" : "error");
+		TRACE_MSG((graph_ok ? LL_INFO : LL_ERROR), (CTX_BB | CTX_WSPACE), "Creating workspace graph... %s", graph_ok ? "ok" : "error");
 		return graph_ok;
 	}
 
 	void WorkSpaces::ClearGraph ()
 	{
 		m_graph.Clear();
+	}
+
+	bool WorkSpaces::RecreateGraph ()
+	{
+		for (WorkGraphConfig & w : m_config.m_clusters)
+		{
+			if (w.m_auto)
+			{
+				w.m_vertexlists.clear();
+				w.m_edgelist.clear();
+				w.m_currentVertexId.clear();
+			}
+		}
+
+		ClearGraph();
+
+		const bool ok = CreateGraph();
+		InitClusterAndVertex();
+		return ok;
 	}
 
 	bool WorkSpaces::AssignWorkSpace (HWND hwnd, bbstring & vertex_id)

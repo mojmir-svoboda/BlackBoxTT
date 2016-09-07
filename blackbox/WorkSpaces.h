@@ -20,9 +20,11 @@ namespace bb {
 		bool Done ();
 		bool CreateGraph ();
 		void ClearGraph ();
+		bool RecreateGraph ();
 
 		void OnWindowCreated ();
 		void OnWindowDestroyed ();
+		void OnGraphConfigurationChanged ();
 
 		void SetCurrentClusterId (bbstring const & id);
 		bool SetCurrentVertexId (bbstring const & id);
