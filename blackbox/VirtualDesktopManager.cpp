@@ -1,51 +1,15 @@
 #include "VirtualDesktopManager.h"
 #include "utils_vdm.h"
 #include <bblib/ScopeGuard.h>
+#include <bblib/logging.h>
 #include <memory>
 #include <functional>
 #include <BlackBox.h>
 
-/*
-MIDL_INTERFACE("a5cd92ff-29be-454c-8d04-d82879fb3f1b")
-IVirtualDesktopManager : public IUnknown
-{
-public:
-	virtual HRESULT STDMETHODCALLTYPE IsWindowOnCurrentVirtualDesktop(
-		__RPC__in HWND topLevelWindow,
-		__RPC__out BOOL *onCurrentDesktop) = 0;
-
-	virtual HRESULT STDMETHODCALLTYPE GetWindowDesktopId(
-		__RPC__in HWND topLevelWindow,
-		__RPC__out GUID *desktopId) = 0;
-
-	virtual HRESULT STDMETHODCALLTYPE MoveWindowToDesktop(
-		__RPC__in HWND topLevelWindow,
-		__RPC__in REFGUID desktopId) = 0;
-};
-*/
-
-
 // void PrintGuid(const GUID &guid)
 // {
-// 	std::wstring guidStr(40, L'\0');
 // 	::StringFromGUID2(guid, const_cast<LPOLESTR>(guidStr.c_str()), guidStr.length());
 // }
-
-
-/*
-{
-	IVirtualDesktop *pNewDesktop = nullptr;
-	hr = pDesktopManager->CreateDesktopW(&pNewDesktop);
-
-	if (SUCCEEDED(hr))
-	{
-		GUID id;
-		hr = pNewDesktop->GetID(&id);
-
-		hr = pDesktopManager->SwitchDesktop(pNewDesktop);
-		hr = pDesktopManager->RemoveDesktop(pNewDesktop, pDesktop);
-	}
-}*/
 
 namespace bb {
 
@@ -153,29 +117,42 @@ namespace bb {
 		IServiceProvider * isvc = nullptr;
 		if (!SUCCEEDED(::CoCreateInstance(CLSID_ImmersiveShell, NULL, CLSCTX_LOCAL_SERVER, __uuidof(IServiceProvider), (PVOID*)&isvc)))
 			return false;
-
 		scope_guard_t on_exit_isvc = mkScopeGuard(std::mem_fun(&IServiceProvider::Release), isvc);
 
 		IVirtualDesktopManager * ivdm = nullptr;
 		if (!SUCCEEDED(isvc->QueryService(__uuidof(IVirtualDesktopManager), &ivdm)))
 			return false;
+		scope_guard_t on_exit_ivdm = mkScopeGuard(std::mem_fun(&IVirtualDesktopManager::Release), ivdm);
 
 		IVirtualDesktopManagerInternal * ivdmi = nullptr;
 		if (!SUCCEEDED(isvc->QueryService(CLSID_VirtualDesktopAPI_Unknown, &ivdmi)))
 			return false;
-
-		VirtualDesktopNotification * n = new VirtualDesktopNotification(*this);
+		scope_guard_t on_exit_ivdmi = mkScopeGuard(std::mem_fun(&IVirtualDesktopManagerInternal::Release), ivdmi);
 
 		IVirtualDesktopNotificationService * notif_svc = nullptr;
 		if (!SUCCEEDED(isvc->QueryService(CLSID_IVirtualNotificationService, &notif_svc)))
 			return false;
+		scope_guard_t on_exit_notif_svc = mkScopeGuard(std::mem_fun(&IVirtualDesktopNotificationService::Release), notif_svc);
 
 		DWORD cookie = 0;
-		if (!SUCCEEDED(notif_svc->Register(n, &cookie)))
+		m_notif = new VirtualDesktopNotification(*this);
+		if (!SUCCEEDED(notif_svc->Register(m_notif, &cookie)))
 			return false;
+
+		IApplicationViewCollection * iavc = nullptr;
+		if (!SUCCEEDED(isvc->QueryService(IID_IApplicationViewCollection, IID_IApplicationViewCollection, (PVOID*)&iavc)))
+			return false;
+		scope_guard_t on_exit_iavc = mkScopeGuard(std::mem_fun(&IApplicationViewCollection::Release), iavc);
+
+
+		on_exit_ivdm.Dismiss();
+		on_exit_ivdmi.Dismiss();
+		on_exit_iavc.Dismiss();
 
 		m_vdm = ivdm;
 		m_vdmi = ivdmi;
+		m_avc = iavc;
+		m_notif_cookie = cookie;
 
 		UpdateDesktopGraph();
 		return true;
@@ -183,10 +160,35 @@ namespace bb {
 
 	bool VirtualDesktopManager::Done ()
 	{
+		if (m_notif_cookie != 0)
+		{
+			IServiceProvider * isvc = nullptr;
+			if (SUCCEEDED(::CoCreateInstance(CLSID_ImmersiveShell, NULL, CLSCTX_LOCAL_SERVER, __uuidof(IServiceProvider), (PVOID*)&isvc)))
+			{
+				scope_guard_t on_exit_isvc = mkScopeGuard(std::mem_fun(&IServiceProvider::Release), isvc);
+				IVirtualDesktopNotificationService * notif_svc = nullptr;
+				if (SUCCEEDED(isvc->QueryService(CLSID_IVirtualNotificationService, &notif_svc)))
+				{
+					scope_guard_t on_exit_notif_svc = mkScopeGuard(std::mem_fun(&IVirtualDesktopNotificationService::Release), notif_svc);
+					if (!SUCCEEDED(notif_svc->Unregister(m_notif_cookie)))
+						TRACE_MSG(LL_ERROR, CTX_WSPACE, "Cannot unregister vdm notification");
+				}
+			}
+		}
+		if (m_notif)
+		{
+			delete m_notif;
+			m_notif = nullptr;
+		}
 		m_desktops.clear();
 		m_names.clear();
 		m_edges.clear();
 
+		if (m_avc)
+		{
+			m_avc->Release();
+			m_avc = nullptr;
+		}
 		if (m_vdmi)
 		{
 			m_vdmi->Release();
@@ -202,7 +204,22 @@ namespace bb {
 
 	bool VirtualDesktopManager::MoveWindowToDesktop (HWND hwnd, GUID const & guid)
 	{
-		return m_vdm->MoveWindowToDesktop(hwnd, guid);
+		IVirtualDesktop * ivd = nullptr;
+		GUID g0 = guid;
+		if (SUCCEEDED(m_vdmi->FindDesktop(&g0, &ivd)))
+		{
+			scope_guard_t on_exit_ivd = mkScopeGuard(std::mem_fun(&IVirtualDesktop::Release), ivd);
+			IApplicationView * iav = nullptr;
+			if (SUCCEEDED(m_avc->GetViewForHwnd(hwnd, &iav)))
+			{
+				scope_guard_t on_exit_iav = mkScopeGuard(std::mem_fun(&IApplicationView::Release), iav);
+				if (SUCCEEDED(m_vdmi->MoveViewToDesktop(iav, ivd)))
+				{
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	bool VirtualDesktopManager::SwitchDesktop (GUID const & g)

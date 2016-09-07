@@ -5,6 +5,7 @@
 #include <platform_win.h>
 struct IVirtualDesktopManagerInternal;
 struct IVirtualDesktopManager;
+struct IApplicationViewCollection;
 enum AdjacentDesktop
 {
 	LeftDirection = 3,
@@ -12,6 +13,7 @@ enum AdjacentDesktop
 };
 
 namespace bb {
+	struct VirtualDesktopNotification;
 
 	struct VirtualDesktopManager
 	{
@@ -26,7 +28,10 @@ namespace bb {
 		friend class Tasks;
 		friend struct VirtualDesktopNotification;
 		IVirtualDesktopManagerInternal * m_vdmi { nullptr };
-		IVirtualDesktopManager * m_vdm { nullptr };
+		IVirtualDesktopManager * m_vdm { nullptr }; 
+		IApplicationViewCollection * m_avc { nullptr };
+		unsigned m_notif_cookie { 0 };
+		VirtualDesktopNotification * m_notif { nullptr };
 		std::vector<GUID> m_desktops;
 		std::vector<bbstring> m_names;
 		std::vector<std::tuple<uint32_t, uint32_t, uint32_t>> m_edges;
