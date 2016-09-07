@@ -59,7 +59,7 @@ namespace bb {
 			if (m_wspaces.CanSetCurrentVertexId(vertex_id))
 			{
 				m_wspaces.SetCurrentVertexId(vertex_id);
-				m_tasks.SwitchWorkSpace(curr_ws, vertex_id);
+				m_tasks.SwitchWorkSpace(curr_ws, vertex_id, false);
 			}
 		}
 		return false;
@@ -74,7 +74,7 @@ namespace bb {
 			{
 				bbstring const curr_ws = *curr_vtx_id;
 				m_wspaces.SetCurrentVertexId(new_vertex_id);
-				m_tasks.SwitchWorkSpace(curr_ws, new_vertex_id);
+				m_tasks.SwitchWorkSpace(curr_ws, new_vertex_id, false);
 				return true;
 			}
 		return false;

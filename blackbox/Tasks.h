@@ -61,7 +61,7 @@ namespace bb {
 		void Focus (HWND hwnd);
 		HWND GetActiveTask () const;
 
-		void SwitchWorkSpace (bbstring const & src, bbstring const & dst);
+		void SwitchWorkSpace (bbstring const & src, bbstring const & dst, bool notification);
 		bool MoveWindowToVertex (HWND hwnd, bbstring const & vertex_id);
 		bool OnSwitchDesktopVDM (bbstring const & src_vertex_id, bbstring const & dst_vertex_id);
 	protected:

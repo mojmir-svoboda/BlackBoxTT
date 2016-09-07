@@ -434,7 +434,7 @@ LRESULT Tasks::UpdateFromTaskHook (WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-void Tasks::SwitchWorkSpace (bbstring const & src_vertex_id, bbstring const & dst_vertex_id)
+void Tasks::SwitchWorkSpace (bbstring const & src_vertex_id, bbstring const & dst_vertex_id, bool notification)
 {
 	bool const src_is_vdm = m_wspaces.IsVertexVDM(src_vertex_id);
 	bool const dst_is_vdm = m_wspaces.IsVertexVDM(dst_vertex_id);
@@ -489,7 +489,7 @@ void Tasks::SwitchWorkSpace (bbstring const & src_vertex_id, bbstring const & ds
 
 	m_lock.Unlock();
 
-	if (dst_is_vdm)
+	if (dst_is_vdm && !notification)
 		m_wspaces.SwitchDesktop(dst_vertex_id);
 }
 
@@ -688,7 +688,7 @@ bool Tasks::OnSwitchDesktopVDM (bbstring const & src_vertex_id, bbstring const &
 			return false; // already there
 
 		m_wspaces.SetCurrentVertexId(dst_vertex_id);
-		SwitchWorkSpace(src_vertex_id, dst_vertex_id);
+		SwitchWorkSpace(src_vertex_id, dst_vertex_id, true);
 		return true;
 	}
 	return false;
