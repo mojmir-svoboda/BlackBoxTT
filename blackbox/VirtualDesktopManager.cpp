@@ -126,9 +126,21 @@ namespace bb {
 			return false;
 		scope_guard_t on_exit_ivdm = mkScopeGuard(std::mem_fun(&IVirtualDesktopManager::Release), ivdm);
 
+		// trying versions... thank you, M$
+		IVirtualDesktopManagerInternal10130 * ivdmi10130 = nullptr;
+		IVirtualDesktopManagerInternal10240 * ivdmi10240 = nullptr;
+		IVirtualDesktopManagerInternal10536 * ivdmi10536 = nullptr;
+		if (!SUCCEEDED(isvc->QueryService(CLSID_VirtualDesktopAPI_Unknown, &ivdmi10130)))
+			if (!SUCCEEDED(isvc->QueryService(CLSID_VirtualDesktopAPI_Unknown, &ivdmi10240)))
+				if (!SUCCEEDED(isvc->QueryService(CLSID_VirtualDesktopAPI_Unknown, &ivdmi10536)))
+					return false;
 		IVirtualDesktopManagerInternal * ivdmi = nullptr;
-		if (!SUCCEEDED(isvc->QueryService(CLSID_VirtualDesktopAPI_Unknown, &ivdmi)))
-			return false;
+		if (ivdmi10130)
+			ivdmi = ivdmi10130;
+		if (ivdmi10240)
+			ivdmi = ivdmi10240;
+		if (ivdmi10536)
+			ivdmi = ivdmi10536;
 		scope_guard_t on_exit_ivdmi = mkScopeGuard(std::mem_fun(&IVirtualDesktopManagerInternal::Release), ivdmi);
 
 		IVirtualDesktopNotificationService * notif_svc = nullptr;

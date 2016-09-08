@@ -44,13 +44,7 @@ public:
 
 EXTERN_C const IID IID_IVirtualDesktopManagerInternal;
 
-// 10130
-//MIDL_INTERFACE("EF9F1A6C-D3CC-4358-B712-F84B635BEBE7")
-// 10240
-//MIDL_INTERFACE("AF8DA486-95BB-4460-B3B7-6E7A6B2962B5")
-// 10536
-MIDL_INTERFACE("f31574d6-b682-4cdc-bd56-1827860abec6")
-IVirtualDesktopManagerInternal : public IUnknown
+struct IVirtualDesktopManagerInternal : public IUnknown
 {
 public:
 	virtual HRESULT STDMETHODCALLTYPE GetCount (UINT * pCount) = 0;
@@ -66,6 +60,16 @@ public:
 	// 10240
 	virtual HRESULT STDMETHODCALLTYPE FindDesktop (GUID * desktopId, IVirtualDesktop ** ppDesktop) = 0;
 };
+// 10130
+MIDL_INTERFACE("EF9F1A6C-D3CC-4358-B712-F84B635BEBE7")
+IVirtualDesktopManagerInternal10130: public IVirtualDesktopManagerInternal { };
+// 10240
+MIDL_INTERFACE("AF8DA486-95BB-4460-B3B7-6E7A6B2962B5")
+IVirtualDesktopManagerInternal10240 : public IVirtualDesktopManagerInternal { };
+// 10536
+MIDL_INTERFACE("f31574d6-b682-4cdc-bd56-1827860abec6")
+IVirtualDesktopManagerInternal10536 : public IVirtualDesktopManagerInternal { };
+
 
 EXTERN_C const IID IID_IVirtualDesktopNotification;
 MIDL_INTERFACE("C179334C-4295-40D3-BEA1-C654D965605A")
