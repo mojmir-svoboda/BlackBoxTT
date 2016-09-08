@@ -163,24 +163,28 @@ namespace bb {
 		return ok;
 	}
 
+	bool BlackBox::HomeDir (wchar_t * cfgpath, size_t sz) const
+	{
+		WCHAR userhomedir[MAX_PATH];
+		if (SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_PROFILE, NULL, 0, userhomedir)))
+			if (combinePath(userhomedir, s_blackboxHomeDir, cfgpath, sz))
+				return true;
+		return false;
+	}
+
 	bool BlackBox::FindConfig (wchar_t * cfgpath, size_t sz, const wchar_t * cfgfile) const
 	{
-		WCHAR homedir[MAX_PATH];
-		if (SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_PROFILE, NULL, 0, homedir)))
-		{
-			WCHAR bbdir[MAX_PATH];
-			if (joinPath(homedir, s_blackboxHomeDir, bbdir, MAX_PATH))
-				if (joinPath(bbdir, cfgfile, cfgpath, sz))
+		WCHAR bbdir[MAX_PATH];
+		if (HomeDir(bbdir, MAX_PATH))
+				if (combinePath(bbdir, cfgfile, cfgpath, sz))
 					if (fileExists(cfgpath))
 						return true;
-
-		}
 
 		TCHAR exepath[1024];
 		bb::getExePath(exepath, 1024);
 		TCHAR etcpath[MAX_PATH * 2];
-		if (!bb::joinPath(exepath, s_blackboxEtcDir, etcpath, MAX_PATH * 2))
-			if (joinPath(etcpath, cfgfile, cfgpath, sz))
+		if (combinePath(exepath, s_blackboxEtcDir, etcpath, MAX_PATH * 2))
+			if (combinePath(etcpath, cfgfile, cfgpath, sz))
 				if (fileExists(cfgpath))
 					return true;
 
@@ -315,7 +319,7 @@ namespace bb {
 			return false;
 		if (!LoadConfig())
 			return false;
-		if (m_scheme.Init(m_config.m_scheme))
+		if (!m_scheme.Init(m_config.m_scheme))
 			return false;
 
 		m_taskHookWM = ::RegisterWindowMessage(c_taskHookName);
@@ -349,13 +353,15 @@ namespace bb {
 	{
 		TRACE_SCOPE_MSG(LL_INFO, CTX_BB, "Terminating BB");
 		bool ok = true;
-		ok &= m_server.Done();
-		ok &= m_scheme.Done();
-		ok &= m_plugins.Done();
-		ok &= m_tasks.Done();
-		ok &= m_gfx.Done();
-		ok &= m_tray.Done();
-		ok &= m_explorer->Done();
+		m_server.Done();
+		m_scheme.Done();
+		m_widgets.Done();
+		m_tray.Done();
+		m_plugins.Done();
+		m_tasks.Done();
+		m_gfx.Done();
+		if (m_explorer)
+			m_explorer->Done();
 
 		::DestroyWindow(m_hwnd);
 		m_hwnd = nullptr;

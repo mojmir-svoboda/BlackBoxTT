@@ -17,7 +17,7 @@ namespace bb {
 		ImGui::Begin(name, &m_config.m_show, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 
 		// temporary control panels
-		auto const & ctrlp = BlackBox::Instance().m_explorer->m_controlPanel;
+		auto const & ctrlp = BlackBox::Instance().GetExplorer().m_controlPanel;
 		if (ImGui::TreeNode("CtrlP", "%s", "ctrl"))
 		{
 			for (ExplorerItem const & it : ctrlp)
@@ -30,7 +30,7 @@ namespace bb {
 				codecvt_utf16_utf8(it.m_name, name); // @TODO: perf!
 				if (ImGui::Button(name.c_str()))
 				{
-					BlackBox::Instance().m_explorer->OnClickedAt(it.m_pidl);
+					BlackBox::Instance().GetExplorer().OnClickedAt(it.m_pidl);
 				}
 			}
 			ImGui::TreePop();

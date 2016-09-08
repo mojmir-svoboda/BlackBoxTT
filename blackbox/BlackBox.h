@@ -26,26 +26,6 @@ namespace bb {
 		//constexpr static char const * const s_BlackboxClass = "BlackBoxClass";
 		constexpr static wchar_t const * const s_blackboxClass = L"BlackBoxClass";
 		constexpr static wchar_t const * const s_blackbox32Name = L"blackbox32.exe";
-		HINSTANCE m_hMainInstance;
-		HWND m_hwnd;
-		unsigned m_taskHookWM;
-		unsigned m_taskHook32on64WM;
-		HANDLE m_job;
-		bool m_inJob;
-		BlackBoxConfig m_config;
-		CommandLine m_cmdLine;
-    Scheme m_scheme;
-		Server m_server;
-
-		std::unique_ptr<StyleStruct> m_defaultStyle; /// legacy style
-		std::unique_ptr<StyleStruct> m_style; /// legacy style
-		std::unique_ptr<Explorer> m_explorer;
-		WorkSpaces m_wspaces;
-		Tasks m_tasks;
-		Widgets m_widgets;
-		Tray m_tray;
-		Gfx m_gfx;
-		PluginManager m_plugins;
 
 		BlackBox ();
 		~BlackBox ();
@@ -54,15 +34,12 @@ namespace bb {
 		BlackBox & operator= (BlackBox const &) = delete;
 
 		BB_API bool Init (HINSTANCE hInstance);
+		BB_API bool Done ();
+		BB_API void Run ();
 		bool CreateBBWindow ();
+		bool HomeDir (wchar_t * cfgpath, size_t sz) const;
 		bool LoadConfig ();
 		bool FindConfig (wchar_t * cfgpath, size_t sz, const wchar_t * cfgfile) const;
-		bool DetectConfig ();
-		BB_API bool Done ();
-		bool Win32RegisterClass (wchar_t const * classname, WNDPROC wndproc, int flags);
-		BB_API void Run ();
-		void HandleServerMessages ();
-		std::unique_ptr<Command> HandleServerMessage (std::unique_ptr<Command> const & request);
 
 		HANDLE GetJob () const { return m_job; }
 		bool GetInJob () const { return m_inJob; }
@@ -74,8 +51,8 @@ namespace bb {
 		Tray const & GetTray () const { return m_tray; }
 		Gfx & GetGfx () { return m_gfx; }
 		Gfx const & GetGfx () const { return m_gfx; }
-
-		HWND FindTopLevelWindow () const;
+		Explorer & GetExplorer () { return *m_explorer; }
+		Explorer const & GetExplorer () const { return *m_explorer; }
 
 		// binds
 		void Quit (uint32_t arg);
@@ -105,6 +82,36 @@ namespace bb {
 		 * @param [in] operation: true, false, toggle
 		 **/
 		void SetTaskManIgnored (bbstring const & op);
+
+	protected:
+		friend LRESULT CALLBACK mainWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+		bool DetectConfig ();
+		bool Win32RegisterClass (wchar_t const * classname, WNDPROC wndproc, int flags);
+		void HandleServerMessages ();
+		std::unique_ptr<Command> HandleServerMessage (std::unique_ptr<Command> const & request);
+		HWND FindTopLevelWindow () const;
+
+	protected:
+		HINSTANCE m_hMainInstance;
+		HWND m_hwnd;
+		unsigned m_taskHookWM;
+		unsigned m_taskHook32on64WM;
+		HANDLE m_job;
+		bool m_inJob;
+		BlackBoxConfig m_config;
+		CommandLine m_cmdLine;
+		Scheme m_scheme;
+		Server m_server;
+
+		std::unique_ptr<StyleStruct> m_defaultStyle; /// legacy style
+		std::unique_ptr<StyleStruct> m_style; /// legacy style
+		std::unique_ptr<Explorer> m_explorer;
+		WorkSpaces m_wspaces;
+		Tasks m_tasks;
+		Widgets m_widgets;
+		Tray m_tray;
+		Gfx m_gfx;
+		PluginManager m_plugins;
 	};
 }
 

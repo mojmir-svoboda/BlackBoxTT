@@ -9,8 +9,14 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	::CoInitialize(nullptr);
 
 	bb::BlackBox & bb = bb::BlackBox::Instance();
-	bb.Init(hInstance);
-	bb.Run();
+	if (bb.Init(hInstance))
+	{
+		bb.Run();
+	}
+	else
+	{
+		TRACE_MSG(LL_ERROR, CTX_BB, "Cannot initialize blackbox, terminating");
+	}
 	bb.Done();
 
 	::CoUninitialize();

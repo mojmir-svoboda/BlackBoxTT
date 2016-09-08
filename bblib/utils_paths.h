@@ -4,6 +4,7 @@
 #include "paths.h"
 #include "unicode.h"
 #include <Shlwapi.h>
+#include <Pathcch.h>
 
 namespace bb {
 
@@ -68,6 +69,13 @@ inline bool makePath (bbstring const & drive, bbstring const & dir, bbstring con
 	}
 	return false;
 }
+
+inline bool combinePath (wchar_t const * filedir, wchar_t const * filename, wchar_t * buff, size_t buffsz)
+{
+	HRESULT const hr = ::PathCchCombineEx(buff, buffsz, filedir, filename, 0);
+	return SUCCEEDED(hr);
+}
+
 
 /* concatenate directory / file */
 inline bool joinPath (wchar_t const * filedir, wchar_t const * filename, wchar_t * buff, size_t buffsz)
