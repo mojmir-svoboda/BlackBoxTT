@@ -87,6 +87,22 @@ namespace bb {
 			maximizeWindow(hwnd, vertical);
 	}
 
+	void BlackBox::SetTaskManIgnored (bbstring const & op)
+	{
+		TRACE_MSG(LL_DEBUG, CTX_BB | CTX_WSPACE | CTX_BIND, "SetTaskManIgnored op=%ws", op.c_str());
+		if (HWND hwnd = FindTopLevelWindow())
+		{
+			if (op == L"true")
+				m_tasks.SetTaskManIgnored(hwnd);
+			else if (op == L"false")
+				m_tasks.UnsetTaskManIgnored(hwnd);
+			else
+			{
+				m_tasks.ToggleTaskManIgnored(hwnd);
+			}
+		}
+	}
+
 	bool BlackBox::FindTargetVertexViaEdge (bbstring const & edge_property, bbstring & dst_vertex_id) const
 	{
 		if (m_wspaces.CanSwitchVertexViaEdge(edge_property, dst_vertex_id))
