@@ -530,6 +530,9 @@ void Tasks::UnsetTaskManIgnoredImpl (TaskState ts, size_t idx)
 	showInFromTaskBar(ti_ptr->m_hwnd, true);
 	if (ti_ptr->m_config)
 		ti_ptr->m_config->m_taskman = true;
+
+	if (ts == e_TaskManIgnored)
+		m_tasks[e_Active].push_back(std::move(ti_ptr));
 }
 void Tasks::UnsetTaskManIgnored (HWND hwnd)
 {
