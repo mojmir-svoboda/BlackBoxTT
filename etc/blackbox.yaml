@@ -28,8 +28,11 @@ Widgets:
     show: false
 
 WorkSpaces:
-  current: 'F'
+  current: 'win10'
   clusters:
+    - id: 'win10'
+      auto: true
+
     - id: 'F'
       label: 'fun'
       current: 'f1'
@@ -65,7 +68,7 @@ Menu:
 Plugins:
   - plugin: 'bbSlit'
     path: 'c:/bb_devel/plugins/bbSlit/bbSlit.dll'
-    enabled: true
+    enabled: false
     is_slit: true
     in_slit: false
 
@@ -81,7 +84,7 @@ Plugins:
 
   - plugin: 'bbAnalog'
     path: 'c:/bb_devel/plugins/bbAnalog/bbAnalog.dll'
-    enabled: true
+    enabled: false
     in_slit: true
  
   - plugin: 'bbAnalogExMod'

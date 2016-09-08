@@ -71,6 +71,7 @@ endif( CMAKE_SIZEOF_VOID_P EQUAL 8 )
 add_definitions ("-DUNICODE")
 add_definitions ("-D_UNICODE")
 
+# 3rd party
 add_subdirectory(3rd_party)
 include_directories (3rd_party)
 include_directories (3rd_party/yaml-cpp/include)
@@ -122,20 +123,11 @@ set_target_properties(bblibcompat PROPERTIES FOLDER "bbTT")
 add_subdirectory(plugins)
 # tools
 add_subdirectory(tools)
+# configs
+add_subdirectory(etc)
 
-# installation
-set(main_CONFIGS
-	etc/blackbox.yaml
-	etc/blackbox.ahk
-)
-
-if(OPTION_DEVEL)
-	# install config files
-	#install_if_absent(. ${main_CONFIGS})
-	# install styles etc
+# install styles etc
 #  install(DIRECTORY styles backgrounds DESTINATION .)
-endif(OPTION_DEVEL)
-
 
 ###############################################################################
 # debug stuff
