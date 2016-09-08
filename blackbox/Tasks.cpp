@@ -303,6 +303,8 @@ void Tasks::Update ()
 	{
 		if (s == e_OtherWS)
 			continue; // do not delete tasks on other wspaces
+		if (s == e_TaskManIgnored)
+			continue; // do not delete ignored taskman tasks either
 
 		for (size_t i = 0, ie = m_tasks[s].size(); i < ie; ++i)
 			if (m_tasks[s][i])
@@ -493,20 +495,14 @@ void Tasks::SwitchWorkSpace (bbstring const & src_vertex_id, bbstring const & ds
 		m_wspaces.SwitchDesktop(dst_vertex_id);
 }
 
-void Tasks::SetTaskManIgnored (HWND hwnd)
-{
-	m_lock.Lock();
-
-	TaskState ts = TaskState::max_enum_value;
-	size_t idx = c_invalidIndex;
-	if (FindTask(hwnd, ts, idx))
+void Tasks::SetTaskManIgnoredImpl (TaskState ts, size_t idx)
 	{
 		TaskInfoPtr & ti_ptr = m_tasks[ts][idx];
 
 		showInFromTaskBar(ti_ptr->m_hwnd, false);
 
 		if (nullptr == ti_ptr->m_config)
-			ti_ptr->m_config = MakeTaskConfig(hwnd);
+		ti_ptr->m_config = MakeTaskConfig(ti_ptr->m_hwnd);
 
 		ti_ptr->m_config->m_taskman = false;
 
@@ -515,21 +511,50 @@ void Tasks::SetTaskManIgnored (HWND hwnd)
 			m_tasks[e_TaskManIgnored].push_back(std::move(ti_ptr));
 	}
 
+void Tasks::SetTaskManIgnored (HWND hwnd)
+{
+	m_lock.Lock();
+
+	TaskState ts = TaskState::max_enum_value;
+	size_t idx = c_invalidIndex;
+	if (FindTask(hwnd, ts, idx))
+		SetTaskManIgnoredImpl(ts, idx);
+
 	m_lock.Unlock();
 }
 
+void Tasks::UnsetTaskManIgnoredImpl (TaskState ts, size_t idx)
+{
+	TaskInfoPtr & ti_ptr = m_tasks[ts][idx];
+	TRACE_MSG(LL_DEBUG, CTX_BB, "unset task ignored hwnd=%x", ti_ptr->m_hwnd);
+	showInFromTaskBar(ti_ptr->m_hwnd, true);
+	if (ti_ptr->m_config)
+		ti_ptr->m_config->m_taskman = true;
+}
 void Tasks::UnsetTaskManIgnored (HWND hwnd)
 {
 	m_lock.Lock();
 
-	for (TaskInfoPtr & ti_ptr : m_tasks[e_TaskManIgnored])
+	TaskState ts = TaskState::max_enum_value;
+	size_t idx = c_invalidIndex;
+	if (FindTask(hwnd, ts, idx))
+		UnsetTaskManIgnoredImpl(ts, idx);
+	
+	m_lock.Unlock();
+}
+
+void Tasks::ToggleTaskManIgnored (HWND hwnd)
 	{
-		if (ti_ptr && ti_ptr->m_hwnd == hwnd)
+	m_lock.Lock();
+
+	TaskState ts = TaskState::max_enum_value;
+	size_t idx = c_invalidIndex;
+	if (FindTask(hwnd, ts, idx))
 		{
-			showInFromTaskBar(ti_ptr->m_hwnd, true);
-			if (ti_ptr->m_config)
-				ti_ptr->m_config->m_taskman = true;
-		}
+		if (ts == e_Active)
+			SetTaskManIgnoredImpl(ts, idx);
+		else if (ts == e_TaskManIgnored)
+			UnsetTaskManIgnoredImpl(ts, idx);
 	}
 	
 	m_lock.Unlock();

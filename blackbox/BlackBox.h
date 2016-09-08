@@ -101,6 +101,10 @@ namespace bb {
 		 * @param [in] vertical
 		 **/
 		void MaximizeTopWindow (bool vertical);
+		/**@fn SetTaskManIgnored
+		 * @param [in] operation: true, false, toggle
+		 **/
+		void SetTaskManIgnored (bbstring const & op);
 	};
 }
 

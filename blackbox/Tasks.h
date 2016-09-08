@@ -54,7 +54,7 @@ namespace bb {
 		bool IsSticky (HWND hwnd);
 		void SetTaskManIgnored (HWND hwnd);
 		void UnsetTaskManIgnored (HWND hwnd);
-		bool IsTaskManIgnored (HWND hwnd);
+		void ToggleTaskManIgnored (HWND hwnd);
 		void SetBBTasksIgnored(HWND hwnd);
 		void UnsetBBTasksIgnored(HWND hwnd);
 		bool IsBBTasksIgnored(HWND hwnd);
@@ -75,6 +75,8 @@ namespace bb {
 		void AddTaskInfo (TaskInfo * ti);
 		bool AddTask (HWND hwnd);
 		bool AddWidgetTask (GfxWindow * w);
+		void SetTaskManIgnoredImpl (TaskState ts, size_t idx);
+		void UnsetTaskManIgnoredImpl (TaskState ts, size_t idx);
 
 		LRESULT UpdateFromTaskHook (WPARAM wParam, LPARAM lParam);
 		void OnHookWindowCreated (HWND hwnd);

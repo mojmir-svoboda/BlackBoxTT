@@ -42,6 +42,11 @@ Return
 ^!m::
    Run, c:\bb_devel\bbcli.exe -c "(MaximizeTopWindow ""both"")"
 Return
+^!i::
+   Run, c:\bb_devel\bbcli.exe -c "(SetTaskManIgnored ""toggle"")"
+Return
+
+
 
 ; ---------------------------------------------------------------------------------------
 
