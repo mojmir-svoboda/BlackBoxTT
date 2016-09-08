@@ -4,6 +4,7 @@
 #include "plugin/PluginsConfig.h"
 #include <yaml-cpp/yaml.h>
 #include <bblib/codecvt.h>
+#include <bblib/utils_paths.h>
 #include "gfx/imgui.h"
 #include "gfx/Gfx.h"
 #include <bblib/logging.h>
@@ -162,11 +163,49 @@ namespace bb {
 		return ok;
 	}
 
+	bool BlackBox::FindConfig (wchar_t * cfgpath, size_t sz, const wchar_t * cfgfile) const
+	{
+		WCHAR homedir[MAX_PATH];
+		if (SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_PROFILE, NULL, 0, homedir)))
+		{
+			WCHAR bbdir[MAX_PATH];
+			if (joinPath(homedir, s_blackboxHomeDir, bbdir, MAX_PATH))
+				if (joinPath(bbdir, cfgfile, cfgpath, sz))
+					if (fileExists(cfgpath))
+						return true;
+
+		}
+
+		TCHAR exepath[1024];
+		bb::getExePath(exepath, 1024);
+		TCHAR etcpath[MAX_PATH * 2];
+		if (!bb::joinPath(exepath, s_blackboxEtcDir, etcpath, MAX_PATH * 2))
+			if (joinPath(etcpath, cfgfile, cfgpath, sz))
+				if (fileExists(cfgpath))
+					return true;
+
+		return false;
+	}
+
 	bool BlackBox::LoadConfig ()
 	{
 		try
 		{
-			std::string cfg_name = m_cmdLine.YamlFile();
+			std::string cfg_name;
+			wchar_t fname[256];
+			if (codecvt_utf8_utf16(m_cmdLine.YamlFile().c_str(), fname, 256))
+			{
+				wchar_t dir[1024];
+				if (FindConfig(dir, 1024, fname))
+				{
+					char tmp[1024];
+					if (codecvt_utf16_utf8(dir, tmp, 1024))
+						cfg_name = std::string(tmp);
+				}
+			}
+			else
+				return false;
+
 			TRACE_SCOPE_MSG(LL_INFO, CTX_BB | CTX_CONFIG | CTX_INIT, "Loading config file: %s", cfg_name.c_str());
 			YAML::Node y_root = YAML::LoadFile(cfg_name);
 			if (y_root.IsNull())
@@ -268,11 +307,16 @@ namespace bb {
 		m_hMainInstance = hmi;
 		bool ok = true;
 
-		ok &= DetectConfig();
-		ok &= mkJobObject(m_job, m_inJob);
-		ok &= m_cmdLine.Init();
-		ok &= LoadConfig();
-		ok &= m_scheme.Init(m_config.m_scheme);
+		if (!DetectConfig())
+			return false;
+		if (!mkJobObject(m_job, m_inJob))
+			return false;
+		if (!m_cmdLine.Init())
+			return false;
+		if (!LoadConfig())
+			return false;
+		if (m_scheme.Init(m_config.m_scheme))
+			return false;
 
 		m_taskHookWM = ::RegisterWindowMessage(c_taskHookName);
 		m_taskHook32on64WM = ::RegisterWindowMessage(c_taskHook32Name);
@@ -282,15 +326,23 @@ namespace bb {
 		rc::init();
 
 		Win32RegisterClass(s_blackboxClass, mainWndProc, 0);
-		ok &= CreateBBWindow();
-		ok &= m_wspaces.Init(m_config.m_wspaces);
-		ok &= m_gfx.Init();
-		ok &= m_tasks.Init(m_config.m_tasks);
-		ok &= m_explorer->Init();
-		ok &= m_widgets.Init(m_config.m_widgets);
-		ok &= m_plugins.Init(m_config.m_plugins);
-		ok &= m_server.Init(m_config.m_server);
-		return ok;
+		if (!CreateBBWindow())
+			return false;
+		if (!m_wspaces.Init(m_config.m_wspaces))
+			return false;
+		if (!m_gfx.Init())
+			return false;
+		if (!m_tasks.Init(m_config.m_tasks))
+			return false;
+		if (!m_explorer->Init())
+			return false;
+		if (!m_widgets.Init(m_config.m_widgets))
+			return false;
+		if (!m_plugins.Init(m_config.m_plugins))
+			return false;
+		if (!m_server.Init(m_config.m_server))
+			return false;
+		return true;
 	}
 
 	bool BlackBox::Done ()

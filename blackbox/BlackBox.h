@@ -21,6 +21,8 @@ namespace bb {
 	{
 		constexpr static wchar_t const * const s_blackboxName = L"BlackBox";
 		constexpr static char const * const s_blackboxConfig = "blackbox.yaml";
+		constexpr static wchar_t const * const s_blackboxHomeDir = L".blackboxTT";
+		constexpr static wchar_t const * const s_blackboxEtcDir = L"etc";
 		//constexpr static char const * const s_BlackboxClass = "BlackBoxClass";
 		constexpr static wchar_t const * const s_blackboxClass = L"BlackBoxClass";
 		constexpr static wchar_t const * const s_blackbox32Name = L"blackbox32.exe";
@@ -54,6 +56,7 @@ namespace bb {
 		BB_API bool Init (HINSTANCE hInstance);
 		bool CreateBBWindow ();
 		bool LoadConfig ();
+		bool FindConfig (wchar_t * cfgpath, size_t sz, const wchar_t * cfgfile) const;
 		bool DetectConfig ();
 		BB_API bool Done ();
 		bool Win32RegisterClass (wchar_t const * classname, WNDPROC wndproc, int flags);
