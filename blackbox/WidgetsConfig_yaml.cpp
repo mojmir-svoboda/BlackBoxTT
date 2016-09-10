@@ -36,7 +36,7 @@ namespace YAML {
 				if (node["h"])
 					rhs.m_h = node["h"].as<int>();
 				if (node["alpha"])
-					rhs.m_h = node["alpha"].as<int>();
+					rhs.m_alpha = node["alpha"].as<int>();
 				if (node["show"])
 					rhs.m_show = node["show"].as<bool>();
 				if (node["vertical"])
