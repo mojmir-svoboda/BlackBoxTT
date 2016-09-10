@@ -26,7 +26,7 @@ namespace bb {
 			if (cfg.m_show)
 			{
 				T * t = new T(cfg);
-				GfxWindow * win = m_gfx.MkGuiWindow(cfg.m_x, cfg.m_y, cfg.m_w, cfg.m_h, t->GetNameW(), t->GetNameW(), cfg.m_show);
+				GfxWindow * win = m_gfx.MkGuiWindow(cfg.m_x, cfg.m_y, cfg.m_w, cfg.m_h, cfg.m_alpha, t->GetNameW(), t->GetNameW(), cfg.m_show);
 				win->m_gui->m_enabled = cfg.m_show;
 				win->GetGui()->AddWidget(t);
 				t->m_hwnd = win->m_hwnd;

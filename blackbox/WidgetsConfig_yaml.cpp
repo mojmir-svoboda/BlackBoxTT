@@ -15,6 +15,7 @@ namespace YAML {
 			node.push_back(rhs.m_y);
 			node.push_back(rhs.m_w);
 			node.push_back(rhs.m_h);
+			node.push_back(rhs.m_alpha);
 			node.push_back(rhs.m_show);
 			node.push_back(rhs.m_vertical);
 			node.push_back(rhs.m_titlebar);
@@ -27,13 +28,15 @@ namespace YAML {
 			{
 				rhs.m_widget = node["widget"].as<bbstring>();
 				if (node["x"])
-					rhs.m_x = node["x"].as<unsigned>();
+					rhs.m_x = node["x"].as<int>();
 				if (node["y"])
-					rhs.m_y = node["y"].as<unsigned>();
+					rhs.m_y = node["y"].as<int>();
 				if (node["w"])
-					rhs.m_w = node["w"].as<unsigned>();
+					rhs.m_w = node["w"].as<int>();
 				if (node["h"])
-					rhs.m_h = node["h"].as<unsigned>();
+					rhs.m_h = node["h"].as<int>();
+				if (node["alpha"])
+					rhs.m_h = node["alpha"].as<int>();
 				if (node["show"])
 					rhs.m_show = node["show"].as<bool>();
 				if (node["vertical"])

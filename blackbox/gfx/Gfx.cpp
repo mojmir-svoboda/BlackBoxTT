@@ -25,7 +25,7 @@ namespace bb {
 		return true;
 	}
 
-	HWND Gfx::MkWindow (void * gui, int x, int y, int w, int h, wchar_t const * clname, wchar_t const * wname)
+	HWND Gfx::MkWindow (void * gui, int x, int y, int w, int h, int alpha, wchar_t const * clname, wchar_t const * wname)
 	{
 		WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC, &Gui::GuiWndProcDispatch, 0L, 0L, ::GetModuleHandle(NULL), NULL, ::LoadCursor(NULL, IDC_ARROW), NULL, NULL, clname, NULL };
 		::RegisterClassEx(&wc);
@@ -47,7 +47,7 @@ namespace bb {
 			, gui);
 
 		if (dwm_on)
-			SetLayeredWindowAttributes(hwnd, RGB(0, 0, 0), 255 - 16, ULW_ALPHA);
+			SetLayeredWindowAttributes(hwnd, RGB(0, 0, 0), alpha, ULW_ALPHA);
 		removeWindowBorder(hwnd); // @TODO: removeWindowBorder triggers WM_PAINT but it's too early (will be ignored)
 
 		TRACE_MSG(LL_INFO, CTX_BB | CTX_GFX, "Created window for gui (dwm=%u), hwnd=0x%08x", dwm_on, hwnd);
@@ -75,12 +75,12 @@ namespace bb {
 		return m_windows.back().get();
 	}
 
-	GfxWindow * Gfx::MkGuiWindow (int x, int y, int w, int h, wchar_t const * clname, wchar_t const * wname, bool show)
+	GfxWindow * Gfx::MkGuiWindow (int x, int y, int w, int h, int alpha, wchar_t const * clname, wchar_t const * wname, bool show)
 	{
 		TRACE_SCOPE(LL_INFO, CTX_BB | CTX_GFX);
 		Gui * gui = new Gui;
 		TRACE_MSG(LL_INFO, CTX_BB | CTX_GFX, "Created new gui @ 0x%x wname=%ws", gui, wname);
-		HWND hwnd = MkWindow(static_cast<void *>(gui), x, y, w, h, clname, wname);
+		HWND hwnd = MkWindow(static_cast<void *>(gui), x, y, w, h, alpha, clname, wname);
 		GfxWindow * res = MkGfxWindow(hwnd, gui, clname, wname);
 
 		::ShowWindow(hwnd, show ? SW_SHOW : SW_HIDE);
