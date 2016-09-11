@@ -342,6 +342,7 @@ void Tasks::OnHookWindowCreated (HWND hwnd)
 	bool const is_app_win = bb::isAppWindow(hwnd);
 	if (is_app_win)
 	{
+		TRACE_MSG(LL_DEBUG, CTX_BB, " taskhook create wnd=0x%08x", hwnd);
 		m_lock.Lock();
 		AddTask(hwnd);
 		m_lock.Unlock();
@@ -350,9 +351,14 @@ void Tasks::OnHookWindowCreated (HWND hwnd)
 
 void Tasks::OnHookWindowDestroyed (HWND hwnd)
 {
-	m_lock.Lock();
-	bool const removed0 = RmTask(hwnd);
-	m_lock.Unlock();
+	bool const is_app_win = bb::isAppWindow(hwnd);
+	if (is_app_win)
+	{
+		TRACE_MSG(LL_DEBUG, CTX_BB, " taskhook destroy wnd=0x%08x", hwnd);
+		m_lock.Lock();
+		bool const removed0 = RmTask(hwnd);
+		m_lock.Unlock();
+	}
 }
 
 void Tasks::OnHookWindowActivated (HWND hwnd)
@@ -370,68 +376,44 @@ void Tasks::OnHookWindowActivated (HWND hwnd)
 
 LRESULT Tasks::UpdateFromTaskHook (WPARAM wParam, LPARAM lParam)
 {
-	TRACE_MSG(LL_DEBUG, CTX_BB, " taskhook wparam=%i", wParam);
 	switch (wParam)
 	{
-		//case HCBT_CREATEWND:
-		case HSHELL_WINDOWCREATED:
+		case HCBT_CREATEWND:
+		//case HSHELL_WINDOWCREATED:
 		{
 			HWND const hwnd = reinterpret_cast<HWND>(lParam);
 			OnHookWindowCreated(hwnd);
 			break;
 		}
-		//case HCBT_DESTROYWND:
-		case HSHELL_WINDOWDESTROYED:
+		case HCBT_DESTROYWND:
+		//case HSHELL_WINDOWDESTROYED:
 		{
 			HWND const hwnd = reinterpret_cast<HWND>(lParam);
 			OnHookWindowDestroyed(hwnd);
 			break;
 		}
-		case HSHELL_ACTIVATESHELLWINDOW:
-			break;
-		
-		case HSHELL_ENDTASK:
-			break;
-		case HSHELL_WINDOWREPLACING:
-			break;
-		case HSHELL_WINDOWREPLACED:
-		{
-			break;
-		}
-		case HSHELL_MONITORCHANGED:
-		{
-			break;
-		}
-		//case HCBT_ACTIVATE:
-		case HSHELL_WINDOWACTIVATED:
+		case HCBT_ACTIVATE:
+		//case HSHELL_WINDOWACTIVATED:
 		{
 			HWND const hwnd = reinterpret_cast<HWND>(lParam);
+			TRACE_MSG(LL_DEBUG, CTX_BB, " taskhook activate wnd=0x%08x", hwnd);
 			OnHookWindowActivated(hwnd);
 			break;
 		}
-		case HSHELL_GETMINRECT:
+		case HCBT_SETFOCUS:
 		{
+			HWND const hwnd = reinterpret_cast<HWND>(lParam);
+			TRACE_MSG(LL_DEBUG, CTX_BB, " taskhook focus wnd=0x%08x", hwnd);
 			break;
 		}
-		case HSHELL_REDRAW:
-		{
-			break;
-		}
-		case HSHELL_TASKMAN:
-			//MessageManager_Send(BB_WINKEY, 0, 0);
-			break;
-//		case HCBT_MINMAX:
-//		{
-//			break;
-//		}
-//		case HCBT_MOVESIZE:
-//		{
-//			break;
-//		}
-//		case HCBT_SETFOCUS:
-//		{
-//			break;
-//		}
+// 		case HCBT_MINMAX:
+// 		{
+// 			break;
+// 		}
+// 		case HCBT_MOVESIZE:
+// 		{
+// 			break;
+// 		}
 	}
 	return 0;
 }
@@ -470,7 +452,7 @@ void Tasks::SwitchWorkSpace (bbstring const & src_vertex_id, bbstring const & ds
 
 			if (t->m_wspace != dst_vertex_id)
 			{
-				if (!dst_is_vdm)
+				if (!dst_is_vdm || t->m_config && t->m_config->m_taskman == false)
 					::ShowWindow(t->m_hwnd, SW_HIDE);
 				m_tasks[e_OtherWS].push_back(std::move(t));
 				continue;
@@ -484,7 +466,11 @@ void Tasks::SwitchWorkSpace (bbstring const & src_vertex_id, bbstring const & ds
 			{
 				if (!dst_is_vdm)
 					::ShowWindow(t->m_hwnd, SW_SHOW);
-				m_tasks[e_Active].push_back(std::move(t));
+
+				if (t->m_config && t->m_config->m_taskman == false)
+					m_tasks[e_TaskManIgnored].push_back(std::move(t));
+				else
+					m_tasks[e_Active].push_back(std::move(t));
 				continue;
 			}
 		}
