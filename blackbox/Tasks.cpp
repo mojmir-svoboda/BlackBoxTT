@@ -396,14 +396,14 @@ LRESULT Tasks::UpdateFromTaskHook (WPARAM wParam, LPARAM lParam)
 		//case HSHELL_WINDOWACTIVATED:
 		{
 			HWND const hwnd = reinterpret_cast<HWND>(lParam);
-			TRACE_MSG(LL_DEBUG, CTX_BB, " taskhook activate wnd=0x%08x", hwnd);
+			TRACE_MSG(LL_VERBOSE, CTX_BB, " taskhook activate wnd=0x%08x", hwnd);
 			OnHookWindowActivated(hwnd);
 			break;
 		}
 		case HCBT_SETFOCUS:
 		{
 			HWND const hwnd = reinterpret_cast<HWND>(lParam);
-			TRACE_MSG(LL_DEBUG, CTX_BB, " taskhook focus wnd=0x%08x", hwnd);
+			TRACE_MSG(LL_VERBOSE, CTX_BB, " taskhook focus wnd=0x%08x", hwnd);
 			break;
 		}
 // 		case HCBT_MINMAX:
