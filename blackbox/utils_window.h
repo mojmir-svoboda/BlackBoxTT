@@ -303,4 +303,18 @@ inline BOOL CALLBACK MonitorEnumProc (HMONITOR hMonitor, HDC hdcMonitor, LPRECT 
 	return true;
 }
 
+inline bool createRoundedRect (HWND hwnd, int r, int b, int rnd, int cimmermann_correction_constant)
+{
+	HRGN hrgn = ::CreateRoundRectRgn(0, 0, r, b, rnd + cimmermann_correction_constant, rnd + cimmermann_correction_constant);
+	::SetWindowRgn(hwnd, hrgn, TRUE);
+	::SetPropW(hwnd, L"region", hrgn);
+	return true;
+}
+inline bool destroyRoundedRect (HWND hwnd)
+{
+	::DeleteObject(::GetPropW(hwnd, L"region"));
+	::RemovePropW(hwnd, L"region");
+	return true;
+}
+
 }

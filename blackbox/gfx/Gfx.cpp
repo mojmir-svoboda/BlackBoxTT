@@ -87,13 +87,8 @@ namespace bb {
 		ImGuiStyle & style = ImGui::GetStyle();
 		RECT rect;
 		::GetClientRect(hwnd, &rect);
-		int const cst = style.WindowRounding; // Cimrmanova opravna cst
-		HRGN hrgn = ::CreateRoundRectRgn(0, 0, rect.right, rect.bottom, style.WindowRounding + cst, style.WindowRounding + cst);
-		::SetWindowRgn(hwnd, hrgn, TRUE);
-		::SetPropW(hwnd, L"region", hrgn);
-		//@TODO on destroy
-		//DeleteObject(GetProp(hWnd, "region"));
-		//RemoveProp(hWnd, "region")
+		int const cst = style.WindowRounding; // dumb correction
+		createRoundedRect(hwnd, rect.right, rect.bottom, style.WindowRounding, cst);
 
 		::ShowWindow(hwnd, show ? SW_SHOW : SW_HIDE);
 		showInFromTaskBar(hwnd, false);
