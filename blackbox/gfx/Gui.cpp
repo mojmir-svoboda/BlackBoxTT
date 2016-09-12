@@ -16,8 +16,16 @@ namespace bb
 		if (m_dx11->m_pd3dDevice != NULL)
 		{
 			ReleaseDeviceObjects();
+			if (m_gfxWindow->m_view)
+			{
+				m_gfxWindow->m_view->Release();
+				m_gfxWindow->m_view = nullptr;
+			}
+			m_dx11->m_pd3dDeviceContext->OMSetRenderTargets(0, nullptr, nullptr);
+			if (!SUCCEEDED(m_gfxWindow->m_chain->ResizeBuffers(0, w, h, DXGI_FORMAT_UNKNOWN, 0)))
+			{
+			}
 
-			m_gfxWindow->m_chain->ResizeBuffers(0, w, h, DXGI_FORMAT_UNKNOWN, 0);
 			m_gfxWindow->m_view = m_dx11->CreateRenderTarget(m_gfxWindow->m_chain);
 
 			CreateDeviceObjects();
