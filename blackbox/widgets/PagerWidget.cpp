@@ -3,6 +3,7 @@
 #include <blackbox/gfx/utils_imgui.h>
 #include <bblib/codecvt.h>
 #include <imgui/imgui_internal.h>
+#include <blackbox/utils_window.h>
 
 namespace bb {
 
@@ -26,7 +27,10 @@ namespace bb {
 		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiSetCond_Always);
 
 		ImVec2 const & display = ImGui::GetIO().DisplaySize;
-		ImGui::SetNextWindowSize(display, ImGuiSetCond_Always);
+		//ImGui::SetNextWindowSize(display, ImGuiSetCond_Always);
+
+		ImVec2 const sz0 = ImGui::GetWindowSize();
+
 		char name[256];
 		codecvt_utf16_utf8(GetNameW(), name, 256);
 		ImGui::Begin(name, &m_config.m_show, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);
@@ -126,7 +130,29 @@ namespace bb {
 				}
 			}
 		}
+		ImGuiWindow * w = ImGui::GetCurrentWindowRead();
+		ImVec2 const & sz1 = w->SizeContents;
+
 		ImGui::End();
+
+		ImGuiStyle & style = ImGui::GetStyle();
+		if (sz1.x > style.WindowMinSize.x && sz1.y > style.WindowMinSize.y)
+		{
+			RECT r;
+			GetWindowRect(m_hwnd, &r);
+			int Width = r.left = r.right;
+			int Height = r.bottom - r.top;
+
+			DWORD dwStyle = ::GetWindowLongPtr(m_hwnd, GWL_STYLE);
+			DWORD dwExStyle = ::GetWindowLongPtr(m_hwnd, GWL_EXSTYLE);
+
+			RECT rc = { 0, 0, sz1.x, sz1.y };
+			//::AdjustWindowRectEx(&rc, dwStyle, FALSE, dwExStyle);
+
+			destroyRoundedRect(m_hwnd);
+			::SetWindowPos(m_hwnd, NULL, 0, 0, rc.right + 32, rc.bottom, SWP_NOZORDER | SWP_NOMOVE);
+			createRoundedRect(m_hwnd, rc.right + 32, rc.bottom, style.WindowRounding, style.WindowRounding);
+		}
 	}
 
 }
