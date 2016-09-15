@@ -150,8 +150,8 @@ namespace bb {
 			//::AdjustWindowRectEx(&rc, dwStyle, FALSE, dwExStyle);
 
 			destroyRoundedRect(m_hwnd);
-			::SetWindowPos(m_hwnd, NULL, 0, 0, rc.right + 32, rc.bottom, SWP_NOZORDER | SWP_NOMOVE);
-			createRoundedRect(m_hwnd, rc.right + 32, rc.bottom, style.WindowRounding, style.WindowRounding);
+			::SetWindowPos(m_hwnd, NULL, 0, 0, rc.right + 24, rc.bottom, SWP_NOZORDER | SWP_NOMOVE);
+			createRoundedRect(m_hwnd, rc.right + 24, rc.bottom, style.WindowRounding, style.WindowRounding);
 		}
 	}
 
