@@ -1,7 +1,7 @@
 project(client)
 cmake_minimum_required(VERSION 2.8)
 
-find_package (DbgT00lkit REQUIRED)
+find_package (DbgToolkit REQUIRED)
 find_package (Threads)
 
 #include_directories(..)

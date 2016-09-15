@@ -15,24 +15,28 @@
 #include <NativeInteger.h>
 #include <asn_SEQUENCE_OF.h>
 #include <constr_SEQUENCE_OF.h>
+#include <OCTET_STRING.h>
 #include <constr_SEQUENCE.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* Forward declarations */
-struct DictPair;
-
 /* DictionaryMsg */
 typedef struct DictionaryMsg {
 	int64_t	 type;
-	struct dict {
-		A_SEQUENCE_OF(struct DictPair) list;
+	struct value {
+		A_SEQUENCE_OF(int64_t) list;
 		
 		/* Context for parsing across buffer boundaries */
 		asn_struct_ctx_t _asn_ctx;
-	} dict;
+	} value;
+	struct name {
+		A_SEQUENCE_OF(OCTET_STRING_t) list;
+		
+		/* Context for parsing across buffer boundaries */
+		asn_struct_ctx_t _asn_ctx;
+	} name;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;
@@ -44,9 +48,6 @@ extern asn_TYPE_descriptor_t asn_DEF_DictionaryMsg;
 #ifdef __cplusplus
 }
 #endif
-
-/* Referred external types */
-#include "DictPair.h"
 
 #endif	/* _DictionaryMsg_H_ */
 #include <asn_internal.h>

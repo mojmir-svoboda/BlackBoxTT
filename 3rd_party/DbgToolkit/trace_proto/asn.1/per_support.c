@@ -343,7 +343,7 @@ per_put_few_bits(Allocator * allocator, asn_per_outp_t *po, uint32_t bits, int o
 	 * Flush whole-bytes output, if necessary.
 	 */
 	if(po->nboff + obits > po->nbits) {
-		int complete_bytes = (po->buffer - po->tmpspace);
+		size_t complete_bytes = (po->buffer - po->tmpspace);
 		ASN_DEBUG("[PER output %ld complete + %ld]",
 			(long)complete_bytes, (long)po->flushed_bytes);
 		if(po->outper(allocator, po->tmpspace, complete_bytes, po->op_key) < 0)

@@ -5,7 +5,6 @@
 #include <sysfn/time_query.h>
 #include <trace_proto/encoder.h>
 #include <trace_proto/header.h>
-#include <trace_proto/dictionary.h>
 #include <trace_proto/encode_config.h>
 #include <trace_proto/encode_log.h>
 #include <trace_proto/encode_dictionary.h>
@@ -26,8 +25,14 @@
 			std::string  m_hostName;
 			std::string  m_hostPort;
 			mixervalues_t m_mixer;
-			std::vector<DictionaryPair> m_levelDict;
-			std::vector<DictionaryPair> m_ctxDict;
+			using level_values_t = std::vector<level_t>;
+			using level_names_t = std::vector<char const *>;
+			level_values_t m_levelValuesDict;
+			level_names_t m_levelNamesDict;
+			using context_values_t = std::vector<context_t>;
+			using context_names_t = std::vector<char const *>;
+			context_values_t m_contextValuesDict;
+			context_names_t m_contextNamesDict;
 
 			ClientConfig ()
 				: m_appName("trace_client")
@@ -54,7 +59,7 @@
 			for (unsigned b = 0; ctx; ++b, ctx >>= 1)
 			{
 				if (ctx & 1)
-					g_Config.m_mixer[b] |= level;
+					g_Config.m_mixer[b] = level;
 			}
 		}
 		level_t GetRuntimeLevelForContext (context_t ctx)
@@ -66,49 +71,43 @@
 			}
 			return 0;
 		}
-
-		bool RuntimeFilterPredicate (level_t level, context_t context)
-		{
-			for (unsigned b = 0; context; ++b, context >>= 1)
-			{
-				if (context & 1)
-				{
-					context_t const curr_level_in_ctx = g_Config.m_mixer[b];
-					if (level & curr_level_in_ctx)
-						return true;
-				}
-			}
-			return false;
-		}
-
 		level_t * GetRuntimeCfgData () { return g_Config.m_mixer.data(); }
 		size_t GetRuntimeCfgSize () { return g_Config.m_mixer.size(); }
 
 		void SetRuntimeBuffering (bool buffered) { g_Config.m_buffered = buffered; }
 		bool GetRuntimeBuffering () { return g_Config.m_buffered; }
-		void SetLevelDictionary (DictionaryPair const * pairs, size_t sz)
+		void SetLevelDictionary (level_t const * values, char const * names[], size_t sz)
 		{
-			std::vector<DictionaryPair> tmp(pairs, pairs + sz);
-			g_Config.m_levelDict = std::move(tmp);
+			ClientConfig::level_values_t tmp_values(values, values + sz);
+			g_Config.m_levelValuesDict = std::move(tmp_values);
+			ClientConfig::level_names_t tmp_names(names, names + sz);
+			g_Config.m_levelNamesDict = std::move(tmp_names);
 		}
-		void SetContextDictionary (DictionaryPair const * pairs, size_t sz)
+		void SetContextDictionary (context_t const * values, char const * names[], size_t sz)
 		{
-			std::vector<DictionaryPair> tmp(pairs, pairs + sz);
-			g_Config.m_ctxDict = std::move(tmp);
+			ClientConfig::context_values_t tmp_values(values, values + sz);
+			g_Config.m_contextValuesDict = std::move(tmp_values);
+			ClientConfig::context_names_t tmp_names(names, names + sz);
+			g_Config.m_contextNamesDict = std::move(tmp_names);
 		}
 	
 		namespace socks {
 			bool WriteToSocket (char const * buff, size_t ln);
 		}
 
-		void SendDictionary (int type, DictionaryPair const * dict_ptr, size_t dict_sz)
+		template<typename T>
+		void SendDictionary (int type, T const * values, char const * names[], size_t dict_sz)
 		{
 			// send config message
 			enum : size_t { max_msg_size = 8192 };
 			char msg[max_msg_size];
 			asn1::Header & hdr = asn1::encode_header(msg, max_msg_size);
-			asn1::DictPair const * const asn1_dict_ptr = reinterpret_cast<asn1::DictPair const *>(dict_ptr); // cast between layout compatible classes
-			if (const size_t n = asn1::encode_dictionary(msg + sizeof(asn1::Header), max_msg_size - sizeof(asn1::Header), type, asn1_dict_ptr, dict_sz))
+
+			int64_t * const asn1_values = reinterpret_cast<int64_t *>(alloca(dict_sz * sizeof(int64_t)));
+			for (size_t i = 0; i < dict_sz; ++i)
+				asn1_values[i] = values[i];
+
+			if (const size_t n = asn1::encode_dictionary(msg + sizeof(asn1::Header), max_msg_size - sizeof(asn1::Header), type, asn1_values, names, dict_sz))
 			{
 				hdr.m_len = n;
 				socks::WriteToSocket(msg, n + sizeof(asn1::Header));
@@ -130,10 +129,10 @@
 				socks::WriteToSocket(msg, n + sizeof(asn1::Header));
 			}
 
-			if (size_t n = g_Config.m_levelDict.size())
-				SendDictionary(0, &g_Config.m_levelDict[0], n);
-			if (size_t n = g_Config.m_ctxDict.size())
-				SendDictionary(1, &g_Config.m_ctxDict[0], n);
+			if (size_t n = g_Config.m_levelValuesDict.size())
+				SendDictionary(0, &g_Config.m_levelValuesDict[0], &g_Config.m_levelNamesDict[0], n);
+			if (size_t n = g_Config.m_contextValuesDict.size())
+				SendDictionary(1, &g_Config.m_contextValuesDict[0], &g_Config.m_contextNamesDict[0], n);
 		}
 
 		// on config received (from server) callback

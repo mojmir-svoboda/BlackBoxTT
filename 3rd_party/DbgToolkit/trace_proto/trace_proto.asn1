@@ -23,12 +23,8 @@ ConfigMsg ::= SEQUENCE {
 
 DictionaryMsg ::= SEQUENCE {
 	type   INTEGER (0..127),
-	dict   SEQUENCE OF DictPair
-}
-
-DictPair ::= SEQUENCE {
-	value  INTEGER,
-	name   OCTET STRING
+	value  SEQUENCE OF INTEGER,
+	name   SEQUENCE OF OCTET STRING
 }
 
 LogMsg ::= SEQUENCE {

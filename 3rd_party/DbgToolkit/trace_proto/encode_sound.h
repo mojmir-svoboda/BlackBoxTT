@@ -1,6 +1,6 @@
 #pragma once
 #include "encoder.h"
-#include <trace_proto/asn.1/SoundMsg.h>
+#include <SoundMsg.h>
 #include <sysfn/os.h>
 
 namespace asn1 {
