@@ -12,11 +12,6 @@ find_package (Threads)
 #   endif(${flag_var} MATCHES "/MD")
 #endforeach(flag_var)
 
-set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR})
-#set(CMAKE_INSTALL_PREFIX "c:/log_devel")
-
-message ("Current src dir: ${CMAKE_CURRENT_SOURCE_DIR}")
-
 if(OPTION_BUILD_SHARED)
 	message("Build: shared")
 	add_definitions ("-DTRACE_DLL")
