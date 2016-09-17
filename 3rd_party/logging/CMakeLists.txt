@@ -60,8 +60,14 @@ else(OPTION_BUILD_SHARED)
 	add_library (logging STATIC ${TRACE_FILES} ${files})
 endif(OPTION_BUILD_SHARED)
 
-
 set_source_files_properties(${files} PROPERTIES LANGUAGE CXX)
 
 install (TARGETS logging LIBRARY DESTINATION lib  ARCHIVE DESTINATION lib RUNTIME DESTINATION bin)
+
+if(MSVC)
+	install(FILES ${PROJECT_BINARY_DIR}/Debug/logging.pdb
+		DESTINATION bin
+		CONFIGURATIONS Debug
+		)
+endif(MSVC)
 
