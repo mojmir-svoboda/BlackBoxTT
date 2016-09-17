@@ -13,7 +13,7 @@ namespace bb {
 
 	bool Explorer::Init ()
 	{
-		TRACE_MSG(LL_INFO, CTX_BB | CTX_EXPLORER | CTX_INIT, "Initializing explorer");
+		TRACE_MSG(LL_INFO, CTX_BB | CTX_INIT, "Initializing explorer");
 		HRESULT hr = ::SHGetMalloc(&m_allocator);
 
 		if (::SHGetDesktopFolder(&m_shell) != NO_ERROR)
@@ -27,7 +27,7 @@ namespace bb {
 
 	bool Explorer::Done ()
 	{
-		TRACE_MSG(LL_INFO, CTX_BB | CTX_EXPLORER, "Terminating explorer");
+		TRACE_MSG(LL_INFO, CTX_BB, "Terminating explorer");
 		m_shell->Release();
 		m_allocator->Release();
 		return true;
@@ -89,7 +89,7 @@ namespace bb {
 					bbstring name(tmp_name);
 					if (hr_ico == E_PENDING)
 					{
-						TRACE_MSG(LL_ERROR, CTX_INIT | CTX_EXPLORER, "PENDING! %ws icofile=%ws idx=%i", tmp_name, icofile, idx);
+						TRACE_MSG(LL_ERROR, CTX_BB | CTX_INIT, "PENDING! %ws icofile=%ws idx=%i", tmp_name, icofile, idx);
 					}
 					else
 					{

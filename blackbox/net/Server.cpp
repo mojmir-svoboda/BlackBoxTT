@@ -30,7 +30,7 @@ namespace bb {
 		{
 			auto fn = [this] (std::error_code ec, asio::ip::tcp::socket socket)
 			{
-				TRACE_MSG(LL_DEBUG, CTX_BB | CTX_NET, "Server worker got connection");
+				TRACE_MSG(LL_VERBOSE, CTX_BB | CTX_NET, "Server worker got connection");
 				if (!ec)
 				{
 					std::make_shared<Session>(m_server, m_io, std::move(socket))->Start();

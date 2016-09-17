@@ -13,11 +13,9 @@ void initTrace (char const * appName, char const * addr, char const * port)
 	const trace::level_t errs = (1u << LL_ERROR) | (1u << LL_FATAL);
 	TRACE_SET_LEVEL(all_contexts, errs);
 	const trace::level_t normal_lvl = (1u << LL_INFO) | (1u << LL_WARNING);
-	TRACE_SET_LEVEL(CTX_DEFAULT | CTX_INIT, normal_lvl);
+	TRACE_SET_LEVEL(CTX_TASKS | CTX_WSPACE | CTX_INIT | CTX_NET | CTX_GFX, normal_lvl);
 	const trace::level_t all_lvl = (1u << LL_VERBOSE) | (1u << LL_DEBUG) | (1u << LL_INFO) | (1u << LL_WARNING) | (1u << LL_ERROR) | (1u << LL_FATAL);
 	TRACE_SET_LEVEL(CTX_BB, all_lvl);
-
-	//TRACE_SET_LEVEL(CTX_NET_MESSAGE | CTX_NETWORK, all_lvl);
 
 	trace::level_t lvl_dict_values[] = {
 		(1u << LL_VERBOSE),
@@ -40,44 +38,36 @@ void initTrace (char const * appName, char const * addr, char const * port)
 	TRACE_SET_LEVEL_DICTIONARY(lvl_dict_values, lvl_dict_names, sizeof(lvl_dict_values) / sizeof(*lvl_dict_values));
 
 	trace::context_t ctx_dict_values[] = {
-		CTX_DEFAULT 			,
-		CTX_INIT 					,
-		CTX_BB						,
-		CTX_GFX 					,
-		CTX_EXPLORER 			,
-		CTX_HOOK  				,
-		CTX_TRAY 					,
-		CTX_CONFIG				,
-		CTX_SCRIPT				,
-		CTX_STYLE					,
-		CTX_PROFILING 		,
-		CTX_SERIALIZE 		,
-		CTX_MEMORY 				,
-		CTX_RESOURCES			,
-		CTX_BBLIB					,
-		CTX_BBLIBCOMPAT		,
-		CTX_PLUGINMGR			,
-		CTX_PLUGIN
+		CTX_INIT,
+		CTX_BB,
+		CTX_TASKS,
+		CTX_WSPACE,
+		CTX_NET,
+		CTX_GFX,
+		CTX_BBLIB,
+		CTX_BBLIBCOMPAT,
+		CTX_CONFIG,
+		CTX_SCRIPT,
+		CTX_BIND,
+		CTX_RESOURCES,
+		CTX_PLUGINMGR,
+		CTX_PLUGIN,
 	};
 	char const * ctx_dict_names[] = {
-		"dflt",
 		"Init",
 		"BB",
+		"Tasks",
+		"Wspace",
+		"Net",
 		"Gfx",
-		"Explr",
-		"Hook",
-		"Tray",
-		"Cfg",
-		"Script",
-		"Style",
-		"Prof",
-		"Ser",
-		"Memory",
-		"Rsrc",
 		"Lib",
 		"LibCompat",
-		"PlugMgr",
-		"Plug"
+		"Cfg",
+		"Script",
+		"Bind",
+		"Rsrcs",
+		"PluginMgr",
+		"Plugin"
 	};
 	static_assert(sizeof(ctx_dict_values) / sizeof(*ctx_dict_values) == sizeof(ctx_dict_names) / sizeof(*ctx_dict_names), "arrays do not match");
 	TRACE_SET_CONTEXT_DICTIONARY(ctx_dict_values, ctx_dict_names, sizeof(ctx_dict_values) / sizeof(*ctx_dict_values));
