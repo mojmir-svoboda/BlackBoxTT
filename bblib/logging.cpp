@@ -10,22 +10,21 @@ void initTrace (char const * appName, char const * addr, char const * port)
 	TRACE_SETBUFFERED(0);
 
 	const trace::context_t all_contexts = -1;
-	const trace::level_t errs = (1u << LL_ERROR) | (1u << LL_FATAL);
+	const trace::level_t errs = LL_ERROR | LL_FATAL;
 	TRACE_SET_LEVEL(all_contexts, errs);
-	const trace::level_t normal_lvl = (1u << LL_INFO) | (1u << LL_WARNING);
+	const trace::level_t normal_lvl = LL_INFO | LL_WARNING;
 	TRACE_SET_LEVEL(CTX_TASKS | CTX_WSPACE | CTX_INIT | CTX_NET | CTX_GFX, normal_lvl);
-	const trace::level_t all_lvl = (1u << LL_VERBOSE) | (1u << LL_DEBUG) | (1u << LL_INFO) | (1u << LL_WARNING) | (1u << LL_ERROR) | (1u << LL_FATAL);
+	const trace::level_t all_lvl = LL_VERBOSE | LL_DEBUG | LL_INFO | LL_WARNING | LL_ERROR | LL_FATAL;
 	TRACE_SET_LEVEL(CTX_BB, all_lvl);
 
 	trace::level_t lvl_dict_values[] = {
-		(1u << LL_VERBOSE),
-		(1u << LL_DEBUG),
-		(1u << LL_INFO),
-		(1u << LL_WARNING),
-		(1u << LL_ERROR),
-		(1u << LL_FATAL)
+		LL_VERBOSE,
+		LL_DEBUG,
+		LL_INFO,
+		LL_WARNING,
+		LL_ERROR,
+		LL_FATAL
 	};
-	static_assert(sizeof(lvl_dict_values) / sizeof(*lvl_dict_values) == e_max_trace_level, "array do not match enum");
 	char const * lvl_dict_names[] = {
 		"vrbs",
 		"dbg",
@@ -34,7 +33,7 @@ void initTrace (char const * appName, char const * addr, char const * port)
 		"ERROR",
 		"FATAL"
 	};
-	static_assert(sizeof(lvl_dict_names) / sizeof(*lvl_dict_names) == e_max_trace_level, "array do not match enum");
+	static_assert(sizeof(lvl_dict_names) / sizeof(*lvl_dict_names) == sizeof(lvl_dict_values) / sizeof(*lvl_dict_values), "arrays do not match");
 	TRACE_SET_LEVEL_DICTIONARY(lvl_dict_values, lvl_dict_names, sizeof(lvl_dict_values) / sizeof(*lvl_dict_values));
 
 	trace::context_t ctx_dict_values[] = {
