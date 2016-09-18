@@ -41,7 +41,7 @@ int found_last_value ()
 bool set_translate_065 (int f)
 {
     bool const r = g_rc->translate_065;
-    g_rc->translate_065 = f;
+    g_rc->translate_065 = f != 0;
     return r;
 }
 

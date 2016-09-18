@@ -256,7 +256,7 @@ bool Tasks::AddTask (HWND hwnd)
 		bbstring const * current_ws = m_wspaces.GetCurrentVertexId();
 		bool const same_ws = *current_ws == ti_ptr->m_wspace;
 		bool const is_current_ws =	same_ws || is_sticky;
-		TRACE_MSG(LL_DEBUG, CTX_BB, "+++ %ws e=%i i=%i", cap.c_str(), (ti_ptr->m_config ? ti_ptr->m_config->m_bbtasks : '0'), (ti_ptr->m_config ? ti_ptr->m_config->m_taskman : '0'));
+		TRACE_MSG(LL_DEBUG, CTX_BB, "+++ hwnd=0x%x %ws e=%i i=%i", ti_ptr->m_hwnd, cap.c_str(), (ti_ptr->m_config ? ti_ptr->m_config->m_bbtasks : '0'), (ti_ptr->m_config ? ti_ptr->m_config->m_taskman : '0'));
 
 		if (is_current_ws)
 		{

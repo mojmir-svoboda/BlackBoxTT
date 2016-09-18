@@ -98,7 +98,7 @@ protected:
 					size_t index = m_props[result_triple[i].value].m_indices[j];
 					//if (m_)
 					//tstring const & val = 
-					wprintf(TEXT("%s: prefix found, [%d/%d] file_index=%i\n"), str.c_str(), n, i, index);
+					wprintf(TEXT("%s: prefix found, [%d/%d] file_index=%i\n"), str.c_str(), static_cast<int>(n), static_cast<int>(i), static_cast<int>(index));
 					on_match(m_props[result_triple[i].value].m_rcfiles[j], index);
 				}
 			}
