@@ -1,6 +1,15 @@
 cmake_minimum_required (VERSION 3.0)
 project (s7)
 
+#if(MSVC)
+  # Force to always compile with /W2
+  if(CMAKE_C_FLAGS MATCHES "/W[0-4]")
+    string(REGEX REPLACE "/W[0-4]" "/W0" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+  else()
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W0")
+  endif()
+#endif()
+
 add_library (s7 STATIC
   s7.c
   s7.h)
