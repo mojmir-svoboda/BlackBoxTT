@@ -33,6 +33,7 @@ namespace YAML {
 			}
 			catch (std::exception const & e)
 			{
+				TRACE_MSG(LL_ERROR, CTX_CONFIG, "YAML exception in source %s: %s", __FILE__, e.what());
 				return false;
 			}
 			return true;
@@ -60,12 +61,14 @@ namespace bb {
 					bb::PluginConfig cfg = y_cfg[i].as<bb::PluginConfig>();
 					config.m_plugins.push_back(cfg);
 				}
+				return true;
 			}
 		}
 		catch (std::exception & e)
 		{
 			return false;
 		}
+		return false;
 	}
 
 }

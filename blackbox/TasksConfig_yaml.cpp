@@ -35,11 +35,12 @@ namespace YAML {
 			}
 			catch (std::regex_error const & e)
 			{
-				//err.what();
+				TRACE_MSG(LL_ERROR, CTX_CONFIG, "regexp exception in source %s: %s", __FILE__, e.what());
 				return false;
 			}
 			catch (std::exception const & e)
 			{
+				TRACE_MSG(LL_ERROR, CTX_CONFIG, "YAML exception in source %s: %s", __FILE__, e.what());
 				return false;
 			}
 			return true;
@@ -81,6 +82,7 @@ namespace bb {
 		}
 		catch (std::exception & e)
 		{
+			TRACE_MSG(LL_ERROR, CTX_CONFIG, "YAML exception in source %s: %s", __FILE__, e.what());
 			return false;
 		}
 	}

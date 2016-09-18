@@ -2,6 +2,7 @@
 #include <yaml-cpp/yaml.h>
 #include <bbstring.h>
 #include <codecvt.h>
+#include <bblib/logging.h>
 
 namespace YAML {
 
@@ -18,6 +19,7 @@ namespace YAML {
 			}
 			catch (std::exception const & e)
 			{
+				TRACE_MSG(LL_ERROR, CTX_CONFIG, "YAML string encode exception: %s", e.what());
 				return node;
 			}
 			return node;
@@ -31,6 +33,7 @@ namespace YAML {
 			}
 			catch (std::exception const & e)
 			{
+				TRACE_MSG(LL_ERROR, CTX_CONFIG, "YAML string decode exception: %s", e.what());
 				return false;
 			}
 			return true;

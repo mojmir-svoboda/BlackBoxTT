@@ -73,12 +73,15 @@ namespace bb {
 					std::unique_ptr<WidgetConfig> tc(new WidgetConfig(tmp));
 					config.m_widgets.push_back(std::move(tc));
 				}
+				return true;
 			}
 		}
 		catch (std::exception & e)
 		{
+			TRACE_MSG(LL_ERROR, CTX_CONFIG, "YAML exception in source %s: %s", __FILE__, e.what());
 			return false;
 		}
+		return false;
 	}
 
 }

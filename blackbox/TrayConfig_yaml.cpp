@@ -33,9 +33,10 @@ namespace YAML {
 // 			}
 			catch (std::exception const & e)
 			{
+				TRACE_MSG(LL_ERROR, CTX_CONFIG, "YAML exception in source %s: %s", __FILE__, e.what());
 				return false;
 			}
-			return true;
+			return false;
 		}
 	};
 }
@@ -56,12 +57,15 @@ namespace bb {
 				for (int i = 0; i < n; ++i)
 				{
 				}
+				return true;
 			}
 		}
 		catch (std::exception & e)
 		{
+			TRACE_MSG(LL_ERROR, CTX_CONFIG, "YAML exception in source %s: %s", __FILE__, e.what());
 			return false;
 		}
+		return false;
 	}
 
 }
