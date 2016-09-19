@@ -62,13 +62,10 @@
 					g_Config.m_mixer[b] = level;
 			}
 		}
-		level_t GetRuntimeLevelForContext (context_t ctx)
+		level_t GetRuntimeLevelForContextBit (context_t b)
 		{
-			for (unsigned b = 0; ctx; ++b, ctx >>= 1)
-			{
-				if (ctx & 1)
-					return g_Config.m_mixer[b];
-			}
+			if (b < g_Config.m_mixer.size())
+				return g_Config.m_mixer[b];
 			return 0;
 		}
 		level_t * GetRuntimeCfgData () { return g_Config.m_mixer.data(); }

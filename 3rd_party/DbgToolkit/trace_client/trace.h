@@ -79,6 +79,14 @@
 #	include TRACE_CONTEXTS_INCLUDE
 #	endif
 
+/**	@macro		TRACE_ADAPT_LEVEL
+ *	@brief		provides mapping between level and bit representation (if different)
+ **/
+#	if !defined TRACE_ADAPT_LEVEL
+#		define TRACE_ADAPT_LEVEL(x) x
+#	endif
+
+
 /*****************************************************************************/
 /* Text logging macros                                                       */
 /*****************************************************************************/
@@ -87,33 +95,33 @@
  *	@brief		logging of the form TRACE_MSG(lvl, ctx, fmt, ...)
  **/
 #	define TRACE_MSG(level, context, fmt, ... )	\
-		trace::Write(static_cast<trace::level_t>(level), context, __FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__)
+		trace::Write(TRACE_ADAPT_LEVEL(static_cast<trace::level_t>(level)), context, __FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__)
 /**	@macro		TRACE_MSG_IF
  *	@brief		logging of the form TRACE_MSG_IF((foo == bar), lvl, ctx, fmt, ...)
  **/
 #	define TRACE_MSG_IF(condition, level, context, fmt, ... )	\
 		if (condition)	\
-			trace::Write(static_cast<trace::level_t>(level), context, __FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__)
+			trace::Write(TRACE_ADAPT_LEVEL(static_cast<trace::level_t>(level)), context, __FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__)
 
 /**	@macro		TRACE_MSG_VA
  *	@brief		logging of the form TRACE_MSG_VA(lvl, ctx, fmt, va_list)
  **/
 #	define TRACE_MSG_VA(level, context, fmt, vaargs)	\
-		trace::WriteVA(static_cast<trace::level_t>(level), context, __FILE__, __LINE__, __FUNCTION__, fmt, vaargs)
+		trace::WriteVA(TRACE_ADAPT_LEVEL(static_cast<trace::level_t>(level)), context, __FILE__, __LINE__, __FUNCTION__, fmt, vaargs)
 
 /**	@macro		TRACE_SCOPE_MSG
  *	@brief		logs "entry to" and "exit from" scope
  *	@param[in]	fmt			formatted message appended to the scope
  **/
 #	define TRACE_SCOPE_MSG(level, context, fmt, ...)	\
-		trace::ScopedLog TRACE_UNIQUE(entry_guard_)(static_cast<trace::level_t>(level), context, __FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__)
+		trace::ScopedLog TRACE_UNIQUE(entry_guard_)(TRACE_ADAPT_LEVEL(static_cast<trace::level_t>(level)), context, __FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__)
 
 /**	@macro		TRACE_SCOPE_MSG_IF
  *	@brief		logs "entry to" and "exit from" scope if condition is true
  *	@param[in]	fmt			formatted message appended to the scope
  **/
 #	define TRACE_SCOPE_MSG_IF(condition, level, context, fmt, ...)	\
-		trace::ScopedLog TRACE_UNIQUE(entry_guard_)(condition, static_cast<trace::level_t>(level), context, __FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__)
+		trace::ScopedLog TRACE_UNIQUE(entry_guard_)(condition, TRACE_ADAPT_LEVEL(static_cast<trace::level_t>(level)), context, __FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__)
 
 /**	@macro		TRACE_SCOPE
  *	@brief		logs "entry to" and "exit from" scope
@@ -138,19 +146,24 @@
 /**	@macro		TRACE_PLOT_XY
  *	@brief		logging of 2d xy data in the form of 2d plot
  **/
-#	define TRACE_PLOT_XY	trace::WritePlot
+#	define TRACE_PLOT_XY(level, context, x, y, fmt, ... ) \
+		trace::WritePlot(TRACE_ADAPT_LEVEL(static_cast<trace::level_t>(level)), context, x, y, fmt, __VA_ARGS__)
 /**	@macro		TRACE_PLOT_XY_MARKER
  *	@brief		place marker on 2d plot
  **/
-#	define TRACE_PLOT_XY_MARKER	trace::WritePlotMarker
+#	define TRACE_PLOT_XY_MARKER(level, context, x, y, fmt, ... ) \
+		trace::WritePlotMarker(TRACE_ADAPT_LEVEL(static_cast<trace::level_t>(level)), context, x, y, fmt, __VA_ARGS__)
 /**	@macro		TRACE_PLOT_XYZ
  *	@brief		logging of 3d xyz data
  **/
-#	define TRACE_PLOT_XYZ	trace::WritePlot
+#	define TRACE_PLOT_XYZ(level, context, x, y, z, fmt, ... ) \
+		trace::WritePlotXYZ(TRACE_ADAPT_LEVEL(static_cast<trace::level_t>(level)), context, x, y, fmt, __VA_ARGS__)
 /**	@macro		TRACE_PLOT_CLEAR
  *	@brief		clear curve data identified by "tag/curve" or clear all plot using "tag" only
  **/
-#	define TRACE_PLOT_CLEAR	trace::WritePlotClear
+#	define TRACE_PLOT_CLEAR	trace::WritePlotClear(level, context, fmt, ...)\
+		trace::WritePlotClear(TRACE_ADAPT_LEVEL(static_cast<trace::level_t>(level)), context, fmt, __VA_ARGS__)
+
 
 /*****************************************************************************/
 /* Table logging macros                                                      */
@@ -160,10 +173,10 @@
  *	@brief		logging of tabular data
  *	@see		trace::WriteTable
  **/
-#	define TRACE_TABLE          trace::WriteTable
-#	define TRACE_TABLE_HHEADER	trace::WriteTableSetHHeader
-#	define TRACE_TABLE_COLOR	trace::WriteTableSetColor
-#	define TRACE_TABLE_CLEAR	trace::WriteTableClear
+//#	define TRACE_TABLE          trace::WriteTable
+//#	define TRACE_TABLE_HHEADER	trace::WriteTableSetHHeader
+//#	define TRACE_TABLE_COLOR	trace::WriteTableSetColor
+//#	define TRACE_TABLE_CLEAR	trace::WriteTableClear
 
 
 /*****************************************************************************/
@@ -173,28 +186,32 @@
 /**	@macro		TRACE_GANTT_.*
  *	@brief		logging of the form TRACE_GANTT_MSG(lvl, ctx, fmt, ...)
  **/
-#	define TRACE_GANTT_BGN                  trace::WriteGanttBgn
-#	define TRACE_GANTT_END                  trace::WriteGanttEnd
+#	define TRACE_GANTT_BGN(level, context, fmt, ... ) \
+		trace::WriteGanttBgn(TRACE_ADAPT_LEVEL(static_cast<trace::level_t>(level)), context, fmt, __VA_ARGS__)
+#	define TRACE_GANTT_END(level, context, fmt, ... ) \
+		trace::WriteGanttEnd(TRACE_ADAPT_LEVEL(static_cast<trace::level_t>(level)), context, fmt, __VA_ARGS__)
 
-#	define TRACE_GANTT_FRAME_BGN            trace::WriteGanttFrameBgn
-#	define TRACE_GANTT_FRAME_END            trace::WriteGanttFrameEnd
-
+#	define TRACE_GANTT_FRAME_BGN(level, context, fmt, ... ) \
+		trace::WriteGanttFrameBgn(TRACE_ADAPT_LEVEL(static_cast<trace::level_t>(level)), context, fmt, __VA_ARGS__)
+#	define TRACE_GANTT_FRAME_END(level, context, fmt, ... ) \
+		trace::WriteGanttFrameEnd(TRACE_ADAPT_LEVEL(static_cast<trace::level_t>(level)), context, fmt, __VA_ARGS__)
 /**	@macro		TRACE_GANTT_MSG_VA
  *	@brief		traces event into gantt chart  of the form TRACE_GANTT_MSG_VA(lvl, ctx, fmt, va_list)
  **/
-#	define TRACE_GANTT_MSG_VA(fmt, vaargs)	trace::WriteGanttVA(fmt, vaargs);
-
+#	define TRACE_GANTT_MSG_VA(level, context, fmt, vaargs) \
+		trace::WriteGanttVA(TRACE_ADAPT_LEVEL(static_cast<trace::level_t>(level)), context, fmt, vaargs)
 /**	@macro		TRACE_GANTT_SCOPE
  *	@brief		traces event into gantt chart
  **/
-#	define TRACE_GANTT_SCOPE                trace::ScopedGantt TRACE_UNIQUE(profile_entry_guard_)
-
+#	define TRACE_GANTT_SCOPE(level, context, fmt, ... ) \
+		trace::ScopedGantt TRACE_UNIQUE(profile_entry_guard_)(TRACE_ADAPT_LEVEL(static_cast<trace::level_t>(level)), context, fmt, __VA_ARGS__)
 /**	@macro		TRACE_GANTT_FRAME_SCOPE
  *	@brief		traces frame into gantt chart
  **/
-#	define TRACE_GANTT_FRAME_SCOPE          trace::ScopedGanttFrame TRACE_UNIQUE(profile_entry_guard_)
-
-#	define TRACE_GANTT_CLEAR                trace::WriteGanttClear
+#	define TRACE_GANTT_FRAME_SCOPE(level, context, fmt, ... ) \
+		trace::ScopedGanttFrame TRACE_UNIQUE(profile_entry_guard_)(TRACE_ADAPT_LEVEL(static_cast<trace::level_t>(level)), context, fmt, __VA_ARGS__)
+#	define TRACE_GANTT_CLEAR(level, context, fmt, ... ) \
+	trace::WriteGanttClear(TRACE_ADAPT_LEVEL(static_cast<trace::level_t>(level)), context, fmt, __VA_ARGS__)
 
 /*****************************************************************************/
 /* Misc notification macros                                                  */
@@ -203,8 +220,8 @@
 /**	@macro		TRACE_SOUND.*
  *	@brief		logging of the form TRACE_SOUND(lvl, ctx, fmt, ...)
  **/
-#	define TRACE_SOUND                      trace::WriteSound
-
+#	define TRACE_SOUND(level, context, vol, loop, fmt, ... ) \
+		trace::WriteSound(TRACE_ADAPT_LEVEL(static_cast<trace::level_t>(level)), context, vol, loop, fmt, __VA_ARGS__)
 
 
 /*****************************************************************************/
@@ -286,7 +303,7 @@
 		 * @brief	adjusts run-time context of log message filtering
 		 **/
 		TRACE_API void SetRuntimeLevelForContext (context_t ctx, level_t level);
-		TRACE_API level_t GetRuntimeLevelForContext (context_t ctx);
+		TRACE_API level_t GetRuntimeLevelForContextBit (context_t ctx);
 
 		TRACE_API void SetLevelDictionary (level_t const * values, char const * names[], size_t sz);
 		TRACE_API void SetContextDictionary (context_t const * values, char const * names[], size_t sz);
@@ -310,8 +327,17 @@
 		 */
 		inline bool RuntimeFilterPredicate (level_t level, context_t context)
 		{
-			const context_t curr_level_in_ctx = GetRuntimeLevelForContext(context);
-			return (level & curr_level_in_ctx) != 0;
+			context_t ctx = context;
+			for (unsigned b = 0; ctx; ++b, ctx >>= 1)
+			{
+				if (ctx & 1)
+				{
+					const context_t curr_level_in_ctx = GetRuntimeLevelForContextBit(b);
+					if (curr_level_in_ctx & level)
+						return true;
+				}
+			}
+			return false;
 		}
 
 		/**@fn		Write to log
