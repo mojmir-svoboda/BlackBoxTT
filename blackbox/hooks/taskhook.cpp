@@ -27,8 +27,8 @@ TASKHOOK_API bool initTaskHook (HWND bb_hwnd, unsigned wm_taskhook)
 	_snwprintf(tmp, 128, L"%ws.dll", c_taskHookName);
 	HINSTANCE taskhook_hinst = ::GetModuleHandle(tmp);
 
-	//g_taskHook = ::SetWindowsHookEx(WH_SHELL, (HOOKPROC)taskManagerHookProc, taskhook_hinst, 0);
-	g_taskHook = ::SetWindowsHookEx(WH_CBT, (HOOKPROC)taskManagerHookProc, taskhook_hinst, 0);
+	g_taskHook = ::SetWindowsHookEx(WH_SHELL, (HOOKPROC)taskManagerHookProc, taskhook_hinst, 0);
+	//g_taskHook = ::SetWindowsHookEx(WH_CBT, (HOOKPROC)taskManagerHookProc, taskhook_hinst, 0);
 
 	if (!g_taskHook)
 	{
@@ -45,8 +45,8 @@ TASKHOOK_API bool initTaskHook32 (HWND bb_hwnd, unsigned wm_taskhook)
 	wchar_t tmp[128];
 	_snwprintf(tmp, 128, L"%ws.dll", c_taskHook32Name);
 	HINSTANCE taskhook_hinst = GetModuleHandle(tmp);
-	//g_taskHook = SetWindowsHookEx(WH_SHELL, (HOOKPROC)taskManagerHookProc, taskhook_hinst, 0);
-	g_taskHook = SetWindowsHookEx(WH_CBT, (HOOKPROC)taskManagerHookProc, taskhook_hinst, 0);
+	g_taskHook = SetWindowsHookEx(WH_SHELL, (HOOKPROC)taskManagerHookProc, taskhook_hinst, 0);
+	//g_taskHook = SetWindowsHookEx(WH_CBT, (HOOKPROC)taskManagerHookProc, taskhook_hinst, 0);
 
 	if (!g_taskHook)
 	{
