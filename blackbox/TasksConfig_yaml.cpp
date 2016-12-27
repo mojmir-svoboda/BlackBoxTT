@@ -79,6 +79,7 @@ namespace bb {
 					//					}
 				}
 			}
+			return true;
 		}
 		catch (std::exception & e)
 		{

@@ -25,6 +25,7 @@ namespace YAML {
 // 					rhs.m_ignored = node["ignored"].as<bool>();
 // 				if (node["sticky"])
 // 					rhs.m_sticky = node["sticky"].as<bool>();
+				return true;
 			}
 // 			catch (std::regex_error const & e)
 // 			{

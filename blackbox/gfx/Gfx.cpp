@@ -153,17 +153,19 @@ namespace bb {
 		data.SysMemSlicePitch = 0;
 		ID3D11Texture2D * texture = nullptr;
 		HRESULT hr = m_dx11->m_pd3dDevice->CreateTexture2D(&texdesc, &data, &texture);
+		if (SUCCEEDED(hr))
+		{
+			D3D11_SHADER_RESOURCE_VIEW_DESC viewdesc;
+			memset(&viewdesc, 0, sizeof(viewdesc));
+			viewdesc.Format = texdesc.Format;
+			viewdesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+			viewdesc.Texture2D.MipLevels = 0;
+			viewdesc.Texture2D.MostDetailedMip = texdesc.MipLevels;
 
-		D3D11_SHADER_RESOURCE_VIEW_DESC viewdesc;
-		memset(&viewdesc, 0, sizeof(viewdesc));
-		viewdesc.Format = texdesc.Format;
-		viewdesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-		viewdesc.Texture2D.MipLevels = 0;
-		viewdesc.Texture2D.MostDetailedMip = texdesc.MipLevels;
+			HRESULT hr_view = m_dx11->m_pd3dDevice->CreateShaderResourceView(texture, nullptr, &texview);
 
-		HRESULT hr_view = m_dx11->m_pd3dDevice->CreateShaderResourceView(texture, nullptr, &texview);
-
-		texture->Release();
+			texture->Release();
+		}
 		return texview;
 	}
 

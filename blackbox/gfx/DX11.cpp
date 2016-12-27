@@ -95,7 +95,10 @@ namespace bb {
 		const D3D_FEATURE_LEVEL featureLevelArray[1] = { D3D_FEATURE_LEVEL_11_1 };
 		D3D_DRIVER_TYPE md3dDriverType = D3D_DRIVER_TYPE_HARDWARE;
 		UINT createDeviceFlags = 0;
-		//createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
+#if defined(_DEBUG)
+		// If the project is in a debug build, enable the debug layer.
+		createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
+#endif
 		createDeviceFlags |= D3D11_CREATE_DEVICE_BGRA_SUPPORT; // enable render on surfaces via d2d
 		HRESULT hr = D3D11CreateDevice( nullptr, md3dDriverType, nullptr, createDeviceFlags, nullptr, 0,
 				D3D11_SDK_VERSION, &m_pd3dDevice, &featureLevel, &m_pd3dDeviceContext);
