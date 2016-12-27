@@ -7,6 +7,7 @@ namespace bb {
 	struct PagerWidget : GuiWidget
 	{
 		bool m_horizontal;
+		ImVec2 m_contentSize { 0 , 0 };
 		std::vector<TaskInfo> m_tasks;
 
 		PagerWidget (WidgetConfig & cfg);
