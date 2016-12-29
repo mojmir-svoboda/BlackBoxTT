@@ -197,7 +197,7 @@ namespace bb {
 		if (it != m_slabs.end())
 		{
 			IconSlabs const * const slabs = it->second;
-			if (id.m_index < slabs->m_slabs.size())
+			if (id.m_slab < slabs->m_slabs.size())
 			{
 				IconSlab const & slab = slabs->m_slabs[id.m_slab];
 				icon_slab = &slab;
