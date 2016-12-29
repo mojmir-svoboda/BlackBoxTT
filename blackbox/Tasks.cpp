@@ -29,9 +29,7 @@ bool Tasks::Init (TasksConfig & config)
 {
 	TRACE_SCOPE(LL_INFO, CTX_BB | CTX_INIT);
 	m_config = &config;
-	m_tasks[TaskState::e_Active].reserve(128);
-	m_tasks[TaskState::e_TaskManIgnored].reserve(32);
-	m_tasks[TaskState::e_OtherWS].reserve(128);
+	m_tasks.reserve(128);
 
 	Update();
 	return true;
@@ -40,49 +38,43 @@ bool Tasks::Init (TasksConfig & config)
 bool Tasks::Done ()
 {
 	TRACE_MSG(LL_INFO, CTX_BB, "Terminating tasks");
-	m_tasks[TaskState::e_Active].clear();
-	m_tasks[TaskState::e_TaskManIgnored].clear();
-	m_tasks[TaskState::e_OtherWS].clear();
+	m_tasks.clear();
 	return true;
 }
 
-void Tasks::MkDataCopy (TaskState ts, std::vector<TaskInfo> & p)
+void Tasks::MkDataCopy (std::vector<TaskInfo> & p)
 {
 	m_lock.Lock();
 
-	for (TaskInfoPtr & t : m_tasks[ts])
+	for (TaskInfoPtr & t : m_tasks)
 		if (t)
 			p.emplace_back(*t.get());
 
 	m_lock.Unlock();
 }
 
-bool Tasks::FindTask (HWND hwnd, TaskState & state, size_t & idx)
+bool Tasks::FindTask (HWND hwnd, size_t & idx)
 {
-	return static_cast<Tasks const &>(*this).FindTask(hwnd, state, idx);
+	return static_cast<Tasks const &>(*this).FindTask(hwnd, idx);
 }
-bool Tasks::FindTask (HWND hwnd, TaskState & state, size_t & idx) const
+bool Tasks::FindTask (HWND hwnd, size_t & idx) const
 {
-	for (size_t s = 0; s < m_tasks.size(); ++s)
-		for (size_t i = 0, ie = m_tasks[s].size(); i < ie; ++i)
-			if (m_tasks[s][i] && m_tasks[s][i]->m_hwnd == hwnd)
-			{
-				state = static_cast<TaskState>(s);
-				idx = i;
-				return true;
-			}
-	state = max_enum_value;
+	for (size_t i = 0; i < m_tasks.size(); ++i)
+		if (m_tasks[i] && m_tasks[i]->m_hwnd == hwnd)
+		{
+			idx = i;
+			return true;
+		}
 	idx = c_invalidIndex;
 	return false;
 }
 
 bool Tasks::RmTask (HWND hwnd)
 {
-	TaskState ts = TaskState::max_enum_value;
 	size_t idx = c_invalidIndex;
-	if (FindTask(hwnd, ts, idx))
+	if (FindTask(hwnd, idx))
 	{
-		TaskInfoPtr & ti_ptr = m_tasks[ts][idx];
+		TaskInfoPtr & ti_ptr = m_tasks[idx];
 		if (ti_ptr)
 		{
 			TRACE_MSG(LL_DEBUG, CTX_BB, "--- %ws", ti_ptr->m_caption);
@@ -90,8 +82,7 @@ bool Tasks::RmTask (HWND hwnd)
 			{
 				m_active = nullptr;
 			}
-			if (ts == e_Active)
-				m_tasks[ts].erase(m_tasks[ts].begin() + idx);
+			m_tasks.erase(m_tasks.begin() + idx);
 			return true;
 		}
 	}
@@ -109,10 +100,9 @@ void Tasks::AddTaskInfo (TaskInfo * ti)
 
 	if (!ti->m_icoSmall.IsValid())
 	{
-		wchar_t tmp[512];
-		if (size_t const n = getAppByWindow(ti->m_hwnd, tmp, 512))
+		if (size_t const n = getAppByWindow(ti->m_hwnd, ti->m_appName, TaskInfo::e_appNameLenMax))
 		{
-			bbstring name(tmp);
+			bbstring name(ti->m_appName);
 
 			IconId id;
 			if (BlackBox::Instance().GetGfx().FindIconInCache(name, id))
@@ -153,11 +143,10 @@ void Tasks::AddTaskInfo (TaskInfo * ti)
 
 bool Tasks::AddWidgetTask (GfxWindow * w)
 {
-	TaskState ts = TaskState::max_enum_value;
 	size_t idx = c_invalidIndex;
-	if (FindTask(w->m_hwnd, ts, idx))
+	if (FindTask(w->m_hwnd, idx))
 	{
-		TaskInfoPtr & ti_ptr = m_tasks[ts][idx];
+		TaskInfoPtr & ti_ptr = m_tasks[idx];
 		if (ti_ptr->m_config)
 		{
 			// already exists
@@ -208,28 +197,12 @@ TaskConfig * Tasks::MakeTaskConfig (HWND hwnd)
 
 bool Tasks::AddTask (HWND hwnd)
 {
-	TaskState ts = TaskState::max_enum_value;
 	size_t idx = c_invalidIndex;
-	if (FindTask(hwnd, ts, idx))
+	if (FindTask(hwnd, idx))
 	{
-		TaskInfoPtr & ti_ptr = m_tasks[ts][idx];
+		TaskInfoPtr & ti_ptr = m_tasks[idx];
 		UpdateTaskInfoCaption(ti_ptr.get());
 
-//		if (ti_ptr->m_config && ti_ptr->m_config->m_sticky)
-//			ti_ptr->SetWorkSpace(current_ws->c_str());
-
-//		TaskState ts_new = e_Active;
-//		if (ti_ptr->m_config)
-//		{
-//			if (!ti_ptr->m_config->m_taskman)
-//				ts_new = e_TaskManIgnored;
-//			else if (!ti_ptr->m_config->m_bbtasks)
-//				ts_new = e_BBIgnored;
-//		}
-// 
-//		m_tasks[ts_new].push_back(std::move(ti_ptr));
-//		m_tasks[ts].erase(m_tasks[ts].begin() + idx);
-// 
 		return false;
 	}
 	else
@@ -260,18 +233,11 @@ bool Tasks::AddTask (HWND hwnd)
 
 		if (is_current_ws)
 		{
-			TaskState ts_new = e_Active;
-			if (ti_ptr->m_config)
-			{
-				if (!ti_ptr->m_config->m_taskman)
-					ts_new = e_TaskManIgnored;
-			}
-
-			m_tasks[ts_new].push_back(std::move(ti_ptr));
+			m_tasks.push_back(std::move(ti_ptr));
 		}
 		else
 		{
-			m_tasks[e_OtherWS].push_back(std::move(ti_ptr));
+			m_tasks.push_back(std::move(ti_ptr));
 			if (!m_wspaces.IsVertexVDM(vertex_id))
 				::ShowWindow(hwnd, SW_HIDE);
 		}
@@ -283,11 +249,6 @@ void Tasks::Update ()
 {
 	m_lock.Lock();
 
-	// clear empty unique_ptrs
-	for (size_t s = 0; s < m_tasks.size(); ++s)
-		m_tasks[s].erase(std::remove_if(m_tasks[s].begin(), m_tasks[s].end(),
-			[] (TaskInfoPtr const & ti_ptr) { return ti_ptr.get() == nullptr; }), m_tasks[s].end());
-
 	// @NOTE: this update probably costs some performance, but UWP apps do
 	// not trigger hook events when window created
 	// (and also triggers destroy hook too late)
@@ -295,34 +256,31 @@ void Tasks::Update ()
 	EnumWindows(taskEnumProc, (LPARAM)&m_taskEnumStorage);
 
 	for (size_t n = 0; n < m_taskEnumStorage.size(); ++n)
-	{
 		AddTask(m_taskEnumStorage[n]);
-	}
 
-	for (size_t s = 0; s < m_tasks.size(); ++s)
+	for (size_t i = 0, ie = m_tasks.size(); i < ie; ++i)
 	{
-		if (s == e_OtherWS)
-			continue; // do not delete tasks on other wspaces
-		if (s == e_TaskManIgnored)
-			continue; // do not delete ignored taskman tasks either
-
-		for (size_t i = 0, ie = m_tasks[s].size(); i < ie; ++i)
-			if (m_tasks[s][i])
-			{
-				bool found = false;
-				for (size_t n = 0; n < m_taskEnumStorage.size(); ++n)
-					if (m_tasks[s][i]->m_hwnd == m_taskEnumStorage[n])
-						found = true;
-				if (!found)
-					m_tasks[s][i].reset();
-			}
+		TaskInfoPtr & ti_ptr = m_tasks[i];
+		if (ti_ptr)
+		{
+			if (ti_ptr->IsTaskManIgnored())
+				continue;
+			bool found = false;
+			for (size_t n = 0; n < m_taskEnumStorage.size(); ++n)
+				if (m_tasks[i]->m_hwnd == m_taskEnumStorage[n])
+					found = true;
+			if (!found)
+				m_tasks[i].reset();
+		}
 	}
 
-	// @TOD:
-	for (size_t s = 0; s < m_tasks.size(); ++s)
-		for (size_t i = 0, ie = m_tasks[s].size(); i < ie; ++i)
-			if (m_tasks[s][i])
-				UpdateTaskInfoCaption(m_tasks[s][i].get());
+	// clear empty unique_ptrs
+	m_tasks.erase(std::remove_if(m_tasks.begin(), m_tasks.end(),
+			[] (TaskInfoPtr const & ti_ptr) { return ti_ptr.get() == nullptr; }), m_tasks.end());
+
+	for (size_t i = 0, ie = m_tasks.size(); i < ie; ++i)
+		if (m_tasks[i])
+			UpdateTaskInfoCaption(m_tasks[i].get());
 
 	m_lock.Unlock();
 }
@@ -364,11 +322,10 @@ void Tasks::OnHookWindowDestroyed (HWND hwnd)
 void Tasks::OnHookWindowActivated (HWND hwnd)
 {
 	m_lock.Lock();
-	TaskState ts = TaskState::max_enum_value;
 	size_t idx = c_invalidIndex;
-	if (FindTask(hwnd, ts, idx))
+	if (FindTask(hwnd, idx))
 	{
-		m_active = m_tasks[ts][idx].get();
+		m_active = m_tasks[idx].get();
 		TRACE_MSG(LL_DEBUG, CTX_BB, " *  %ws", m_active->m_caption);
 	}
 	m_lock.Unlock();
@@ -429,51 +386,29 @@ void Tasks::SwitchWorkSpace (bbstring const & src_vertex_id, bbstring const & ds
 
 	m_lock.Lock();
 
-	for (TaskInfoPtr & t : m_tasks[e_Active])
+	for (TaskInfoPtr & t : m_tasks)
+	{
 		if (t)
 		{
-			if (t->m_config && t->m_config->m_sticky)
+			if (t->IsSticky())
 				continue;
 
-			if (t->m_wspace != dst_vertex_id)
+			bool const on_future_ws = t->m_wspace == dst_vertex_id;
+
+			if (t->IsTaskManIgnored())
+			{
+				int const flag = on_future_ws ? SW_SHOW : SW_HIDE;
+				::ShowWindow(t->m_hwnd, flag); // @NOTE: taskman ignored windows are not handled by VDM when switching
+			}
+
+			if (!on_future_ws)
 			{
 				if (!dst_is_vdm)
 					::ShowWindow(t->m_hwnd, SW_HIDE);
-				m_tasks[e_OtherWS].push_back(std::move(t));
 				continue;
 			}
 		}
-
-	for (TaskInfoPtr & t : m_tasks[e_TaskManIgnored])
-		if (t)
-		{
-			if (t->m_config && t->m_config->m_sticky)
-				continue;
-
-			if (t->m_wspace != dst_vertex_id)
-			{
-				if (!dst_is_vdm || t->m_config && t->m_config->m_taskman == false)
-					::ShowWindow(t->m_hwnd, SW_HIDE);
-				m_tasks[e_OtherWS].push_back(std::move(t));
-				continue;
-			}
-		}
-
-	for (TaskInfoPtr & t : m_tasks[e_OtherWS])
-		if (t)
-		{
-			if (t->m_wspace == dst_vertex_id)
-			{
-				if (!dst_is_vdm)
-					::ShowWindow(t->m_hwnd, SW_SHOW);
-
-				if (t->m_config && t->m_config->m_taskman == false)
-					m_tasks[e_TaskManIgnored].push_back(std::move(t));
-				else
-					m_tasks[e_Active].push_back(std::move(t));
-				continue;
-			}
-		}
+	}
 
 	m_lock.Unlock();
 
@@ -481,69 +416,62 @@ void Tasks::SwitchWorkSpace (bbstring const & src_vertex_id, bbstring const & ds
 		m_wspaces.SwitchDesktop(dst_vertex_id);
 }
 
-void Tasks::SetTaskManIgnoredImpl (TaskState ts, size_t idx)
-	{
-		TaskInfoPtr & ti_ptr = m_tasks[ts][idx];
+void Tasks::SetTaskManIgnoredImpl (size_t idx)
+{
+	TaskInfoPtr & ti_ptr = m_tasks[idx];
 
-		showInFromTaskBar(ti_ptr->m_hwnd, false);
+	showInFromTaskBar(ti_ptr->m_hwnd, false);
 
-		if (nullptr == ti_ptr->m_config)
+	if (nullptr == ti_ptr->m_config)
 		ti_ptr->m_config = MakeTaskConfig(ti_ptr->m_hwnd);
 
-		ti_ptr->m_config->m_taskman = false;
+	ti_ptr->m_config->m_taskman = false;
 
-		TRACE_MSG(LL_DEBUG, CTX_BB, "make task ignored hwnd=%x", ti_ptr->m_hwnd);
-		if (ts != e_TaskManIgnored)
-			m_tasks[e_TaskManIgnored].push_back(std::move(ti_ptr));
-	}
+	TRACE_MSG(LL_DEBUG, CTX_BB, "make task ignored hwnd=%x", ti_ptr->m_hwnd);
+}
 
 void Tasks::SetTaskManIgnored (HWND hwnd)
 {
 	m_lock.Lock();
 
-	TaskState ts = TaskState::max_enum_value;
 	size_t idx = c_invalidIndex;
-	if (FindTask(hwnd, ts, idx))
-		SetTaskManIgnoredImpl(ts, idx);
+	if (FindTask(hwnd, idx))
+		SetTaskManIgnoredImpl(idx);
 
 	m_lock.Unlock();
 }
 
-void Tasks::UnsetTaskManIgnoredImpl (TaskState ts, size_t idx)
+void Tasks::UnsetTaskManIgnoredImpl (size_t idx)
 {
-	TaskInfoPtr & ti_ptr = m_tasks[ts][idx];
+	TaskInfoPtr & ti_ptr = m_tasks[idx];
 	TRACE_MSG(LL_DEBUG, CTX_BB, "unset task ignored hwnd=%x", ti_ptr->m_hwnd);
 	showInFromTaskBar(ti_ptr->m_hwnd, true);
 	if (ti_ptr->m_config)
 		ti_ptr->m_config->m_taskman = true;
-
-	if (ts == e_TaskManIgnored)
-		m_tasks[e_Active].push_back(std::move(ti_ptr));
 }
 void Tasks::UnsetTaskManIgnored (HWND hwnd)
 {
 	m_lock.Lock();
 
-	TaskState ts = TaskState::max_enum_value;
 	size_t idx = c_invalidIndex;
-	if (FindTask(hwnd, ts, idx))
-		UnsetTaskManIgnoredImpl(ts, idx);
+	if (FindTask(hwnd, idx))
+		UnsetTaskManIgnoredImpl(idx);
 	
 	m_lock.Unlock();
 }
 
 void Tasks::ToggleTaskManIgnored (HWND hwnd)
-	{
+{
 	m_lock.Lock();
 
-	TaskState ts = TaskState::max_enum_value;
 	size_t idx = c_invalidIndex;
-	if (FindTask(hwnd, ts, idx))
-		{
-		if (ts == e_Active)
-			SetTaskManIgnoredImpl(ts, idx);
-		else if (ts == e_TaskManIgnored)
-			UnsetTaskManIgnoredImpl(ts, idx);
+	if (FindTask(hwnd, idx))
+	{
+		TaskInfoPtr & ti_ptr = m_tasks[idx];
+		if (!ti_ptr->IsTaskManIgnored())
+			SetTaskManIgnoredImpl(idx);
+		else
+			UnsetTaskManIgnoredImpl(idx);
 	}
 	
 	m_lock.Unlock();
@@ -594,19 +522,18 @@ void Tasks::SetBBTasksIgnored (HWND hwnd)
 {
 	m_lock.Lock();
 
-	TaskState ts = TaskState::max_enum_value;
-	size_t idx = c_invalidIndex;
-	if (FindTask(hwnd, ts, idx))
-	{
-		TaskInfoPtr & ti_ptr = m_tasks[ts][idx];
-
-		if (nullptr == ti_ptr->m_config)
-			ti_ptr->m_config = MakeTaskConfig(hwnd);
-
-		ti_ptr->m_config->m_bbtasks = false;
-
-		TRACE_MSG(LL_DEBUG, CTX_BB, "bbtasks ignores hwnd=%x", ti_ptr->m_hwnd);
-	}
+// 	size_t idx = c_invalidIndex;
+// 	if (FindTask(hwnd, idx))
+// 	{
+// 		TaskInfoPtr & ti_ptr = m_tasks[idx];
+// 
+// 		if (nullptr == ti_ptr->m_config)
+// 			ti_ptr->m_config = MakeTaskConfig(hwnd);
+// 
+// 		ti_ptr->m_config->m_bbtasks = false;
+// 
+// 		TRACE_MSG(LL_DEBUG, CTX_BB, "bbtasks ignores hwnd=%x", ti_ptr->m_hwnd);
+// 	}
 
 	m_lock.Unlock();
 }
@@ -650,11 +577,10 @@ bool Tasks::MoveWindowToVertex (HWND hwnd, bbstring const & vertex_id)
 	TRACE_MSG(LL_DEBUG, CTX_BB | CTX_WSPACE, "Move hwnd to vertex: %ws", vertex_id.c_str());
 
 	m_lock.Lock();
-	TaskState ts = TaskState::max_enum_value;
 	size_t idx = c_invalidIndex;
-	if (FindTask(hwnd, ts, idx))
+	if (FindTask(hwnd, idx))
 	{
-		TaskInfoPtr & ti_ptr = m_tasks[ts][idx];
+		TaskInfoPtr & ti_ptr = m_tasks[idx];
 		if (ti_ptr)
 		{
 			ti_ptr->SetWorkSpace(vertex_id.c_str());
@@ -666,18 +592,10 @@ bool Tasks::MoveWindowToVertex (HWND hwnd, bbstring const & vertex_id)
 
 			if (is_current_ws)
 			{
-				TaskState ts_new = e_Active;
-				if (ti_ptr->m_config)
-				{
-					if (!ti_ptr->m_config->m_taskman)
-						ts_new = e_TaskManIgnored;
-				}
-
-				m_tasks[ts_new].push_back(std::move(ti_ptr));
 			}
 			else
 			{
-				m_tasks[e_OtherWS].push_back(std::move(ti_ptr));
+				//m_tasks[e_OtherWS].push_back(std::move(ti_ptr));
 				size_t vdm_idx = 0;
 				if (!m_wspaces.IsVertexVDM(vertex_id, vdm_idx))
 					::ShowWindow(hwnd, SW_HIDE);

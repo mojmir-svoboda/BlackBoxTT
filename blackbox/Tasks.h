@@ -14,13 +14,6 @@ namespace bb {
 	BOOL CALLBACK taskEnumProc (HWND hwnd, LPARAM lParam);
 	LRESULT CALLBACK mainWndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-	enum TaskState : unsigned
-	{
-			e_Active		/// task is in active state (current workspace, not ignored)
-		, e_TaskManIgnored		/// task is ignored by user (and task manager)
-		, e_OtherWS		/// task is currently on another workspace
-		, max_enum_value		/// do not use this as index, please
-	};
 	using TaskInfoPtr = std::unique_ptr<TaskInfo>;
 
 	class Tasks
@@ -35,7 +28,7 @@ namespace bb {
 		using ptrs_t = std::vector<TaskInfoPtr>;
 		using ptrs_it = ptrs_t::iterator;
 		using ptrs_cit = ptrs_t::const_iterator;
-		std::array<ptrs_t, max_enum_value> m_tasks;
+		ptrs_t m_tasks;
 		std::vector<HWND> m_taskEnumStorage;
 		TaskInfo * m_active;
 		WorkSpaces & m_wspaces;
@@ -48,7 +41,7 @@ namespace bb {
 		void Update ();
 		bool Done ();
 
-		void MkDataCopy (TaskState ts, std::vector<TaskInfo> & p);
+		void MkDataCopy (std::vector<TaskInfo> & p);
 		void SetSticky (HWND hwnd);
 		void UnsetSticky (HWND hwnd);
 		bool IsSticky (HWND hwnd);
@@ -65,8 +58,8 @@ namespace bb {
 		bool MoveWindowToVertex (HWND hwnd, bbstring const & vertex_id);
 		bool OnSwitchDesktopVDM (bbstring const & src_vertex_id, bbstring const & dst_vertex_id);
 	protected:
-		bool FindTask (HWND hwnd, TaskState & state, size_t & idx);
-		bool FindTask (HWND hwnd, TaskState & state, size_t & idx) const;
+		bool FindTask (HWND hwnd, size_t & idx);
+		bool FindTask (HWND hwnd, size_t & idx) const;
 		TaskConfig const * FindTaskConfig (bbstring const & cap) const;
 		TaskConfig * FindTaskConfig (bbstring const & cap);
 		TaskConfig * MakeTaskConfig (HWND hwnd);
@@ -75,8 +68,8 @@ namespace bb {
 		void AddTaskInfo (TaskInfo * ti);
 		bool AddTask (HWND hwnd);
 		bool AddWidgetTask (GfxWindow * w);
-		void SetTaskManIgnoredImpl (TaskState ts, size_t idx);
-		void UnsetTaskManIgnoredImpl (TaskState ts, size_t idx);
+		void SetTaskManIgnoredImpl (size_t idx);
+		void UnsetTaskManIgnoredImpl (size_t idx);
 
 		LRESULT UpdateFromTaskHook (WPARAM wParam, LPARAM lParam);
 		void OnHookWindowCreated (HWND hwnd);

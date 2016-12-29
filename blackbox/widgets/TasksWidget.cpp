@@ -17,7 +17,7 @@ namespace bb {
 		m_tasks.clear();
 
 		Tasks & tasks = BlackBox::Instance().GetTasks();
-		tasks.MkDataCopy(e_Active, m_tasks);
+		tasks.MkDataCopy(m_tasks);
 	}
 
 

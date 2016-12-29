@@ -18,8 +18,7 @@ namespace bb {
 		m_tasks.clear();
 
 		Tasks & tasks = BlackBox::Instance().GetTasks();
-		tasks.MkDataCopy(e_Active, m_tasks);
-		tasks.MkDataCopy(e_OtherWS, m_tasks);
+		tasks.MkDataCopy(m_tasks);
 	}
 
 	void resizeWindowToContents (HWND hwnd, int x, int y, int maxx, int maxy, int rnd)
@@ -158,7 +157,7 @@ namespace bb {
 		ImVec2 const & sz1 = w->SizeContents;
 		m_contentSize = sz1;
 		ImGui::End();
-	}
+ 	}
 
 }
 

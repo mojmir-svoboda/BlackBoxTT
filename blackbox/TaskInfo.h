@@ -18,6 +18,8 @@ namespace bb {
 		wchar_t m_wspace[e_wspaceLenMax] = { 0 };
 		enum : size_t { e_captionLenMax = 512 };
 		wchar_t m_caption[e_captionLenMax] = { 0 };
+		enum : size_t { e_appNameLenMax = 512 };
+		wchar_t m_appName[e_appNameLenMax] = { 0 };
 
 		TaskInfo (HWND hwnd)
 			: m_hwnd(hwnd)
@@ -31,6 +33,20 @@ namespace bb {
 		void SetCaption (wchar_t const * s)
 		{
 			wcsncpy(m_caption, s, e_captionLenMax);
+		}
+
+		bool IsTaskManIgnored () const
+		{
+			if (m_config)
+				return m_config->m_taskman == false;
+			return false;
+		}
+
+		bool IsSticky () const
+		{
+			if (m_config)
+				return m_config->m_sticky;
+			return false;
 		}
 	};
 
