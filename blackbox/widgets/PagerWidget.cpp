@@ -115,10 +115,15 @@ namespace bb {
 								{
 									int framing = -1;
 									ImGui::PushID(t.m_hwnd);
-									bool const clkd = ImGui::IconButton(icoid, ImColor(255, 255, 255, 255), ImColor(255, 255, 255, 128), framing);
+									bool const skip_taskman = t.IsTaskManIgnored();
+									bool const is_sticky = t.IsSticky();
+									ImColor const col_int = ImColor(0, 0, 0, 0);
+									ImColor const col_border = ImColor(255, 255, 255, 255);
+									ImColor const col_int_skip_taskman = ImColor(0, 0, 0, 128);
+									ImColor const col_border_skip = ImColor(0, 0, 0, 128);
+									bool const clkd = ImGui::IconButton(icoid, skip_taskman ? col_int_skip_taskman : col_int, skip_taskman ? col_border_skip : col_border, framing);
 									if (ImGui::BeginPopupContextItem(""))
 									{
-										bool is_sticky = t.m_config && t.m_config->m_sticky;
 										if (ImGui::Selectable(is_sticky ? "UnStick" : "Stick"))
 										{
 											if (is_sticky)
@@ -127,7 +132,6 @@ namespace bb {
 												tasks.SetSticky(t.m_hwnd);
 										}
 
-										bool skip_taskman = t.m_config && t.m_config->m_taskman == false;
 										if (ImGui::Selectable(skip_taskman ? "back to TaskMan" : "rm from TaskMan"))
 										{
 											if (skip_taskman)
