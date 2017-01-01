@@ -9,6 +9,7 @@ namespace bb {
 		uint16_t m_index;			// with 64k entries each
 
 		IconId () : m_size(0), m_slab(0), m_index(0) { }
+		IconId (uint32_t sz, uint32_t s, uint32_t i) : m_size(sz), m_slab(s), m_index(i) { }
 		bool IsValid () const { return m_size > 0; }
 	};
 }

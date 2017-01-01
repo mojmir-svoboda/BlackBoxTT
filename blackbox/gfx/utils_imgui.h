@@ -39,6 +39,7 @@ namespace ImGui
 			}
 			return false;
 		}
+		assert(0);
 		return false;
 	}
 

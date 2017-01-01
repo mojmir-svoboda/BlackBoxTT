@@ -126,8 +126,12 @@ namespace bb {
 
 #define USE_DYNAMIC_UPDATE 0
 
-	ID3D11ShaderResourceView * Gfx::MkIconResourceView (uint32_t x, uint32_t y, uint32_t bits, uint8_t * bmpdata)
+	bool Gfx::MkIconResourceView (IconSlab & slab)
 	{
+		uint8_t * bmpdata = slab.m_buffer.get();
+		uint32_t const x = slab.m_x * slab.m_nx;
+		uint32_t const y = slab.m_y * slab.m_ny;
+
 		ID3D11ShaderResourceView * texview = nullptr;
 
 		D3D11_TEXTURE2D_DESC texdesc = CD3D11_TEXTURE2D_DESC(
@@ -136,7 +140,7 @@ namespace bb {
 			, 1, 1				// arraySize, mipLevels
 			, D3D11_BIND_SHADER_RESOURCE		// bindFlags
 #if USE_DYNAMIC_UPDATE
-			, D3D11_USAGE_DYNAMIC						// dynamic usage. just for testing, default shoud be better (updates of icon textures should be rare)
+			, D3D11_USAGE_DYNAMIC						// dynamic usage. just for testing, default should be better (updates of icon textures should be rare)
 			, D3D11_CPU_ACCESS_WRITE				// cpuaccessFlags
 #else
 			, D3D11_USAGE_DEFAULT						// default usage.
@@ -145,14 +149,8 @@ namespace bb {
 			, 1, 0, 0			// sampleCount, sampleQuality, miscFlags
 			);
 
-		D3D11_SUBRESOURCE_DATA data;
-		memset(&data, 0, sizeof(D3D11_SUBRESOURCE_DATA));
-
-		data.pSysMem = bmpdata;
-		data.SysMemPitch = bits / 8 * x; // line size in byte
-		data.SysMemSlicePitch = 0;
 		ID3D11Texture2D * texture = nullptr;
-		HRESULT hr = m_dx11->m_pd3dDevice->CreateTexture2D(&texdesc, &data, &texture);
+		HRESULT hr = m_dx11->m_pd3dDevice->CreateTexture2D(&texdesc, nullptr, &texture);
 		if (SUCCEEDED(hr))
 		{
 			D3D11_SHADER_RESOURCE_VIEW_DESC viewdesc;
@@ -164,30 +162,66 @@ namespace bb {
 
 			HRESULT hr_view = m_dx11->m_pd3dDevice->CreateShaderResourceView(texture, nullptr, &texview);
 
+			if (SUCCEEDED(hr_view))
+			{
+				slab.m_view = texview;
+				slab.m_updated = slab.m_end;
+
+				UINT const srcRowPitch = slab.m_bits / CHAR_BIT * x;
+				m_dx11->m_pd3dDeviceContext->UpdateSubresource(texture, 0, nullptr, bmpdata, srcRowPitch, 0); // update whole texture
+			}
 			texture->Release();
+			return true;
 		}
-		return texview;
+		return false;
 	}
 
-	bool Gfx::UpdateIconResourceView (uint32_t x, uint32_t y, uint32_t bits, uint8_t * bmpdata, ID3D11ShaderResourceView * view)
+	bool Gfx::UpdateIconResourceView (IconSlab & slab)
 	{
 #if USE_DYNAMIC_UPDATE
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
 		memset(&mappedResource, 0, sizeof(D3D11_MAPPED_SUBRESOURCE));
 
-		m_dx11->m_pd3dDeviceContext->Map(view->Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+		m_dx11->m_pd3dDeviceContext->Map(v->Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		memcpy(mappedResource.pData, bmpdata, x * y * bits / CHAR_BIT);
 		m_dx11->m_pd3dDeviceContext->Unmap(vertexBuffer2.Get(), 0);
 #else
-		D3D11_SUBRESOURCE_DATA data;
-		memset(&data, 0, sizeof(D3D11_SUBRESOURCE_DATA));
-		data.pSysMem = bmpdata;
-		data.SysMemPitch = bits / 8 * x; // line size in byte
-		data.SysMemSlicePitch = 0;
-		// @NOTE: UpdateSubresource can update only portion of texture.. make use of it @TODO
-		//			ID3D11Texture2D * texture = nullptr;
-		//			HRESULT hr = m_dx11->m_pd3dDevice->UpdateSubresource();
-		//			HRESULT hr = m_dx11->m_pd3dDevice->CreateTexture2D(&texdesc, &data, &texture);
+
+		uint8_t * const bmpdata = slab.m_buffer.get();
+
+		for (; slab.m_updated < slab.m_end; ++slab.m_updated)
+		{
+			uint32_t const index = slab.m_updated;
+
+			uint32_t const bytes = slab.m_bits / CHAR_BIT;
+			uint32_t const row_size = bytes * slab.m_x * slab.m_nx;
+			uint32_t const sz = static_cast<float>(slab.m_x);
+			uint32_t const x = index % slab.m_nx;
+			uint32_t const y = index / slab.m_nx;
+			uint32_t const u0x = x * slab.m_x;
+			uint32_t const u0y = y * slab.m_y;
+			uint32_t const u1x = u0x + sz;
+			uint32_t const u1y = u0y + sz;
+
+			D3D11_BOX destRegion;
+			destRegion.left = u0x;
+			destRegion.top = u0y;
+			destRegion.right = u1x;
+			destRegion.bottom = u1y;
+			destRegion.front = 0;
+			destRegion.back = 1;
+
+			ID3D11Resource * res = nullptr;
+			slab.m_view->GetResource(&res);
+			void * const data = bmpdata + row_size * y + x * bytes * slab.m_x;
+			m_dx11->m_pd3dDeviceContext->UpdateSubresource(res, 0, &destRegion, data, row_size, 0);
+		}
+
+// update whole texture
+// 		UINT const srcRowPitch = slab.m_bits / CHAR_BIT * slab.m_x * slab.m_nx;
+// 		ID3D11Resource * res = nullptr;
+// 		slab.m_view->GetResource(&res);
+// 		m_dx11->m_pd3dDeviceContext->UpdateSubresource(res, 0, nullptr, bmpdata, srcRowPitch, 0);
 		return true;
 #endif
 	}

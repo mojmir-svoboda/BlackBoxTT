@@ -31,8 +31,8 @@ namespace bb {
 		GfxWindow * GetGfxWindow (size_t n) { return m_windows[n].get(); }
 		GfxWindow const * GetGfxWindow (size_t n) const { return m_windows[n].get(); }
 
-		ID3D11ShaderResourceView * MkIconResourceView (uint32_t x, uint32_t y, uint32_t bits, uint8_t * data);
-		bool UpdateIconResourceView (uint32_t x, uint32_t y, uint32_t bits, uint8_t * bmpdata, ID3D11ShaderResourceView * view);
+		bool MkIconResourceView (IconSlab & slab);
+		bool UpdateIconResourceView (IconSlab & slab);
 		bool AddIconToCache (bbstring const & name, HICON ico, IconId & id)
 		{
 			return m_iconCache.Add(name, ico, id);

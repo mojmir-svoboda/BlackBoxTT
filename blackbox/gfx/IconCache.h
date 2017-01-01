@@ -13,18 +13,19 @@ namespace bb {
 
 	struct IconSlab
 	{
-		uint16_t m_x; // icon x size
-		uint16_t m_y; // icon y size
-		uint16_t m_nx; // number of icons in x dir
-		uint16_t m_ny; // number of icons in y dir
-		uint16_t m_end;
-		uint8_t m_bits;
-		bool m_dirty;
+		uint16_t m_x { 0 }; // icon x size
+		uint16_t m_y { 0 }; // icon y size
+		uint16_t m_nx { 0 }; // number of icons in x dir
+		uint16_t m_ny { 0 }; // number of icons in y dir
+		uint8_t m_bits { 0 };
+		uint16_t m_end { 0 };
+		uint16_t m_updated { 0 };
 		std::unique_ptr<uint8_t[]> m_buffer;
-		ID3D11ShaderResourceView * m_view;
-		std::vector<bbstring>  m_names;
 
-		IconSlab () : m_x(0), m_y(0), m_nx(0), m_ny(0), m_end(0), m_bits(0), m_dirty(false), m_buffer(), m_view(nullptr) { }
+		ID3D11ShaderResourceView * m_view { nullptr };
+		std::vector<bbstring> m_names;
+
+		~IconSlab ();
 
 		bool Init (uint32_t x, uint32_t y, uint32_t nx, uint32_t ny, uint32_t bits);
 		bool AddIconToSlab (bbstring const & name, BITMAP const & b, uint8_t * buff, size_t buffsz, IconId & id);
@@ -36,7 +37,7 @@ namespace bb {
 
 	struct IconSlabs
 	{
-		std::vector<IconSlab>  m_slabs;
+		std::vector<std::unique_ptr<IconSlab>>  m_slabs;
 
 		bool AddIconToSlab (bbstring const & name, BITMAP const & b, uint8_t * buff, size_t buffsz, IconId & id);
 		void Update ();

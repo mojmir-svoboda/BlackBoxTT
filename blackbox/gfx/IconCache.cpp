@@ -6,19 +6,27 @@
 
 namespace bb {
 
+	IconSlab::~IconSlab ()
+	{
+		if (m_view)
+		{
+			m_view->Release();
+			m_view = nullptr;
+		}
+	}
+
 	void IconSlab::Update ()
 	{
-		if (m_dirty)
+		if (m_updated < m_end)
 		{
-			m_dirty = false;
-			uint32_t const x = m_x * m_nx;
-			uint32_t const y = m_y * m_ny;
 			if (m_view == nullptr)
 			{
-				m_view = BlackBox::Instance().GetGfx().MkIconResourceView(x, y, m_bits, m_buffer.get());
+				BlackBox::Instance().GetGfx().MkIconResourceView(*this);
 			}
 			else
-				BlackBox::Instance().GetGfx().UpdateIconResourceView(x, y, m_bits, m_buffer.get(), m_view);
+			{
+				BlackBox::Instance().GetGfx().UpdateIconResourceView(*this);
+			}
 		}
 	}
 
@@ -53,25 +61,24 @@ namespace bb {
 			return false;
 
 		uint32_t const idx = m_end++;
+		assert(idx <= IconId(~0U, ~0U, ~0U).m_index);
 		id.m_index = idx;
 		m_names.push_back(name);
-		uint32_t const bgn = idx * m_nx;
-		uint32_t const start = idx * m_x;
-		uint32_t const bits = m_bits / CHAR_BIT;
-		uint32_t const x_dim = m_x * m_nx * bits;
+		uint32_t const bytes = m_bits / CHAR_BIT;
+		uint32_t const x_dim = m_x * m_nx * bytes;
+		uint32_t const bgn = idx * m_x * bytes;
 		uint32_t const yend = b.bmHeight;
 
 		// bmp cpy
 		for (uint32_t y = 0; y < yend; ++y)
 		{
-			size_t const dst_offs = start + y * x_dim;
+			size_t const dst_offs = bgn + y * x_dim;
 			void * dst = m_buffer.get() + dst_offs;
-			size_t const src_offs = y * m_x * bits;
+			size_t const src_offs = y * m_x * bytes;
 			void * src = buff + src_offs;
-			memcpy(dst, src, m_x * bits);
+			memcpy(dst, src, m_x * bytes);
 		}
 
-		m_dirty = true;
 		return true;
 	}
 
@@ -82,8 +89,7 @@ namespace bb {
 			uint32_t const sz = static_cast<float>(m_x);
 			uint32_t const x = index % m_nx;
 			uint32_t const y = index / m_nx;
-			uint32_t const b = m_bits / CHAR_BIT;
-			float const u0x = x * m_x * b;
+			float const u0x = x * m_x;
 			float const u0y = y * m_y;
 			float const u1x = u0x + sz;
 			float const u1y = u0y + sz;
@@ -106,13 +112,14 @@ namespace bb {
 		bool placed = false;
 		for (size_t s = 0, se = m_slabs.size(); s < se; ++s)
 		{
-			IconSlab & slab = m_slabs[s];
+			IconSlab & slab = *m_slabs[s];
 			if (slab.IsFull())
 				continue;
 			else
 			{
 				if (placed = slab.AddIconToSlab(name, b, buff, buffsz, id))
 				{
+					assert(s <= IconId(~0U, ~0U, ~0U).m_slab);
 					id.m_slab = s;
 					return true;
 				}
@@ -121,18 +128,21 @@ namespace bb {
 		if (!placed)
 		{
 			size_t const s = m_slabs.size();
-			m_slabs.push_back(IconSlab());
-			IconSlab & slab = m_slabs.back();
-/////////////////////////////////////////////////////////////////////////////////////////////
-			if (s)
-				; // warning is to remind me
-			uint32_t const nx = 1;//c_maxIconTextureSize / b.bmWidth;
-			uint32_t const ny = 1;//c_maxIconTextureSize / b.bmHeight;
-			//uint32_t const nx = c_maxIconTextureSize / b.bmWidth;
-			//uint32_t const ny = c_maxIconTextureSize / b.bmHeight;
+			std::unique_ptr<IconSlab> new_slab(new IconSlab);
+			m_slabs.push_back(std::move(new_slab));
+			IconSlab & slab = *m_slabs.back();
+
+			//uint32_t const nx = 1; // to test slabs (1x ico per slab)
+			//uint32_t const ny = 1;
+			uint32_t const nx = c_maxIconTextureSize / b.bmWidth;
+			uint32_t const ny = c_maxIconTextureSize / b.bmHeight;
 			slab.Init(b.bmWidth, b.bmHeight, nx, ny, b.bmBitsPixel);
-			id.m_slab = s;
-			return slab.AddIconToSlab(name, b, buff, buffsz, id);
+			if (slab.AddIconToSlab(name, b, buff, buffsz, id))
+			{
+				assert(s <= IconId(~0U, ~0U, ~0U).m_slab);
+				id.m_slab = s;
+				return true;
+			}
 		}
 		return false;
 	}
@@ -140,14 +150,15 @@ namespace bb {
 	void IconSlabs::Update ()
 	{
 		for (auto & it : m_slabs)
-			it.Update();
+			it->Update();
 	}
 
 	bool IconSlabs::Find (bbstring const & name, IconId & id) const
 	{
 		for (size_t s = 0, se = m_slabs.size(); s < se; ++s)
-			if (m_slabs[s].Find(name, id))
+			if (m_slabs[s]->Find(name, id))
 			{
+				assert(s <= IconId(~0U, ~0U, ~0U).m_slab);
 				id.m_slab = s;
 				return true;
 			}
@@ -199,7 +210,7 @@ namespace bb {
 			IconSlabs const * const slabs = it->second;
 			if (id.m_slab < slabs->m_slabs.size())
 			{
-				IconSlab const & slab = slabs->m_slabs[id.m_slab];
+				IconSlab const & slab = *slabs->m_slabs[id.m_slab];
 				icon_slab = &slab;
 				return true;
 			}
