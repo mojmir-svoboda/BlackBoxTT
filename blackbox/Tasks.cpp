@@ -481,32 +481,32 @@ void Tasks::SetSticky (HWND hwnd)
 {
 	m_lock.Lock();
 
-	TaskState ts = TaskState::max_enum_value;
-	size_t idx = c_invalidIndex;
-	if (FindTask(hwnd, ts, idx))
-	{
-		TaskInfoPtr & ti_ptr = m_tasks[ts][idx];
-
-		if (nullptr == ti_ptr->m_config)
-			ti_ptr->m_config = MakeTaskConfig(hwnd);
-
-		ti_ptr->m_config->m_sticky = true;
-
-		TRACE_MSG(LL_DEBUG, CTX_BB, "make task sticky hwnd=%x", ti_ptr->m_hwnd);
-//		if (ts == e_OtherWS)
-//			m_tasks[e_Active].push_back(std::move(ti_ptr));
-	}
+// 	size_t idx = c_invalidIndex;
+// 	if (FindTask(hwnd, idx))
+// 	{
+// 		TaskInfoPtr & ti_ptr = m_tasks[idx];
+// 
+// 		if (nullptr == ti_ptr->m_config)
+// 			ti_ptr->m_config = MakeTaskConfig(hwnd);
+// 
+// 		ti_ptr->m_config->m_sticky = true;
+// 
+// 		TRACE_MSG(LL_DEBUG, CTX_BB, "make task sticky hwnd=%x", ti_ptr->m_hwnd);
+// //		if (ts == e_OtherWS)
+// //			m_tasks[e_Active].push_back(std::move(ti_ptr));
+// 	}
 
 	m_lock.Unlock();
 }
 
 void Tasks::UnsetSticky (HWND hwnd)
 {
-	TaskState ts = TaskState::max_enum_value;
+	m_lock.Lock();
+
 	size_t idx = c_invalidIndex;
-	if (FindTask(hwnd, ts, idx))
+	if (FindTask(hwnd, idx))
 	{
-		TaskInfoPtr & ti_ptr = m_tasks[ts][idx];
+		TaskInfoPtr & ti_ptr = m_tasks[idx];
 
 		if (nullptr == ti_ptr->m_config)
 			ti_ptr->m_config = MakeTaskConfig(hwnd);
