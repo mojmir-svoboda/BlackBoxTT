@@ -158,15 +158,21 @@ namespace bb {
 			return false;
 		scope_guard_t on_exit_iavc = mkScopeGuard(std::mem_fun(&IApplicationViewCollection::Release), iavc);
 
+		IVirtualDesktopPinnedApps * ivdpa = nullptr;
+		if (!SUCCEEDED(isvc->QueryService(CLSID_VirtualDesktopPinnedApps, __uuidof(IVirtualDesktopPinnedApps), (PVOID*)&ivdpa)))
+			return false;
+		scope_guard_t on_exit_ivdpa = mkScopeGuard(std::mem_fun(&IVirtualDesktopPinnedApps::Release), ivdpa);
 
 		on_exit_ivdm.Dismiss();
 		on_exit_ivdmi.Dismiss();
 		on_exit_iavc.Dismiss();
+		on_exit_ivdpa.Dismiss();
 
 		m_vdm = ivdm;
 		m_vdmi = ivdmi;
 		m_avc = iavc;
 		m_notif_cookie = cookie;
+		m_vdpa = ivdpa;
 
 		UpdateDesktopGraph();
 		return true;
@@ -212,6 +218,11 @@ namespace bb {
 		{
 			m_vdm->Release();
 			m_vdm = nullptr;
+		}
+		if (m_vdpa)
+		{
+			m_vdpa->Release();
+			m_vdpa = nullptr;
 		}
 		return true;
 	}
