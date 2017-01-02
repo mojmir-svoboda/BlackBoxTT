@@ -98,6 +98,7 @@ namespace bb {
 		unsigned m_taskHook32on64WM;
 		HANDLE m_job;
 		bool m_inJob;
+		bool m_quit;
 		BlackBoxConfig m_config;
 		CommandLine m_cmdLine;
 		Scheme m_scheme;

@@ -5,6 +5,10 @@
 #include <vector>
 #include <bblib/SpinLock.h>
 
+namespace asio {
+	class io_context;
+}
+
 namespace bb {
 
 	struct Session;
@@ -26,7 +30,7 @@ namespace bb {
 		SpinLock m_requestLock;
     std::vector<std::unique_ptr<PendingCommand>> m_requests;
     std::vector<std::unique_ptr<PendingCommand>> m_responses;
-		std::unique_ptr<AsioServer> m_impl;
+		std::unique_ptr<asio::io_context> m_io;
 		std::vector<std::weak_ptr<Session>> m_sessions;
 		std::vector<char> m_encodingBuffer;
 
