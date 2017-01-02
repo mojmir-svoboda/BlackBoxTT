@@ -335,6 +335,8 @@ namespace bb {
 			return false;
 		if (!m_wspaces.Init(m_config.m_wspaces))
 			return false;
+		if (!m_wallpaper.Init())
+			return false;
 		if (!m_gfx.Init())
 			return false;
 		if (!m_tasks.Init(m_config.m_tasks))
@@ -361,6 +363,7 @@ namespace bb {
 		m_plugins.Done();
 		m_tasks.Done();
 		m_gfx.Done();
+		m_wallpaper.Done();
 		if (m_explorer)
 			m_explorer->Done();
 

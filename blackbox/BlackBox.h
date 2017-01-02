@@ -7,6 +7,7 @@
 #include "Explorer.h"
 #include "gfx/Gfx.h"
 #include "CommandLine.h"
+#include "DesktopWallpaper.h"
 #include <net/Server.h>
 #include <scheme/Scheme.h>
 #include <VersionHelpers.h>
@@ -113,6 +114,7 @@ namespace bb {
 		Tray m_tray;
 		Gfx m_gfx;
 		PluginManager m_plugins;
+		DesktopWallpaper m_wallpaper;
 	};
 }
 
