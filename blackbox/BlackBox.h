@@ -114,7 +114,7 @@ namespace bb {
 		Tray m_tray;
 		Gfx m_gfx;
 		PluginManager m_plugins;
-		DesktopWallpaper m_wallpaper;
+		DesktopWallpaper m_wallpapers;
 	};
 }
 

@@ -2,6 +2,7 @@
 #include "TasksConfig.h"
 #include "TrayConfig.h"
 #include "WidgetsConfig.h"
+#include "DesktopWallpaperConfig.h"
 #include "scheme/SchemeConfig.h"
 #include "WorkSpacesConfig.h"
 #include "net/ServerConfig.h"
@@ -44,6 +45,7 @@ namespace bb {
 		ServerConfig m_server;
 		SchemeConfig m_scheme;
 		WidgetsConfig m_widgets;
+		DesktopWallpaperConfig m_wallpapers;
 	};
 }
 

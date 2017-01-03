@@ -269,6 +269,17 @@ namespace bb {
 				TRACE_MSG(LL_ERROR, CTX_BB | CTX_CONFIG, "* failed to load plugins section");
 			}
 
+			DesktopWallpaperConfig wall_cfg;
+			if (loadDesktopWallpaperConfig(y_root, wall_cfg))
+			{
+				TRACE_MSG(LL_INFO, CTX_BB | CTX_CONFIG, "* loaded Wallpaper section");
+				m_config.m_wallpapers = wall_cfg;
+			}
+			else
+			{
+				TRACE_MSG(LL_ERROR, CTX_BB | CTX_CONFIG, "* failed to load tasks section");
+			}
+
 			TRACE_MSG(LL_INFO, CTX_BB | CTX_CONFIG, "Config loaded");
 			return true;
 		}
@@ -335,7 +346,7 @@ namespace bb {
 			return false;
 		if (!m_wspaces.Init(m_config.m_wspaces))
 			return false;
-		if (!m_wallpaper.Init())
+		if (!m_wallpapers.Init(m_config.m_wallpapers))
 			return false;
 		if (!m_gfx.Init())
 			return false;
@@ -363,7 +374,7 @@ namespace bb {
 		m_plugins.Done();
 		m_tasks.Done();
 		m_gfx.Done();
-		m_wallpaper.Done();
+		m_wallpapers.Done();
 		if (m_explorer)
 			m_explorer->Done();
 

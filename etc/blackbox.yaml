@@ -98,4 +98,12 @@ Tray:
 
 Explorer:
   show: false
+
+Wallpapers:
+  slideShowTick: 32000
+  slideShowShuffle: false
+  slideShowFiles:
+    - 'C:/bbTT/media/wallpaper/80656.jpg'
+    - 'media/wallpaper/121134.jpg'
+
 ...
