@@ -11,7 +11,10 @@ namespace bb {
 			if (y_root.IsNull())
 				return false;
 
-			YAML::Node node = y_root["Wallpapers"]; // @TODO: unicode? utf8?
+			YAML::Node node = y_root["Wallpapers"];
+
+			if (node["enabled"])
+				rhs.m_enabled = node["enabled"].as<bool>();
 
 			if (node["slideShowFiles"])
 				rhs.m_slideShowFileNames = node["slideShowFiles"].as<std::vector<bbstring>>();
@@ -21,6 +24,12 @@ namespace bb {
 
 			if (node["slideShowTick"])
 				rhs.m_slideShowTick_ms = node["slideShowTick"].as<unsigned>();
+
+			if (node["position"])
+				rhs.m_position = node["position"].as<unsigned>();
+
+			if (node["bgColor"])
+				rhs.m_bgColor = node["bgColor"].as<unsigned>();
 
 			return true;
 		}

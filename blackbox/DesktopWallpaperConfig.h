@@ -5,9 +5,19 @@
 namespace YAML { class Node; }
 namespace bb {
 
+	/*typedef enum DESKTOP_WALLPAPER_POSITION { 
+		DWPOS_CENTER   = 0,
+		DWPOS_TILE     = 1,
+		DWPOS_STRETCH  = 2,
+		DWPOS_FIT      = 3,
+		DWPOS_FILL     = 4,
+		DWPOS_SPAN     = 5
+	} DESKTOP_WALLPAPER_POSITION;*/
+
 	struct DesktopWallpaperConfig
 	{
-		unsigned m_position { 0 };
+		bool m_enabled { true };
+		unsigned m_position { 0 }; // DESKTOP_WALLPAPER_POSITION
 		unsigned m_bgColor { 0 };
 		std::vector<std::vector<bbstring>> m_monitorWallpapers;
 

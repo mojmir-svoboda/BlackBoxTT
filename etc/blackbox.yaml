@@ -100,10 +100,29 @@ Explorer:
   show: false
 
 Wallpapers:
-  slideShowTick: 32000
+  enabled: true
+  bgColor: 0x000000 # bgr
+  position: 4 # 
+  slideShowTick: 1800000  # [ms]
   slideShowShuffle: false
   slideShowFiles:
-    - 'C:/bbTT/media/wallpaper/80656.jpg'
-    - 'media/wallpaper/121134.jpg'
+    - 'media/wallpaper/NASA/138038main_image_feature_451_ys_full.jpg'
+    - 'media/wallpaper/NASA/145046main_image_feature_533_ys_full.jpg'
+    - 'media/wallpaper/NASA/27250243350_5563fbc72b_o.jpg'
+    - 'media/wallpaper/NASA/361015main_PIA12064_full.jpg'
+    - 'media/wallpaper/NASA/445659main_Lena_Delta_full.jpg'
+    - 'media/wallpaper/NASA/ccfid_111329_2016196161113_image.jpg'
+    - 'media/wallpaper/NASA/ccfid_113386_2016277154705_image.jpg'
+    - 'media/wallpaper/NASA/ccfid_96093_2016040101009_image.jpg'
+    - 'media/wallpaper/NASA/image11052016_250m.jpg'
+    - 'media/wallpaper/NASA/iss040e000788.jpg'
+    - 'media/wallpaper/NASA/iss047e122077a.jpg'
+    - 'media/wallpaper/NASA/iss048-e-28526.jpg'
+    - 'media/wallpaper/NASA/iss048e004418.jpg'
+    - 'media/wallpaper/NASA/M157270357RE_thumb2.png'
+    - 'media/wallpaper/NASA/orientf_thumb.png'
+    - 'media/wallpaper/NASA/v2016069.westernnorthatlantic.half_.jpg'
+
+
 
 ...

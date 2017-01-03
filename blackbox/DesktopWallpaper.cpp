@@ -4,6 +4,7 @@
 #include <bblib/utils_paths.h>
 #include <BlackBox.h>
 #include "Shobjidl.h"
+#include <filesystem>
 
 namespace bb {
 
@@ -41,7 +42,7 @@ namespace bb {
 			m_idw = idw;
 
 			//GetWallpaper();
-			StartSlideShow();
+			ApplyConfig(m_config);
 			return true;
 		}
 		return false;
@@ -57,37 +58,59 @@ namespace bb {
 		return true;
 	}
 
-	void DesktopWallpaper::StartSlideShow ()
+	void DesktopWallpaper::Enable (bool on)
 	{
-		SetSlideShow(m_config);
+		if (m_idw)
+		{
+			BOOL b = on ? TRUE : FALSE;
+			m_idw->Enable(b);
+		}
 	}
 
-	void DesktopWallpaper::SetSlideShow (DesktopWallpaperConfig const & config)
+	// @TODO: free pidls, IShellItemArrays ?
+	void DesktopWallpaper::ApplyConfig (DesktopWallpaperConfig const & config)
 	{
-		std::vector<LPCITEMIDLIST> pidlChilds;
-
-		for (bbstring const & s : config.m_slideShowFileNames)
+		if (config.m_enabled)
 		{
-			TCHAR buffer[1024];
-			TCHAR** lppPart = { nullptr };
-			if (PathIsRelative(s.c_str()))
+			std::vector<LPCITEMIDLIST> pidlChilds;
+
+			for (bbstring const & s : config.m_slideShowFileNames)
 			{
-				// @TODO: append curr wrk dir
-			}
-			else
-			{
-				if (DWORD  retval = GetFullPathName(s.c_str(), 256, buffer, lppPart))
+				TCHAR buffer[1024];
+				TCHAR** lppPart = { nullptr };
+				if (PathIsRelative(s.c_str()))
 				{
-					pidlChilds.push_back(ILCreateFromPath(buffer));
+					std::experimental::filesystem::path p_c = std::experimental::filesystem::current_path();
+					std::experimental::filesystem::path p_s(s.c_str());
+
+					std::experimental::filesystem::path p = p_c / p_s;
+
+					if (std::experimental::filesystem::exists(p))
+					{
+						pidlChilds.push_back(ILCreateFromPath(p.c_str()));
+					}
+				}
+				else
+				{
+					if (DWORD  retval = GetFullPathName(s.c_str(), 256, buffer, lppPart))
+					{
+						pidlChilds.push_back(ILCreateFromPath(buffer));
+					}
 				}
 			}
-		}
 		
-		IShellItemArray * psiaFiles = nullptr;
-		HRESULT hr = SHCreateShellItemArrayFromIDLists(pidlChilds.size(), pidlChilds.data(), &psiaFiles);
+			IShellItemArray * psiaFiles = nullptr;
+			HRESULT hr = SHCreateShellItemArrayFromIDLists(pidlChilds.size(), pidlChilds.data(), &psiaFiles);
 
-		m_idw->SetSlideshow(psiaFiles);
-		DESKTOP_SLIDESHOW_OPTIONS opts = config.m_slideshowShuffle ? DSO_SHUFFLEIMAGES : (DESKTOP_SLIDESHOW_OPTIONS)0;
-		m_idw->SetSlideshowOptions(opts, config.m_slideShowTick_ms);
+			m_idw->SetSlideshow(psiaFiles);
+			DESKTOP_SLIDESHOW_OPTIONS const opts = config.m_slideshowShuffle ? DSO_SHUFFLEIMAGES : (DESKTOP_SLIDESHOW_OPTIONS)0;
+			m_idw->SetSlideshowOptions(opts, config.m_slideShowTick_ms);
+
+			DESKTOP_WALLPAPER_POSITION const pos = (DESKTOP_WALLPAPER_POSITION)config.m_position;
+			m_idw->SetPosition(pos);
+		}
+		COLORREF col = config.m_bgColor;
+		m_idw->SetBackgroundColor(col);
+		Enable(config.m_enabled);
 	}
 }

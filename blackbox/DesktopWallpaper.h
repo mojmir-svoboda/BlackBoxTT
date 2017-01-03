@@ -15,8 +15,9 @@ namespace bb {
 		bool Done ();
 
 		void GetWallpaper ();
-		void SetSlideShow (DesktopWallpaperConfig const &);
-		void StartSlideShow ();
+		void ApplyConfig (DesktopWallpaperConfig const &);
+
+		void Enable (bool on);
 	};
 
 }
