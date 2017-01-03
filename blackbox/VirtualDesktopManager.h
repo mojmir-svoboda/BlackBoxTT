@@ -46,6 +46,10 @@ namespace bb {
 		bool FindDesktopIndex (HWND hwnd, size_t & idx);
 		bool SwitchDesktop (GUID const & g);
 		bool MoveWindowToDesktop (HWND hwnd, GUID const & guid);
+
+		bool SupportsPinnedViews () const;
+		bool IsPinned (HWND hwnd) const;
+		bool SetPinned (HWND hwnd, bool on) const;
 	};
 
 }

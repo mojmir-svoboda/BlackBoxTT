@@ -212,7 +212,19 @@ bool Tasks::AddTask (HWND hwnd)
 		bbstring const & cap = ti_ptr->m_caption;
 
 		TaskConfig * c = FindTaskConfig(cap);
-		bool is_sticky = false;
+
+		bool pinned = false;
+		if (m_wspaces.m_vdm->SupportsPinnedViews())
+			pinned = m_wspaces.m_vdm->IsPinned(hwnd);
+
+		if (pinned && !c)
+		{
+			ti_ptr->m_config = MakeTaskConfig(ti_ptr->m_hwnd);
+			c = ti_ptr->m_config;
+			c->m_sticky = pinned;
+		}
+
+		bool is_sticky = pinned;
 		if (c)
 		{
 			ti_ptr->m_config = c;
@@ -481,20 +493,20 @@ void Tasks::SetSticky (HWND hwnd)
 {
 	m_lock.Lock();
 
-// 	size_t idx = c_invalidIndex;
-// 	if (FindTask(hwnd, idx))
-// 	{
-// 		TaskInfoPtr & ti_ptr = m_tasks[idx];
-// 
-// 		if (nullptr == ti_ptr->m_config)
-// 			ti_ptr->m_config = MakeTaskConfig(hwnd);
-// 
-// 		ti_ptr->m_config->m_sticky = true;
-// 
-// 		TRACE_MSG(LL_DEBUG, CTX_BB, "make task sticky hwnd=%x", ti_ptr->m_hwnd);
-// //		if (ts == e_OtherWS)
-// //			m_tasks[e_Active].push_back(std::move(ti_ptr));
-// 	}
+	size_t idx = c_invalidIndex;
+	if (FindTask(hwnd, idx))
+	{
+		TaskInfoPtr & ti_ptr = m_tasks[idx];
+
+		if (nullptr == ti_ptr->m_config)
+			ti_ptr->m_config = MakeTaskConfig(hwnd);
+
+		TRACE_MSG(LL_DEBUG, CTX_BB, "make task sticky hwnd=%x", ti_ptr->m_hwnd);
+
+		ti_ptr->m_config->m_sticky = true;
+		if (m_wspaces.m_vdm->SupportsPinnedViews())
+			m_wspaces.m_vdm->SetPinned(hwnd, ti_ptr->m_config->m_sticky);
+	}
 
 	m_lock.Unlock();
 }
@@ -512,6 +524,8 @@ void Tasks::UnsetSticky (HWND hwnd)
 			ti_ptr->m_config = MakeTaskConfig(hwnd);
 
 		ti_ptr->m_config->m_sticky = false;
+		if (m_wspaces.m_vdm->SupportsPinnedViews())
+			m_wspaces.m_vdm->SetPinned(hwnd, ti_ptr->m_config->m_sticky);
 	}
 	
 	m_lock.Unlock();

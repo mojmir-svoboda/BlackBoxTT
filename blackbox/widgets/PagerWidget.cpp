@@ -96,7 +96,7 @@ namespace bb {
 						{
 	// 						if (t.m_config && t.m_config->m_bbtasks)
 	// 							continue;
-							if (t.m_wspace == vertex_id)
+							if (t.m_wspace == vertex_id || t.IsSticky())
 							{
 								if (tmp++ % 3 != 0)
 									ImGui::SameLine();

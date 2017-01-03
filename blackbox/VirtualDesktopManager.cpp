@@ -250,6 +250,43 @@ namespace bb {
 		return false;
 	}
 
+	bool VirtualDesktopManager::SupportsPinnedViews () const
+	{
+		return m_vdpa && m_avc;
+	}
+
+	bool VirtualDesktopManager::IsPinned (HWND hwnd) const
+	{
+		if (SupportsPinnedViews())
+		{
+			IApplicationView * v = nullptr;
+			m_avc->GetViewForHwnd(hwnd, &v);
+
+			BOOL b;
+			m_vdpa->IsViewPinned(v, &b);
+			if (b == TRUE)
+				return true;
+		}
+		return false;
+	}
+
+	bool VirtualDesktopManager::SetPinned (HWND hwnd, bool on) const
+	{
+		if (SupportsPinnedViews())
+		{
+			IApplicationView * v = nullptr;
+			m_avc->GetViewForHwnd(hwnd, &v);
+
+			if (on)
+				m_vdpa->PinView(v);
+			else
+				m_vdpa->UnpinView(v);
+			return true;
+		}
+		return false;
+
+	}
+
 	bool VirtualDesktopManager::SwitchDesktop (GUID const & g)
 	{
 		IVirtualDesktop * ivd = nullptr;
