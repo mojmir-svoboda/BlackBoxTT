@@ -28,7 +28,7 @@ namespace bb {
 		friend class Tasks;
 		friend struct VirtualDesktopNotification;
 		IVirtualDesktopManagerInternal * m_vdmi { nullptr };
-		IVirtualDesktopManager * m_vdm { nullptr }; 
+		IVirtualDesktopManager * m_vdm { nullptr };
 		IApplicationViewCollection * m_avc { nullptr };
 		unsigned m_notif_cookie { 0 };
 		VirtualDesktopNotification * m_notif { nullptr };
