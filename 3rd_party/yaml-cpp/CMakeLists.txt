@@ -300,12 +300,12 @@ if(MSVC)
 	endif()
 endif()
 
-install(TARGETS yaml-cpp ${_INSTALL_DESTINATIONS})
-install(
-	DIRECTORY ${header_directory}
-	DESTINATION ${INCLUDE_INSTALL_DIR}
-	FILES_MATCHING PATTERN "*.h"
-)
+#install(TARGETS yaml-cpp ${_INSTALL_DESTINATIONS})
+#install(
+#	DIRECTORY ${header_directory}
+#	DESTINATION ${INCLUDE_INSTALL_DIR}
+#	FILES_MATCHING PATTERN "*.h"
+#)
 
 export(
     TARGETS yaml-cpp
