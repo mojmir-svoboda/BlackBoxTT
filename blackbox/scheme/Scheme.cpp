@@ -8,6 +8,19 @@
 
 //typedef s7_pointer(*s7_function)(s7_scheme *sc, s7_pointer args);   /* that is, obj = func(s7, args) -- args is a list of arguments */
 
+s7_pointer bind_SetQuit (s7_scheme * sc, s7_pointer args)
+{
+	if (s7_is_integer(s7_car(args)))
+	{
+		uint32_t const n = s7_integer(s7_car(args));
+		bb::BlackBox * const bb = getBlackBoxInstanceRW();
+		bb->Quit(n);
+
+		return s7_nil(sc);
+	}
+	return s7_wrong_type_arg_error(sc, "SetQuit", 1, s7_car(args), "integer code");
+}
+
 s7_pointer bind_SetCurrentVertexId (s7_scheme * sc, s7_pointer args)
 {
 	if (s7_is_string(s7_car(args)))
@@ -127,6 +140,7 @@ namespace bb {
 		m_config = cfg;
 		m_scheme = s7_init();
 
+		s7_define_function(m_scheme, "SetQuit", bind_SetQuit, 1, 0, false, "(SetQuit int) Quits with code int");
 		s7_define_function(m_scheme, "SetCurrentVertexId", bind_SetCurrentVertexId, 1, 0, false, "(SetCurrentVertexId vertex_id_string) Sets WorkSpace Graph to specified VertexId");
 		s7_define_function(m_scheme, "SwitchVertexViaEdge", bind_SwitchVertexViaEdge, 1, 0, false, "(SwitchVertexViaEdge edge_id_string) Switch WorkSpace via edge to destination vertex_id");
 		s7_define_function(m_scheme, "MaximizeTopWindow", bind_MaximizeTopWindow, 1, 0, false, "(SwitchVertexViaEdge edge_id_string) Switch WorkSpace via edge to destination vertex_id");

@@ -6,6 +6,7 @@
 struct IVirtualDesktopManagerInternal;
 struct IVirtualDesktopManager;
 struct IApplicationViewCollection;
+struct IVirtualDesktopPinnedApps;
 enum AdjacentDesktop
 {
 	LeftDirection = 3,
@@ -32,6 +33,7 @@ namespace bb {
 		IApplicationViewCollection * m_avc { nullptr };
 		unsigned m_notif_cookie { 0 };
 		VirtualDesktopNotification * m_notif { nullptr };
+		IVirtualDesktopPinnedApps * m_vdpa { nullptr };
 		std::vector<GUID> m_desktops;
 		std::vector<bbstring> m_names;
 		std::vector<std::tuple<uint32_t, uint32_t, uint32_t>> m_edges;

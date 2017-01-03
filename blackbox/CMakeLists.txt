@@ -42,6 +42,7 @@ set(blackbox_SOURCES
 	BlackBox_binds.cpp
 	Explorer.cpp
 	VirtualDesktopManager.cpp
+	DesktopWallpaper.cpp
 	Tasks.cpp
 	TasksConfig_yaml.cpp
 	Tray.cpp
@@ -79,6 +80,7 @@ set (blackbox_HEADERS
 	CommandLine.h
 	Explorer.h
 	VirtualDesktopManager.h
+	DesktopWallpaper.h
 	Tasks.h
 	TaskConfig.h
 	TasksConfig.h

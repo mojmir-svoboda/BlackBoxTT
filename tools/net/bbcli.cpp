@@ -133,8 +133,11 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	{
 		bb::CommandLine cli;
 		cli.Init();
-		asio::io_context io;
 
+		if (cli.m_quit)
+			return 0;
+
+		asio::io_context io;
 		asio::ip::tcp::resolver resolver(io);
 		std::string p = std::to_string(cli.Port());
 		auto endpoints = resolver.resolve(cli.Host().c_str(), p.c_str());

@@ -142,6 +142,7 @@ namespace bb {
 		, m_taskHookWM(0)
 		, m_taskHook32on64WM(0)
 		, m_job(nullptr), m_inJob(false)
+		, m_quit(false)
 		, m_defaultStyle(new StyleStruct)
 		, m_style()
 		, m_explorer()
@@ -334,6 +335,8 @@ namespace bb {
 			return false;
 		if (!m_wspaces.Init(m_config.m_wspaces))
 			return false;
+		if (!m_wallpaper.Init())
+			return false;
 		if (!m_gfx.Init())
 			return false;
 		if (!m_tasks.Init(m_config.m_tasks))
@@ -360,6 +363,7 @@ namespace bb {
 		m_plugins.Done();
 		m_tasks.Done();
 		m_gfx.Done();
+		m_wallpaper.Done();
 		if (m_explorer)
 			m_explorer->Done();
 
@@ -427,17 +431,20 @@ namespace bb {
 				if (!m_cmdLine.NoTrayHook())
 					m_tray.UpdateFromTrayHook();
 
-				// Rendering
 				m_gfx.Render();
-			}
 
-			m_gfx.Done();
+				if (m_quit)
+				{
+					break;
+				}
+			}
 		}
 		/* On crash: gather windows, then pass it to the OS */
 		__except (on_crash_handler(), EXCEPTION_CONTINUE_SEARCH)
 		{
 		}
-		//TRACE_MSG(trace::e_Info, trace::CTX_BBCore, "Main message loop terminated...");
+		
+		TRACE_MSG(LL_INFO, CTX_BB, "Main message loop terminated...");
 	}
 
 	void BlackBox::HandleServerMessages ()

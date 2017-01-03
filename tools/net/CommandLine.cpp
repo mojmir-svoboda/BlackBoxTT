@@ -28,7 +28,7 @@ namespace bb {
 		}
 		catch (TCLAP::ExitException & e)
 		{
-			//TRACE_MSG(LL_ERROR, CTX_INIT | CTX_CONFIG, "Command line parse exception: status=%i", e.getExitStatus());
+			m_quit = true;
 			return false;
 		}
 		catch (...)

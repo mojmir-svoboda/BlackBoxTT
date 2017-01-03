@@ -29,6 +29,7 @@ CLSID const CLSID_IVirtualNotificationService = { 0xA501FDEC, 0x4A09, 0x464C, 0x
 IID const IID_IVirtualDesktopNotification = { 0xC179334C, 0x4295, 0x40D3,{ 0xBE, 0xA1, 0xC6, 0x54, 0xD9, 0x65, 0x60, 0x5A }};
 CLSID const CLSID_VirtualDesktopAPI_Unknown = { 0xC5E0CDCA, 0x7B6E, 0x41B2, 0x9F, 0xC4, 0xD9, 0x39, 0x75, 0xCC, 0x46, 0x7B };
 IID const IID_IApplicationViewCollection  = { 0x2C08ADF0, 0xA386, 0x4B35, {0x92, 0x50, 0x0F, 0xE1, 0x83, 0x47, 0x6F, 0xCC }};
+CLSID const CLSID_VirtualDesktopPinnedApps = { 0xb5a399e7, 0x1c87, 0x46b8, 0x88, 0xe9, 0xfc, 0x57, 0x47, 0xb1, 0x71, 0xbd };
 
 struct IApplicationView;
 
@@ -92,6 +93,26 @@ public:
 	virtual HRESULT STDMETHODCALLTYPE Register (IVirtualDesktopNotification * pNotification, DWORD * pdwCookie) = 0;
 	virtual HRESULT STDMETHODCALLTYPE Unregister (DWORD dwCookie) = 0;
 };
+
+EXTERN_C const IID IID_IVirtualDesktopPinnedApps;
+
+// thanks to https://github.com/Ciantic/VirtualDesktopAccessor.git
+DECLARE_INTERFACE_IID_(IVirtualDesktopPinnedApps, IUnknown, "4ce81583-1e4c-4632-a621-07a53543148f")
+{
+	/*** IUnknown methods ***/
+	STDMETHOD(QueryInterface)(THIS_ REFIID riid, LPVOID FAR* ppvObject) PURE;
+	STDMETHOD_(ULONG, AddRef)(THIS) PURE;
+	STDMETHOD_(ULONG, Release)(THIS) PURE;
+
+	/*** IVirtualDesktopPinnedApps methods ***/
+	STDMETHOD(IsAppIdPinned)(THIS_ PCWSTR appId, BOOL*) PURE;
+	STDMETHOD(PinAppID)(THIS_ PCWSTR appId) PURE;
+	STDMETHOD(UnpinAppID)(THIS_ PCWSTR appId) PURE;
+	STDMETHOD(IsViewPinned)(THIS_ IApplicationView*, BOOL*) PURE;
+	STDMETHOD(PinView)(THIS_ IApplicationView*) PURE;
+	STDMETHOD(UnpinView)(THIS_ IApplicationView*) PURE;
+};
+
 
 EXTERN_C const IID IID_IApplicationViewCollection;
 struct IImmersiveApplication;

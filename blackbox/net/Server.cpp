@@ -44,7 +44,7 @@ namespace bb {
 
 	Server::Server ()
 		: m_requestLock()
-		, m_impl(nullptr)
+		, m_io(nullptr)
 	{
 		TRACE_MSG(LL_DEBUG, CTX_BB | CTX_NET, "Server @ 0x%x", this);
 		m_requests.reserve(64);
@@ -91,9 +91,8 @@ namespace bb {
 		try
 		{
 			TRACE_MSG(LL_DEBUG, CTX_BB | CTX_NET, "Server worker started");
-			asio::io_context io_context;
-			AsioServer s(this, io_context, m_config.m_port);
-			io_context.run();
+			AsioServer s(this, *m_io, m_config.m_port);
+			m_io->run();
 		}
 		catch (std::exception & e)
 		{
@@ -109,6 +108,7 @@ namespace bb {
 		m_config = cfg;
 		m_encodingBuffer.resize(m_config.m_encodeBuffSz);
 		TRACE_MSG(LL_INFO, CTX_BB | CTX_INIT, "Server init, port=%u", cfg.m_port);
+		m_io.reset(new asio::io_context);
 		m_thread = std::thread(&Server::Run, this);
 		return true;
 	}
@@ -117,7 +117,10 @@ namespace bb {
 	{
 		TRACE_MSG(LL_DEBUG, CTX_BB | CTX_NET, "Server terminating...");
 		// @TODO: terminate asio io ctx
+		if (m_io)
+			m_io->stop();
 		m_thread.join();
+		m_io.reset();
 		TRACE_MSG(LL_DEBUG, CTX_BB | CTX_NET, "Server terminated.");
 		return true;
 	}

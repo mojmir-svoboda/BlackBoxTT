@@ -7,6 +7,7 @@
 #include "Explorer.h"
 #include "gfx/Gfx.h"
 #include "CommandLine.h"
+#include "DesktopWallpaper.h"
 #include <net/Server.h>
 #include <scheme/Scheme.h>
 #include <VersionHelpers.h>
@@ -98,6 +99,7 @@ namespace bb {
 		unsigned m_taskHook32on64WM;
 		HANDLE m_job;
 		bool m_inJob;
+		bool m_quit;
 		BlackBoxConfig m_config;
 		CommandLine m_cmdLine;
 		Scheme m_scheme;
@@ -112,6 +114,7 @@ namespace bb {
 		Tray m_tray;
 		Gfx m_gfx;
 		PluginManager m_plugins;
+		DesktopWallpaper m_wallpaper;
 	};
 }
 

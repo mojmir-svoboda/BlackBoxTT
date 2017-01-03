@@ -7,6 +7,7 @@ namespace bb {
 
 	void BlackBox::Quit (uint32_t arg)
 	{
+		m_quit = true;
 	}
 
 	void BlackBox::MakeSticky (HWND hwnd)
