@@ -160,13 +160,16 @@ namespace bb {
 
 		IVirtualDesktopPinnedApps * ivdpa = nullptr;
 		if (!SUCCEEDED(isvc->QueryService(CLSID_VirtualDesktopPinnedApps, __uuidof(IVirtualDesktopPinnedApps), (PVOID*)&ivdpa)))
-			return false;
-		scope_guard_t on_exit_ivdpa = mkScopeGuard(std::mem_fun(&IVirtualDesktopPinnedApps::Release), ivdpa);
+		{ 
+// can fail on 10240
+//			return false;
+		}
+//		scope_guard_t on_exit_ivdpa = mkScopeGuard(std::mem_fun(&IVirtualDesktopPinnedApps::Release), ivdpa);
 
 		on_exit_ivdm.Dismiss();
 		on_exit_ivdmi.Dismiss();
 		on_exit_iavc.Dismiss();
-		on_exit_ivdpa.Dismiss();
+//		on_exit_ivdpa.Dismiss();
 
 		m_vdm = ivdm;
 		m_vdmi = ivdmi;
