@@ -68,6 +68,7 @@ namespace bb {
 	}
 
 	// @TODO: free pidls, IShellItemArrays ?
+	// @TODO: doc says to use SHParseDisplayName instead of ILCreateFromPath
 	void DesktopWallpaper::ApplyConfig (DesktopWallpaperConfig const & config)
 	{
 		if (config.m_enabled)

@@ -87,7 +87,7 @@ Plugins:
     path: 'c:/bb_devel/plugins/bbAnalog/bbAnalog.dll'
     enabled: false
     in_slit: true
- 
+
   - plugin: 'bbAnalogExMod'
     path: 'c:/bb_devel/plugins/bbAnalogExMod/bbAnalogExMod.dll'
     enabled: false
