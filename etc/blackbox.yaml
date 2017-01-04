@@ -58,13 +58,26 @@ Tasks:
 #  - window: '^Foo$'
 #    exclude: true
 
+# folder ids: https://msdn.microsoft.com/en-us/library/windows/desktop/dd378457(v=vs.85).aspx
 Menu:
-  - menu: 'Start'
-    cmd: 'SEARCHMENU'
-    type: 'path'
-  - menu: 'Explorer'
-    cmd: 'explorer.exe'
-    type: 'exec'
+  - item: 'Start'
+    folder: [ 'StartMenu', 'CommonStartMenu' ]
+  - item: 'Desktop'
+    folder: 'Desktop'
+  - item: 'Explorer'
+    exec: 'explorer.exe'
+  - item: 'System'
+      - item: 'Drives'
+        folder: 'Drives'
+        type: 'path'
+      - item: 'Controls'
+        folder: 'Controls'
+        type: 'path'
+#  - type: 'separator'
+  - item: 'bbTT'
+      - item: 'Cfg'
+      - item: 'About'
+      - item: 'Quit'
 
 Plugins:
   - plugin: 'bbSlit'
