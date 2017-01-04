@@ -128,6 +128,7 @@ add_subdirectory(etc)
 
 # install styles etc
 #  install(DIRECTORY styles backgrounds DESTINATION .)
+install(DIRECTORY media DESTINATION .)
 
 ###############################################################################
 # debug stuff
