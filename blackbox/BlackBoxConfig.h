@@ -7,6 +7,7 @@
 #include "WorkSpacesConfig.h"
 #include "net/ServerConfig.h"
 #include "plugin/PluginsConfig.h"
+#include "menu/MenuConfig.h"
 
 namespace bb {
 
@@ -46,6 +47,7 @@ namespace bb {
 		SchemeConfig m_scheme;
 		WidgetsConfig m_widgets;
 		DesktopWallpaperConfig m_wallpapers;
+		MenuConfig m_menu;
 	};
 }
 

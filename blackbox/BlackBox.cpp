@@ -280,6 +280,17 @@ namespace bb {
 				TRACE_MSG(LL_ERROR, CTX_BB | CTX_CONFIG, "* failed to load tasks section");
 			}
 
+			MenuConfig menu_cfg;
+			if (loadMenuConfig(y_root, menu_cfg))
+			{
+				TRACE_MSG(LL_INFO, CTX_BB | CTX_CONFIG, "* loaded Menu section");
+				m_config.m_menu = menu_cfg;
+			}
+			else
+			{
+				TRACE_MSG(LL_ERROR, CTX_BB | CTX_CONFIG, "* failed to load Menu section");
+			}
+
 			TRACE_MSG(LL_INFO, CTX_BB | CTX_CONFIG, "Config loaded");
 			return true;
 		}
