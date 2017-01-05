@@ -73,6 +73,7 @@ set(blackbox_SOURCES
 	plugin/PluginsConfig_yaml.cpp
 	utils_recover.cpp
 	utils_vdm.cpp
+	menu/MenuConfig_yaml.cpp
 )
 
 set (blackbox_HEADERS
@@ -119,6 +120,7 @@ set (blackbox_HEADERS
 	plugin/PluginManager.h
 	plugin/PluginConfig.h
 	plugin/PluginsConfig.h
+	menu/Menuconfig.h
 )
 
 if (NOT MINGW)

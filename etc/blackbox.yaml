@@ -60,24 +60,32 @@ Tasks:
 
 # folder ids: https://msdn.microsoft.com/en-us/library/windows/desktop/dd378457(v=vs.85).aspx
 Menu:
-  - item: 'Start'
-    folder: [ 'StartMenu', 'CommonStartMenu' ]
-  - item: 'Desktop'
-    folder: 'Desktop'
-  - item: 'Explorer'
-    exec: 'explorer.exe'
-  - item: 'System'
-      - item: 'Drives'
-        folder: 'Drives'
-        type: 'path'
-      - item: 'Controls'
-        folder: 'Controls'
-        type: 'path'
-#  - type: 'separator'
-  - item: 'bbTT'
-      - item: 'Cfg'
-      - item: 'About'
-      - item: 'Quit'
+  name: 'bbTT'
+  items:
+    - name: 'Start'
+      folder: 'StartMenu'
+    - name: 'Desktop'
+      folder: 'Desktop'
+    - name: 'Explorer'
+      exec: 'explorer.exe'
+    - name: 'System'
+      menu: 'Windows'
+        name: 'Win'
+        items:
+          - name: 'Drives'
+            folder: 'Drives'
+          - name: 'Controls'
+            folder: 'Controls'
+    - name: 'bbTT'
+      menu:
+        name: 'bbTT'
+        items:
+          - name: 'Cfg'
+          - name: 'Reconfigure'
+          - name: 'About'
+            script: '(ShowAbout)'
+          - name: 'Quit'
+            script: '(SetQuit 0)'
 
 Plugins:
   - plugin: 'bbSlit'
@@ -115,7 +123,7 @@ Explorer:
 Wallpapers:
   enabled: true
   bgColor: 0x000000 # bgr
-  position: 4 # 
+  position: 4 #
   slideShowTick: 1800000  # [ms]
   slideShowShuffle: false
   slideShowFiles:

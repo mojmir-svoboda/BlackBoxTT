@@ -284,7 +284,7 @@ namespace bb {
 			if (loadMenuConfig(y_root, menu_cfg))
 			{
 				TRACE_MSG(LL_INFO, CTX_BB | CTX_CONFIG, "* loaded Menu section");
-				m_config.m_menu = menu_cfg;
+				m_config.m_menu = std::move(menu_cfg);
 			}
 			else
 			{
