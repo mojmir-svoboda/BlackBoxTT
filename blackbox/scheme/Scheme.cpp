@@ -21,6 +21,19 @@ s7_pointer bind_SetQuit (s7_scheme * sc, s7_pointer args)
 	return s7_wrong_type_arg_error(sc, "SetQuit", 1, s7_car(args), "integer code");
 }
 
+s7_pointer bind_ShowMenu (s7_scheme * sc, s7_pointer args)
+{
+	if (s7_is_integer(s7_car(args)))
+	{
+		uint32_t const n = s7_integer(s7_car(args));
+		bb::BlackBox * const bb = getBlackBoxInstanceRW();
+		bb->ShowMenu(n);
+
+		return s7_nil(sc);
+	}
+	return s7_wrong_type_arg_error(sc, "ShowMenu", 1, s7_car(args), "0/1");
+}
+
 s7_pointer bind_SetCurrentVertexId (s7_scheme * sc, s7_pointer args)
 {
 	if (s7_is_string(s7_car(args)))

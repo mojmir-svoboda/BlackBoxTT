@@ -63,11 +63,11 @@ set(blackbox_SOURCES
 	widgets/ControlPanelWidget.cpp
 	widgets/DebugWidget.cpp
 	widgets/TasksWidget.cpp
+	widgets/MenuWidget.cpp
 	widgets/RecoverWindowsWidget.cpp
 	widgets/TrayWidget.cpp
 	widgets/PagerWidget.cpp
 	widgets/QuickBarWidget.cpp
-	Menu/Menu.cpp
 	bind/bind.cpp
 	plugin/PluginManager.cpp
 	plugin/PluginsConfig_yaml.cpp
@@ -112,6 +112,7 @@ set (blackbox_HEADERS
 	widgets/ControlPanelWidget.h
 	widgets/DebugWidget.h
 	widgets/TasksWidget.h
+	widgets/MenuWidget.h
 	widgets/RecoverWindowsWidget.h
 	widgets/TrayWidget.h
 	widgets/PagerWidget.h

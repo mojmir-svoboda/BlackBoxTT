@@ -118,9 +118,11 @@ namespace bb {
 		TRACE_MSG(LL_DEBUG, CTX_BB | CTX_NET, "Server terminating...");
 		// @TODO: terminate asio io ctx
 		if (m_io)
+		{
 			m_io->stop();
-		m_thread.join();
-		m_io.reset();
+			m_thread.join();
+			m_io.reset();
+		}
 		TRACE_MSG(LL_DEBUG, CTX_BB | CTX_NET, "Server terminated.");
 		return true;
 	}

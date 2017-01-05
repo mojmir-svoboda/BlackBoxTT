@@ -69,7 +69,7 @@ Menu:
     - name: 'Explorer'
       exec: 'explorer.exe'
     - name: 'System'
-      menu: 'Windows'
+      menu:
         name: 'Win'
         items:
           - name: 'Drives'

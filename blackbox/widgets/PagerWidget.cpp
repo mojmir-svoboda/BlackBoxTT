@@ -21,27 +21,6 @@ namespace bb {
 		tasks.MkDataCopy(m_tasks);
 	}
 
-	void resizeWindowToContents (HWND hwnd, int x, int y, int maxx, int maxy, int rnd)
-	{
-		if (x > maxx && y > maxy)
-		{
-			RECT r;
-			GetWindowRect(hwnd, &r);
-			int Width = r.left = r.right;
-			int Height = r.bottom - r.top;
-
-			DWORD dwStyle = ::GetWindowLongPtr(hwnd, GWL_STYLE);
-			DWORD dwExStyle = ::GetWindowLongPtr(hwnd, GWL_EXSTYLE);
-
-			RECT rc = { 0, 0, x, y };
-			//::AdjustWindowRectEx(&rc, dwStyle, FALSE, dwExStyle);
-
-			destroyRoundedRect(hwnd);
-			::SetWindowPos(hwnd, NULL, 0, 0, rc.right + 24, rc.bottom, SWP_NOZORDER | SWP_NOMOVE);
-			createRoundedRect(hwnd, rc.right + 24, rc.bottom, rnd, rnd);
-		}
-	}
-
 	void PagerWidget::DrawUI ()
 	{
 		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiSetCond_Always);

@@ -4,11 +4,11 @@
 
 namespace bb {
 
-inline void getWindowText (HWND hwnd, wchar_t * str, size_t n)
-{
-	str[0] = '\0';
-	::GetWindowTextW(hwnd, str, n);
-}
+	inline void getWindowText (HWND hwnd, wchar_t * str, size_t n)
+	{
+		str[0] = '\0';
+		::GetWindowTextW(hwnd, str, n);
+	}
 
 // BOOL IsAltTabWindow(HWND hwnd)
 // {
@@ -315,6 +315,26 @@ inline bool destroyRoundedRect (HWND hwnd)
 	::DeleteObject(::GetPropW(hwnd, L"region"));
 	::RemovePropW(hwnd, L"region");
 	return true;
+}
+inline void resizeWindowToContents (HWND hwnd, int x, int y, int maxx, int maxy, int rnd)
+{
+	if (x > maxx && y > maxy)
+	{
+		RECT r;
+		GetWindowRect(hwnd, &r);
+		int Width = r.left = r.right;
+		int Height = r.bottom - r.top;
+
+		DWORD dwStyle = ::GetWindowLongPtr(hwnd, GWL_STYLE);
+		DWORD dwExStyle = ::GetWindowLongPtr(hwnd, GWL_EXSTYLE);
+
+		RECT rc = { 0, 0, x, y };
+		//::AdjustWindowRectEx(&rc, dwStyle, FALSE, dwExStyle);
+
+		destroyRoundedRect(hwnd);
+		::SetWindowPos(hwnd, NULL, 0, 0, rc.right + 24, rc.bottom, SWP_NOZORDER | SWP_NOMOVE);
+		createRoundedRect(hwnd, rc.right + 24, rc.bottom, rnd, rnd);
+	}
 }
 
 }

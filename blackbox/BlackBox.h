@@ -57,6 +57,7 @@ namespace bb {
 
 		// binds
 		void Quit (uint32_t arg);
+		void ShowMenu (uint32_t arg);
 		void MakeSticky (HWND hwnd);
 		void RemoveSticky (HWND hwnd);
 		HWND GetHwnd ();

@@ -1,6 +1,7 @@
 #include "BlackBox.h"
 #include <bblib/utils_paths.h>
 #include <bblib/logging.h>
+#include "widgets/MenuWidget.h"
 #include "utils_window.h"
 
 namespace bb {
@@ -8,6 +9,19 @@ namespace bb {
 	void BlackBox::Quit (uint32_t arg)
 	{
 		m_quit = true;
+	}
+
+	void BlackBox::ShowMenu (uint32_t arg)
+	{
+		WidgetConfig wc;
+		wc.m_show = true;
+		wc.m_x = 0;
+		wc.m_y = 0;
+		wc.m_w = 120;
+		wc.m_h = 240;
+		wc.m_titlebar = true;
+		MenuWidget * m = m_widgets.MkWidget<MenuWidget>(wc);
+		m->CreateMenuFromConfig(m_config.m_menu);
 	}
 
 	void BlackBox::MakeSticky (HWND hwnd)
