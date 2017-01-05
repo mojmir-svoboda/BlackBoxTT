@@ -98,9 +98,12 @@ namespace bb {
 	bool Gfx::Done ()
 	{
 		TRACE_MSG(LL_INFO, CTX_BB | CTX_GFX, "Terminating gfx");
-		m_dx11->CleanupDeviceD3D();
-		delete m_dx11;
-		m_dx11 = nullptr;
+		if (m_dx11)
+		{
+			m_dx11->CleanupDeviceD3D();
+			delete m_dx11;
+			m_dx11 = nullptr;
+		}
 		return true;
 	}
 
