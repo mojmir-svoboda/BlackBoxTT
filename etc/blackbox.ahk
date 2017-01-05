@@ -1,5 +1,9 @@
 ; # = Win  ! = Alt  ^ = Control  + = Shift
 
+!RButton::
+   Run, c:\bb_devel\bbcli.exe -c "(ShowMenu 1)"
+Return
+
 +!h::
    Run, c:\bb_devel\bbcli.exe -c "(SwitchVertexViaEdge ""left"")"
 Return
