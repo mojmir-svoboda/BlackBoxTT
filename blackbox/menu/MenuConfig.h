@@ -24,6 +24,7 @@ namespace bb {
 
 		MenuItem () { }
 		MenuItem (MenuItem const & rhs);
+		MenuItem & operator= (MenuItem const & rhs);
 	};
 
 	struct MenuConfig
@@ -40,6 +41,23 @@ namespace bb {
 		, m_value(rhs.m_value)
 		, m_menu(rhs.m_menu ? new MenuConfig(*rhs.m_menu) : nullptr)
 	{ }
+
+	inline MenuItem & MenuItem::operator= (MenuItem const & rhs)
+	{
+		if (this != &rhs)
+		{
+			m_name = rhs.m_name;
+			m_type = rhs.m_type;
+			m_value = rhs.m_value;
+			if (rhs.m_menu)
+			{
+				std::unique_ptr<MenuConfig> cpy(new MenuConfig(*rhs.m_menu));
+				m_menu = std::move(cpy);
+			}
+		}
+		return *this;
+	}
+	
 
 	bool loadMenuConfig (YAML::Node & y_root, MenuConfig & config);
 }
