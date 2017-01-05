@@ -18,6 +18,7 @@ namespace bb {
 
 	void MenuWidget::CreateMenuFromConfig (MenuConfig const & cfg)
 	{
+		m_menuConfig = cfg;
 	}
 
 	void MenuWidget::DrawUI ()
