@@ -14,6 +14,7 @@
 #include <net/commands.h>
 #include "utils_win32.h"
 #include "hooks/taskhook.h"
+#include "widgets/MenuWidget.h"
 
 extern "C"
 {
@@ -137,15 +138,7 @@ namespace bb {
 	}
 
 	BlackBox::BlackBox ()
-		: m_hMainInstance(nullptr)
-		, m_hwnd(nullptr)
-		, m_taskHookWM(0)
-		, m_taskHook32on64WM(0)
-		, m_job(nullptr), m_inJob(false)
-		, m_quit(false)
-		, m_defaultStyle(new StyleStruct)
-		, m_style()
-		, m_explorer()
+		: m_defaultStyle(new StyleStruct)
 		, m_tasks(m_wspaces)
 		, m_widgets(m_tasks, m_gfx)
 	{
@@ -443,6 +436,19 @@ namespace bb {
 						::TranslateMessage(&msg);
 						::DispatchMessage(&msg);
 					}
+				}
+
+				if (m_menu)
+				{
+					if (!m_menuWidget)
+						m_menuWidget = CreateMenu(m_config.m_menu);
+					else if (!m_menuWidget->Enabled())
+						m_menuWidget->Show(true);
+				}
+				else if (!m_menu && m_menuWidget)
+				{
+					if (m_menuWidget->Enabled())
+						m_menuWidget->Show(false);
 				}
 
 				m_gfx.NewFrame();

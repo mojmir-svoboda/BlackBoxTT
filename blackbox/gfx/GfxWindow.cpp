@@ -1,6 +1,7 @@
 #include "GfxWindow.h"
 #include "DX11.h"
 #include "Gui.h"
+#include <blackbox/utils_window.h>
 
 namespace bb {
 
@@ -15,6 +16,17 @@ namespace bb {
 		m_gui->m_dx11->m_pd3dDeviceContext->ClearRenderTargetView(m_view, (float*)&m_clrCol);
 		m_gui->Render();
 		m_chain->Present(0, 0);
+	}
+
+	void GfxWindow::Show (bool on)
+	{
+		m_gui->m_enabled = on;
+		showWindow(m_gui->m_hwnd, on);
+	}
+
+	bool GfxWindow::Enabled () const
+	{
+		return m_gui->m_enabled;
 	}
 
 	bool GfxWindow::Done ()

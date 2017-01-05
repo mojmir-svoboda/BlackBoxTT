@@ -1,7 +1,7 @@
 ; # = Win  ! = Alt  ^ = Control  + = Shift
 
-!RButton::
-   Run, c:\bb_devel\bbcli.exe -c "(ShowMenu 1)"
+MButton::
+   Run, c:\bb_devel\bbcli.exe -c "(ToggleMenu)"
 Return
 
 +!h::

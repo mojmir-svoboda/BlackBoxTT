@@ -15,6 +15,7 @@
 #include <plugin/PluginManager.h>
 #include "blackbox_api.h"
 #include <bblibcompat/StyleStruct.h>
+namespace bb { struct MenuWidget; }
 
 namespace bb {
 
@@ -55,9 +56,12 @@ namespace bb {
 		Explorer & GetExplorer () { return *m_explorer; }
 		Explorer const & GetExplorer () const { return *m_explorer; }
 
+		MenuWidget * CreateMenu (MenuConfig const & config);
+
 		// binds
 		void Quit (uint32_t arg);
 		void ShowMenu (uint32_t arg);
+		void ToggleMenu ();
 		void MakeSticky (HWND hwnd);
 		void RemoveSticky (HWND hwnd);
 		HWND GetHwnd ();
@@ -94,13 +98,14 @@ namespace bb {
 		HWND FindTopLevelWindow () const;
 
 	protected:
-		HINSTANCE m_hMainInstance;
-		HWND m_hwnd;
-		unsigned m_taskHookWM;
-		unsigned m_taskHook32on64WM;
-		HANDLE m_job;
-		bool m_inJob;
-		bool m_quit;
+		HINSTANCE m_hMainInstance { nullptr };
+		HWND m_hwnd { nullptr };
+		unsigned m_taskHookWM { 0 };
+		unsigned m_taskHook32on64WM { 0 };
+		HANDLE m_job { nullptr };
+		bool m_inJob { false };
+		bool m_quit { false };
+		bool m_menu { false };
 		BlackBoxConfig m_config;
 		CommandLine m_cmdLine;
 		Scheme m_scheme;
@@ -116,6 +121,7 @@ namespace bb {
 		Gfx m_gfx;
 		PluginManager m_plugins;
 		DesktopWallpaper m_wallpapers;
+		MenuWidget * m_menuWidget { nullptr };
 	};
 }
 

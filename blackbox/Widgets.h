@@ -30,6 +30,7 @@ namespace bb {
 				win->m_gui->m_enabled = cfg.m_show;
 				win->GetGui()->AddWidget(t);
 				t->m_hwnd = win->m_hwnd;
+				t->m_gfxWindow = win;
 				m_tasks.AddWidgetTask(win);
 				return t;
 			}

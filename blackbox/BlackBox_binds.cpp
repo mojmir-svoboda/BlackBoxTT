@@ -13,15 +13,27 @@ namespace bb {
 
 	void BlackBox::ShowMenu (uint32_t arg)
 	{
+		m_menu = true;
+	}
+
+	void BlackBox::ToggleMenu ()
+	{
+		m_menu = !m_menu;
+	}
+
+	MenuWidget * BlackBox::CreateMenu (MenuConfig const & config)
+	{
 		WidgetConfig wc;
 		wc.m_show = true;
 		wc.m_x = 0;
-		wc.m_y = 0;
+		wc.m_y = 120;
 		wc.m_w = 120;
 		wc.m_h = 240;
 		wc.m_titlebar = true;
 		MenuWidget * m = m_widgets.MkWidget<MenuWidget>(wc);
-		m->CreateMenuFromConfig(m_config.m_menu);
+		m->CreateMenuFromConfig(config);
+		m->m_gfxWindow->m_gui->NewFrame();
+		return m;
 	}
 
 	void BlackBox::MakeSticky (HWND hwnd)

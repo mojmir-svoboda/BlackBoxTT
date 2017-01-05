@@ -34,6 +34,13 @@ s7_pointer bind_ShowMenu (s7_scheme * sc, s7_pointer args)
 	return s7_wrong_type_arg_error(sc, "ShowMenu", 1, s7_car(args), "0/1");
 }
 
+s7_pointer bind_ToggleMenu (s7_scheme * sc, s7_pointer args)
+{
+	bb::BlackBox * const bb = getBlackBoxInstanceRW();
+	bb->ToggleMenu();
+	return s7_nil(sc);
+}
+
 s7_pointer bind_SetCurrentVertexId (s7_scheme * sc, s7_pointer args)
 {
 	if (s7_is_string(s7_car(args)))
@@ -154,6 +161,8 @@ namespace bb {
 		m_scheme = s7_init();
 
 		s7_define_function(m_scheme, "SetQuit", bind_SetQuit, 1, 0, false, "(SetQuit int) Quits with code int");
+		s7_define_function(m_scheme, "ShowMenu", bind_ShowMenu, 1, 0, false, "(ShowMenu int) Show/Hide menu where int=1/0");
+		s7_define_function(m_scheme, "ToggleMenu", bind_ToggleMenu, 0, 0, false, "(ToggleMenu) Show/Hide menu if hidden/shown");
 		s7_define_function(m_scheme, "SetCurrentVertexId", bind_SetCurrentVertexId, 1, 0, false, "(SetCurrentVertexId vertex_id_string) Sets WorkSpace Graph to specified VertexId");
 		s7_define_function(m_scheme, "SwitchVertexViaEdge", bind_SwitchVertexViaEdge, 1, 0, false, "(SwitchVertexViaEdge edge_id_string) Switch WorkSpace via edge to destination vertex_id");
 		s7_define_function(m_scheme, "MaximizeTopWindow", bind_MaximizeTopWindow, 1, 0, false, "(SwitchVertexViaEdge edge_id_string) Switch WorkSpace via edge to destination vertex_id");

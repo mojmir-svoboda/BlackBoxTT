@@ -24,6 +24,8 @@ namespace bb {
 		void Render ();
 		void NewFrame ();
 		bool Done ();
+		void Show (bool on);
+		bool Enabled () const;
 		virtual void DrawUI () { }
 		Gui * GetGui () { return m_gui; }
 		Gui const * GetGui () const { return m_gui; }
