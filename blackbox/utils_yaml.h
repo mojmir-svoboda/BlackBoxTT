@@ -39,6 +39,34 @@ namespace YAML {
 			return true;
 		}
 	};
+
+// 	template<class T>
+// 	struct convert<std::vector<std::unique_ptr<T>>>
+// 	{
+// 		static Node encode (std::vector<std::unique_ptr<T>> const & rhs)
+// 		{
+// 			Node node(NodeType::Sequence);
+// 			for (typename std::vector<std::unique_ptr<T>>::const_iterator it = rhs.begin(); it != rhs.end(); ++it)
+// 				node.push_back(**it);
+// 			return node;
+// 		}
+// 
+// 		static bool decode (Node const & node, std::vector<std::unique_ptr<T>> & rhs)
+// 		{
+// 			if (!node.IsSequence())
+// 				return false;
+// 
+// 			rhs.clear();
+// 			for (typename std::vector<std::unique_ptr<T>>::const_iterator it = node.begin(); it != node.end(); ++it)
+// 			{
+// 				T tmp = it->as<T>();
+// 				std::unique_ptr<T> unique_tmp(new T(std::move(tmp)));
+// 				rhs.push_back(std::move(unique_tmp));
+// 			}
+// 			return true;
+// 		}
+// 	};
+
 }
 
 
