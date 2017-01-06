@@ -7,6 +7,7 @@ namespace bb {
 	struct MenuWidget : GuiWidget
 	{
 		MenuConfig m_menuConfig;
+		size_t m_currentIndex { 0 };
 		ImVec2 m_contentSize { 0, 0 };
 		MenuWidget (WidgetConfig & cfg);
 		virtual ~MenuWidget ();

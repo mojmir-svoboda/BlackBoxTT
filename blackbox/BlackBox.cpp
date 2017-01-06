@@ -438,19 +438,7 @@ namespace bb {
 					}
 				}
 
-				if (m_menu)
-				{
-					if (!m_menuWidget)
-						m_menuWidget = CreateMenu(m_config.m_menu);
-					else if (!m_menuWidget->Enabled())
-						m_menuWidget->Show(true);
-				}
-				else if (!m_menu && m_menuWidget)
-				{
-					if (m_menuWidget->Enabled())
-						m_menuWidget->Show(false);
-				}
-
+				HandleMenuState();
 				m_gfx.NewFrame();
 
 				m_tasks.Update();
@@ -526,5 +514,71 @@ namespace bb {
 			return m_tasks.GetActiveTask();
 		}
 		return hwnd;
+	}
+
+	
+	MenuWidget * BlackBox::CreateMenu (WidgetConfig & wcfg, MenuConfig const & config)
+	{
+		MenuWidget * m = m_widgets.MkWidget<MenuWidget>(wcfg);
+		m_tasks.Focus(m->m_hwnd);
+		m->CreateMenuFromConfig(config);
+		return m;
+	}
+
+	void BlackBox::ShowMenuOnPointerPos (bool show)
+	{
+		POINT p;
+		if (::GetCursorPos(&p))
+		{
+			RECT r;
+			::GetWindowRect(m_menuWidget->m_hwnd, &r);
+			if (::PtInRect(&r, p))
+			{
+				m_menuWidget->Show(show);
+			}
+			else
+			{
+				int const width = r.right - r.left;
+				int const height = r.bottom - r.top;
+				::MoveWindow(m_menuWidget->m_hwnd, p.x, p.y, width, height, false);
+				m_tasks.Focus(m_menuWidget->m_hwnd);
+				m_menuWidget->Show(true);
+				m_menu = true;
+			}
+		}
+	}
+
+	MenuWidget * BlackBox::CreateMenuOnPointerPos (MenuConfig const & config)
+	{
+		POINT p;
+		if (GetCursorPos(&p))
+		{
+			// #%@%#$^!#$^!#$^!#^#^# ^#% 
+			WidgetConfig wc;
+			wc.m_show = true;
+			wc.m_x = p.x;
+			wc.m_y = p.y;
+			wc.m_w = 32;
+			wc.m_h = 32;
+			wc.m_titlebar = true;
+			return CreateMenu(wc, config);
+		}
+		return nullptr;
+	}
+
+	void BlackBox::HandleMenuState ()
+	{
+		if (m_menu)
+		{
+			if (!m_menuWidget)
+				m_menuWidget = CreateMenuOnPointerPos(m_config.m_menu);
+			else if (!m_menuWidget->Enabled())
+				ShowMenuOnPointerPos(true);
+		}
+		else if (!m_menu && m_menuWidget)
+		{
+			if (m_menuWidget->Enabled())
+				ShowMenuOnPointerPos(false);
+		}
 	}
 }

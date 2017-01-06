@@ -56,7 +56,9 @@ namespace bb {
 		Explorer & GetExplorer () { return *m_explorer; }
 		Explorer const & GetExplorer () const { return *m_explorer; }
 
-		MenuWidget * CreateMenu (MenuConfig const & config);
+		MenuWidget * CreateMenu (WidgetConfig & wcfg, MenuConfig const & config);
+		MenuWidget * CreateMenuOnPointerPos (MenuConfig const & config);
+		void ShowMenuOnPointerPos (bool show);
 
 		// binds
 		void Quit (uint32_t arg);
@@ -94,6 +96,7 @@ namespace bb {
 		bool DetectConfig ();
 		bool Win32RegisterClass (wchar_t const * classname, WNDPROC wndproc, int flags);
 		void HandleServerMessages ();
+		void HandleMenuState ();
 		std::unique_ptr<Command> HandleServerMessage (std::unique_ptr<Command> const & request);
 		HWND FindTopLevelWindow () const;
 

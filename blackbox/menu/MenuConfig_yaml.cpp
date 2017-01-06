@@ -20,7 +20,7 @@ namespace YAML {
 			try
 			{
 				rhs.m_name = node["name"].as<bbstring>();
-				rhs.m_items = node["items"].as<std::vector<bb::MenuItem>>();
+				rhs.m_items = node["items"].as<std::vector<bb::MenuConfigItem>>();
 			}
 			catch (std::exception const & e)
 			{
@@ -32,9 +32,9 @@ namespace YAML {
 	};
 
 	template<>
-	struct convert<bb::MenuItem>
+	struct convert<bb::MenuConfigItem>
 	{
-		static Node encode (bb::MenuItem const & rhs)
+		static Node encode (bb::MenuConfigItem const & rhs)
 		{
 			Node node;
 			node.push_back(rhs.m_name);
@@ -45,7 +45,7 @@ namespace YAML {
 			return node;
 		}
 
-		static bool decode (Node const & node, bb::MenuItem & rhs)
+		static bool decode (Node const & node, bb::MenuConfigItem & rhs)
 		{
 			try
 			{

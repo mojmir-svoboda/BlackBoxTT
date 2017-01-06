@@ -15,34 +15,34 @@ namespace bb {
 
 	struct MenuConfig;
 
-	struct MenuItem
+	struct MenuConfigItem
 	{
 		bbstring m_name;
 		MenuItemType m_type { e_MenuItemSeparator };
 		bbstring m_value;
 		std::unique_ptr<MenuConfig> m_menu;
 
-		MenuItem () { }
-		MenuItem (MenuItem const & rhs);
-		MenuItem & operator= (MenuItem const & rhs);
+		MenuConfigItem () { }
+		MenuConfigItem (MenuConfigItem const & rhs);
+		MenuConfigItem & operator= (MenuConfigItem const & rhs);
 	};
 
 	struct MenuConfig
 	{
 		bbstring m_name;
-		std::vector<MenuItem> m_items;
+		std::vector<MenuConfigItem> m_items;
 
 		//void clear () { m_items.clear(); }
 	};
 
-	inline MenuItem::MenuItem (MenuItem const & rhs)
+	inline MenuConfigItem::MenuConfigItem (MenuConfigItem const & rhs)
 		: m_name(rhs.m_name)
 		, m_type(rhs.m_type)
 		, m_value(rhs.m_value)
 		, m_menu(rhs.m_menu ? new MenuConfig(*rhs.m_menu) : nullptr)
 	{ }
 
-	inline MenuItem & MenuItem::operator= (MenuItem const & rhs)
+	inline MenuConfigItem & MenuConfigItem::operator= (MenuConfigItem const & rhs)
 	{
 		if (this != &rhs)
 		{

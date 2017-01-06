@@ -71,8 +71,8 @@ namespace bb {
 			w->m_gui->m_dx11 = m_dx11;
 			w->m_gui->Init(hwnd, m_dx11);
 		}
-		m_windows.push_back(std::move(w));
-		return m_windows.back().get();
+		m_newWindows.push_back(std::move(w)); // @NOTE: new windows are waiting in m_newWindows until next frame
+		return m_newWindows.back().get();
 	}
 
 	GfxWindow * Gfx::MkGuiWindow (int x, int y, int w, int h, int alpha, wchar_t const * clname, wchar_t const * wname, bool show)
@@ -109,6 +109,10 @@ namespace bb {
 
 	void Gfx::NewFrame ()
 	{
+		for (GfxWindowPtr & w : m_newWindows)
+			m_windows.push_back(std::move(w));
+		m_newWindows.clear();
+
 		for (GfxWindowPtr & w : m_windows)
 		{
 			w->NewFrame();

@@ -14,6 +14,7 @@ namespace bb {
 		DX11 * m_dx11 { nullptr };
 		using GfxWindowPtr = std::unique_ptr<GfxWindow>;
 		std::vector<GfxWindowPtr> m_windows;
+		std::vector<GfxWindowPtr> m_newWindows;
 		std::vector<ID3D11Texture2D *> m_textures;
 		IconCache m_iconCache;
 

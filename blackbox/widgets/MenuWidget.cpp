@@ -37,11 +37,40 @@ namespace bb {
 		codecvt_utf16_utf8(GetNameW(), name, 256);
 		ImGui::Begin(name, &m_config.m_show, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);
 
-		ImGui::End();
+		size_t const sz = m_menuConfig.m_items.size();
+
+		{
+			//bool value_changed = false;
+			for (size_t i = 0; i < sz; ++i)
+			{
+				MenuConfigItem const & item = m_menuConfig.m_items[i];
+				const bool item_selected = (i == m_currentIndex);
+				char item_text[1024];
+				codecvt_utf16_utf8(item.m_name.c_str(), item_text, 1024);
+
+				//ImGui::SameLine();
+				ImGui::PushID(i);
+				//ImGui::SameLine();
+				if (ImGui::Selectable(item_text, item_selected))
+				{
+					// BB::CreateMenu()
+					if (item.m_type == e_MenuItemMenu)
+					{	
+						MenuWidget * w = bb::BlackBox::Instance().CreateMenuOnPointerPos(*item.m_menu);
+					}
+
+					m_currentIndex = i;
+					//value_changed = true;
+				}
+				ImGui::PopID();
+			}
+		}
 
 		ImGuiWindow * w = ImGui::GetCurrentWindowRead();
 		ImVec2 const & sz1 = w->SizeContents;
 		m_contentSize = sz1;
+
+		ImGui::End();
 	}
 
 }
