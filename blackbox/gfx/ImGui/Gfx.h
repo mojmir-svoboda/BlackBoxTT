@@ -8,6 +8,7 @@
 #include <WidgetConfig.h>
 
 namespace bb {
+namespace imgui {
 
 	struct Gfx
 	{
@@ -45,5 +46,5 @@ namespace bb {
 		//void OnResize (unsigned w, unsigned h);
 	};
 
-}
+}}
 

@@ -51,11 +51,11 @@ set(blackbox_SOURCES
 	WorkSpacesConfig_yaml.cpp
 	WorkSpacesGraph.cpp
 	WorkSpaces.cpp
-	gfx/DX11.cpp
-	gfx/Gfx.cpp
-	gfx/GfxWindow.cpp
+	gfx/ImGui/DX11.cpp
+	gfx/ImGui/Gfx.cpp
 	gfx/IconCache.cpp
-	gfx/Gui.cpp
+	gfx/ImGui/GfxWindow.cpp
+	gfx/ImGui/Gui.cpp
 	WidgetsConfig_yaml.cpp
 	Widgets.cpp
 	widgets/PluginsWidget.cpp
@@ -97,16 +97,17 @@ set (blackbox_HEADERS
 	utils_recover.h
 	utils_yaml.h
 	utils_vdm.h
-	gfx/DX11.h
-	gfx/Gfx.h
-	gfx/GfxWindow.h
-	gfx/Gui.h
+	gfx/ImGui/DX11.h
+	gfx/ImGui/Gfx.h
+	gfx/ImGui/GfxWindow.h
+	gfx/ImGui/Gui.h
 	gfx/GuiWidget.h
 	gfx/IconCache.h
 	gfx/IconId.h
-	gfx/imgui.h
+	gfx/GfxWindow.h
 	gfx/utils_gdi.h
-	gfx/utils_imgui.h
+	gfx/ImGui/imgui.h
+	gfx/ImGui/utils_imgui.h
 	widgets/PluginsWidget.h
 	widgets/StyleEditorWidget.h
 	widgets/ControlPanelWidget.h

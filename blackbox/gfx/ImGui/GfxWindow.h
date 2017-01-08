@@ -7,29 +7,23 @@ struct ID3D11RenderTargetView;
 struct ID3D11DepthStencilView;
 
 namespace bb {
+namespace imgui {
 	struct Gui;
 
-	struct GfxWindow
+	struct GfxWindow : bb::GfxWindow
 	{
-		HWND m_hwnd { nullptr };
-		Gui * m_gui { nullptr };
 		IDXGISwapChain1 * m_chain { nullptr };
 		ID3D11RenderTargetView * m_view { nullptr };
 		ImVec4 m_clrCol { ImColor(0, 0, 0, 255) };
-		bbstring m_clName { };
-		bbstring m_wName { };
 
 		GfxWindow () { }
 		virtual ~GfxWindow () { }
-		void Render ();
-		void NewFrame ();
-		bool Done ();
-		void Show (bool on);
-		bool Enabled () const;
+		virtual void Render () override;
+		virtual void NewFrame () override;
+		virtual bool Done () override;
+		virtual void Show (bool on) override;
+		virtual bool Enabled () const override;
 		virtual void DrawUI () { }
-		Gui * GetGui () { return m_gui; }
-		Gui const * GetGui () const { return m_gui; }
-		bbstring const & GetName () const { return m_wName; }
 	};
-}
+}}
 

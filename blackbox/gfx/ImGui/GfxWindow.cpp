@@ -4,6 +4,7 @@
 #include <blackbox/utils_window.h>
 
 namespace bb {
+namespace imgui {
 
 	void GfxWindow::NewFrame ()
 	{
@@ -56,4 +57,4 @@ namespace bb {
 		return true;
 	}
 
-}
+}}

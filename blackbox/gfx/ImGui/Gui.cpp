@@ -9,8 +9,9 @@
 #include <bblib/ScopeGuard.h>
 #include <functional>
 
-namespace bb
-{
+namespace bb {
+namespace imgui {
+
 	void Gui::OnResize (unsigned w, unsigned h)
 	{
 		if (m_dx11->m_pd3dDevice != NULL)
@@ -645,6 +646,6 @@ namespace bb
 		m_dx11->m_pd3dDeviceContext->PSSetShader(NULL, NULL, 0);
 		m_dx11->m_pd3dDeviceContext->VSSetShader(NULL, NULL, 0);
 	}
-}
+}}
 
 

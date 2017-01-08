@@ -8,8 +8,8 @@ struct ID3D11Buffer; struct ID3D10Blob;
 struct ID3D11VertexShader; struct ID3D11InputLayout; struct ID3D11PixelShader; struct ID3D11SamplerState;
 struct ID3D11ShaderResourceView; struct ID3D11RasterizerState; struct ID3D11BlendState;
 
-namespace bb
-{
+namespace bb {
+namespace imgui {
 	struct DX11;
 	struct GfxWindow;
 
@@ -59,5 +59,5 @@ namespace bb
 		void ReleaseDeviceObjects ();
 		void CreateFontsTexture ();
 	};
-}
+}}
 

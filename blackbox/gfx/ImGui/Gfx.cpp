@@ -8,6 +8,7 @@
 #include <bblib/logging.h>
 
 namespace bb {
+namespace imgui {
 
 	Gfx::~Gfx () { }
 
@@ -233,4 +234,4 @@ namespace bb {
 #endif
 	}
 
-}
+}}
