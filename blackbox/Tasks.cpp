@@ -105,7 +105,7 @@ void Tasks::AddTaskInfo (TaskInfo * ti)
 			bbstring name(ti->m_appName);
 
 			IconId id;
-			if (BlackBox::Instance().GetGfx().FindIconInCache(name, id))
+			if (BlackBox::Instance().FindIconInCache(name, id))
 			{
 				ti->m_icoSmall = id;
 			}
@@ -120,7 +120,7 @@ void Tasks::AddTaskInfo (TaskInfo * ti)
 					if (HICON sml = getTaskIconSmall(ti->m_hwnd))
 					{
 						IconId sml_id;
-						BlackBox::Instance().GetGfx().AddIconToCache(name, sml, sml_id);
+						BlackBox::Instance().AddIconToCache(name, sml, sml_id);
 						ti->m_icoSmall = sml_id;
 					}
 				}

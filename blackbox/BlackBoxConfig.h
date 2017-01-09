@@ -8,6 +8,7 @@
 #include "net/ServerConfig.h"
 #include "plugin/PluginsConfig.h"
 #include "menu/MenuConfig.h"
+#include "GfxConfig.h"
 
 namespace bb {
 
@@ -40,6 +41,7 @@ namespace bb {
 		OSConfig m_os;
 		DisplayConfig m_display;
 		TasksConfig m_tasks;
+		GfxConfig m_gfx;
 		TrayConfig m_tray;
 		WorkSpacesConfig m_wspaces;
 		PluginsConfig m_plugins;

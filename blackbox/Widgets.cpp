@@ -14,7 +14,7 @@
 
 namespace bb {
 
-Widgets::Widgets (Tasks & t, Gfx & g)
+Widgets::Widgets (Tasks & t, Gfx * g)
 	: m_tasks(t)
 	, m_gfx(g)
 {

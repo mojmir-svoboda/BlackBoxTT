@@ -99,8 +99,8 @@ namespace bb {
 						//DBG(L"%ws icofile=%ws idx=%i", tmp_name, icofile, idx);
 						if (hr_ex_ico == S_OK)
 						{
-							BlackBox::Instance().GetGfx().AddIconToCache(name, sml, sml_id);
-							BlackBox::Instance().GetGfx().AddIconToCache(name, lrg, lrg_id);
+							BlackBox::Instance().AddIconToCache(name, sml, sml_id);
+							BlackBox::Instance().AddIconToCache(name, lrg, lrg_id);
 
 							ExplorerItem ei(final_pidl, bbstring(tmp_name), bbstring(icofile), idx, sml_id, lrg_id);
 							m_controlPanel.push_back(std::move(ei));
@@ -113,7 +113,7 @@ namespace bb {
 							{
 								//DBG(L"extracted icon!");
 								IconId id;
-								BlackBox::Instance().GetGfx().AddIconToCache(name, exico, id);
+								BlackBox::Instance().AddIconToCache(name, exico, id);
 
 								if (id.m_size > 16)
 									lrg_id = id;

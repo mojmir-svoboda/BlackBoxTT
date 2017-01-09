@@ -5,41 +5,36 @@
 #include "Gui.h"
 #include "IconCache.h"
 #include "GfxWindow.h"
+#include <blackbox/gfx/Gfx.h>
 #include <WidgetConfig.h>
 
 namespace bb {
 namespace imgui {
 
-	struct Gfx
+	struct Gfx : bb::Gfx
 	{
 		DX11 * m_dx11 { nullptr };
-		using GfxWindowPtr = std::unique_ptr<GfxWindow>;
-		std::vector<GfxWindowPtr> m_windows;
-		std::vector<GfxWindowPtr> m_newWindows;
 		std::vector<ID3D11Texture2D *> m_textures;
 		IconCache m_iconCache;
 
 		Gfx () { }
-		~Gfx ();
-		bool IsReady () const { return m_dx11 != nullptr; }
-		bool Init ();
-		void Render ();
-		void NewFrame ();
-		bool Done ();
+		virtual ~Gfx ();
+		virtual bool Init () override;
+		virtual void Render () override;
+		virtual void NewFrame () override;
+		virtual bool Done () override;
 
-		GfxWindow * MkGuiWindow (int x, int y, int w, int h, int alpha, wchar_t const * clname, wchar_t const * wname, bool show);
-		HWND MkWindow (void * gui, int x, int y, int w, int h, int alpha, wchar_t const * clname, wchar_t const * wname);
-		GfxWindow * MkGfxWindow (HWND hwnd, Gui * gui, wchar_t const * clname, wchar_t const * wname);
-		GfxWindow * GetGfxWindow (size_t n) { return m_windows[n].get(); }
-		GfxWindow const * GetGfxWindow (size_t n) const { return m_windows[n].get(); }
+		virtual GfxWindow * MkGuiWindow (int x, int y, int w, int h, int alpha, wchar_t const * clname, wchar_t const * wname, bool show) override;
+		virtual HWND MkWindow (void * gui, int x, int y, int w, int h, int alpha, wchar_t const * clname, wchar_t const * wname) override;
+		virtual GfxWindow * MkGfxWindow (HWND hwnd, Gui * gui, wchar_t const * clname, wchar_t const * wname) override;
 
 		bool MkIconResourceView (IconSlab & slab);
 		bool UpdateIconResourceView (IconSlab & slab);
-		bool AddIconToCache (bbstring const & name, HICON ico, IconId & id)
+		virtual bool AddIconToCache (bbstring const & name, HICON ico, IconId & id) override
 		{
 			return m_iconCache.Add(name, ico, id);
 		}
-		bool FindIconInCache (bbstring const & name, IconId & id) const
+		virtual bool FindIconInCache (bbstring const & name, IconId & id) const override
 		{
 			return m_iconCache.Find(name, id);
 		}

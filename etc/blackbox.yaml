@@ -4,6 +4,9 @@ BlackBox:
     - 'default'
   styleCycle:
 
+Gfx:
+  use: 'ImGui'
+
 Widgets:
   - widget: 'QuickBar'
     show: true

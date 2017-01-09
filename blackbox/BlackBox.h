@@ -51,14 +51,17 @@ namespace bb {
 		WorkSpaces const & GetWorkSpaces() const { return m_wspaces; }
 		Tray & GetTray () { return m_tray; }
 		Tray const & GetTray () const { return m_tray; }
-		Gfx & GetGfx () { return m_gfx; }
-		Gfx const & GetGfx () const { return m_gfx; }
+		bool CreateGfx (GfxConfig & cfg);
+		//Gfx & GetGfx () { return m_gfx; }
+		//Gfx const & GetGfx () const { return m_gfx; }
 		Explorer & GetExplorer () { return *m_explorer; }
 		Explorer const & GetExplorer () const { return *m_explorer; }
 
 		MenuWidget * CreateMenu (WidgetConfig & wcfg, MenuConfig const & config);
 		MenuWidget * CreateMenuOnPointerPos (MenuConfig const & config);
 		void ShowMenuOnPointerPos (bool show);
+		bool AddIconToCache (bbstring const & name, HICON ico, IconId & id);
+		bool FindIconInCache (bbstring const & name, IconId & id);
 
 		// binds
 		void Quit (uint32_t arg);
@@ -121,7 +124,7 @@ namespace bb {
 		Tasks m_tasks;
 		Widgets m_widgets;
 		Tray m_tray;
-		Gfx m_gfx;
+		std::unique_ptr<Gfx> m_gfx;
 		PluginManager m_plugins;
 		DesktopWallpaper m_wallpapers;
 		MenuWidget * m_menuWidget { nullptr };

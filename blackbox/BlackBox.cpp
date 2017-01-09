@@ -139,7 +139,7 @@ namespace bb {
 	BlackBox::BlackBox ()
 		: m_defaultStyle(new StyleStruct)
 		, m_tasks(m_wspaces)
-		, m_widgets(m_tasks, m_gfx)
+		, m_widgets(m_tasks, nullptr)
 	{
 		setDefaultValuesTo(*m_defaultStyle.get());
 	}
@@ -217,6 +217,15 @@ namespace bb {
 			{
 				TRACE_MSG(LL_ERROR, CTX_BB | CTX_CONFIG, "* failed to load tasks section");
 				m_config.m_tasks.clear();
+			}
+			if (loadGfxConfig(y_root, m_config.m_gfx))
+			{
+				TRACE_MSG(LL_INFO, CTX_BB | CTX_CONFIG, "* loaded Gfx section");
+			}
+			else
+			{
+				TRACE_MSG(LL_ERROR, CTX_BB | CTX_CONFIG, "* failed to load Gfx section");
+				m_config.m_widgets.clear();
 			}
 			if (loadWidgetsConfig(y_root, m_config.m_widgets))
 			{
@@ -317,8 +326,10 @@ namespace bb {
 		return m_hwnd != nullptr;
 	}
 
-
-
+	bool BlackBox::CreateGfx (GfxConfig & cfg)
+	{
+		bbstring const & use = cfg.m_use;
+	}
 
 	bool BlackBox::Init (HINSTANCE hmi)
 	{
@@ -351,7 +362,7 @@ namespace bb {
 			return false;
 		if (!m_wallpapers.Init(m_config.m_wallpapers))
 			return false;
-		if (!m_gfx.Init())
+		if (!CreateGfx(m_config.m_gfx))
 			return false;
 		if (!m_tasks.Init(m_config.m_tasks))
 			return false;
@@ -376,7 +387,8 @@ namespace bb {
 		m_tray.Done();
 		m_plugins.Done();
 		m_tasks.Done();
-		m_gfx.Done();
+		if (m_gfx)
+			m_gfx->Done();
 		m_wallpapers.Done();
 		if (m_explorer)
 			m_explorer->Done();
@@ -438,7 +450,8 @@ namespace bb {
 				}
 
 				HandleMenuState();
-				m_gfx.NewFrame();
+				if (m_gfx)
+					m_gfx->NewFrame();
 
 				m_tasks.Update();
 				HandleServerMessages();
@@ -446,7 +459,8 @@ namespace bb {
 				if (!m_cmdLine.NoTrayHook())
 					m_tray.UpdateFromTrayHook();
 
-				m_gfx.Render();
+				if (m_gfx)
+					m_gfx->Render();
 
 				if (m_quit)
 				{
