@@ -1,6 +1,7 @@
 #pragma once
 #include <blackbox/gfx/GuiWidget.h>
 #include <blackbox/Tasks.h>
+#include <imgui/imgui.h>
 
 namespace bb {
 

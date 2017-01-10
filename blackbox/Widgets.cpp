@@ -1,14 +1,14 @@
 #include "Widgets.h"
 #include <bblib/logging.h>
-#include <widgets/StyleEditorWidget.h>
-#include <widgets/PluginsWidget.h>
-#include <widgets/ControlPanelWidget.h>
-#include <widgets/RecoverWindowsWidget.h>
-#include <widgets/TasksWidget.h>
-#include <widgets/PagerWidget.h>
-#include <widgets/DebugWidget.h>
-#include <widgets/QuickBarWidget.h>
-#include <widgets/TrayWidget.h>
+#include <gfx/widgets/ImGui/StyleEditorWidget.h>
+#include <gfx/widgets/ImGui/PluginsWidget.h>
+#include <gfx/widgets/ImGui/ControlPanelWidget.h>
+#include <gfx/widgets/ImGui/RecoverWindowsWidget.h>
+#include <gfx/widgets/ImGui/TasksWidget.h>
+#include <gfx/widgets/ImGui/PagerWidget.h>
+#include <gfx/widgets/ImGui/DebugWidget.h>
+#include <gfx/widgets/ImGui/QuickBarWidget.h>
+#include <gfx/widgets/ImGui/TrayWidget.h>
 #include "utils_window.h"
 #include <array>
 

@@ -51,23 +51,7 @@ set(blackbox_SOURCES
 	WorkSpacesConfig_yaml.cpp
 	WorkSpacesGraph.cpp
 	WorkSpaces.cpp
-	gfx/ImGui/DX11.cpp
-	gfx/ImGui/Gfx.cpp
-	gfx/IconCache.cpp
-	gfx/ImGui/GfxWindow.cpp
-	gfx/ImGui/Gui.cpp
 	WidgetsConfig_yaml.cpp
-	Widgets.cpp
-	widgets/PluginsWidget.cpp
-	widgets/StyleEditorWidget.cpp
-	widgets/ControlPanelWidget.cpp
-	widgets/DebugWidget.cpp
-	widgets/TasksWidget.cpp
-	widgets/MenuWidget.cpp
-	widgets/RecoverWindowsWidget.cpp
-	widgets/TrayWidget.cpp
-	widgets/PagerWidget.cpp
-	widgets/QuickBarWidget.cpp
 	bind/bind.cpp
 	plugin/PluginManager.cpp
 	plugin/PluginsConfig_yaml.cpp
@@ -97,32 +81,54 @@ set (blackbox_HEADERS
 	utils_recover.h
 	utils_yaml.h
 	utils_vdm.h
-	gfx/ImGui/DX11.h
-	gfx/ImGui/Gfx.h
-	gfx/ImGui/GfxWindow.h
-	gfx/ImGui/Gui.h
 	gfx/GuiWidget.h
 	gfx/IconCache.h
 	gfx/IconId.h
 	gfx/GfxWindow.h
 	gfx/utils_gdi.h
-	gfx/ImGui/imgui.h
-	gfx/ImGui/utils_imgui.h
-	widgets/PluginsWidget.h
-	widgets/StyleEditorWidget.h
-	widgets/ControlPanelWidget.h
-	widgets/DebugWidget.h
-	widgets/TasksWidget.h
-	widgets/MenuWidget.h
-	widgets/RecoverWindowsWidget.h
-	widgets/TrayWidget.h
-	widgets/PagerWidget.h
-	widgets/QuickBarWidget.h
 	plugin/plugin.h
 	plugin/PluginManager.h
 	plugin/PluginConfig.h
 	plugin/PluginsConfig.h
 	menu/Menuconfig.h
+)
+
+set (blackbox_ImGui_SOURCES
+	gfx/ImGui/DX11.cpp
+	gfx/ImGui/Gfx.cpp
+	gfx/IconCache.cpp
+	gfx/ImGui/GfxWindow.cpp
+	gfx/ImGui/Gui.cpp
+	gfx/widgets/ImGui/PluginsWidget.cpp
+	gfx/widgets/ImGui/StyleEditorWidget.cpp
+	gfx/widgets/ImGui/ControlPanelWidget.cpp
+	gfx/widgets/ImGui/DebugWidget.cpp
+	gfx/widgets/ImGui/TasksWidget.cpp
+	gfx/widgets/ImGui/MenuWidget.cpp
+	gfx/widgets/ImGui/RecoverWindowsWidget.cpp
+	gfx/widgets/ImGui/TrayWidget.cpp
+	gfx/widgets/ImGui/PagerWidget.cpp
+	gfx/widgets/ImGui/QuickBarWidget.cpp
+	#gfx/Widgets.cpp
+)
+
+set (blackbox_ImGui_SOURCES
+	gfx/ImGui/imgui.h
+	gfx/ImGui/utils_imgui.h
+	gfx/ImGui/DX11.h
+	gfx/ImGui/Gfx.h
+	gfx/ImGui/GfxWindow.h
+	gfx/ImGui/Gui.h
+	gfx/widgets/ImGui/PluginsWidget.h
+	gfx/widgets/ImGui/StyleEditorWidget.h
+	gfx/widgets/ImGui/ControlPanelWidget.h
+	gfx/widgets/ImGui/DebugWidget.h
+	gfx/widgets/ImGui/TasksWidget.h
+	gfx/widgets/ImGui/MenuWidget.h
+	gfx/widgets/ImGui/RecoverWindowsWidget.h
+	gfx/widgets/ImGui/TrayWidget.h
+	gfx/widgets/ImGui/PagerWidget.h
+	gfx/widgets/ImGui/QuickBarWidget.h
 )
 
 if (NOT MINGW)
@@ -137,21 +143,23 @@ endif (NOT MINGW)
 
 ### blackbox dll
 
+add_library(bbImGui SHARED ${blackbox_ImGui_SOURCES} ${blackbox_ImGui_HEADERS})
+target_link_libraries(bbImGui d3d11)
+target_link_libraries(bbImGui d3dcompiler)
+target_link_libraries(bbImGui imgui)
 add_library(blackbox SHARED ${blackbox_SOURCES} ${blackbox_HEADERS} blackbox.def)
 set_target_properties(blackbox PROPERTIES ENABLE_EXPORTS ON)
 target_link_libraries(blackbox bblib)
 target_link_libraries(blackbox version comctl32 shlwapi)
 target_link_libraries(blackbox taskhook trayhook)
 target_link_libraries(blackbox yaml-cpp)
-target_link_libraries(blackbox imgui)
 target_link_libraries(blackbox dwmapi)
-target_link_libraries(blackbox d3d11)
-target_link_libraries(blackbox d3dcompiler)
 target_link_libraries(blackbox net)
 target_link_libraries(blackbox scheme)
 target_link_libraries(blackbox bbprotolib)
 target_link_libraries(blackbox libcrazyrc)
 target_link_libraries(blackbox Pathcch)
+target_link_libraries(blackbox bbImGui)
 if(OPTION_USE_TRACE)
 	target_link_libraries(blackbox ${TRACE_LIBRARY})
 endif(OPTION_USE_TRACE)

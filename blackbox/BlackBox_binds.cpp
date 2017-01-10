@@ -1,7 +1,6 @@
 #include "BlackBox.h"
 #include <bblib/utils_paths.h>
 #include <bblib/logging.h>
-#include "widgets/MenuWidget.h"
 #include "utils_window.h"
 
 namespace bb {
