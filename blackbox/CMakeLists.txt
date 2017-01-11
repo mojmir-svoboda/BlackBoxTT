@@ -82,7 +82,6 @@ set (blackbox_HEADERS
 	utils_yaml.h
 	utils_vdm.h
 	gfx/GuiWidget.h
-	gfx/IconCache.h
 	gfx/IconId.h
 	gfx/GfxWindow.h
 	gfx/utils_gdi.h
@@ -96,7 +95,7 @@ set (blackbox_HEADERS
 set (blackbox_ImGui_SOURCES
 	gfx/ImGui/DX11.cpp
 	gfx/ImGui/Gfx.cpp
-	gfx/IconCache.cpp
+	gfx/ImGui/IconCache.cpp
 	gfx/ImGui/GfxWindow.cpp
 	gfx/ImGui/Gui.cpp
 	gfx/widgets/ImGui/PluginsWidget.cpp
@@ -112,13 +111,14 @@ set (blackbox_ImGui_SOURCES
 	#gfx/Widgets.cpp
 )
 
-set (blackbox_ImGui_SOURCES
+set (blackbox_ImGui_HEADERS
 	gfx/ImGui/imgui.h
 	gfx/ImGui/utils_imgui.h
 	gfx/ImGui/DX11.h
 	gfx/ImGui/Gfx.h
 	gfx/ImGui/GfxWindow.h
 	gfx/ImGui/Gui.h
+	gfx/ImGui/IconCache.h
 	gfx/widgets/ImGui/PluginsWidget.h
 	gfx/widgets/ImGui/StyleEditorWidget.h
 	gfx/widgets/ImGui/ControlPanelWidget.h
@@ -143,7 +143,8 @@ endif (NOT MINGW)
 
 ### blackbox dll
 
-add_library(bbImGui SHARED ${blackbox_ImGui_SOURCES} ${blackbox_ImGui_HEADERS})
+#add_library(bbImGui SHARED ${blackbox_ImGui_SOURCES} ${blackbox_ImGui_HEADERS})
+add_library(bbImGui ${blackbox_ImGui_SOURCES} ${blackbox_ImGui_HEADERS})
 target_link_libraries(bbImGui d3d11)
 target_link_libraries(bbImGui d3dcompiler)
 target_link_libraries(bbImGui imgui)

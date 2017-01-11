@@ -57,7 +57,7 @@ namespace imgui {
 
 	GfxWindow * Gfx::MkGfxWindow (HWND hwnd, Gui * gui, wchar_t const * clname, wchar_t const * wname)
 	{
-		GfxWindowPtr w(new GfxWindow);
+		GfxWindowPtr w(new ImGui::GfxWindow);
 		w->m_hwnd = hwnd;
 		w->m_chain = m_dx11->CreateSwapChain(hwnd);
 		w->m_view = nullptr; // created in WM_SIZE

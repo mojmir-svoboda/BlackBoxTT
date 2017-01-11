@@ -8,17 +8,18 @@ namespace bb
 {
 	struct GuiWidget
 	{
-		WidgetConfig & m_config;
-		HWND m_hwnd { nullptr };
+		bool m_show { false };
 		GfxWindow * m_gfxWindow { nullptr };
+		WidgetConfig m_config;
 
 		GuiWidget (WidgetConfig & cfg) : m_config(cfg) { }
 		virtual ~GuiWidget () { }
 		virtual void DrawUI () { }
 		virtual char const * GetName () = 0;
 		virtual wchar_t const * GetNameW () = 0;
-		void Show (bool on) { m_gfxWindow->Show(on); }
-		bool Enabled () const { return m_gfxWindow->Enabled(); }
+
+		virtual void Show (bool on) { m_show = on; }
+		virtual bool Visible () const { return m_show; }
 	};
 }
 

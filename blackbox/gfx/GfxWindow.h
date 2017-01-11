@@ -20,7 +20,7 @@ namespace bb {
 		virtual bool Done () = 0;
 
 		virtual void Show (bool on) = 0;
-		virtual bool Enabled () const = 0;
+		virtual bool Visible () const = 0;
 
 		Gui * GetGui () { return m_gui; }
 		Gui const * GetGui () const { return m_gui; }

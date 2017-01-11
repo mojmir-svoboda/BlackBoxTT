@@ -2,21 +2,21 @@
 #include <imgui/imgui.h>
 #include <platform_win.h>
 #include <vector>
-#include "GuiWidget.h"
+#include <blackbox/gfx/Gui.h>
+#include <blackbox/gfx/GuiWidget.h>
 #include <bblib/bbstring.h>
 struct ID3D11Buffer; struct ID3D10Blob;
 struct ID3D11VertexShader; struct ID3D11InputLayout; struct ID3D11PixelShader; struct ID3D11SamplerState;
 struct ID3D11ShaderResourceView; struct ID3D11RasterizerState; struct ID3D11BlendState;
 
 namespace bb {
-namespace imgui {
 	struct DX11;
+namespace imgui {
 	struct GfxWindow;
 
-	struct Gui
+	struct Gui : bb::Gui
 	{
 		Gui () { }
-		bool m_enabled { false };
 		bool m_hasDeviceObjects { false };
 		HWND m_hwnd { nullptr };
 		DX11 * m_dx11 { nullptr };
@@ -41,13 +41,17 @@ namespace imgui {
 
 		void AddWidget (GuiWidget * win);
 
-		bool Init (HWND hwnd, DX11 * dx11);
-		void DrawUI ();
-		void Render ();
+		virtual void NewFrame () override;
+		virtual void DrawUI () override;
+		virtual void Render () override;
+		virtual bool Init (bb::GfxWindow * w) override;
+		virtual bool Done () override;
+
+		virtual void Show (bool on) { m_show = on; }
+		virtual bool Visible () const { return m_show; }
+
+		bool InitDX (GfxWindow * w, DX11 * dx11);
 		void RenderImGui ();
-		void NewFrame ();
-		void Done ();
-		void SetEnabled (bool enabled) { m_enabled = enabled; }
 
 		static LRESULT CALLBACK GuiWndProcDispatch (HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam);
 		LRESULT WndProcHandler (HWND, UINT msg, WPARAM wParam, LPARAM lParam);

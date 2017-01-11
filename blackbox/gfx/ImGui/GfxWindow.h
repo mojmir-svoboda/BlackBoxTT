@@ -22,7 +22,7 @@ namespace imgui {
 		virtual void NewFrame () override;
 		virtual bool Done () override;
 		virtual void Show (bool on) override;
-		virtual bool Enabled () const override;
+		virtual bool Visible () const override;
 		virtual void DrawUI () { }
 	};
 }}

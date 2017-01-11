@@ -2,7 +2,7 @@
 #include <platform_win.h>
 #include <bbstring.h>
 #include <memory>
-#include "IconId.h"
+#include <blackbox/gfx/IconId.h>
 #include <loki/AssocVector.h>
 #include <imgui/imgui.h>
 struct ID3D11ShaderResourceView;

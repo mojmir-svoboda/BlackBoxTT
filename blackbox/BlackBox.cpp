@@ -13,6 +13,7 @@
 #include <net/commands.h>
 #include "utils_win32.h"
 #include "hooks/taskhook.h"
+#include "gfx/ImGui/Gfx.h"
 
 extern "C"
 {
@@ -328,6 +329,10 @@ namespace bb {
 	bool BlackBox::CreateGfx (GfxConfig & cfg)
 	{
 		bbstring const & use = cfg.m_use;
+
+		std::unique_ptr<Gfx> gfx;
+		if (use == L"ImGui")
+			gfx = std::move(new bb::imgui::Gfx());
 	}
 
 	bool BlackBox::Init (HINSTANCE hmi)
