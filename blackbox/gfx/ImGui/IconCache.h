@@ -8,6 +8,7 @@
 struct ID3D11ShaderResourceView;
 
 namespace bb {
+namespace imgui {
 
 	uint32_t const c_maxIconTextureSize = 2048;
 
@@ -53,6 +54,5 @@ namespace bb {
 		bool Add (bbstring const & name, HICON ico, IconId & id);
 		bool Find (bbstring const & name, IconId & id) const;
 		bool GetSlab (IconId id, IconSlab const * & icon_slab) const;
-		void Update ();
 	};
-}
+}}

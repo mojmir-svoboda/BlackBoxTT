@@ -1,10 +1,12 @@
 #pragma once
 #include "IconCache.h"
-#include "utils_gdi.h"
+#include <blackbox/gfx/utils_gdi.h>
 #include <imgui/imgui.h>
 #include <blackbox/BlackBox.h>
+#include <blackbox/gfx/ImGui/DX11.h>
 
 namespace bb {
+namespace imgui {
 
 	IconSlab::~IconSlab ()
 	{
@@ -12,21 +14,6 @@ namespace bb {
 		{
 			m_view->Release();
 			m_view = nullptr;
-		}
-	}
-
-	void IconSlab::Update ()
-	{
-		if (m_updated < m_end)
-		{
-			if (m_view == nullptr)
-			{
-				BlackBox::Instance().GetGfx().MkIconResourceView(*this);
-			}
-			else
-			{
-				BlackBox::Instance().GetGfx().UpdateIconResourceView(*this);
-			}
 		}
 	}
 
@@ -147,12 +134,6 @@ namespace bb {
 		return false;
 	}
 
-	void IconSlabs::Update ()
-	{
-		for (auto & it : m_slabs)
-			it->Update();
-	}
-
 	bool IconSlabs::Find (bbstring const & name, IconId & id) const
 	{
 		for (size_t s = 0, se = m_slabs.size(); s < se; ++s)
@@ -218,10 +199,4 @@ namespace bb {
 		icon_slab = nullptr;
 		return false;
 	}
-
-	void IconCache::Update ()
-	{
-		for (auto it : m_slabs)
-			it.second->Update();
-	}
-}
+}}

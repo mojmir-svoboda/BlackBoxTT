@@ -1,6 +1,6 @@
 #include "MenuWidget.h"
 #include <blackbox/BlackBox.h>
-#include <blackbox/gfx/utils_imgui.h>
+#include <blackbox/gfx/ImGui/utils_imgui.h>
 #include <blackbox/utils_window.h>
 #include <bblib/codecvt.h>
 #include <imgui/imgui_internal.h>
@@ -30,7 +30,7 @@ namespace bb {
 		if (m_contentSize.x > 0 && m_contentSize.y > 0)
 		{
 			ImGuiStyle & style = ImGui::GetStyle();
-			resizeWindowToContents(m_hwnd, m_contentSize.x, m_contentSize.y, style.WindowMinSize.x, style.WindowMinSize.y, style.WindowRounding);
+			resizeWindowToContents(m_gfxWindow->m_hwnd, m_contentSize.x, m_contentSize.y, style.WindowMinSize.x, style.WindowMinSize.y, style.WindowRounding);
 		}
 
 		char name[256];

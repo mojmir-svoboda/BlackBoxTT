@@ -1,4 +1,5 @@
 #include "Gui.h"
+#include "GfxWindow.h"
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 #include "DX11.h"
@@ -35,7 +36,7 @@ namespace imgui {
 
 	void Gui::Render ()
 	{
-		if (m_enabled)
+		if (m_show)
 		{
 			ImGuiContext * const old_ctx = ImGui::GetCurrentContext();
 			ImGui::SetCurrentContext(m_context);
@@ -55,7 +56,7 @@ namespace imgui {
 
 	void Gui::DrawUI ()
 	{
-		if (!m_enabled)
+		if (!m_show)
 			return;
 
 		for (GuiWidget * w : m_widgets)
@@ -78,7 +79,7 @@ namespace imgui {
 
 	void Gui::NewFrame ()
 	{
-		if (m_enabled)
+		if (m_show)
 		{
 			ImGuiContext * const old_ctx = ImGui::GetCurrentContext();
 			ImGui::SetCurrentContext(m_context);
@@ -240,11 +241,11 @@ namespace imgui {
 	}
 
 
-	bool Gui::Init (HWND hwnd, DX11 * dx11)
+	bool Gui::Init (bb::GfxWindow * w)
 	{
-		TRACE_MSG(LL_INFO, CTX_BB | CTX_GFX | CTX_INIT , "Initializing GUI for hwnd=0x%x", hwnd);
-		m_hwnd = hwnd;
-		m_dx11 = dx11;
+		TRACE_MSG(LL_INFO, CTX_BB | CTX_GFX | CTX_INIT , "Initializing GUI for hwnd=0x%x", w->m_hwnd);
+		m_hwnd = w->m_hwnd;
+		m_dx11 = w->m_dx11;
 		ImGuiContext * const old_ctx = ImGui::GetCurrentContext();
 		TRACE_MSG(LL_INFO, CTX_BB | CTX_GFX, "Old context = 0x%x", old_ctx);
 		m_context = ImGui::CreateContext();
@@ -497,7 +498,7 @@ namespace imgui {
 		}
 	}
 
-	void Gui::Done ()
+	bool Gui::Done ()
 	{
 		TRACE_MSG(LL_INFO, CTX_BB | CTX_GFX, "Terminating GUI");
 		ImGuiContext * const old_ctx = ImGui::GetCurrentContext();
@@ -510,6 +511,7 @@ namespace imgui {
 
 		ImGui::DestroyContext(m_context);
 		m_context = nullptr;
+		return true;
 	}
 
 	void Gui::RenderImGui ()

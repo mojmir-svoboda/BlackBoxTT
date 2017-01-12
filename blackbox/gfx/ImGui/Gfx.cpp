@@ -55,34 +55,30 @@ namespace imgui {
 		return hwnd;
 	}
 
-	GfxWindow * Gfx::MkGfxWindow (HWND hwnd, Gui * gui, wchar_t const * clname, wchar_t const * wname)
-	{
-		GfxWindowPtr w(new ImGui::GfxWindow);
-		w->m_hwnd = hwnd;
-		w->m_chain = m_dx11->CreateSwapChain(hwnd);
-		w->m_view = nullptr; // created in WM_SIZE
-		w->m_clName = std::move(bbstring(clname));
-		w->m_wName = std::move(bbstring(wname));
-		if (!w->m_gui)
-		{
-			w->m_gui = gui;
-			w->m_gui->m_name = wname;
-			w->m_gui->m_enabled = true;
-			w->m_gui->m_gfxWindow = w.get();
-			w->m_gui->m_dx11 = m_dx11;
-			w->m_gui->Init(hwnd, m_dx11);
-		}
-		m_newWindows.push_back(std::move(w)); // @NOTE: new windows are waiting in m_newWindows until next frame
-		return m_newWindows.back().get();
-	}
-
 	GfxWindow * Gfx::MkGuiWindow (int x, int y, int w, int h, int alpha, wchar_t const * clname, wchar_t const * wname, bool show)
 	{
 		TRACE_SCOPE(LL_INFO, CTX_BB | CTX_GFX);
 		Gui * gui = new Gui;
+		gui->m_dx11 = m_dx11;
 		TRACE_MSG(LL_INFO, CTX_BB | CTX_GFX, "Created new gui @ 0x%x wname=%ws", gui, wname);
 		HWND hwnd = MkWindow(static_cast<void *>(gui), x, y, w, h, alpha, clname, wname);
-		GfxWindow * res = MkGfxWindow(hwnd, gui, clname, wname);
+		//GfxWindow * res = MkGfxWindow(hwnd, gui, clname, wname, show);
+
+		std::unique_ptr<GfxWindow> gw(new GfxWindow);
+		gw->m_hwnd = hwnd;
+		gw->m_chain = m_dx11->CreateSwapChain(hwnd);
+		gw->m_view = nullptr; // created in WM_SIZE
+		gw->m_clName = std::move(bbstring(clname));
+		gw->m_wName = std::move(bbstring(wname));
+		if (!gw->m_gui)
+		{
+			gw->m_gui = gui;
+			gw->m_gui->m_name = wname;
+			gw->m_gui->m_show = show;
+			gw->m_gui->m_gfxWindow = gw.get();
+			gw->m_gui->Init(gw.get());
+		}
+		m_newWindows.push_back(std::move(gw)); // @NOTE: new windows are waiting in m_newWindows until next frame
 
 		// @TODO: find better place for this
 		ImGuiStyle & style = ImGui::GetStyle();
@@ -93,7 +89,7 @@ namespace imgui {
 
 		::ShowWindow(hwnd, show ? SW_SHOW : SW_HIDE);
 		showInFromTaskBar(hwnd, false);
-		return res;
+		return m_newWindows.back().get();
 	}
 
 	bool Gfx::Done ()
@@ -124,10 +120,31 @@ namespace imgui {
 	{
 		if (IsReady())
 		{
-			m_iconCache.Update();
+			UpdateIconCache();
 			for (GfxWindowPtr & w : m_windows)
 			{
 				w->Render();
+			}
+		}
+	}
+
+	void Gfx::UpdateIconCache ()
+	{
+		for (auto & it : m_iconCache.m_slabs)
+		{
+			for (auto & it2 : it.second->m_slabs)
+			{
+				if (it2->m_updated < it2->m_end)
+				{
+					if (it2->m_view == nullptr)
+					{
+						MkIconResourceView(*it2);
+					}
+					else
+					{
+						UpdateIconResourceView(*it2);
+					}
+				}
 			}
 		}
 	}

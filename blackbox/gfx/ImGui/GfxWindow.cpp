@@ -13,21 +13,22 @@ namespace imgui {
 
 	void GfxWindow::Render ()
 	{
-		m_gui->m_dx11->m_pd3dDeviceContext->OMSetRenderTargets(1, &m_view, nullptr);
-		m_gui->m_dx11->m_pd3dDeviceContext->ClearRenderTargetView(m_view, (float*)&m_clrCol);
-		m_gui->Render();
+		Gui * gui= static_cast<Gui *>(m_gui);
+		gui->m_dx11->m_pd3dDeviceContext->OMSetRenderTargets(1, &m_view, nullptr);
+		gui->m_dx11->m_pd3dDeviceContext->ClearRenderTargetView(m_view, (float*)&m_clrCol);
+		gui->Render();
 		m_chain->Present(0, 0);
 	}
 
 	void GfxWindow::Show (bool on)
 	{
-		m_gui->m_enabled = on;
-		showWindow(m_gui->m_hwnd, on);
+		m_gui->Show(on);
+		showWindow(m_hwnd, on);
 	}
 
-	bool GfxWindow::Enabled () const
+	bool GfxWindow::Visible () const
 	{
-		return m_gui->m_enabled;
+		return m_gui->Visible();
 	}
 
 	bool GfxWindow::Done ()

@@ -8,38 +8,38 @@ namespace ImGui
 {
 	inline bool Icon (bb::IconId id, const ImVec4 & tint_col = ImVec4(1, 1, 1, 1), const ImVec4 & border_col = ImVec4(0, 0, 0, 0))
 	{
-		bb::IconSlab const * slab = nullptr;
-		if (bb::BlackBox::Instance().GetGfx().m_iconCache.GetSlab(id, slab))
-		{
-			ImVec2 sz((float)id.m_size, (float)id.m_size);
-			ImVec2 uv0(0.0f, 0.0f);
-			ImVec2 uv1(1.0f, 1.0f);
-			ImTextureID texid = nullptr;
-			if (slab->Get(id.m_index, texid, uv0, uv1))
-			{
-				ImGui::Image(texid, sz, uv0, uv1, tint_col, border_col);
-				return true;
-			}
-			return false;
-		}
+// 		bb::imgui::IconSlab const * slab = nullptr;
+// 		if (bb::BlackBox::Instance().GetGfx().m_iconCache.GetSlab(id, slab))
+// 		{
+// 			ImVec2 sz((float)id.m_size, (float)id.m_size);
+// 			ImVec2 uv0(0.0f, 0.0f);
+// 			ImVec2 uv1(1.0f, 1.0f);
+// 			ImTextureID texid = nullptr;
+// 			if (slab->Get(id.m_index, texid, uv0, uv1))
+// 			{
+// 				ImGui::Image(texid, sz, uv0, uv1, tint_col, border_col);
+// 				return true;
+// 			}
+// 			return false;
+// 		}
 		return false;
 	}
 	inline bool IconButton (bb::IconId id, const ImVec4 & tint_col = ImVec4(1, 1, 1, 1), const ImVec4 & border_col = ImVec4(0, 0, 0, 0), int framing = -1)
 	{
-		bb::IconSlab const * slab = nullptr;
-		if (bb::BlackBox::Instance().GetGfx().m_iconCache.GetSlab(id, slab))
-		{
-			ImVec2 sz((float)id.m_size, (float)id.m_size);
-			ImVec2 uv0(0.0f, 0.0f);
-			ImVec2 uv1(1.0f, 1.0f);
-			ImTextureID texid = nullptr;
-			if (slab->Get(id.m_index, texid, uv0, uv1))
-			{
-				return ImGui::ImageButton(texid, sz, uv0, uv1, framing, tint_col, border_col);
-			}
-			return false;
-		}
-		assert(0);
+// 		bb::imgui::IconSlab const * slab = nullptr;
+// 		if (bb::BlackBox::Instance().GetGfx().m_iconCache.GetSlab(id, slab))
+// 		{
+// 			ImVec2 sz((float)id.m_size, (float)id.m_size);
+// 			ImVec2 uv0(0.0f, 0.0f);
+// 			ImVec2 uv1(1.0f, 1.0f);
+// 			ImTextureID texid = nullptr;
+// 			if (slab->Get(id.m_index, texid, uv0, uv1))
+// 			{
+// 				return ImGui::ImageButton(texid, sz, uv0, uv1, framing, tint_col, border_col);
+// 			}
+// 			return false;
+// 		}
+// 		assert(0);
 		return false;
 	}
 

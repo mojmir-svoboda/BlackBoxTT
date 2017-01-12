@@ -2,6 +2,7 @@
 #include "platform_win.h"
 #include "imgui.h"
 #include <bblib/bbstring.h>
+#include <blackbox/gfx/GfxWindow.h>
 struct IDXGISwapChain1;
 struct ID3D11RenderTargetView;
 struct ID3D11DepthStencilView;
@@ -10,7 +11,7 @@ namespace bb {
 namespace imgui {
 	struct Gui;
 
-	struct GfxWindow : bb::GfxWindow
+	struct GfxWindow : ::bb::GfxWindow
 	{
 		IDXGISwapChain1 * m_chain { nullptr };
 		ID3D11RenderTargetView * m_view { nullptr };
