@@ -1,4 +1,5 @@
 #include "GfxWindow.h"
+#include "Gfx.h"
 #include "DX11.h"
 #include "Gui.h"
 #include <blackbox/utils_window.h>
@@ -13,10 +14,9 @@ namespace imgui {
 
 	void GfxWindow::Render ()
 	{
-		Gui * gui= static_cast<Gui *>(m_gui);
-		gui->m_dx11->m_pd3dDeviceContext->OMSetRenderTargets(1, &m_view, nullptr);
-		gui->m_dx11->m_pd3dDeviceContext->ClearRenderTargetView(m_view, (float*)&m_clrCol);
-		gui->Render();
+		m_gui->m_gfx->m_dx11->m_pd3dDeviceContext->OMSetRenderTargets(1, &m_view, nullptr);
+		m_gui->m_gfx->m_dx11->m_pd3dDeviceContext->ClearRenderTargetView(m_view, (float*)&m_clrCol);
+		m_gui->Render();
 		m_chain->Present(0, 0);
 	}
 

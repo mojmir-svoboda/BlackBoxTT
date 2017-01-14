@@ -8,7 +8,6 @@ namespace bb {
 	struct GfxWindow
 	{
 		HWND m_hwnd { nullptr };
-		Gui * m_gui { nullptr };
 		bbstring m_clName { };
 		bbstring m_wName { };
 
@@ -22,8 +21,9 @@ namespace bb {
 		virtual void Show (bool on) = 0;
 		virtual bool Visible () const = 0;
 
-		Gui * GetGui () { return m_gui; }
-		Gui const * GetGui () const { return m_gui; }
+		virtual Gui * GetGui () = 0;
+		virtual Gui const * GetGui () const = 0;
+
 		bbstring const & GetName () const { return m_wName; }
 	};
 }

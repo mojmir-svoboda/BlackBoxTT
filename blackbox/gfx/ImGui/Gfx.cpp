@@ -58,10 +58,10 @@ namespace imgui {
 	GfxWindow * Gfx::MkGuiWindow (int x, int y, int w, int h, int alpha, wchar_t const * clname, wchar_t const * wname, bool show)
 	{
 		TRACE_SCOPE(LL_INFO, CTX_BB | CTX_GFX);
-		Gui * gui = new Gui;
-		gui->m_dx11 = m_dx11;
+		std::unique_ptr<Gui> gui(new Gui);
+		gui->m_gfx = this;
 		TRACE_MSG(LL_INFO, CTX_BB | CTX_GFX, "Created new gui @ 0x%x wname=%ws", gui, wname);
-		HWND hwnd = MkWindow(static_cast<void *>(gui), x, y, w, h, alpha, clname, wname);
+		HWND hwnd = MkWindow(static_cast<void *>(gui.get()), x, y, w, h, alpha, clname, wname);
 		//GfxWindow * res = MkGfxWindow(hwnd, gui, clname, wname, show);
 
 		std::unique_ptr<GfxWindow> gw(new GfxWindow);
@@ -72,7 +72,7 @@ namespace imgui {
 		gw->m_wName = std::move(bbstring(wname));
 		if (!gw->m_gui)
 		{
-			gw->m_gui = gui;
+			gw->m_gui = std::move(gui);
 			gw->m_gui->m_name = wname;
 			gw->m_gui->m_show = show;
 			gw->m_gui->m_gfxWindow = gw.get();

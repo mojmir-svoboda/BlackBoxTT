@@ -10,8 +10,8 @@ struct ID3D11VertexShader; struct ID3D11InputLayout; struct ID3D11PixelShader; s
 struct ID3D11ShaderResourceView; struct ID3D11RasterizerState; struct ID3D11BlendState;
 
 namespace bb {
-	struct DX11;
 namespace imgui {
+	struct Gfx;
 	struct GfxWindow;
 
 	struct Gui : bb::Gui
@@ -19,7 +19,7 @@ namespace imgui {
 		Gui () { }
 		bool m_hasDeviceObjects { false };
 		HWND m_hwnd { nullptr };
-		DX11 * m_dx11 { nullptr };
+		Gfx * m_gfx { nullptr };
 		GfxWindow * m_gfxWindow { nullptr };
 		ImGuiContext * m_context { nullptr };
 		std::vector<GuiWidget *> m_widgets;
@@ -50,7 +50,7 @@ namespace imgui {
 		virtual void Show (bool on) { m_show = on; }
 		virtual bool Visible () const { return m_show; }
 
-		bool InitDX (GfxWindow * w, DX11 * dx11);
+		//bool InitDX (GfxWindow * w, DX11 * dx11);
 		void RenderImGui ();
 
 		static LRESULT CALLBACK GuiWndProcDispatch (HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam);

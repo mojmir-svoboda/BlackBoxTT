@@ -2,6 +2,7 @@
 #include "GfxWindow.h"
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
+#include "Gfx.h"
 #include "DX11.h"
 #include "BlackBox.h"
 #include "utils_imgui.h"
@@ -15,7 +16,7 @@ namespace imgui {
 
 	void Gui::OnResize (unsigned w, unsigned h)
 	{
-		if (m_dx11->m_pd3dDevice != NULL)
+		if (m_gfx->m_dx11->m_pd3dDevice != NULL)
 		{
 			ReleaseDeviceObjects();
 			if (m_gfxWindow->m_view)
@@ -23,12 +24,12 @@ namespace imgui {
 				m_gfxWindow->m_view->Release();
 				m_gfxWindow->m_view = nullptr;
 			}
-			m_dx11->m_pd3dDeviceContext->OMSetRenderTargets(0, nullptr, nullptr);
+			m_gfx->m_dx11->m_pd3dDeviceContext->OMSetRenderTargets(0, nullptr, nullptr);
 			if (!SUCCEEDED(m_gfxWindow->m_chain->ResizeBuffers(0, w, h, DXGI_FORMAT_UNKNOWN, 0)))
 			{
 			}
 
-			m_gfxWindow->m_view = m_dx11->CreateRenderTarget(m_gfxWindow->m_chain);
+			m_gfxWindow->m_view = m_gfx->m_dx11->CreateRenderTarget(m_gfxWindow->m_chain);
 
 			CreateDeviceObjects();
 		}
@@ -212,7 +213,7 @@ namespace imgui {
 			{
 				case WM_SIZE:
 				{
-					if (m_dx11 && wParam != SIZE_MINIMIZED)
+					if (m_gfx->m_dx11 && wParam != SIZE_MINIMIZED)
 					{
 						unsigned const x = (UINT)LOWORD(lParam);
 						unsigned const y = (UINT)HIWORD(lParam);
@@ -244,8 +245,8 @@ namespace imgui {
 	bool Gui::Init (bb::GfxWindow * w)
 	{
 		TRACE_MSG(LL_INFO, CTX_BB | CTX_GFX | CTX_INIT , "Initializing GUI for hwnd=0x%x", w->m_hwnd);
+		GfxWindow * imgui_w = static_cast<GfxWindow *>(w);
 		m_hwnd = w->m_hwnd;
-		m_dx11 = w->m_dx11;
 		ImGuiContext * const old_ctx = ImGui::GetCurrentContext();
 		TRACE_MSG(LL_INFO, CTX_BB | CTX_GFX, "Old context = 0x%x", old_ctx);
 		m_context = ImGui::CreateContext();
@@ -324,7 +325,7 @@ namespace imgui {
 				D3DCompile(vertexShader, strlen(vertexShader), NULL, NULL, NULL, "main", "vs_4_0", 0, 0, &m_pVertexShaderBlob, NULL);
 				if (m_pVertexShaderBlob == NULL) // NB: Pass ID3D10Blob* pErrorBlob to D3DCompile() to get error showing in (const char*)pErrorBlob->GetBufferPointer(). Make sure to Release() the blob!
 						return false;
-				if (m_dx11->m_pd3dDevice->CreateVertexShader((DWORD*)m_pVertexShaderBlob->GetBufferPointer(), m_pVertexShaderBlob->GetBufferSize(), NULL, &m_pVertexShader) != S_OK)
+				if (m_gfx->m_dx11->m_pd3dDevice->CreateVertexShader((DWORD*)m_pVertexShaderBlob->GetBufferPointer(), m_pVertexShaderBlob->GetBufferSize(), NULL, &m_pVertexShader) != S_OK)
 						return false;
 
 				// Create the input layout
@@ -334,7 +335,7 @@ namespace imgui {
 						{ "COLOR",		0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, (size_t)(&((ImDrawVert*)0)->col), D3D11_INPUT_PER_VERTEX_DATA, 0 },
 				};
 
-				if (m_dx11->m_pd3dDevice->CreateInputLayout(localLayout, 3, m_pVertexShaderBlob->GetBufferPointer(), m_pVertexShaderBlob->GetBufferSize(), &m_pInputLayout) != S_OK)
+				if (m_gfx->m_dx11->m_pd3dDevice->CreateInputLayout(localLayout, 3, m_pVertexShaderBlob->GetBufferPointer(), m_pVertexShaderBlob->GetBufferSize(), &m_pInputLayout) != S_OK)
 						return false;
 
 				// Create the constant buffer
@@ -345,7 +346,7 @@ namespace imgui {
 						cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 						cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 						cbDesc.MiscFlags = 0;
-						m_dx11->m_pd3dDevice->CreateBuffer(&cbDesc, NULL, &m_pVertexConstantBuffer);
+						m_gfx->m_dx11->m_pd3dDevice->CreateBuffer(&cbDesc, NULL, &m_pVertexConstantBuffer);
 				}
 		}
 
@@ -370,7 +371,7 @@ namespace imgui {
 				D3DCompile(pixelShader, strlen(pixelShader), NULL, NULL, NULL, "main", "ps_4_0", 0, 0, &m_pPixelShaderBlob, NULL);
 				if (m_pPixelShaderBlob == NULL)  // NB: Pass ID3D10Blob* pErrorBlob to D3DCompile() to get error showing in (const char*)pErrorBlob->GetBufferPointer(). Make sure to Release() the blob!
 						return false;
-				if (m_dx11->m_pd3dDevice->CreatePixelShader((DWORD*)m_pPixelShaderBlob->GetBufferPointer(), m_pPixelShaderBlob->GetBufferSize(), NULL, &m_pPixelShader) != S_OK)
+				if (m_gfx->m_dx11->m_pd3dDevice->CreatePixelShader((DWORD*)m_pPixelShaderBlob->GetBufferPointer(), m_pPixelShaderBlob->GetBufferSize(), NULL, &m_pPixelShader) != S_OK)
 						return false;
 		}
 
@@ -387,7 +388,7 @@ namespace imgui {
 				desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
 				desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 				desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-				m_dx11->m_pd3dDevice->CreateBlendState(&desc, &m_pBlendState);
+				m_gfx->m_dx11->m_pd3dDevice->CreateBlendState(&desc, &m_pBlendState);
 		}
 
 		// Create the rasterizer state
@@ -398,7 +399,7 @@ namespace imgui {
 				desc.CullMode = D3D11_CULL_NONE;
 				desc.ScissorEnable = true;
 				desc.DepthClipEnable = true;
-				m_dx11->m_pd3dDevice->CreateRasterizerState(&desc, &m_pRasterizerState);
+				m_gfx->m_dx11->m_pd3dDevice->CreateRasterizerState(&desc, &m_pRasterizerState);
 		}
 
 		CreateFontsTexture();
@@ -434,7 +435,7 @@ namespace imgui {
 				subResource.pSysMem = pixels;
 				subResource.SysMemPitch = texDesc.Width * 4;
 				subResource.SysMemSlicePitch = 0;
-				m_dx11->m_pd3dDevice->CreateTexture2D(&texDesc, &subResource, &pTexture);
+				m_gfx->m_dx11->m_pd3dDevice->CreateTexture2D(&texDesc, &subResource, &pTexture);
 
 				// Create texture view
 				D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
@@ -443,7 +444,7 @@ namespace imgui {
 				srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 				srvDesc.Texture2D.MipLevels = texDesc.MipLevels;
 				srvDesc.Texture2D.MostDetailedMip = 0;
-				m_dx11->m_pd3dDevice->CreateShaderResourceView(pTexture, &srvDesc, &m_pFontTextureView);
+				m_gfx->m_dx11->m_pd3dDevice->CreateShaderResourceView(pTexture, &srvDesc, &m_pFontTextureView);
 				pTexture->Release();
 		}
 		
@@ -461,13 +462,13 @@ namespace imgui {
 				samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
 				samplerDesc.MinLOD = 0.f;
 				samplerDesc.MaxLOD = 0.f;
-				m_dx11->m_pd3dDevice->CreateSamplerState(&samplerDesc, &m_pFontSampler);
+				m_gfx->m_dx11->m_pd3dDevice->CreateSamplerState(&samplerDesc, &m_pFontSampler);
 		}
 	}
 
 	void Gui::ReleaseDeviceObjects ()
 	{
-		if (!m_dx11)
+		if (!m_gfx->m_dx11)
 				return;
 
 		if (m_pFontSampler) { m_pFontSampler->Release(); m_pFontSampler = NULL; }
@@ -530,7 +531,7 @@ namespace imgui {
 			desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 			desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 			desc.MiscFlags = 0;
-			if (m_dx11->m_pd3dDevice->CreateBuffer(&desc, NULL, &m_pVB) < 0)
+			if (m_gfx->m_dx11->m_pd3dDevice->CreateBuffer(&desc, NULL, &m_pVB) < 0)
 				return;
 		}
 		if (!m_pIB || m_IndexBufferSize < draw_data->TotalIdxCount)
@@ -543,15 +544,15 @@ namespace imgui {
 			bufferDesc.ByteWidth = m_IndexBufferSize * sizeof(ImDrawIdx);
 			bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 			bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-			if (m_dx11->m_pd3dDevice->CreateBuffer(&bufferDesc, NULL, &m_pIB) < 0)
+			if (m_gfx->m_dx11->m_pd3dDevice->CreateBuffer(&bufferDesc, NULL, &m_pIB) < 0)
 				return;
 		}
 
 		// Copy and convert all vertices into a single contiguous buffer
 		D3D11_MAPPED_SUBRESOURCE vtx_resource, idx_resource;
-		if (m_dx11->m_pd3dDeviceContext->Map(m_pVB, 0, D3D11_MAP_WRITE_DISCARD, 0, &vtx_resource) != S_OK)
+		if (m_gfx->m_dx11->m_pd3dDeviceContext->Map(m_pVB, 0, D3D11_MAP_WRITE_DISCARD, 0, &vtx_resource) != S_OK)
 			return;
-		if (m_dx11->m_pd3dDeviceContext->Map(m_pIB, 0, D3D11_MAP_WRITE_DISCARD, 0, &idx_resource) != S_OK)
+		if (m_gfx->m_dx11->m_pd3dDeviceContext->Map(m_pIB, 0, D3D11_MAP_WRITE_DISCARD, 0, &idx_resource) != S_OK)
 			return;
 		ImDrawVert* vtx_dst = (ImDrawVert*)vtx_resource.pData;
 		ImDrawIdx* idx_dst = (ImDrawIdx*)idx_resource.pData;
@@ -563,13 +564,13 @@ namespace imgui {
 			vtx_dst += cmd_list->VtxBuffer.size();
 			idx_dst += cmd_list->IdxBuffer.size();
 		}
-		m_dx11->m_pd3dDeviceContext->Unmap(m_pVB, 0);
-		m_dx11->m_pd3dDeviceContext->Unmap(m_pIB, 0);
+		m_gfx->m_dx11->m_pd3dDeviceContext->Unmap(m_pVB, 0);
+		m_gfx->m_dx11->m_pd3dDeviceContext->Unmap(m_pIB, 0);
 
 		// Setup orthographic projection matrix into our constant buffer
 		{
 				D3D11_MAPPED_SUBRESOURCE mappedResource;
-				if (m_dx11->m_pd3dDeviceContext->Map(m_pVertexConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource) != S_OK)
+				if (m_gfx->m_dx11->m_pd3dDeviceContext->Map(m_pVertexConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource) != S_OK)
 						return;
 
 				VERTEX_CONSTANT_BUFFER* pConstantBuffer = (VERTEX_CONSTANT_BUFFER*)mappedResource.pData;
@@ -585,7 +586,7 @@ namespace imgui {
 					{ (R+L)/(L-R),	(T+B)/(B-T),		0.5f,				1.0f },
 				};
 				memcpy(&pConstantBuffer->mvp, mvp, sizeof(mvp));
-				m_dx11->m_pd3dDeviceContext->Unmap(m_pVertexConstantBuffer, 0);
+				m_gfx->m_dx11->m_pd3dDeviceContext->Unmap(m_pVertexConstantBuffer, 0);
 		}
 
 		// Setup viewport
@@ -598,25 +599,25 @@ namespace imgui {
 			vp.MaxDepth = 1.0f;
 			vp.TopLeftX = 0;
 			vp.TopLeftY = 0;
-			m_dx11->m_pd3dDeviceContext->RSSetViewports(1, &vp);
+			m_gfx->m_dx11->m_pd3dDeviceContext->RSSetViewports(1, &vp);
 		}
 
 		// Bind shader and vertex buffers
 		unsigned stride = sizeof(ImDrawVert);
 		unsigned int offset = 0;
-		m_dx11->m_pd3dDeviceContext->IASetInputLayout(m_pInputLayout);
-		m_dx11->m_pd3dDeviceContext->IASetVertexBuffers(0, 1, &m_pVB, &stride, &offset);
-		m_dx11->m_pd3dDeviceContext->IASetIndexBuffer(m_pIB, sizeof(ImDrawIdx) == 2 ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT, 0);
-		m_dx11->m_pd3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		m_dx11->m_pd3dDeviceContext->VSSetShader(m_pVertexShader, NULL, 0);
-		m_dx11->m_pd3dDeviceContext->VSSetConstantBuffers(0, 1, &m_pVertexConstantBuffer);
-		m_dx11->m_pd3dDeviceContext->PSSetShader(m_pPixelShader, NULL, 0);
-		m_dx11->m_pd3dDeviceContext->PSSetSamplers(0, 1, &m_pFontSampler);
+		m_gfx->m_dx11->m_pd3dDeviceContext->IASetInputLayout(m_pInputLayout);
+		m_gfx->m_dx11->m_pd3dDeviceContext->IASetVertexBuffers(0, 1, &m_pVB, &stride, &offset);
+		m_gfx->m_dx11->m_pd3dDeviceContext->IASetIndexBuffer(m_pIB, sizeof(ImDrawIdx) == 2 ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT, 0);
+		m_gfx->m_dx11->m_pd3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		m_gfx->m_dx11->m_pd3dDeviceContext->VSSetShader(m_pVertexShader, NULL, 0);
+		m_gfx->m_dx11->m_pd3dDeviceContext->VSSetConstantBuffers(0, 1, &m_pVertexConstantBuffer);
+		m_gfx->m_dx11->m_pd3dDeviceContext->PSSetShader(m_pPixelShader, NULL, 0);
+		m_gfx->m_dx11->m_pd3dDeviceContext->PSSetSamplers(0, 1, &m_pFontSampler);
 
 		// Setup render state
 		const float blendFactor[4] = { 0.f, 0.f, 0.f, 0.f };
-		m_dx11->m_pd3dDeviceContext->OMSetBlendState(m_pBlendState, blendFactor, 0xffffffff);
-		m_dx11->m_pd3dDeviceContext->RSSetState(m_pRasterizerState);
+		m_gfx->m_dx11->m_pd3dDeviceContext->OMSetBlendState(m_pBlendState, blendFactor, 0xffffffff);
+		m_gfx->m_dx11->m_pd3dDeviceContext->RSSetState(m_pRasterizerState);
 
 		// Render command lists
 		int vtx_offset = 0;
@@ -634,9 +635,9 @@ namespace imgui {
 				else
 				{
 					const D3D11_RECT r = { (LONG)pcmd->ClipRect.x, (LONG)pcmd->ClipRect.y, (LONG)pcmd->ClipRect.z, (LONG)pcmd->ClipRect.w };
-					m_dx11->m_pd3dDeviceContext->PSSetShaderResources(0, 1, (ID3D11ShaderResourceView**)&pcmd->TextureId);
-					m_dx11->m_pd3dDeviceContext->RSSetScissorRects(1, &r);
-					m_dx11->m_pd3dDeviceContext->DrawIndexed(pcmd->ElemCount, idx_offset, vtx_offset);
+					m_gfx->m_dx11->m_pd3dDeviceContext->PSSetShaderResources(0, 1, (ID3D11ShaderResourceView**)&pcmd->TextureId);
+					m_gfx->m_dx11->m_pd3dDeviceContext->RSSetScissorRects(1, &r);
+					m_gfx->m_dx11->m_pd3dDeviceContext->DrawIndexed(pcmd->ElemCount, idx_offset, vtx_offset);
 				}
 				idx_offset += pcmd->ElemCount;
 			}
@@ -644,9 +645,9 @@ namespace imgui {
 		}
 
 		// Restore modified state
-		m_dx11->m_pd3dDeviceContext->IASetInputLayout(NULL);
-		m_dx11->m_pd3dDeviceContext->PSSetShader(NULL, NULL, 0);
-		m_dx11->m_pd3dDeviceContext->VSSetShader(NULL, NULL, 0);
+		m_gfx->m_dx11->m_pd3dDeviceContext->IASetInputLayout(NULL);
+		m_gfx->m_dx11->m_pd3dDeviceContext->PSSetShader(NULL, NULL, 0);
+		m_gfx->m_dx11->m_pd3dDeviceContext->VSSetShader(NULL, NULL, 0);
 	}
 }}
 

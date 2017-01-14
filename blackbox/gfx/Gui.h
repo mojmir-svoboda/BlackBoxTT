@@ -10,7 +10,6 @@ namespace bb {
 	struct Gui
 	{
 		bool m_show { false };
-		GfxWindow * m_gfxWindow { nullptr };
 		std::vector<std::unique_ptr<GuiWidget>> m_widgets;
 		bbstring m_name { };
 

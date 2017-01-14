@@ -330,9 +330,14 @@ namespace bb {
 	{
 		bbstring const & use = cfg.m_use;
 
-		std::unique_ptr<Gfx> gfx;
+		std::unique_ptr<bb::Gfx> gfx;
 		if (use == L"ImGui")
-			gfx = std::move(new bb::imgui::Gfx());
+		{
+			std::unique_ptr<bb::imgui::Gfx> imgui_gfx(new bb::imgui::Gfx());
+			gfx = std::move(imgui_gfx);
+			return true;
+		}
+		return false;
 	}
 
 	bool BlackBox::Init (HINSTANCE hmi)

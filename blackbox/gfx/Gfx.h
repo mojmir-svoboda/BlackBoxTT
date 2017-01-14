@@ -11,8 +11,8 @@ namespace bb {
 		bool m_ready { false };
 
 		Gfx () { }
-		virtual ~Gfx ();
-		virtual bool Init ();
+		virtual ~Gfx () { }
+		virtual bool Init () = 0;
 		virtual void Render () = 0;
 		virtual void NewFrame () = 0;
 		virtual bool Done () = 0;
