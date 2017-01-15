@@ -6,23 +6,35 @@
 #include "IconCache.h"
 #include "GfxWindow.h"
 #include <blackbox/gfx/Gfx.h>
-#include <WidgetConfig.h>
+#include <blackbox/gfx/Gfx.h>
+#include <blackbox/WidgetConfig.h>
+#include <blackbox/WidgetsConfig.h>
+#include <blackbox/Tasks.h>
 
 namespace bb {
 namespace imgui {
 
 	struct Gfx : bb::Gfx
 	{
+		Tasks & m_tasks;
+		WidgetsConfig * m_config;
 		DX11 * m_dx11 { nullptr };
 		std::vector<ID3D11Texture2D *> m_textures;
 		using GfxWindowPtr = std::unique_ptr<GfxWindow>;
 		std::vector<GfxWindowPtr> m_windows;
 		std::vector<GfxWindowPtr> m_newWindows;
+		std::vector<std::unique_ptr<GuiWidget>> m_widgets;
 		IconCache m_iconCache;
 
-		Gfx () { }
+		Gfx (Tasks & t)
+			: m_tasks(t)
+		{
+			m_widgets.reserve(16);
+		}
+
 		virtual ~Gfx ();
-		virtual bool Init () override;
+		virtual bool Init (WidgetsConfig & config) override;
+		bool CreateWidgets (WidgetsConfig & config);
 		virtual void Render () override;
 		virtual void NewFrame () override;
 		virtual bool Done () override;
@@ -45,6 +57,20 @@ namespace imgui {
 		bool MkIconResourceView (IconSlab & slab);
 		bool UpdateIconResourceView (IconSlab & slab);
 		void UpdateIconCache ();
+
+		template<class T>
+		T * MkWidget (WidgetConfig & cfg)
+		{
+			if (cfg.m_show)
+			{
+				T * t = new T(cfg);
+				GfxWindow * win = MkGuiWindow(cfg.m_x, cfg.m_y, cfg.m_w, cfg.m_h, cfg.m_alpha, t->GetNameW(), t->GetNameW(), cfg.m_show);
+				t->m_gfxWindow = win;
+				m_tasks.AddWidgetTask(win);
+				return t;
+			}
+			return nullptr;
+		}
 	};
 
 }}

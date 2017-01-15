@@ -57,6 +57,7 @@ namespace bb {
 		void SwitchWorkSpace (bbstring const & src, bbstring const & dst, bool notification);
 		bool MoveWindowToVertex (HWND hwnd, bbstring const & vertex_id);
 		bool OnSwitchDesktopVDM (bbstring const & src_vertex_id, bbstring const & dst_vertex_id);
+		bool AddWidgetTask (GfxWindow * w);
 	protected:
 		bool FindTask (HWND hwnd, size_t & idx);
 		bool FindTask (HWND hwnd, size_t & idx) const;
@@ -67,7 +68,6 @@ namespace bb {
 		void UpdateTaskInfoCaption (TaskInfo * ti);
 		void AddTaskInfo (TaskInfo * ti);
 		bool AddTask (HWND hwnd);
-		bool AddWidgetTask (GfxWindow * w);
 		void SetTaskManIgnoredImpl (size_t idx);
 		void UnsetTaskManIgnoredImpl (size_t idx);
 

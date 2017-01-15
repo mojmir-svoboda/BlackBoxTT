@@ -122,7 +122,6 @@ namespace bb {
 		std::unique_ptr<Explorer> m_explorer;
 		WorkSpaces m_wspaces;
 		Tasks m_tasks;
-		Widgets m_widgets;
 		Tray m_tray;
 		std::unique_ptr<Gfx> m_gfx;
 		PluginManager m_plugins;

@@ -2,7 +2,7 @@
 #include "platform_win.h"
 #include <vector>
 #include "GfxWindow.h"
-#include <WidgetConfig.h>
+#include <blackbox/WidgetsConfig.h>
 
 namespace bb {
 
@@ -12,7 +12,7 @@ namespace bb {
 
 		Gfx () { }
 		virtual ~Gfx () { }
-		virtual bool Init () = 0;
+		virtual bool Init (WidgetsConfig & cfg) = 0;
 		virtual void Render () = 0;
 		virtual void NewFrame () = 0;
 		virtual bool Done () = 0;

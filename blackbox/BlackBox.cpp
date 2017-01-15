@@ -139,7 +139,6 @@ namespace bb {
 	BlackBox::BlackBox ()
 		: m_defaultStyle(new StyleStruct)
 		, m_tasks(m_wspaces)
-		, m_widgets(m_tasks, nullptr)
 	{
 		setDefaultValuesTo(*m_defaultStyle.get());
 	}
@@ -333,7 +332,7 @@ namespace bb {
 		std::unique_ptr<bb::Gfx> gfx;
 		if (use == L"ImGui")
 		{
-			std::unique_ptr<bb::imgui::Gfx> imgui_gfx(new bb::imgui::Gfx());
+			std::unique_ptr<bb::imgui::Gfx> imgui_gfx(new bb::imgui::Gfx(m_tasks));
 			gfx = std::move(imgui_gfx);
 			return true;
 		}
@@ -373,11 +372,11 @@ namespace bb {
 			return false;
 		if (!CreateGfx(m_config.m_gfx))
 			return false;
+		if (!m_gfx->Init(m_config.m_widgets))
+			return false;
 		if (!m_tasks.Init(m_config.m_tasks))
 			return false;
 		if (!m_explorer->Init())
-			return false;
-		if (!m_widgets.Init(m_config.m_widgets))
 			return false;
 		if (!m_plugins.Init(m_config.m_plugins))
 			return false;
@@ -392,7 +391,6 @@ namespace bb {
 		bool ok = true;
 		m_server.Done();
 		m_scheme.Done();
-		m_widgets.Done();
 		m_tray.Done();
 		m_plugins.Done();
 		m_tasks.Done();
