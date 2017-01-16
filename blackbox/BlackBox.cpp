@@ -333,7 +333,8 @@ namespace bb {
 		if (use == L"ImGui")
 		{
 			std::unique_ptr<bb::imgui::Gfx> imgui_gfx(new bb::imgui::Gfx(m_tasks));
-			gfx = std::move(imgui_gfx);
+			gfx = std::move(imgui_gfx); // imgui to base
+			m_gfx = std::move(gfx); // base to m_gfx
 			return true;
 		}
 		return false;
@@ -526,6 +527,15 @@ namespace bb {
 		}
 	}
 
+	bool BlackBox::AddIconToCache (bbstring const & name, HICON ico, IconId & id)
+	{
+		return m_gfx->AddIconToCache(name, ico, id);
+	}
+	bool BlackBox::FindIconInCache (bbstring const & name, IconId & id)
+	{
+		return m_gfx->FindIconInCache(name, id);
+	}
+
 	HWND BlackBox::FindTopLevelWindow () const
 	{
 		HWND hwnd = ::GetForegroundWindow();
@@ -537,16 +547,17 @@ namespace bb {
 	}
 
 	
-// 	MenuWidget * BlackBox::CreateMenu (WidgetConfig & wcfg, MenuConfig const & config)
-// 	{
+	MenuWidget * BlackBox::CreateMenu (WidgetConfig & wcfg, MenuConfig const & config)
+	{
+		return nullptr;
 // 		MenuWidget * m = m_widgets.MkWidget<MenuWidget>(wcfg);
 // 		m_tasks.Focus(m->m_hwnd);
 // 		m->CreateMenuFromConfig(config);
 // 		return m;
-// 	}
-// 
-// 	void BlackBox::ShowMenuOnPointerPos (bool show)
-// 	{
+	}
+
+	void BlackBox::ShowMenuOnPointerPos (bool show)
+	{
 // 		POINT p;
 // 		if (::GetCursorPos(&p))
 // 		{
@@ -566,10 +577,10 @@ namespace bb {
 // 				m_menu = true;
 // 			}
 // 		}
-// 	}
-// 
-// 	MenuWidget * BlackBox::CreateMenuOnPointerPos (MenuConfig const & config)
-// 	{
+	}
+
+	MenuWidget * BlackBox::CreateMenuOnPointerPos (MenuConfig const & config)
+	{
 // 		POINT p;
 // 		if (GetCursorPos(&p))
 // 		{
@@ -583,11 +594,11 @@ namespace bb {
 // 			wc.m_titlebar = true;
 // 			return CreateMenu(wc, config);
 // 		}
-// 		return nullptr;
-// 	}
-// 
-// 	void BlackBox::HandleMenuState ()
-// 	{
+		return nullptr;
+	}
+
+	void BlackBox::HandleMenuState ()
+	{
 // 		if (m_menu)
 // 		{
 // 			if (!m_menuWidget)
@@ -600,5 +611,5 @@ namespace bb {
 // 			if (m_menuWidget->Enabled())
 // 				ShowMenuOnPointerPos(false);
 // 		}
-// 	}
+	}
 }

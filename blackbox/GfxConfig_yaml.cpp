@@ -42,7 +42,7 @@ namespace bb {
 			YAML::Node y_gfx = y_root["Gfx"];
 			if (y_gfx)
 			{
-				rhs.m_use = y_gfx.as<GfxConfig>();
+				config = y_gfx.as<GfxConfig>();
 				return true;
 			}
 		}

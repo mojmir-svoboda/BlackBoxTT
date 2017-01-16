@@ -44,6 +44,7 @@ set(blackbox_SOURCES
 	VirtualDesktopManager.cpp
 	DesktopWallpaper.cpp
 	DesktopWallpaperConfig_yaml.cpp
+	GfxConfig_yaml.cpp
 	Tasks.cpp
 	TasksConfig_yaml.cpp
 	Tray.cpp
@@ -81,6 +82,7 @@ set (blackbox_HEADERS
 	utils_recover.h
 	utils_yaml.h
 	utils_vdm.h
+	GfxConfig.h
 	gfx/GuiWidget.h
 	gfx/IconId.h
 	gfx/GfxWindow.h
