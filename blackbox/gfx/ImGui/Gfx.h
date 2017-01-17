@@ -6,7 +6,7 @@
 #include "IconCache.h"
 #include "GfxWindow.h"
 #include <blackbox/gfx/Gfx.h>
-#include <blackbox/gfx/Gfx.h>
+#include <blackbox/gfx/GuiWidget.h>
 #include <blackbox/WidgetConfig.h>
 #include <blackbox/WidgetsConfig.h>
 #include <blackbox/Tasks.h>
@@ -23,23 +23,19 @@ namespace imgui {
 		using GfxWindowPtr = std::unique_ptr<GfxWindow>;
 		std::vector<GfxWindowPtr> m_windows;
 		std::vector<GfxWindowPtr> m_newWindows;
-		std::vector<std::unique_ptr<GuiWidget>> m_widgets;
 		IconCache m_iconCache;
 
-		Gfx (Tasks & t)
-			: m_tasks(t)
-		{
-			m_widgets.reserve(16);
-		}
-
+		Gfx (Tasks & t) : m_tasks(t) { }
 		virtual ~Gfx ();
 		virtual bool Init (WidgetsConfig & config) override;
 		bool CreateWidgets (WidgetsConfig & config);
+		bool IsReady () const { return m_dx11 != nullptr; }
+
 		virtual void Render () override;
 		virtual void NewFrame () override;
 		virtual bool Done () override;
 
-		virtual GfxWindow * MkGuiWindow (int x, int y, int w, int h, int alpha, wchar_t const * clname, wchar_t const * wname, bool show) override;
+		virtual GfxWindow * MkWidgetWindow (int x, int y, int w, int h, int alpha, wchar_t const * clname, wchar_t const * wname, bool show) override;
 		virtual HWND MkWindow (void * gui, int x, int y, int w, int h, int alpha, wchar_t const * clname, wchar_t const * wname) override;
 
 		GfxWindow * GetGfxWindow (size_t n) { return m_windows[n].get(); }
@@ -63,11 +59,11 @@ namespace imgui {
 		{
 			if (cfg.m_show)
 			{
-				T * t = new T(cfg);
-				GfxWindow * win = MkGuiWindow(cfg.m_x, cfg.m_y, cfg.m_w, cfg.m_h, cfg.m_alpha, t->GetNameW(), t->GetNameW(), cfg.m_show);
-				t->m_gfxWindow = win;
-				m_tasks.AddWidgetTask(win);
-				return t;
+				std::unique_ptr<GuiWidget> widget_ptr(new T(cfg));
+				GfxWindow * win = MkWidgetWindow(cfg.m_x, cfg.m_y, cfg.m_w, cfg.m_h, cfg.m_alpha, widget_ptr->GetNameW(), widget_ptr->GetNameW(), cfg.m_show);
+				widget_ptr->m_gfxWindow = win;
+				win->m_gui->m_widgets.push_back(std::move(widget_ptr));
+				return static_cast<T *>(win->m_gui->m_widgets.back().get());
 			}
 			return nullptr;
 		}

@@ -16,7 +16,7 @@ namespace imgui {
 
 	void Gui::OnResize (unsigned w, unsigned h)
 	{
-		if (m_gfx->m_dx11->m_pd3dDevice != NULL)
+		if (m_gfxWindow->IsReady())
 		{
 			ReleaseDeviceObjects();
 			if (m_gfxWindow->m_view)
@@ -50,17 +50,12 @@ namespace imgui {
 		}
 	}
 
-	void Gui::AddWidget (GuiWidget * win)
-	{
-		m_widgets.push_back(win);
-	}
-
 	void Gui::DrawUI ()
 	{
 		if (!m_show)
 			return;
 
-		for (GuiWidget * w : m_widgets)
+		for (std::unique_ptr<GuiWidget> & w : m_widgets)
 		{
 			if (w->m_config.m_show)
 				w->DrawUI();

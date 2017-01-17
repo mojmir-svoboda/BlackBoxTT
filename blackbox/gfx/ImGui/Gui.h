@@ -22,7 +22,7 @@ namespace imgui {
 		Gfx * m_gfx { nullptr };
 		GfxWindow * m_gfxWindow { nullptr };
 		ImGuiContext * m_context { nullptr };
-		std::vector<GuiWidget *> m_widgets;
+		std::vector<std::unique_ptr<GuiWidget>> m_widgets;
 		bbstring m_name { };
 		ID3D11Buffer *						m_pVB { nullptr };
 		ID3D11Buffer *						m_pIB { nullptr };
@@ -38,8 +38,6 @@ namespace imgui {
 		ID3D11BlendState *				m_pBlendState { nullptr };
 		int												m_VertexBufferSize { 5000 };
 		int												m_IndexBufferSize { 10000 };
-
-		void AddWidget (GuiWidget * win);
 
 		virtual void NewFrame () override;
 		virtual void DrawUI () override;

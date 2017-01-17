@@ -373,9 +373,9 @@ namespace bb {
 			return false;
 		if (!CreateGfx(m_config.m_gfx))
 			return false;
-		if (!m_gfx->Init(m_config.m_widgets))
-			return false;
 		if (!m_tasks.Init(m_config.m_tasks))
+			return false;
+		if (!m_gfx->Init(m_config.m_widgets))
 			return false;
 		if (!m_explorer->Init())
 			return false;

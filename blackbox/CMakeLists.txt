@@ -77,7 +77,6 @@ set (blackbox_HEADERS
 	WorkSpaces.h
 	WidgetConfig.h
 	WidgetsConfig.h
-	Widgets.h
 	utils_window.h
 	utils_recover.h
 	utils_yaml.h
@@ -110,7 +109,6 @@ set (blackbox_ImGui_SOURCES
 	gfx/widgets/ImGui/TrayWidget.cpp
 	gfx/widgets/ImGui/PagerWidget.cpp
 	gfx/widgets/ImGui/QuickBarWidget.cpp
-	#gfx/Widgets.cpp
 )
 
 set (blackbox_ImGui_HEADERS

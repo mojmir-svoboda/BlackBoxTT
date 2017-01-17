@@ -24,7 +24,7 @@ namespace bb {
 
 		size_t const c_invalidIndex = std::numeric_limits<size_t>::max();
 		SpinLock m_lock;
-		TasksConfig * m_config;
+		TasksConfig * m_config { nullptr };
 		using ptrs_t = std::vector<TaskInfoPtr>;
 		using ptrs_it = ptrs_t::iterator;
 		using ptrs_cit = ptrs_t::const_iterator;

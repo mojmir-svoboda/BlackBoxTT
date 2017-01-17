@@ -30,6 +30,8 @@ namespace imgui {
 
 		virtual Gui * GetGui () override { return m_gui.get(); }
 		virtual Gui const * GetGui () const override { return m_gui.get(); }
+
+		bool IsReady () const { return m_chain != nullptr; }
 	};
 }}
 

@@ -105,19 +105,18 @@ namespace imgui {
 		return hwnd;
 	}
 
-	GfxWindow * Gfx::MkGuiWindow (int x, int y, int w, int h, int alpha, wchar_t const * clname, wchar_t const * wname, bool show)
+	GfxWindow * Gfx::MkWidgetWindow (int x, int y, int w, int h, int alpha, wchar_t const * clname, wchar_t const * wname, bool show)
 	{
 		TRACE_SCOPE(LL_INFO, CTX_BB | CTX_GFX);
 		std::unique_ptr<Gui> gui(new Gui);
 		gui->m_gfx = this;
+		std::unique_ptr<GfxWindow> gw(new GfxWindow);
+		gui->m_gfxWindow = gw.get();
 		TRACE_MSG(LL_INFO, CTX_BB | CTX_GFX, "Created new gui @ 0x%x wname=%ws", gui, wname);
 		HWND hwnd = MkWindow(static_cast<void *>(gui.get()), x, y, w, h, alpha, clname, wname);
-		//GfxWindow * res = MkGfxWindow(hwnd, gui, clname, wname, show);
-
-		std::unique_ptr<GfxWindow> gw(new GfxWindow);
 		gw->m_hwnd = hwnd;
 		gw->m_chain = m_dx11->CreateSwapChain(hwnd);
-		gw->m_view = nullptr; // created in WM_SIZE
+		gw->m_view = nullptr; // created in WM_SIZE @see Gui::WndProcHandler
 		gw->m_clName = std::move(bbstring(clname));
 		gw->m_wName = std::move(bbstring(wname));
 		if (!gw->m_gui)
@@ -139,6 +138,7 @@ namespace imgui {
 
 		::ShowWindow(hwnd, show ? SW_SHOW : SW_HIDE);
 		showInFromTaskBar(hwnd, false);
+		m_tasks.AddWidgetTask(m_newWindows.back().get());
 		return m_newWindows.back().get();
 	}
 
