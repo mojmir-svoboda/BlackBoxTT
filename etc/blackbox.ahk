@@ -1,7 +1,7 @@
 ; # = Win  ! = Alt  ^ = Control  + = Shift
 
 MButton::
-   Run, c:\bb_devel\bbcli.exe -c "(ToggleMenu)"
+   Run, c:\bb_devel\bbcli.exe -c "(ToggleMenu ""bbMenu"")"
 Return
 
 +!h::

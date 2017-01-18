@@ -2,6 +2,7 @@
 #include "platform_win.h"
 #include <vector>
 #include "GfxWindow.h"
+#include "GuiWidget.h"
 #include <blackbox/WidgetsConfig.h>
 
 namespace bb {
@@ -17,6 +18,7 @@ namespace bb {
 
 		virtual GfxWindow * MkWidgetWindow (int x, int y, int w, int h, int alpha, wchar_t const * clname, wchar_t const * wname, bool show) = 0;
 		virtual HWND MkWindow (void * gui, int x, int y, int w, int h, int alpha, wchar_t const * clname, wchar_t const * wname) = 0;
+		virtual GuiWidget * FindWidget (bbstring const & name) = 0;
 
 		virtual bool AddIconToCache (bbstring const & name, HICON ico, IconId & id) = 0;
 		virtual bool FindIconInCache (bbstring const & name, IconId & id) const = 0;

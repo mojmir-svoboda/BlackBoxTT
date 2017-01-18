@@ -54,6 +54,8 @@ namespace imgui {
 		bool UpdateIconResourceView (IconSlab & slab);
 		void UpdateIconCache ();
 
+		virtual GuiWidget * FindWidget (bbstring const & name) override;
+
 		template<class T>
 		T * MkWidget (WidgetConfig & cfg)
 		{

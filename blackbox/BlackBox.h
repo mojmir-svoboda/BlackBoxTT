@@ -1,7 +1,6 @@
 #pragma once
 #include <platform_win.h>
 #include "Tasks.h"
-#include "Widgets.h"
 #include "WorkSpaces.h"
 #include "Tray.h"
 #include "Explorer.h"
@@ -65,8 +64,8 @@ namespace bb {
 
 		// binds
 		void Quit (uint32_t arg);
-		void ShowMenu (uint32_t arg);
-		void ToggleMenu ();
+		void ShowMenu (bbstring const & vertex_id);
+		void ToggleMenu (bbstring const & vertex_id);
 		void MakeSticky (HWND hwnd);
 		void RemoveSticky (HWND hwnd);
 		HWND GetHwnd ();

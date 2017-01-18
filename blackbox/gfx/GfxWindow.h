@@ -4,6 +4,7 @@
 
 namespace bb {
 	struct Gui;
+	struct GuiWidget;
 
 	struct GfxWindow
 	{
@@ -23,6 +24,7 @@ namespace bb {
 
 		virtual Gui * GetGui () = 0;
 		virtual Gui const * GetGui () const = 0;
+		virtual GuiWidget * FindWidget (bbstring const & name) = 0;
 
 		bbstring const & GetName () const { return m_wName; }
 	};

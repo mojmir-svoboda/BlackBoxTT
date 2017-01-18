@@ -21,24 +21,38 @@ s7_pointer bind_SetQuit (s7_scheme * sc, s7_pointer args)
 	return s7_wrong_type_arg_error(sc, "SetQuit", 1, s7_car(args), "integer code");
 }
 
+bbstring toString (char const * src)
+{
+	size_t const ln = strlen(src);
+	size_t const sz = bb::codecvt_utf8_utf16_dst_size(src, ln);
+	wchar_t * const bbcmd_u16 = static_cast<wchar_t *>(alloca(sz * sizeof(wchar_t)));
+	size_t const bbcmd_u16_ln = bb::codecvt_utf8_utf16(src, ln, bbcmd_u16, sz);
+	bbstring b(bbcmd_u16, bbcmd_u16_ln);
+	return std::move(b);
+}
+
 s7_pointer bind_ShowMenu (s7_scheme * sc, s7_pointer args)
 {
-	if (s7_is_integer(s7_car(args)))
+	if (s7_is_string(s7_car(args)))
 	{
-		uint32_t const n = s7_integer(s7_car(args));
-		bb::BlackBox * const bb = getBlackBoxInstanceRW();
-		bb->ShowMenu(n);
-
+		char const * widget_name = s7_string(s7_car(args));
+		bbstring name = toString(widget_name);
+		getBlackBoxInstanceRW()->ShowMenu(name);
 		return s7_nil(sc);
 	}
-	return s7_wrong_type_arg_error(sc, "ShowMenu", 1, s7_car(args), "0/1");
+	return s7_wrong_type_arg_error(sc, "ShowMenu", 1, s7_car(args), "utf8 string");
 }
 
 s7_pointer bind_ToggleMenu (s7_scheme * sc, s7_pointer args)
 {
-	bb::BlackBox * const bb = getBlackBoxInstanceRW();
-	bb->ToggleMenu();
-	return s7_nil(sc);
+	if (s7_is_string(s7_car(args)))
+	{
+		char const * widget_name = s7_string(s7_car(args));
+		bbstring name = toString(widget_name);
+		getBlackBoxInstanceRW()->ToggleMenu(name);
+		return s7_nil(sc);
+	}
+	return s7_wrong_type_arg_error(sc, "ToggleMenu", 1, s7_car(args), "utf8 string");
 }
 
 s7_pointer bind_SetCurrentVertexId (s7_scheme * sc, s7_pointer args)
@@ -46,16 +60,8 @@ s7_pointer bind_SetCurrentVertexId (s7_scheme * sc, s7_pointer args)
 	if (s7_is_string(s7_car(args)))
 	{
 		char const * vertex = s7_string(s7_car(args));
-
-		size_t const ln = strlen(vertex);
-		size_t const sz = bb::codecvt_utf8_utf16_dst_size(vertex, ln);
-		wchar_t * const bbcmd_u16 = static_cast<wchar_t *>(alloca(sz * sizeof(wchar_t)));
-		size_t const bbcmd_u16_ln = bb::codecvt_utf8_utf16(vertex, ln, bbcmd_u16, sz);
-		bbstring b(bbcmd_u16, bbcmd_u16_ln);
-
-		bb::BlackBox * const bb = getBlackBoxInstanceRW();
-		bb->WorkSpacesSetCurrentVertexId(b);
-
+		bbstring name = toString(vertex);
+		getBlackBoxInstanceRW()->WorkSpacesSetCurrentVertexId(name);
 		return s7_nil(sc);
 	}
 	return s7_wrong_type_arg_error(sc, "SetCurrentVertexId", 1, s7_car(args), "utf8 string");
@@ -65,17 +71,9 @@ s7_pointer bind_SwitchVertexViaEdge (s7_scheme * sc, s7_pointer args)
 {
 	if (s7_is_string(s7_car(args)))
 	{
-		char const * vertex = s7_string(s7_car(args));
-
-		size_t const ln = strlen(vertex);
-		size_t const sz = bb::codecvt_utf8_utf16_dst_size(vertex, ln);
-		wchar_t * const bbcmd_u16 = static_cast<wchar_t *>(alloca(sz * sizeof(wchar_t)));
-		size_t const bbcmd_u16_ln = bb::codecvt_utf8_utf16(vertex, ln, bbcmd_u16, sz);
-		bbstring edge_id(bbcmd_u16, bbcmd_u16_ln);
-
-		bb::BlackBox * const bb = getBlackBoxInstanceRW();
-		bb->WorkSpacesSwitchVertexViaEdge(edge_id);
-
+		char const * edge = s7_string(s7_car(args));
+		bbstring name = toString(edge);
+		getBlackBoxInstanceRW()->WorkSpacesSwitchVertexViaEdge(name);
 		return s7_nil(sc);
 	}
 	return s7_wrong_type_arg_error(sc, "SetCurrentVertexId", 1, s7_car(args), "utf8 string");
@@ -85,18 +83,10 @@ s7_pointer bind_MaximizeTopWindow (s7_scheme * sc, s7_pointer args)
 {
 	if (s7_is_string(s7_car(args)))
 	{
-		char const * param = s7_string(s7_car(args));
-
-		size_t const ln = strlen(param);
-		size_t const sz = bb::codecvt_utf8_utf16_dst_size(param, ln);
-		wchar_t * const param_u16 = static_cast<wchar_t *>(alloca(sz * sizeof(wchar_t)));
-		size_t const param_u16_ln = bb::codecvt_utf8_utf16(param, ln, param_u16, sz);
-		bbstring p(param_u16, param_u16_ln);
-
-		bb::BlackBox * const bb = getBlackBoxInstanceRW();
-		bool vertical = p == L"vertical";
-		bb->MaximizeTopWindow(vertical);
-
+		char const * arg = s7_string(s7_car(args));
+		bbstring a = toString(arg);
+		bool vertical = a == L"vertical";
+		getBlackBoxInstanceRW()->MaximizeTopWindow(vertical);
 		return s7_nil(sc);
 	}
 	return s7_wrong_type_arg_error(sc, "SetCurrentVertexId", 1, s7_car(args), "utf8 string");
@@ -107,16 +97,8 @@ s7_pointer bind_MoveTopWindowToVertexViaEdge (s7_scheme * sc, s7_pointer args)
 	if (s7_is_string(s7_car(args)))
 	{
 		char const * param = s7_string(s7_car(args));
-
-		size_t const ln = strlen(param);
-		size_t const sz = bb::codecvt_utf8_utf16_dst_size(param, ln);
-		wchar_t * const param_u16 = static_cast<wchar_t *>(alloca(sz * sizeof(wchar_t)));
-		size_t const param_u16_ln = bb::codecvt_utf8_utf16(param, ln, param_u16, sz);
-		bbstring p(param_u16, param_u16_ln);
-
-		bb::BlackBox * const bb = getBlackBoxInstanceRW();
-		bb->MoveTopWindowToVertexViaEdge(p);
-
+		bbstring name = toString(param);
+		getBlackBoxInstanceRW()->MoveTopWindowToVertexViaEdge(name);
 		return s7_nil(sc);
 	}
 	return s7_wrong_type_arg_error(sc, "SetCurrentVertexId", 1, s7_car(args), "utf8 string");
@@ -127,21 +109,12 @@ s7_pointer bind_SetTaskManIgnored (s7_scheme * sc, s7_pointer args)
 	if (s7_is_string(s7_car(args)))
 	{
 		char const * param = s7_string(s7_car(args));
-
-		size_t const ln = strlen(param);
-		size_t const sz = bb::codecvt_utf8_utf16_dst_size(param, ln);
-		wchar_t * const param_u16 = static_cast<wchar_t *>(alloca(sz * sizeof(wchar_t)));
-		size_t const param_u16_ln = bb::codecvt_utf8_utf16(param, ln, param_u16, sz);
-		bbstring p(param_u16, param_u16_ln);
-
-		bb::BlackBox * const bb = getBlackBoxInstanceRW();
-		bb->SetTaskManIgnored(p);
-
+		bbstring name = toString(param);
+		getBlackBoxInstanceRW()->SetTaskManIgnored(name);
 		return s7_nil(sc);
 	}
 	return s7_wrong_type_arg_error(sc, "SetTaskManIgnored", 1, s7_car(args), "utf8 string");
 }
-
 
 namespace bb {
 
@@ -161,8 +134,8 @@ namespace bb {
 		m_scheme = s7_init();
 
 		s7_define_function(m_scheme, "SetQuit", bind_SetQuit, 1, 0, false, "(SetQuit int) Quits with code int");
-		s7_define_function(m_scheme, "ShowMenu", bind_ShowMenu, 1, 0, false, "(ShowMenu int) Show/Hide menu where int=1/0");
-		s7_define_function(m_scheme, "ToggleMenu", bind_ToggleMenu, 0, 0, false, "(ToggleMenu) Show/Hide menu if hidden/shown");
+		s7_define_function(m_scheme, "ShowMenu", bind_ShowMenu, 1, 0, false, "(ShowMenu widget_name) Show/Hide menu with name widget_name");
+		s7_define_function(m_scheme, "ToggleMenu", bind_ToggleMenu, 1, 0, false, "(ToggleMenu widget_name) Show/Hide menu with widget_name if hidden/shown");
 		s7_define_function(m_scheme, "SetCurrentVertexId", bind_SetCurrentVertexId, 1, 0, false, "(SetCurrentVertexId vertex_id_string) Sets WorkSpace Graph to specified VertexId");
 		s7_define_function(m_scheme, "SwitchVertexViaEdge", bind_SwitchVertexViaEdge, 1, 0, false, "(SwitchVertexViaEdge edge_id_string) Switch WorkSpace via edge to destination vertex_id");
 		s7_define_function(m_scheme, "MaximizeTopWindow", bind_MaximizeTopWindow, 1, 0, false, "(SwitchVertexViaEdge edge_id_string) Switch WorkSpace via edge to destination vertex_id");

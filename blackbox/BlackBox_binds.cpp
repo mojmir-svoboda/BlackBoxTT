@@ -10,14 +10,18 @@ namespace bb {
 		m_quit = true;
 	}
 
-	void BlackBox::ShowMenu (uint32_t arg)
+	void BlackBox::ShowMenu (bbstring const & widget_name)
 	{
 		m_menu = true;
 	}
 
-	void BlackBox::ToggleMenu ()
+	void BlackBox::ToggleMenu (bbstring const & widget_name)
 	{
 		m_menu = !m_menu;
+		if (GuiWidget * w = m_gfx->FindWidget(widget_name))
+		{
+			;
+		}
 	}
 
 	void BlackBox::MakeSticky (HWND hwnd)

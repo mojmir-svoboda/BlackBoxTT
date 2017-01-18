@@ -22,7 +22,8 @@ namespace imgui {
 		Gfx * m_gfx { nullptr };
 		GfxWindow * m_gfxWindow { nullptr };
 		ImGuiContext * m_context { nullptr };
-		std::vector<std::unique_ptr<GuiWidget>> m_widgets;
+		using GuiWidgetPtr = std::unique_ptr<GuiWidget>;
+		std::vector<GuiWidgetPtr> m_widgets;
 		bbstring m_name { };
 		ID3D11Buffer *						m_pVB { nullptr };
 		ID3D11Buffer *						m_pIB { nullptr };
@@ -47,6 +48,7 @@ namespace imgui {
 
 		virtual void Show (bool on) { m_show = on; }
 		virtual bool Visible () const { return m_show; }
+		virtual GuiWidget * FindWidget (bbstring const & name) override;
 
 		//bool InitDX (GfxWindow * w, DX11 * dx11);
 		void RenderImGui ();

@@ -21,6 +21,7 @@ namespace bb {
 		virtual void Render () = 0;
 		virtual bool Init (GfxWindow * w) = 0;
 		virtual bool Done () = 0;
+		virtual GuiWidget * FindWidget (bbstring const & name) = 0;
 
 		virtual void Show (bool on) { m_show = on; }
 		virtual bool Visible () const { return m_show; }

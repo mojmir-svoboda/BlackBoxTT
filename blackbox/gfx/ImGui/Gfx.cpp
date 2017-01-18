@@ -75,6 +75,17 @@ namespace imgui {
 		return true;
 	}
 
+	GuiWidget * Gfx::FindWidget (bbstring const & name)
+	{
+		for (GfxWindowPtr & win : m_windows)
+		{
+			if (GuiWidget * w = win->FindWidget(name))
+			{
+				return w;
+			}
+		}
+		return nullptr;
+	}
 
 	HWND Gfx::MkWindow (void * gui, int x, int y, int w, int h, int alpha, wchar_t const * clname, wchar_t const * wname)
 	{

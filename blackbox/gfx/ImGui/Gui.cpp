@@ -35,6 +35,14 @@ namespace imgui {
 		}
 	}
 
+	GuiWidget * Gui::FindWidget (bbstring const & name)
+	{
+		for (GuiWidgetPtr & w : m_widgets)
+			if (name == w->GetNameW())
+				return w.get();
+		return nullptr;
+	}
+
 	void Gui::Render ()
 	{
 		if (m_show)

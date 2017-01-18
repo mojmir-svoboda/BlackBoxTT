@@ -31,6 +31,8 @@ namespace imgui {
 		virtual Gui * GetGui () override { return m_gui.get(); }
 		virtual Gui const * GetGui () const override { return m_gui.get(); }
 
+		virtual GuiWidget * FindWidget (bbstring const & name) override { return m_gui->FindWidget(name); }
+
 		bool IsReady () const { return m_chain != nullptr; }
 	};
 }}
