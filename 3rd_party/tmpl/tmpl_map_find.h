@@ -1,16 +1,4 @@
 #pragma once
-#include <utility>
-
-namespace std {
-
-template<class Type>
-struct identity
-{
-  typedef Type type;
-};
-
-}
-
 template<class M, class K> struct tmpl_map_find_impl;
 
 template<class M, class K>
