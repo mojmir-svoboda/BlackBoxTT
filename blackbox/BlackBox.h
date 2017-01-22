@@ -62,6 +62,8 @@ namespace bb {
 		bool AddIconToCache (bbstring const & name, HICON ico, IconId & id);
 		bool FindIconInCache (bbstring const & name, IconId & id);
 
+		// probably future binds
+		bool GetPointerPos (int & x, int & y);
 		// binds
 		void Quit (uint32_t arg);
 		void ShowMenu (bbstring const & vertex_id);

@@ -3,20 +3,23 @@
 #include <vector>
 #include <WidgetConfig.h>
 #include "GfxWindow.h"
+namespace YAML { class Node; }
 
 namespace bb
 {
 	struct GuiWidget
 	{
 		bool m_show { false };
+		bbstring m_id { };
 		GfxWindow * m_gfxWindow { nullptr };
-		WidgetConfig m_config;
 
-		GuiWidget (WidgetConfig & cfg) : m_config(cfg) { }
+		GuiWidget () { }
 		virtual ~GuiWidget () { }
-		virtual void DrawUI () { }
-		virtual char const * GetName () = 0;
-		virtual wchar_t const * GetNameW () = 0;
+		virtual void DrawUI () = 0;
+		virtual wchar_t const * GetWidgetTypeName () = 0;
+		virtual bool loadConfig (YAML::Node & y_root) = 0;
+		//virtual bool saveConfig (YAML::Node & y_root) = 0;
+		virtual bbstring const & GetId () { return m_id; }
 
 		virtual void Show (bool on) { m_show = on; }
 		virtual bool Visible () const { return m_show; }
