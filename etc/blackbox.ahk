@@ -17,10 +17,10 @@ Return
    Run, c:\bb_devel\bbcli.exe -c "(SwitchVertexViaEdge ""right"")"
 Return
 
-!F1::
++!F1::
    Run, c:\bb_devel\bbcli.exe -c "(SetCurrentVertexId ""Desktop 1"")"
 Return
-!F2::
++!F2::
    Run, c:\bb_devel\bbcli.exe -c "(SetCurrentVertexId ""Desktop 2"")"
 Return
 
