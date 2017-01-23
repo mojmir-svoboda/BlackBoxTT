@@ -38,7 +38,7 @@ namespace imgui {
 	GuiWidget * Gui::FindWidget (bbstring const & name)
 	{
 		for (GuiWidgetPtr & w : m_widgets)
-			if (name == w->GetNameW())
+			if (name == w->GetId())
 				return w.get();
 		return nullptr;
 	}
@@ -65,7 +65,7 @@ namespace imgui {
 
 		for (std::unique_ptr<GuiWidget> & w : m_widgets)
 		{
-			if (w->m_config.m_show)
+			if (w->Visible())
 				w->DrawUI();
 		}
 	}

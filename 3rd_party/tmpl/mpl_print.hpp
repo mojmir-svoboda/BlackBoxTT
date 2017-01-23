@@ -14,14 +14,9 @@
 
 #include <type_traits>
 
-template <class T>
-struct print_identity
-{
-  using type = T;
-};
 
 template <class T>
-struct print : print_identity<T>
+struct print : std::identity<T>
 {
     enum : unsigned { n = sizeof(T) -10 };
 };

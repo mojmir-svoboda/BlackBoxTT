@@ -52,6 +52,7 @@ set(blackbox_SOURCES
 	WorkSpacesConfig_yaml.cpp
 	WorkSpacesGraph.cpp
 	WorkSpaces.cpp
+	WidgetConfig_yaml.cpp
 	WidgetsConfig_yaml.cpp
 	bind/bind.cpp
 	plugin/PluginManager.cpp

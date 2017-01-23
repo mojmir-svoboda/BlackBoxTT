@@ -16,12 +16,13 @@ namespace bb {
 		virtual void NewFrame () = 0;
 		virtual bool Done () = 0;
 
-		virtual GfxWindow * MkWidgetWindow (int x, int y, int w, int h, int alpha, wchar_t const * clname, wchar_t const * wname, bool show) = 0;
-		virtual HWND MkWindow (void * gui, int x, int y, int w, int h, int alpha, wchar_t const * clname, wchar_t const * wname) = 0;
-		virtual GuiWidget * FindWidget (bbstring const & name) = 0;
-
 		virtual bool AddIconToCache (bbstring const & name, HICON ico, IconId & id) = 0;
 		virtual bool FindIconInCache (bbstring const & name, IconId & id) const = 0;
+
+		virtual GuiWidget * FindWidget (bbstring const & name) = 0;
+		virtual GuiWidget * MkWidget (WidgetConfig & cfg) = 0;
+		virtual GfxWindow * MkWidgetWindow (int x, int y, int w, int h, int alpha, wchar_t const * clname, wchar_t const * wname, bool show) = 0;
+		virtual HWND MkWindow (void * gui, int x, int y, int w, int h, int alpha, wchar_t const * clname, wchar_t const * wname) = 0;
 	};
 
 }

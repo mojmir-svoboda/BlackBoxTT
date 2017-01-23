@@ -5,17 +5,21 @@
 
 namespace bb {
 
+	struct PagerWidgetConfig : WidgetConfig
+	{
+	};
+
 	struct PagerWidget : GuiWidget
 	{
-		bool m_horizontal;
+		constexpr static wchar_t const * const c_type = L"Pager";
+		PagerWidgetConfig m_config;
 		ImVec2 m_contentSize { 0 , 0 };
 		std::vector<TaskInfo> m_tasks;
 
-		PagerWidget (WidgetConfig & cfg);
+		PagerWidget ();
 		virtual ~PagerWidget () { }
 		virtual void DrawUI () override;
-		virtual char const * GetName () override { return "Pager"; }
-		virtual wchar_t const * GetNameW () override { return L"Pager"; }
+		virtual wchar_t const * GetWidgetTypeName () override { return c_type; }
 
 		void UpdateTasks ();
 	};

@@ -16,6 +16,7 @@ Widgets:
     h: 64
     titlebar: false
   - widget: 'Pager'
+    id: 'bbTT Pager'
     show: true
     x: 0
     y: 0
