@@ -53,7 +53,6 @@ set(blackbox_SOURCES
 	WorkSpacesGraph.cpp
 	WorkSpaces.cpp
 	WidgetConfig_yaml.cpp
-	WidgetsConfig_yaml.cpp
 	bind/bind.cpp
 	plugin/PluginManager.cpp
 	plugin/PluginsConfig_yaml.cpp
@@ -77,7 +76,6 @@ set (blackbox_HEADERS
 	TrayConfig.h
 	WorkSpaces.h
 	WidgetConfig.h
-	WidgetsConfig.h
 	utils_window.h
 	utils_recover.h
 	utils_yaml.h

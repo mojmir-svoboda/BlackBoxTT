@@ -203,12 +203,13 @@ namespace bb {
 				return false;
 
 			TRACE_SCOPE_MSG(LL_INFO, CTX_BB | CTX_CONFIG | CTX_INIT, "Loading config file: %s", cfg_name.c_str());
-			YAML::Node y_root = YAML::LoadFile(cfg_name);
-			if (y_root.IsNull())
+			YAML::Node y_config = YAML::LoadFile(cfg_name);
+			if (y_config.IsNull())
 			{
 				return false;
 			}
-			if (loadTasksConfig(y_root, m_config.m_tasks))
+			m_y_config = std::move(std::unique_ptr<YAML::Node>(new YAML::Node(y_config)));
+			if (loadTasksConfig(*m_y_config, m_config.m_tasks))
 			{
 				TRACE_MSG(LL_INFO, CTX_BB | CTX_CONFIG, "* loaded tasks section");
 			}
@@ -217,27 +218,18 @@ namespace bb {
 				TRACE_MSG(LL_ERROR, CTX_BB | CTX_CONFIG, "* failed to load tasks section");
 				m_config.m_tasks.clear();
 			}
-			if (loadGfxConfig(y_root, m_config.m_gfx))
+			if (loadGfxConfig(*m_y_config, m_config.m_gfx))
 			{
 				TRACE_MSG(LL_INFO, CTX_BB | CTX_CONFIG, "* loaded Gfx section");
 			}
 			else
 			{
 				TRACE_MSG(LL_ERROR, CTX_BB | CTX_CONFIG, "* failed to load Gfx section");
-				m_config.m_widgets.clear();
-			}
-			if (loadWidgetsConfig(y_root, m_config.m_widgets))
-			{
-				TRACE_MSG(LL_INFO, CTX_BB | CTX_CONFIG, "* loaded widgets section");
-			}
-			else
-			{
-				TRACE_MSG(LL_ERROR, CTX_BB | CTX_CONFIG, "* failed to load widgets section");
-				m_config.m_widgets.clear();
+				m_config.m_gfx.clear();
 			}
 
 			WorkSpacesConfig ws_cfg;
-			if (loadWorkSpacesConfig(y_root, ws_cfg))
+			if (loadWorkSpacesConfig(*m_y_config, ws_cfg))
 			{
 				TRACE_MSG(LL_INFO, CTX_BB | CTX_CONFIG, "* loaded workspaces section");
 				m_config.m_wspaces = ws_cfg;
@@ -248,7 +240,7 @@ namespace bb {
 			}
 
 			TrayConfig tray_cfg;
-			if (loadTrayConfig(y_root, tray_cfg))
+			if (loadTrayConfig(*m_y_config, tray_cfg))
 			{
 				TRACE_MSG(LL_INFO, CTX_BB | CTX_CONFIG, "* loaded tray section");
 				m_config.m_tray = tray_cfg;
@@ -259,7 +251,7 @@ namespace bb {
 			}
 
 			PluginsConfig plugins_cfg;
-			if (loadPluginsConfig(y_root, plugins_cfg))
+			if (loadPluginsConfig(*m_y_config, plugins_cfg))
 			{
 				TRACE_MSG(LL_INFO, CTX_BB | CTX_CONFIG, "* loaded plugins section");
 				m_config.m_plugins = plugins_cfg;
@@ -270,7 +262,7 @@ namespace bb {
 			}
 
 			DesktopWallpaperConfig wall_cfg;
-			if (loadDesktopWallpaperConfig(y_root, wall_cfg))
+			if (loadDesktopWallpaperConfig(*m_y_config, wall_cfg))
 			{
 				TRACE_MSG(LL_INFO, CTX_BB | CTX_CONFIG, "* loaded Wallpaper section");
 				m_config.m_wallpapers = wall_cfg;
@@ -281,7 +273,7 @@ namespace bb {
 			}
 
 			MenuConfig menu_cfg;
-			if (loadMenuConfig(y_root, menu_cfg))
+			if (loadMenuConfig(*m_y_config, menu_cfg))
 			{
 				TRACE_MSG(LL_INFO, CTX_BB | CTX_CONFIG, "* loaded Menu section");
 				m_config.m_menu = std::move(menu_cfg);
@@ -332,7 +324,7 @@ namespace bb {
 		std::unique_ptr<bb::Gfx> gfx;
 		if (use == L"ImGui")
 		{
-			std::unique_ptr<bb::imgui::Gfx> imgui_gfx(new bb::imgui::Gfx(m_tasks));
+			std::unique_ptr<bb::imgui::Gfx> imgui_gfx(new bb::imgui::Gfx(m_tasks, *m_y_config.get()));
 			gfx = std::move(imgui_gfx); // imgui to base
 			m_gfx = std::move(gfx); // base to m_gfx
 			return true;
@@ -375,7 +367,7 @@ namespace bb {
 			return false;
 		if (!m_tasks.Init(m_config.m_tasks))
 			return false;
-		if (!m_gfx->Init(m_config.m_widgets))
+		if (!m_gfx->Init(m_config.m_gfx))
 			return false;
 		if (!m_explorer->Init())
 			return false;

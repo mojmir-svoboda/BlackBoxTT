@@ -10,6 +10,7 @@ namespace YAML {
 		{
 			Node node;
 			node.push_back(rhs.m_use);
+			node.push_back(rhs.m_startWidgets);
 			return node;
 		}
 
@@ -18,6 +19,7 @@ namespace YAML {
 			try
 			{
 				rhs.m_use = node["use"].as<bbstring>();
+				rhs.m_startWidgets = node["start"].as<std::vector<bbstring>>();
 				return true;
 			}
 			catch (std::exception const & e)

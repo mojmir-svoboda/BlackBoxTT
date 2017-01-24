@@ -15,13 +15,16 @@
 #include <gfx/widgets/ImGui/DebugWidget.h>
 #include <gfx/widgets/ImGui/QuickBarWidget.h>
 #include <gfx/widgets/ImGui/TrayWidget.h>
+#include <yaml-cpp/yaml.h>
+#include "utils_yaml.h"
+#include "WidgetConfig_yaml.h"
 
 namespace bb {
 namespace imgui {
 
 	Gfx::~Gfx () { }
 
-	bool Gfx::Init (WidgetsConfig & config)
+	bool Gfx::Init (GfxConfig & config)
 	{
 		TRACE_MSG(LL_INFO, CTX_BB | CTX_INIT, "Initializing gfx");
 		m_dx11 = new DX11;
@@ -35,10 +38,10 @@ namespace imgui {
 		return CreateWidgets(config);
 	}
 
-	bool Gfx::CreateWidgets (WidgetsConfig & config)
+	bool Gfx::CreateWidgets (GfxConfig & config)
 	{
 		TRACE_SCOPE(LL_INFO, CTX_BB | CTX_INIT);
-		m_config = &config;
+		m_config = config;
 
 		SecondMon s = { 0 };
 		EnumDisplayMonitors(NULL, NULL, &MonitorEnumProc, reinterpret_cast<LPARAM>(&s));
@@ -49,28 +52,13 @@ namespace imgui {
 			sx = s.x1;
 		}
 
-
-		for (size_t i = 0, ie = config.m_widgets.size(); i < ie; ++i)
+		for (size_t i = 0, ie = config.m_startWidgets.size(); i < ie; ++i)
 		{
-			// hey piggy...
-			if (config.m_widgets[i]->m_widget == L"Pager")
-				MkWidget<PagerWidget>(*config.m_widgets[i]);
-			if (config.m_widgets[i]->m_widget == L"QuickBar")
-				MkWidget<QuickBarWidget>(*config.m_widgets[i]);
-			if (config.m_widgets[i]->m_widget == L"Tasks")
-				MkWidget<TasksWidget>(*config.m_widgets[i]);
-			if (config.m_widgets[i]->m_widget == L"ControlPanel")
-				MkWidget<ControlPanelWidget>(*config.m_widgets[i]);
-			if (config.m_widgets[i]->m_widget == L"RecoverWindows")
-				MkWidget<RecoverWindowsWidget>(*config.m_widgets[i]);
-			if (config.m_widgets[i]->m_widget == L"Debug")
-				MkWidget<DebugWidget>(*config.m_widgets[i]);
-			if (config.m_widgets[i]->m_widget == L"Plugins")
-				MkWidget<PluginsWidget>(*config.m_widgets[i]);
-			if (config.m_widgets[i]->m_widget == L"StyleEditor")
-				MkWidget<StyleEditorWidget>(*config.m_widgets[i]);
-			if (config.m_widgets[i]->m_widget == L"Tray")
-				MkWidget<TrayWidget>(*config.m_widgets[i]);
+			bbstring const & id = config.m_startWidgets[i];
+			if (!id.empty())
+			{
+				auto tmp = MkWidgetFromId(id.c_str());
+			}
 		}
 		return true;
 	}
@@ -102,10 +90,30 @@ namespace imgui {
 		return w;
 	}
 
-	std::unique_ptr<GuiWidget> Gfx::MkWidgetFromId (wchar_t const * widgetId)
+	bool Gfx::MkWidgetFromId (wchar_t const * widgetId)
 	{
-		std::unique_ptr<GuiWidget> w;
-		return w;
+		YAML::Node & y_widgets = m_y_root["Widgets"];
+		if (y_widgets)
+		{
+			int const n = y_widgets.size();
+			for (int i = 0; i < n; ++i)
+			{
+				YAML::Node & y_widgets_i = y_widgets[i];
+				bb::WidgetConfig tmp = y_widgets[i].as<bb::WidgetConfig>();
+				if (tmp.m_id == widgetId)
+				{
+					std::unique_ptr<GuiWidget> w = MkWidgetFromType(tmp.m_widgetType.c_str());
+					if (w && w->loadConfig(y_widgets_i))
+					{
+						GfxWindow * win = MkWidgetWindow(tmp.m_x, tmp.m_y, tmp.m_w, tmp.m_h, tmp.m_alpha, w->GetWidgetTypeName(), w->GetId().c_str(), tmp.m_show);
+						w->m_gfxWindow = win;
+						win->m_gui->m_widgets.push_back(std::move(w));
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 	GuiWidget * Gfx::MkWidget (WidgetConfig & cfg)

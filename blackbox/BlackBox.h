@@ -15,6 +15,7 @@
 #include "blackbox_api.h"
 #include <bblibcompat/StyleStruct.h>
 namespace bb { struct MenuWidget; }
+namespace YAML { class Node; }
 
 namespace bb {
 
@@ -113,6 +114,7 @@ namespace bb {
 		bool m_inJob { false };
 		bool m_quit { false };
 		bool m_menu { false };
+		std::unique_ptr<YAML::Node> m_y_config;
 		BlackBoxConfig m_config;
 		CommandLine m_cmdLine;
 		Scheme m_scheme;

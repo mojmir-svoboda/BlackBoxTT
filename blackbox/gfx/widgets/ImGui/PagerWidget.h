@@ -4,6 +4,7 @@
 #include <imgui/imgui.h>
 
 namespace bb {
+namespace imgui {
 
 	struct PagerWidgetConfig : WidgetConfig
 	{
@@ -20,9 +21,9 @@ namespace bb {
 		virtual ~PagerWidget () { }
 		virtual void DrawUI () override;
 		virtual wchar_t const * GetWidgetTypeName () override { return c_type; }
+		virtual bool loadConfig (YAML::Node & y_cfg_node) override;
 
 		void UpdateTasks ();
 	};
 
-}
-
+}}

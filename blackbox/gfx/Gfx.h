@@ -3,7 +3,7 @@
 #include <vector>
 #include "GfxWindow.h"
 #include "GuiWidget.h"
-#include <blackbox/WidgetsConfig.h>
+#include "GfxConfig.h"
 
 namespace bb {
 
@@ -11,7 +11,7 @@ namespace bb {
 	{
 		Gfx () { }
 		virtual ~Gfx () { }
-		virtual bool Init (WidgetsConfig & cfg) = 0;
+		virtual bool Init (GfxConfig & cfg) = 0;
 		virtual void Render () = 0;
 		virtual void NewFrame () = 0;
 		virtual bool Done () = 0;

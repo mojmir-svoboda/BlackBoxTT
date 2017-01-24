@@ -4,34 +4,6 @@ BlackBox:
     - 'default'
   styleCycle:
 
-Gfx:
-  use: 'ImGui'
-
-Widgets:
-  - widget: 'QuickBar'
-    show: true
-    x: 0
-    y: 0
-    w: 128
-    h: 64
-    titlebar: false
-  - widget: 'Pager'
-    id: 'bbTT Pager'
-    show: true
-    x: 0
-    y: 0
-    w: 256
-    h: 256
-    alpha: 192
-  - widget: 'Tasks'
-    show: false
-  - widget: 'RecoverWindows'
-    x: 0
-    y: 512
-    w: 512
-    h: 768
-    show: false
-
 WorkSpaces:
   current: 'win10'
   clusters:
@@ -147,6 +119,39 @@ Wallpapers:
     - 'media/wallpaper/NASA/M157270357RE_thumb2.png'
     - 'media/wallpaper/NASA/orientf_thumb.png'
     - 'media/wallpaper/NASA/v2016069.westernnorthatlantic.half_.jpg'
+
+Gfx:
+  use: 'ImGui'
+  start: [ 'bbTT Pager' ]
+
+Widgets:
+  - widget: 'QuickBar'
+    id: 'bbTT QB'
+    show: true
+    x: 0
+    y: 0
+    w: 128
+    h: 64
+    titlebar: false
+  - widget: 'Pager'
+    id: 'bbTT Pager'
+    show: true
+    x: 0
+    y: 0
+    w: 256
+    h: 256
+    alpha: 192
+  - widget: 'Tasks'
+    id: 'bbTT Tasks'
+    show: false
+  - widget: 'RecoverWindows'
+    id: 'bbTT RecoverWindows'
+    x: 0
+    y: 512
+    w: 512
+    h: 768
+    show: false
+
 
 
 

@@ -4,13 +4,56 @@
 #include <bblib/codecvt.h>
 #include <imgui/imgui_internal.h>
 #include <blackbox/utils_window.h>
+#include <yaml-cpp/yaml.h>
+#include "utils_yaml.h"
+#include "WidgetConfig_yaml.h"
+
+namespace YAML {
+	template<>
+	struct convert<bb::imgui::PagerWidgetConfig>
+	{
+		static Node encode(bb::imgui::PagerWidgetConfig const & rhs)
+		{
+			Node node = convert<bb::WidgetConfig>::encode(rhs);
+			//node.push_back(rhs.);
+			return node;
+		}
+
+		static bool decode (Node const & node, bb::imgui::PagerWidgetConfig & rhs)
+		{
+			try
+			{
+				if (convert<bb::WidgetConfig>::decode(node, rhs))
+				{
+					return true;
+				}
+			}
+			catch (std::exception const & e)
+			{
+				return false;
+			}
+			return true;
+		}
+	};
+}
 
 namespace bb {
+namespace imgui {
 
 	PagerWidget::PagerWidget ()
 		: GuiWidget()
 	{
 		m_tasks.reserve(64);
+	}
+
+	bool PagerWidget::loadConfig (YAML::Node & y_cfg_node)
+	{
+		if (!y_cfg_node.IsNull())
+		{
+			PagerWidgetConfig tmp = y_cfg_node.as<PagerWidgetConfig>();
+			m_config = std::move(tmp);
+		}
+		return false;
 	}
 
 	void PagerWidget::UpdateTasks ()
@@ -139,5 +182,5 @@ namespace bb {
 		ImGui::End();
  	}
 
-}
+}}
 

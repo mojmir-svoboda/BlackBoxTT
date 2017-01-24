@@ -8,8 +8,9 @@
 #include <blackbox/gfx/Gfx.h>
 #include <blackbox/gfx/GuiWidget.h>
 #include <blackbox/WidgetConfig.h>
-#include <blackbox/WidgetsConfig.h>
+#include <blackbox/GfxConfig.h>
 #include <blackbox/Tasks.h>
+namespace YAML { class Node; }
 
 namespace bb {
 namespace imgui {
@@ -17,7 +18,8 @@ namespace imgui {
 	struct Gfx : bb::Gfx
 	{
 		Tasks & m_tasks;
-		WidgetsConfig * m_config;
+		YAML::Node & m_y_root;
+		GfxConfig m_config;
 		DX11 * m_dx11 { nullptr };
 		std::vector<ID3D11Texture2D *> m_textures;
 		using GfxWindowPtr = std::unique_ptr<GfxWindow>;
@@ -25,10 +27,10 @@ namespace imgui {
 		std::vector<GfxWindowPtr> m_newWindows;
 		IconCache m_iconCache;
 
-		Gfx (Tasks & t) : m_tasks(t) { }
+		Gfx (Tasks & t, YAML::Node & y_root) : m_tasks(t), m_y_root(y_root) { }
 		virtual ~Gfx ();
-		virtual bool Init (WidgetsConfig & config) override;
-		bool CreateWidgets (WidgetsConfig & config);
+		virtual bool Init (GfxConfig & config) override;
+		bool CreateWidgets (GfxConfig & config);
 		bool IsReady () const { return m_dx11 != nullptr; }
 
 		virtual void Render () override;
@@ -58,7 +60,7 @@ namespace imgui {
 
 		virtual GuiWidget * MkWidget (WidgetConfig & cfg) override;
 		std::unique_ptr<GuiWidget> MkWidgetFromType (wchar_t const * widgetType);
-		std::unique_ptr<GuiWidget> MkWidgetFromId (wchar_t const * widgetId);
+		bool MkWidgetFromId (wchar_t const * widgetId);
 	};
 
 }}
