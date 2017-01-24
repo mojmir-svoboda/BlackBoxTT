@@ -52,6 +52,7 @@ namespace imgui {
 		{
 			return m_iconCache.Find(name, id);
 		}
+		virtual bool FindIconCoords (IconId & id, void * & texture, float & u0, float & v0, float & u1, float & v1) const override;
 		bool MkIconResourceView (IconSlab & slab);
 		bool UpdateIconResourceView (IconSlab & slab);
 		void UpdateIconCache ();

@@ -52,8 +52,8 @@ namespace bb {
 		Tray & GetTray () { return m_tray; }
 		Tray const & GetTray () const { return m_tray; }
 		bool CreateGfx (GfxConfig & cfg);
-		//Gfx & GetGfx () { return m_gfx; }
-		//Gfx const & GetGfx () const { return m_gfx; }
+		Gfx & GetGfx () { return *m_gfx; }
+		Gfx const & GetGfx () const { return *m_gfx; }
 		Explorer & GetExplorer () { return *m_explorer; }
 		Explorer const & GetExplorer () const { return *m_explorer; }
 

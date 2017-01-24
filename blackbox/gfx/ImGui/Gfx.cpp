@@ -143,6 +143,28 @@ namespace imgui {
 		return nullptr;
 	}
 
+	bool Gfx::FindIconCoords (IconId & id, void * & texture, float & u0, float & v0, float & u1, float & v1) const
+	{
+		bb::imgui::IconSlab const * slab = nullptr;
+		if (m_iconCache.GetSlab(id, slab))
+		{
+			ImVec2 sz((float)id.m_size, (float)id.m_size);
+			ImVec2 uv0(0.0f, 0.0f);
+			ImVec2 uv1(1.0f, 1.0f);
+			ImTextureID texid = nullptr;
+			if (slab->Get(id.m_index, texid, uv0, uv1))
+			{
+				texture = texid;
+				u0 = uv0.x;
+				v0 = uv0.y;
+				u1 = uv1.x;
+				v1 = uv1.y;
+				return true;
+			}
+		}
+		return false;
+	}
+
 	HWND Gfx::MkWindow (void * gui, int x, int y, int w, int h, int alpha, wchar_t const * clname, wchar_t const * wname)
 	{
 		WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC, &Gui::GuiWndProcDispatch, 0L, 0L, ::GetModuleHandle(NULL), NULL, ::LoadCursor(NULL, IDC_ARROW), NULL, NULL, clname, NULL };
