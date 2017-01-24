@@ -52,6 +52,7 @@ namespace imgui {
 		{
 			PagerWidgetConfig tmp = y_cfg_node.as<PagerWidgetConfig>();
 			m_config = std::move(tmp);
+			return true;
 		}
 		return false;
 	}

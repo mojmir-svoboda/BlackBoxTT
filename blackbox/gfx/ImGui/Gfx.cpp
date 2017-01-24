@@ -57,7 +57,9 @@ namespace imgui {
 			bbstring const & id = config.m_startWidgets[i];
 			if (!id.empty())
 			{
-				auto tmp = MkWidgetFromId(id.c_str());
+				bool const ok = MkWidgetFromId(id.c_str());
+				if (!ok)
+					TRACE_MSG(LL_ERROR, CTX_BB | CTX_GFX, "Cannot create widget with id=%ws", id.c_str());
 			}
 		}
 		return true;
