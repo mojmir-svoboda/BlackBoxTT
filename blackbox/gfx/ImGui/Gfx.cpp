@@ -75,6 +75,52 @@ namespace imgui {
 		return true;
 	}
 
+	template <typename T>
+	std::unique_ptr<GuiWidget> newWidget ()
+	{
+		return std::unique_ptr<T>(new T);
+	}
+
+// 	template <typename T>
+// 	using config_of = decltype(T::m_config);
+	using widgetNewFnT = std::unique_ptr<GuiWidget> (*)();
+	static constexpr std::pair<wchar_t const *, widgetNewFnT> const table[] = {
+			{ PagerWidget::c_type, newWidget<PagerWidget> }
+		//,	{}
+	};
+
+	std::unique_ptr<GuiWidget> Gfx::MkWidgetFromType (wchar_t const * widgetType)
+	{
+		std::unique_ptr<GuiWidget> w;
+		for (auto & t : table)
+			if (0 == wcscmp(t.first, widgetType))
+			{
+				w = t.second();
+				return w;
+			}
+
+		return w;
+	}
+
+	std::unique_ptr<GuiWidget> Gfx::MkWidgetFromId (wchar_t const * widgetId)
+	{
+		std::unique_ptr<GuiWidget> w;
+		return w;
+	}
+
+	GuiWidget * Gfx::MkWidget (WidgetConfig & cfg)
+	{
+		if (cfg.m_show)
+		{
+// 			std::unique_ptr<GuiWidget> widget_ptr(new T(cfg));
+// 			GfxWindow * win = MkWidgetWindow(cfg.m_x, cfg.m_y, cfg.m_w, cfg.m_h, cfg.m_alpha, widget_ptr->GetNameW(), widget_ptr->GetNameW(), cfg.m_show);
+// 			widget_ptr->m_gfxWindow = win;
+// 			win->m_gui->m_widgets.push_back(std::move(widget_ptr));
+// 			return static_cast<T *>(win->m_gui->m_widgets.back().get());
+		}
+		return nullptr;
+	}
+
 	GuiWidget * Gfx::FindWidget (bbstring const & name)
 	{
 		for (GfxWindowPtr & win : m_windows)

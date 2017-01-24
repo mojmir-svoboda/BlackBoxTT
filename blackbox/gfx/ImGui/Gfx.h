@@ -57,8 +57,8 @@ namespace imgui {
 		virtual GuiWidget * FindWidget (bbstring const & name) override;
 
 		virtual GuiWidget * MkWidget (WidgetConfig & cfg) override;
-		std::unique_ptr<GuiWidget> MkWidgetFromType (bbstring const & widgetType);
-		std::unique_ptr<GuiWidget> MkWidgetFromId (bbstring const & widgetId);
+		std::unique_ptr<GuiWidget> MkWidgetFromType (wchar_t const * widgetType);
+		std::unique_ptr<GuiWidget> MkWidgetFromId (wchar_t const * widgetId);
 	};
 
 }}
