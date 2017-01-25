@@ -6,17 +6,24 @@
 
 namespace bb {
 
+	struct NotifWindow
+	{
+		HWND m_window { nullptr };
+	};
+
 	struct WorkSpaces
 	{
 		WorkSpacesConfig m_config;
 		WorkSpacesGraph m_graph;
 		std::unique_ptr<VirtualDesktopManager> m_vdm;
+		NotifWindow m_notif;
 
 		WorkSpaces ();
 		~WorkSpaces ();
 
 		bool Init (WorkSpacesConfig & config);
 		void InitClusterAndVertex ();
+		void InitNotifWindow ();
 		bool Done ();
 		bool CreateGraph ();
 		void ClearGraph ();
@@ -25,6 +32,7 @@ namespace bb {
 		void OnWindowCreated ();
 		void OnWindowDestroyed ();
 		void OnGraphConfigurationChanged ();
+		void OnSwitchedDesktop ();
 
 		void SetCurrentClusterId (bbstring const & id);
 		bool SetCurrentVertexId (bbstring const & id);

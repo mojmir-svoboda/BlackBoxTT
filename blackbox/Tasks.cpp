@@ -30,8 +30,6 @@ bool Tasks::Init (TasksConfig & config)
 	TRACE_SCOPE(LL_INFO, CTX_BB | CTX_INIT);
 	m_config = &config;
 	m_tasks.reserve(128);
-
-	Update();
 	return true;
 }
 
@@ -494,6 +492,8 @@ void Tasks::SetSticky (HWND hwnd)
 	m_lock.Lock();
 
 	size_t idx = c_invalidIndex;
+	if (!FindTask(hwnd, idx))
+		AddTask(hwnd);
 	if (FindTask(hwnd, idx))
 	{
 		TaskInfoPtr & ti_ptr = m_tasks[idx];
