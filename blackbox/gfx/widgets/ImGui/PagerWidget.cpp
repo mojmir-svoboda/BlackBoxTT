@@ -97,8 +97,6 @@ namespace imgui {
 		if (cols && rows)
 		{
 			ImGui::Columns(cols, "mixed", true);
-			ImGui::Separator();
-
 			for (uint32_t c = 0; c < cols; ++c)
 			{
 				for (uint32_t r = 0; r < rows; ++r)
