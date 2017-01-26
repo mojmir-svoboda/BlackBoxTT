@@ -261,12 +261,13 @@ namespace bb {
 		if (SupportsPinnedViews())
 		{
 			IApplicationView * v = nullptr;
-			m_avc->GetViewForHwnd(hwnd, &v);
-
+			if (SUCCEEDED(m_avc->GetViewForHwnd(hwnd, &v)))
+			{
 			BOOL b;
 			m_vdpa->IsViewPinned(v, &b);
 			if (b == TRUE)
 				return true;
+		}
 		}
 		return false;
 	}
@@ -276,13 +277,14 @@ namespace bb {
 		if (SupportsPinnedViews())
 		{
 			IApplicationView * v = nullptr;
-			m_avc->GetViewForHwnd(hwnd, &v);
-
+			if (SUCCEEDED(m_avc->GetViewForHwnd(hwnd, &v)))
+			{
 			if (on)
 				m_vdpa->PinView(v);
 			else
 				m_vdpa->UnpinView(v);
 			return true;
+		}
 		}
 		return false;
 
