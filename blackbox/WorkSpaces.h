@@ -8,7 +8,14 @@ namespace bb {
 
 	struct NotifWindow
 	{
+		uint32_t m_counter { 0 };
+		uint32_t m_counterMax { 32 };
+		uint32_t m_timeout1_ms { 16 };
+		uint32_t m_timeout2_ms { 1 };
 		HWND m_window { nullptr };
+
+		static LRESULT CALLBACK notifWndProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+		//LRESULT WndProcHandler (HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	};
 
 	struct WorkSpaces
@@ -24,6 +31,7 @@ namespace bb {
 		bool Init (WorkSpacesConfig & config);
 		void InitClusterAndVertex ();
 		void InitNotifWindow ();
+		void DoneNotifWindow ();
 		bool Done ();
 		bool CreateGraph ();
 		void ClearGraph ();

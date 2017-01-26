@@ -380,6 +380,8 @@ namespace bb {
 
 	bool BlackBox::Done ()
 	{
+		m_wspaces.DoneNotifWindow();
+
 		TRACE_SCOPE_MSG(LL_INFO, CTX_BB, "Terminating BB");
 		bool ok = true;
 		m_server.Done();

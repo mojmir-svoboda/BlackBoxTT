@@ -5,6 +5,136 @@
 #include <regex>
 #include <tuple>
 #include "utils_window.h"
+
+namespace bb {
+
+	// to cfg:
+	int notif_w = 800;
+	int notif_h = 400;
+	int notif_alpha = 128;
+
+	const int IDT_NOTIF_TIMER1 = 1;
+
+	// bbLean drawText with outline
+	inline RECT addStep(RECT const & src, int dx, int dy)
+	{
+		RECT dst = src;
+		dst.left += dx;
+		dst.right += dx;
+		dst.top += dy;
+		dst.bottom += dy;
+		return dst;
+	}
+	void drawText(HDC hDC, wchar_t * text, RECT rc, COLORREF text_col, COLORREF out_col)
+	{
+		// draw outline
+		::SetTextColor(hDC, out_col);
+		for (int i = -1; i < 2; i++)
+		{
+			for (int j = -1; j < 2; j++)
+			{
+				if (!(i | j))
+					continue;
+				RECT rcOutline = addStep(rc, i, j);
+				::DrawTextExW(hDC, text, -1, &rcOutline, DT_SINGLELINE | DT_CENTER | DT_VCENTER, NULL);
+			}
+		}
+		// draw text
+		::SetTextColor(hDC, text_col);
+		::DrawTextExW(hDC, text, -1, &rc, DT_SINGLELINE | DT_CENTER | DT_VCENTER, NULL);
+	}
+
+
+	LRESULT CALLBACK notifWndProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+	{
+		switch (message)
+		{
+			case WM_PAINT:
+			{
+				PAINTSTRUCT ps = { 0 };
+				HDC hDC = ::BeginPaint(hWnd, &ps);
+				RECT rc = { 0 };
+
+				::GetClientRect(hWnd, &rc);
+				HBRUSH hbrWhite = (HBRUSH)::GetStockObject(BLACK_BRUSH);
+				::FillRect(hDC, &rc, hbrWhite);
+				::SetBkMode(hDC, TRANSPARENT);
+
+				bb::WorkSpaces & ws = bb::BlackBox::Instance().GetWorkSpaces();
+				if (ws.m_notif.m_counter > 0)
+				{
+					HFONT hFont = (HFONT)::GetStockObject(ANSI_VAR_FONT);
+
+					LOGFONT logfont;
+					GetObject(hFont, sizeof(LOGFONT), &logfont);
+					logfont.lfHeight = -MulDiv(72, GetDeviceCaps(hDC, LOGPIXELSY), 72);
+					HFONT myFont = CreateFontIndirect(&logfont);
+
+					if (bbstring const * current_ws = ws.GetCurrentVertexId())
+					{
+						bbstring curr = *current_ws;
+
+						if (HFONT hOldFont = (HFONT)::SelectObject(hDC, myFont))
+						{
+							size_t const ln = curr.length();
+							wchar_t * tmp = (wchar_t *)alloca((ln + 1) * sizeof(wchar_t));
+							wcsncpy(tmp, curr.c_str(), ln);
+							tmp[ln] = 0;
+							int a = 255 * ws.m_notif.m_counter / ws.m_notif.m_counterMax;
+							drawText(hDC, tmp, rc, RGB(a, a, a), RGB(1, 1, 1));
+							SelectObject(hDC, hOldFont);
+						}
+					}
+					::DeleteObject(myFont);
+					::DeleteObject(hFont);
+				}
+
+				::DeleteObject(hbrWhite);
+
+				::EndPaint(hWnd, &ps);
+
+				return 0;
+			}
+
+			case WM_NCHITTEST:
+				return HTCAPTION;
+
+			case WM_ERASEBKGND:
+			{
+				HDC hdc = (HDC)wParam;
+				RECT rc;
+				GetClientRect(hWnd, &rc);
+				SetMapMode(hdc, MM_ANISOTROPIC);
+				SetWindowExtEx(hdc, 100, 100, NULL);
+				SetViewportExtEx(hdc, rc.right, rc.bottom, NULL);
+				HBRUSH hbrWhite = (HBRUSH)::GetStockObject(BLACK_BRUSH);
+				FillRect(hdc, &rc, hbrWhite);
+				return 1;
+			}
+
+			case WM_TIMER:
+			{
+				bb::WorkSpaces & ws = bb::BlackBox::Instance().GetWorkSpaces();
+				if (0 == ws.m_notif.m_counter)
+				{
+					::ShowWindow(hWnd, SW_HIDE);
+				}
+				else
+				{
+					--ws.m_notif.m_counter;
+					::UpdateWindow(ws.m_notif.m_window);
+					::SetTimer(ws.m_notif.m_window, IDT_NOTIF_TIMER1, ws.m_notif.m_timeout2_ms, (TIMERPROC)NULL);
+				}
+				return 0;
+			}
+			default:
+				break;
+		}
+		return ::DefWindowProc(hWnd, message, wParam, lParam);
+	}
+
+}
+
 namespace bb {
 
 	WorkSpaces::WorkSpaces ()
@@ -14,68 +144,6 @@ namespace bb {
 	{
 	}
 
-	LRESULT CALLBACK notifWndProc ( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
-	{
-		switch ( message )
-		{
-			case WM_PAINT:
-			{
-				PAINTSTRUCT ps = { 0 };
-				HDC hDC = ::BeginPaint( hWnd, &ps );
-				RECT rc = { 0 };
-				::GetClientRect( hWnd, &rc );
-				::SetTextColor( hDC, RGB( 255, 255, 255 ) );
-				::SetBkMode( hDC, TRANSPARENT );
-
-				HFONT hFont = (HFONT)::GetStockObject(ANSI_VAR_FONT); 
-
-				LOGFONT logfont;
-				GetObject(hFont, sizeof(LOGFONT), &logfont);
-				logfont.lfHeight = -MulDiv(72, GetDeviceCaps(hDC, LOGPIXELSY), 72);
-				HFONT myFont = CreateFontIndirect(&logfont);
-				if (HFONT hOldFont = (HFONT)::SelectObject(hDC, myFont)) 
-				{
-					bb::WorkSpaces & ws = bb::BlackBox::Instance().GetWorkSpaces();
-					if (bbstring const * current_ws = ws.GetCurrentVertexId())
-					{
-						bbstring curr = *current_ws;
-						::DrawTextExW( hDC, (LPWSTR)curr.c_str(), -1, &rc, DT_SINGLELINE | DT_CENTER | DT_VCENTER, NULL );
-					}
-
-					SelectObject(hDC, hOldFont); 
-				}
-
-				::EndPaint( hWnd, &ps );
-			}
-			return 0;
-			////@#!#$$!@#%$ delete myFont
-
-
-
-			case WM_NCHITTEST:
-				return HTCAPTION;
-
-			case WM_DESTROY:
-				::PostQuitMessage( 0 );
-				return 0;
-
-			case WM_ERASEBKGND: 
-			{
-				HDC hdc = (HDC) wParam;
-				RECT rc;
-				GetClientRect(hWnd, &rc); 
-				SetMapMode(hdc, MM_ANISOTROPIC); 
-				SetWindowExtEx(hdc, 100, 100, NULL); 
-				SetViewportExtEx(hdc, rc.right, rc.bottom, NULL); 
-				HBRUSH hbrWhite = (HBRUSH)::GetStockObject(BLACK_BRUSH); 
-				FillRect(hdc, &rc, hbrWhite); 
-				return 1;
-			}
-			default:
-				break;
-		}
-		return ::DefWindowProc( hWnd, message, wParam, lParam );
-	}
 
 	bool WorkSpaces::Init (WorkSpacesConfig & config)
 	{
@@ -96,39 +164,54 @@ namespace bb {
 
 	void WorkSpaces::InitNotifWindow ()
 	{
-		// Register window class
 		WNDCLASSEXW wcex = { 0 };
 		wcex.cbSize = sizeof(wcex);
-		wcex.style          = CS_HREDRAW | CS_VREDRAW;
-		wcex.lpfnWndProc    = notifWndProc;
-		wcex.hInstance      = BlackBox::Instance().GetHInstance();
-		wcex.hCursor        = ::LoadCursorW( NULL, IDC_ARROW);
+		wcex.style = CS_HREDRAW | CS_VREDRAW;
+		wcex.lpfnWndProc = notifWndProc;
+		wcex.hInstance = BlackBox::Instance().GetHInstance();
+		wcex.hCursor = ::LoadCursorW( NULL, IDC_ARROW);
 		wcex.hbrBackground  = (HBRUSH)::GetStockObject(BLACK_BRUSH);
-		wcex.lpszClassName  = L"OverlayWindowClass";
+		wcex.lpszClassName = L"bbTTNotifWindowClass";
 		::RegisterClassExW( &wcex );
 
-		m_notif.m_window = CreateWindowExW( WS_EX_TOPMOST | WS_EX_LAYERED, 
-			wcex.lpszClassName,
-			L"bbTT Notif",
-			WS_POPUP | WS_VISIBLE,
-			CW_USEDEFAULT, CW_USEDEFAULT,
-			800, 400,
-			NULL, NULL,
-			wcex.hInstance,
-			NULL);
-		// Make window semi-transparent, and mask out background color
-		//showInFromTaskBar(m_notif.m_window, false);
-		::SetLayeredWindowAttributes(m_notif.m_window, RGB( 0, 0, 0 ), 128, LWA_ALPHA | LWA_COLORKEY);
+		POINT ptZero = { 0 };
+		HMONITOR hmonPrimary = MonitorFromPoint(ptZero, MONITOR_DEFAULTTOPRIMARY);
+		MONITORINFO monitorinfo = { 0 };
+		monitorinfo.cbSize = sizeof(monitorinfo);
+		GetMonitorInfo(hmonPrimary, &monitorinfo);
+		RECT const & rcWork = monitorinfo.rcWork;
+		int const notif_x = rcWork.left + (rcWork.right - rcWork.left - notif_w) / 2;
+		int const notif_y = rcWork.top + (rcWork.bottom - rcWork.top - notif_h) / 2;
+
+		m_notif.m_window = CreateWindowExW( WS_EX_TOPMOST | WS_EX_LAYERED | WS_EX_TOOLWINDOW,
+				wcex.lpszClassName, L"bbTT Notif", WS_POPUP | WS_VISIBLE,
+				notif_x, notif_y, notif_w, notif_h,
+				NULL, NULL, wcex.hInstance, NULL);
+		::SetLayeredWindowAttributes(m_notif.m_window, RGB(0, 0, 0), notif_alpha, LWA_ALPHA | LWA_COLORKEY);
 
 		bb::BlackBox::Instance().GetTasks().SetSticky(m_notif.m_window);
+		OnSwitchedDesktop();
+	}
+
+	void WorkSpaces::DoneNotifWindow ()
+	{
+		if (m_notif.m_window)
+		{
+			::DestroyWindow(m_notif.m_window);
+			m_notif.m_window = nullptr;
+		}
 	}
 
 	void WorkSpaces::OnSwitchedDesktop ()
 	{
+		if (m_notif.m_counter == 0)
+			::ShowWindow(m_notif.m_window, SW_SHOW);
+
+		m_notif.m_counter = m_notif.m_counterMax;
 		::InvalidateRect(m_notif.m_window, NULL, NULL);
 		::UpdateWindow(m_notif.m_window);
-		//::AnimateWindow(m_notif.m_window, 2000, AW_ACTIVATE);
-		::AnimateWindow(m_notif.m_window, 2000, AW_BLEND);
+
+		::SetTimer(m_notif.m_window, IDT_NOTIF_TIMER1, m_notif.m_timeout1_ms, (TIMERPROC)NULL);
 	}
 
 	void WorkSpaces::InitClusterAndVertex ()
