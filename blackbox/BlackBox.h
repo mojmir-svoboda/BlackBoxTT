@@ -43,6 +43,7 @@ namespace bb {
 		bool LoadConfig ();
 		bool FindConfig (wchar_t * cfgpath, size_t sz, const wchar_t * cfgfile) const;
 
+		HINSTANCE GetHInstance () const { return m_hMainInstance; }
 		HANDLE GetJob () const { return m_job; }
 		bool GetInJob () const { return m_inJob; }
 		Tasks & GetTasks () { return m_tasks; }

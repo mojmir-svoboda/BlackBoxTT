@@ -375,6 +375,8 @@ namespace bb {
 			return false;
 		if (!m_server.Init(m_config.m_server))
 			return false;
+
+		m_wspaces.InitNotifWindow();
 		return true;
 	}
 
