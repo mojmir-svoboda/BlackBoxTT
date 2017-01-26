@@ -274,13 +274,20 @@ void Tasks::Update ()
 		if (ti_ptr)
 		{
 			if (ti_ptr->IsTaskManIgnored())
+			{
+				if (!::IsWindow(ti_ptr->m_hwnd))
+					m_tasks[i].reset();
 				continue;
-			bool found = false;
-			for (size_t n = 0; n < m_taskEnumStorage.size(); ++n)
-				if (m_tasks[i]->m_hwnd == m_taskEnumStorage[n])
-					found = true;
-			if (!found)
-				m_tasks[i].reset();
+			}
+			else
+			{
+				bool found = false;
+				for (size_t n = 0; n < m_taskEnumStorage.size(); ++n)
+					if (m_tasks[i]->m_hwnd == m_taskEnumStorage[n])
+						found = true;
+				if (!found)
+					m_tasks[i].reset();
+			}
 		}
 	}
 
