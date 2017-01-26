@@ -400,13 +400,7 @@ namespace bb {
 		return true;
 	}
 
-	bool WorkSpaces::CreateGraph ()
-	{
-		TRACE_MSG(LL_INFO, CTX_BB | CTX_WSPACE, "Creating workspace graph...");
-		// setup VDM first
-		for (WorkGraphConfig & w : m_config.m_clusters)
-		{
-			if (w.m_auto)
+	bool WorkSpaces::CreateGraphOfAutoVDM (WorkGraphConfig & w)
 			{
 				w.m_vertexlists.push_back(std::vector<bbstring>());
 
@@ -439,6 +433,18 @@ namespace bb {
 						TRACE_MSG(LL_DEBUG, CTX_BB | CTX_WSPACE, "Found edge: %ws --> %ws", ws[0]->m_id.c_str(), ws[1]->m_id.c_str());
 					}
 				}
+		return true;
+	}
+
+	bool WorkSpaces::CreateGraph ()
+	{
+		TRACE_MSG(LL_INFO, CTX_BB | CTX_WSPACE, "Creating workspace graph...");
+		// setup VDM first
+		for (WorkGraphConfig & w : m_config.m_clusters)
+		{
+			if (w.m_auto)
+			{
+				CreateGraphOfAutoVDM(w);
 			}
 		}
 

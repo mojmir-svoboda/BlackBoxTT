@@ -34,6 +34,7 @@ namespace bb {
 		void DoneNotifWindow ();
 		bool Done ();
 		bool CreateGraph ();
+		bool CreateGraphOfAutoVDM (WorkGraphConfig & w);
 		void ClearGraph ();
 		bool RecreateGraph ();
 

@@ -8,10 +8,24 @@ WorkSpaces:
   current: 'win10'
   clusters:
     - id: 'win10'
-      auto: true
+      auto: false
+      useVDM: true
+      label: 'win10 2d'
+      current: 'a1'
+      vertexlist:
+        - [ a1, a2, a3 ]
+        - [ b1, b2, b3 ]
+        - [ c1, c2, c3 ]
+      edgelist:
+        - 'a1 -> a2 -> a3 [label="right"]'
+        - 'b1 -> b2 -> b3 [label="right"]'
+        - 'c1 -> c2 -> c3 [label="right"]'
+
 
     - id: 'F'
       label: 'fun'
+      auto: false
+      vdm: false
       current: 'f1'
       vertexlist:
         - [ f1, f2, f3 ]

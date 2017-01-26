@@ -22,6 +22,7 @@ namespace bb {
 		bbstring m_id;
 		bbstring m_label;
 		bool m_auto { false };
+		bool m_useVDM { true };
 		std::vector<std::vector<bbstring>> m_vertexlists;
 		std::vector<bbstring> m_edgelist;
 		bbstring m_currentVertexId;
