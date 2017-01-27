@@ -106,7 +106,7 @@ namespace bb {
 		}
 		if (found == 2)
 		{
-			bb::BlackBox::Instance().GetTasks().OnSwitchDesktopVDM(m_vdm.m_names[idx[0]], m_vdm.m_names[idx[1]]);
+			bb::BlackBox::Instance().GetTasks().OnSwitchDesktopVDM(m_vdm.m_ids[idx[0]], m_vdm.m_ids[idx[1]]);
 			bb::BlackBox::Instance().GetWorkSpaces().OnSwitchedDesktop();
 		}
 		return S_OK;
@@ -263,11 +263,11 @@ namespace bb {
 			IApplicationView * v = nullptr;
 			if (SUCCEEDED(m_avc->GetViewForHwnd(hwnd, &v)))
 			{
-			BOOL b;
-			m_vdpa->IsViewPinned(v, &b);
-			if (b == TRUE)
-				return true;
-		}
+				BOOL b;
+				m_vdpa->IsViewPinned(v, &b);
+				if (b == TRUE)
+					return true;
+			}
 		}
 		return false;
 	}
@@ -279,12 +279,12 @@ namespace bb {
 			IApplicationView * v = nullptr;
 			if (SUCCEEDED(m_avc->GetViewForHwnd(hwnd, &v)))
 			{
-			if (on)
-				m_vdpa->PinView(v);
-			else
-				m_vdpa->UnpinView(v);
-			return true;
-		}
+				if (on)
+					m_vdpa->PinView(v);
+				else
+					m_vdpa->UnpinView(v);
+				return true;
+			}
 		}
 		return false;
 
@@ -353,9 +353,9 @@ namespace bb {
 
 	bool VirtualDesktopManager::FindDesktop (bbstring const & name, size_t & idx)
 	{
-		for (size_t i = 0, ie = m_names.size(); i < ie; ++i)
+		for (size_t i = 0, ie = m_ids.size(); i < ie; ++i)
 		{
-			if (m_names[i] == name)
+			if (m_ids[i] == name)
 			{
 				idx = i;
 				return true;
@@ -365,7 +365,7 @@ namespace bb {
 	}
 	bool VirtualDesktopManager::FindDesktop (GUID const & guid, size_t & idx)
 	{
-		for (size_t i = 0, ie = m_names.size(); i < ie; ++i)
+		for (size_t i = 0, ie = m_desktops.size(); i < ie; ++i)
 		{
 			if (m_desktops[i] == guid)
 			{

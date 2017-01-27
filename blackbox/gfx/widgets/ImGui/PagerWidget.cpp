@@ -97,9 +97,9 @@ namespace imgui {
 		if (cols && rows)
 		{
 			ImGui::Columns(cols, "mixed", true);
-			for (uint32_t c = 0; c < cols; ++c)
+			for (uint32_t r = 0; r < rows; ++r)
 			{
-				for (uint32_t r = 0; r < rows; ++r)
+				for (uint32_t c = 0; c < cols; ++c)
 				{
 					bbstring const & vertex_id = wg->m_vertexlists[r][c];
 					char idu8[TaskInfo::e_wspaceLenMax];
@@ -171,8 +171,9 @@ namespace imgui {
 							}
 						}
 					}
+					ImGui::NextColumn();
 				}
-				ImGui::NextColumn();
+				ImGui::Separator();
 			}
 		}
 		ImGuiWindow * w = ImGui::GetCurrentWindowRead();

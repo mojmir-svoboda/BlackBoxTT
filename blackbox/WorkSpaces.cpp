@@ -256,15 +256,30 @@ namespace bb {
 		{
 			for (WorkGraphConfig & wg : m_config.m_clusters)
 			{
-				if (wg.m_currentVertexId.empty())
+				if (wg.m_useVDM)
 				{
-					if (wg.m_vertexlists.size() > 0 && wg.m_vertexlists[0].size())
+					GUID g = { 0 };
+					if (m_vdm->GetCurrentDesktop(g))
 					{
-						wg.m_currentVertexId = wg.m_vertexlists[0][0];
+						size_t idx = 0;
+						if (m_vdm->FindDesktop(g, idx))
+						{
+							wg.m_currentVertexId = m_vdm->m_ids[idx];
+						}
 					}
-					else
+				}
+				else
+				{
+					if (wg.m_currentVertexId.empty())
 					{
-						// @TODO: error
+						if (wg.m_vertexlists.size() > 0 && wg.m_vertexlists[0].size())
+						{
+							wg.m_currentVertexId = wg.m_vertexlists[0][0];
+						}
+						else
+						{
+							// @TODO: error
+						}
 					}
 				}
 			}
@@ -300,12 +315,34 @@ namespace bb {
 
 	bool WorkSpaces::IsVertexVDM (bbstring const & vertex_id) const
 	{
-		size_t idx = 0;
-		return m_vdm->FindDesktop(vertex_id, idx);
+		if (WorkGraphConfig const * const cfg = FindClusterForVertex(vertex_id))
+		{
+			csr::vertex_t idx;
+			if (m_graph.FindVertexIndex(vertex_id, idx))
+			{
+				if (WorkSpaceConfig const * const cfg = m_graph.m_vertices[idx].get())
+					if (cfg->m_isVDM)
+						return true;
+			}
+		}
+		return false;
 	}
 	bool WorkSpaces::IsVertexVDM (bbstring const & vertex_id, size_t & idx) const
 	{
-		return m_vdm->FindDesktop(vertex_id, idx);
+		if (WorkGraphConfig const * const cfg = FindClusterForVertex(vertex_id))
+		{
+			csr::vertex_t graph_idx;
+			if (m_graph.FindVertexIndex(vertex_id, graph_idx))
+			{
+				if (WorkSpaceConfig const * const cfg = m_graph.m_vertices[graph_idx].get())
+					if (cfg->m_isVDM)
+					{
+						idx = cfg->m_idxVDM;
+						return true;
+					}
+			}
+		}
+		return false;
 	}
 
 	GUID WorkSpaces::GetVertexGUID (size_t idx) const
@@ -315,12 +352,20 @@ namespace bb {
 
 	bool WorkSpaces::SwitchDesktop (bbstring const & vertex_id)
 	{
-		size_t idx = 0;
-		if (m_vdm->FindDesktop(vertex_id, idx))
+		if (WorkGraphConfig const * const cfg = FindClusterForVertex(vertex_id))
 		{
-			TRACE_MSG(LL_DEBUG, CTX_BB | CTX_WSPACE, "VDM switch to vertex: %ws", vertex_id.c_str());
-			m_vdm->SwitchDesktop(m_vdm->m_desktops[idx]);
-			return true;
+			csr::vertex_t graph_idx;
+			if (m_graph.FindVertexIndex(vertex_id, graph_idx))
+			{
+				if (WorkSpaceConfig const * const cfg = m_graph.m_vertices[graph_idx].get())
+					if (cfg->m_isVDM)
+					{
+						TRACE_MSG(LL_DEBUG, CTX_BB | CTX_WSPACE, "VDM switch to vertex: %ws", vertex_id.c_str());
+						size_t const vdm_idx = cfg->m_idxVDM;
+						m_vdm->SwitchDesktop(m_vdm->m_desktops[vdm_idx]);
+						return true;
+					}
+			}
 		}
 		return false;
 	}
@@ -659,7 +704,7 @@ namespace bb {
 		size_t idx = 0;
 		if (m_vdm->FindDesktopIndex(hwnd, idx))
 		{
-			vertex_id = m_vdm->m_names[idx];
+			vertex_id = m_vdm->m_ids[idx];
 			return true;
 		}
 
