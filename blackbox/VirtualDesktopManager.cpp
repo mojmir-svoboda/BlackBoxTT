@@ -306,6 +306,7 @@ namespace bb {
 	void VirtualDesktopManager::UpdateDesktopGraph ()
 	{
 		m_desktops.clear();
+		m_ids.clear();
 		m_names.clear();
 		m_edges.clear();
 
@@ -420,6 +421,42 @@ namespace bb {
 		GUID g = { 0 };
 		if (SUCCEEDED(m_vdm->GetWindowDesktopId(hwnd, &g)))
 			return FindDesktop(g, idx);
+		return false;
+	}
+
+	void VirtualDesktopManager::ClearAssignedDesktops ()
+	{
+		m_ids.clear();
+	}
+
+	bool VirtualDesktopManager::CreateDesktops (size_t needed_total_count)
+	{
+		bool failed = false;
+		size_t const n = m_desktops.size();
+		if (n < needed_total_count)
+		{
+			for (size_t i = n; i < needed_total_count; ++i)
+			{
+				IVirtualDesktop * ivd = nullptr;
+				if (SUCCEEDED(m_vdmi->CreateDesktopW(&ivd)))
+				{
+					scope_guard_t on_exit_ivd = mkScopeGuard(std::mem_fun(&IVirtualDesktop::Release), ivd);
+				}
+				else
+					failed = true;
+			}
+		}
+		return failed;
+	}
+
+	bool VirtualDesktopManager::AssignDesktopTo (bbstring const & vertex_id, size_t & idx)
+	{
+		if (m_ids.size() < m_desktops.size())
+		{
+			idx = m_ids.size();
+			m_ids.push_back(vertex_id);
+			return true;
+		}
 		return false;
 	}
 

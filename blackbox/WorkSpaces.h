@@ -9,8 +9,8 @@ namespace bb {
 	struct NotifWindow
 	{
 		uint32_t m_counter { 0 };
-		uint32_t m_counterMax { 32 };
-		uint32_t m_timeout1_ms { 16 };
+		uint32_t m_counterMax { 16 };
+		uint32_t m_timeout1_ms { 1 };
 		uint32_t m_timeout2_ms { 1 };
 		HWND m_window { nullptr };
 
@@ -34,6 +34,9 @@ namespace bb {
 		void DoneNotifWindow ();
 		bool Done ();
 		bool CreateGraph ();
+		bool IsVDMPreparedForGraph ();
+		bool PrepareVDMForGraph ();
+		
 		bool CreateGraphOfAutoVDM (WorkGraphConfig & w);
 		void ClearGraph ();
 		bool RecreateGraph ();

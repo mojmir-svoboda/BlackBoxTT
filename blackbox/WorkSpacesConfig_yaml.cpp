@@ -12,7 +12,6 @@ namespace YAML {
 			Node node;
 			node.push_back(rhs.m_id);
 			node.push_back(rhs.m_label);
-			node.push_back(rhs.m_auto);
 			node.push_back(rhs.m_currentVertexId);
 			node.push_back(rhs.m_vertexlists);
 			node.push_back(rhs.m_edgelist);
@@ -28,8 +27,6 @@ namespace YAML {
 					rhs.m_label = node["label"].as<bbstring>();
 				if (node["useVDM"])
 					rhs.m_useVDM = node["useVDM"].as<bool>();
-				if (node["auto"])
-					rhs.m_auto = node["auto"].as<bool>();
 				if (node["vertexlist"])
 					rhs.m_vertexlists = node["vertexlist"].as<std::vector<std::vector<bbstring>>>();
 				if (node["edgelist"])
@@ -65,6 +62,8 @@ namespace bb {
 
 			if (node["current"])
 				rhs.m_currentClusterId = node["current"].as<bbstring>();
+			if (node["auto"])
+				rhs.m_auto = node["auto"].as<bool>();
 			if (node["edgelist"])
 				rhs.m_edgelist = node["edgelist"].as<std::vector<std::string>>();
 

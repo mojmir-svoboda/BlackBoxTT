@@ -21,8 +21,7 @@ namespace bb {
 	{
 		bbstring m_id;
 		bbstring m_label;
-		bool m_auto { false };
-		bool m_useVDM { true };
+		bool m_useVDM { false };
 		std::vector<std::vector<bbstring>> m_vertexlists;
 		std::vector<bbstring> m_edgelist;
 		bbstring m_currentVertexId;
@@ -58,6 +57,7 @@ namespace bb {
 	struct WorkSpacesConfig
 	{
 		bbstring m_currentClusterId;
+		bool m_auto { true };
 		std::vector<WorkGraphConfig> m_clusters;
 		std::vector<std::string> m_edgelist;
 		// cluster edges

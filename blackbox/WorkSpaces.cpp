@@ -90,9 +90,7 @@ namespace bb {
 				}
 
 				::DeleteObject(hbrWhite);
-
 				::EndPaint(hWnd, &ps);
-
 				return 0;
 			}
 
@@ -157,7 +155,20 @@ namespace bb {
 		size_t const l = m_graph.FindPropertyIndex(L"left");
 		size_t const r = m_graph.FindPropertyIndex(L"right");
 		ok &= m_vdm->Init(l, r);
-		ok &= CreateGraph();
+		if (m_config.m_auto)
+		{
+			TRACE_MSG(LL_INFO, CTX_BB | CTX_WSPACE, "Creating workspace auto graph...");
+			// @TODO: 
+			WorkGraphConfig auto_cfg;
+			m_config.m_clusters.push_back(auto_cfg);
+			WorkGraphConfig & w = m_config.m_clusters[0];
+			ok &= CreateGraphOfAutoVDM(w);
+			return true;
+		}
+		else
+		{
+			ok &= CreateGraph();
+		}
 		InitClusterAndVertex();
 		return ok;
 	}
@@ -227,30 +238,34 @@ namespace bb {
 				// @TODO: error
 			}
 		}
-
-		for (WorkGraphConfig & wg : m_config.m_clusters)
+			
+		if (m_config.m_auto)
 		{
-			if (wg.m_auto)
+			WorkGraphConfig & wg = m_config.m_clusters[0];
+			GUID g = { 0 };
+			if (m_vdm->GetCurrentDesktop(g))
 			{
-				GUID g = {0};
-				if (m_vdm->GetCurrentDesktop(g))
+				size_t idx = 0;
+				if (m_vdm->FindDesktop(g, idx))
 				{
-					size_t idx = 0;
-					if (m_vdm->FindDesktop(g, idx))
-					{
-						wg.m_currentVertexId = m_vdm->m_names[idx];
-					}
+					wg.m_currentVertexId = m_vdm->m_names[idx];
 				}
 			}
-			else if (wg.m_currentVertexId.empty())
+		}
+		else
+		{
+			for (WorkGraphConfig & wg : m_config.m_clusters)
 			{
-				if (wg.m_vertexlists.size() > 0 && wg.m_vertexlists[0].size())
+				if (wg.m_currentVertexId.empty())
 				{
-					wg.m_currentVertexId = wg.m_vertexlists[0][0];
-				}
-				else
-				{
-					// @TODO: error
+					if (wg.m_vertexlists.size() > 0 && wg.m_vertexlists[0].size())
+					{
+						wg.m_currentVertexId = wg.m_vertexlists[0][0];
+					}
+					else
+					{
+						// @TODO: error
+					}
 				}
 			}
 		}
@@ -436,20 +451,67 @@ namespace bb {
 		return true;
 	}
 
-	bool WorkSpaces::CreateGraph ()
+	bool WorkSpaces::PrepareVDMForGraph ()
 	{
 		TRACE_MSG(LL_INFO, CTX_BB | CTX_WSPACE, "Creating workspace graph...");
-		// setup VDM first
+		size_t n = 0;
 		for (WorkGraphConfig & w : m_config.m_clusters)
 		{
-			if (w.m_auto)
+			if (w.m_useVDM)
 			{
-				CreateGraphOfAutoVDM(w);
+				for (auto const & vtxlist : w.m_vertexlists)
+					for (bbstring const & s : vtxlist)
+						++n;
+			}
+		}
+		return m_vdm->CreateDesktops(n);
+	}
+
+	bool WorkSpaces::IsVDMPreparedForGraph ()
+	{
+		TRACE_MSG(LL_INFO, CTX_BB | CTX_WSPACE, "Creating workspace graph...");
+		size_t n = 0;
+		for (WorkGraphConfig & w : m_config.m_clusters)
+		{
+			if (w.m_useVDM)
+			{
+				for (auto const & vtxlist : w.m_vertexlists)
+					for (bbstring const & s : vtxlist)
+						++n;
+			}
+		}
+		return n == m_vdm->GetDesktopCount();
+	}
+
+	bool WorkSpaces::CreateGraph ()
+	{
+		if (m_config.m_auto)
+		{
+			TRACE_MSG(LL_INFO, CTX_BB | CTX_WSPACE, "Creating workspace auto graph...");
+			WorkGraphConfig & w = m_config.m_clusters[0];
+			CreateGraphOfAutoVDM(w);
+			return true;
+		}
+
+		if (!IsVDMPreparedForGraph())
+		{
+			PrepareVDMForGraph();
+			
+			int count = 32;
+			while (!IsVDMPreparedForGraph())
+			{
+				::Sleep(16);
+				if (++count > 32)
+				{
+					return false;
+				}
 			}
 		}
 
+		TRACE_MSG(LL_INFO, CTX_BB | CTX_WSPACE, "Creating workspace custom graph...");
 		for (WorkGraphConfig & w : m_config.m_clusters)
 		{
+			bool const useVDM = w.m_useVDM;
 			for (auto const & vtxlist : w.m_vertexlists)
 			{
 				for (bbstring const & s : vtxlist)
@@ -458,6 +520,19 @@ namespace bb {
 					ws->m_id = s;
 					ws->m_label = s;
 					ws->m_vertex = m_graph.m_vertices.size();
+					if (useVDM)
+					{
+						size_t idx = 0;
+						if (m_vdm->AssignDesktopTo(s, idx))
+						{
+							ws->m_idxVDM = static_cast<uint32_t>(idx);
+							ws->m_isVDM = true;
+						}
+						else
+						{
+							TRACE_MSG(LL_ERROR, CTX_BB | CTX_WSPACE, "Cannot assign vertex %ws to VDM desktop!", s.c_str());
+						}
+					}
 					m_graph.m_vertices.push_back(std::move(ws));
 					TRACE_MSG(LL_DEBUG, CTX_BB | CTX_WSPACE, "Found config vertex: %ws", s.c_str());
 				}
@@ -552,21 +627,31 @@ namespace bb {
 
 	bool WorkSpaces::RecreateGraph ()
 	{
-		for (WorkGraphConfig & w : m_config.m_clusters)
+		if (m_config.m_auto)
 		{
-			if (w.m_auto)
+			WorkGraphConfig & w = m_config.m_clusters[0];
+			w.m_vertexlists.clear();
+			w.m_edgelist.clear();
+			w.m_currentVertexId.clear();
+
+			ClearGraph();
+
+			const bool ok = CreateGraph();
+			InitClusterAndVertex();
+			return ok;
+		}
+		else
+		{
+			if (IsVDMPreparedForGraph())
 			{
-				w.m_vertexlists.clear();
-				w.m_edgelist.clear();
-				w.m_currentVertexId.clear();
+				ClearGraph();
+
+				const bool ok = CreateGraph();
+				InitClusterAndVertex();
+				return ok;
 			}
 		}
-
-		ClearGraph();
-
-		const bool ok = CreateGraph();
-		InitClusterAndVertex();
-		return ok;
+		return false;
 	}
 
 	bool WorkSpaces::AssignWorkSpace (HWND hwnd, bbstring & vertex_id)

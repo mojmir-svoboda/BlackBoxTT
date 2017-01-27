@@ -6,9 +6,9 @@ BlackBox:
 
 WorkSpaces:
   current: 'win10'
+  auto: false
   clusters:
     - id: 'win10'
-      auto: false
       useVDM: true
       label: 'win10 2d'
       current: 'a1'
@@ -24,8 +24,7 @@ WorkSpaces:
 
     - id: 'F'
       label: 'fun'
-      auto: false
-      vdm: false
+      useVDM: false
       current: 'f1'
       vertexlist:
         - [ f1, f2, f3 ]
@@ -34,6 +33,7 @@ WorkSpaces:
         - 'f3 -> f2 -> f1 -> f3 [label="left"]'
     - id: 'W'
       label: 'w0rk'
+      useVDM: false
       current: 'b2'
       vertexlist:
         - [ a1, a2, a3 ]

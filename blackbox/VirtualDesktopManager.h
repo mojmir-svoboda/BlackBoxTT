@@ -35,6 +35,7 @@ namespace bb {
 		VirtualDesktopNotification * m_notif { nullptr };
 		IVirtualDesktopPinnedApps * m_vdpa { nullptr };
 		std::vector<GUID> m_desktops;
+		std::vector<bbstring> m_ids; /// assigned vertex ids to GUIDs
 		std::vector<bbstring> m_names;
 		std::vector<std::tuple<uint32_t, uint32_t, uint32_t>> m_edges;
 
@@ -44,6 +45,10 @@ namespace bb {
 		bool FindDesktop (bbstring const & name, size_t & idx);
 		bool FindDesktop (GUID const & guid, size_t & idx);
 		bool FindDesktopIndex (HWND hwnd, size_t & idx);
+		bool AssignDesktopTo (bbstring const & vertex_id, size_t & idx);
+		bool CreateDesktops (size_t needed_total_count);
+		size_t GetDesktopCount () const { return m_desktops.size(); }
+		void ClearAssignedDesktops ();
 		bool SwitchDesktop (GUID const & g);
 		bool MoveWindowToDesktop (HWND hwnd, GUID const & guid);
 
