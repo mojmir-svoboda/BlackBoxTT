@@ -20,6 +20,15 @@ WorkSpaces:
         - 'a1 -> a2 -> a3 [label="right"]'
         - 'b1 -> b2 -> b3 [label="right"]'
         - 'c1 -> c2 -> c3 [label="right"]'
+        - 'a3 -> a2 -> a1 [label="left"]'
+        - 'b3 -> b2 -> b1 [label="left"]'
+        - 'c3 -> c2 -> c1 [label="left"]'
+        - 'a1 -> b1 -> c1 [label="down"]'
+        - 'a2 -> b2 -> c2 [label="down"]'
+        - 'a3 -> b3 -> c3 [label="down"]'
+        - 'c1 -> b1 -> a1 [label="up"]'
+        - 'c2 -> b2 -> a2 [label="up"]'
+        - 'c3 -> b3 -> a3 [label="up"]'
 
 
     - id: 'F'
