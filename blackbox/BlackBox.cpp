@@ -531,14 +531,16 @@ namespace bb {
 		return hwnd;
 	}
 
-	
-	MenuWidget * BlackBox::CreateMenu (WidgetConfig & wcfg, MenuConfig const & config)
+	bool BlackBox::GetPointerPos (int & x, int & y)
 	{
-		return nullptr;
-// 		MenuWidget * m = m_widgets.MkWidget<MenuWidget>(wcfg);
-// 		m_tasks.Focus(m->m_hwnd);
-// 		m->CreateMenuFromConfig(config);
-// 		return m;
+		POINT p;
+		if (::GetCursorPos(&p))
+		{
+			x = p.x;
+			y = p.y;
+			return true;
+		}
+		return false;
 	}
 
 	void BlackBox::ShowMenuOnPointerPos (bool show)
