@@ -18,9 +18,13 @@ namespace bb {
 	void BlackBox::ToggleMenu (bbstring const & widget_name)
 	{
 		m_menu = !m_menu;
-		if (GuiWidget * w = m_gfx->FindWidget(widget_name))
+		if (GuiWidget * w = m_gfx->FindWidget(widget_name.c_str()))
 		{
 			;
+		}
+		else
+		{
+			m_gfx->MkWidgetFromId(widget_name.c_str());
 		}
 	}
 
