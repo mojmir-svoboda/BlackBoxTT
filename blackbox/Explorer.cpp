@@ -28,8 +28,16 @@ namespace bb {
 	bool Explorer::Done ()
 	{
 		TRACE_MSG(LL_INFO, CTX_BB, "Terminating explorer");
-		m_shell->Release();
-		m_allocator->Release();
+		if (m_shell)
+		{
+			m_shell->Release();
+			m_shell = nullptr;
+		}
+		if (m_allocator)
+		{
+			m_allocator->Release();
+			m_allocator= nullptr;
+		}
 		return true;
 	}
 

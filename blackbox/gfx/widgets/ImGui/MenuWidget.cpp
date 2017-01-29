@@ -4,11 +4,15 @@
 #include <blackbox/utils_window.h>
 #include <bblib/codecvt.h>
 #include <imgui/imgui_internal.h>
+#include <yaml-cpp/yaml.h>
+#include "utils_yaml.h"
+#include "WidgetConfig_yaml.h"
+#include <blackbox/menu/MenuConfig_yaml.h>
 
 namespace bb {
+namespace imgui {
 
-	MenuWidget::MenuWidget (WidgetConfig & cfg) 
-		: GuiWidget(cfg)
+	MenuWidget::MenuWidget ()
 	{
 	}
 
@@ -18,7 +22,18 @@ namespace bb {
 
 	void MenuWidget::CreateMenuFromConfig (MenuConfig const & cfg)
 	{
-		m_menuConfig = cfg;
+		m_config = cfg;
+	}
+
+	bool MenuWidget::loadConfig (YAML::Node & y_cfg_node)
+	{
+		if (!y_cfg_node.IsNull())
+		{
+			MenuConfig tmp = y_cfg_node.as<MenuConfig>();
+			m_config = std::move(tmp);
+			return true;
+		}
+		return false;
 	}
 
 	void MenuWidget::DrawUI ()
@@ -34,16 +49,16 @@ namespace bb {
 		}
 
 		char name[256];
-		codecvt_utf16_utf8(GetNameW(), name, 256);
+		codecvt_utf16_utf8(GetId(), name, 256);
 		ImGui::Begin(name, &m_config.m_show, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);
 
-		size_t const sz = m_menuConfig.m_items.size();
+		size_t const sz = m_config.m_items.size();
 
 		{
 			//bool value_changed = false;
 			for (size_t i = 0; i < sz; ++i)
 			{
-				MenuConfigItem const & item = m_menuConfig.m_items[i];
+				MenuConfigItem const & item = m_config.m_items[i];
 				const bool item_selected = (i == m_currentIndex);
 				char item_text[1024];
 				codecvt_utf16_utf8(item.m_name.c_str(), item_text, 1024);
@@ -56,7 +71,7 @@ namespace bb {
 					// BB::CreateMenu()
 					if (item.m_type == e_MenuItemMenu)
 					{	
-						MenuWidget * w = bb::BlackBox::Instance().CreateMenuOnPointerPos(*item.m_menu);
+						//MenuWidget * w = bb::BlackBox::Instance().CreateMenuOnPointerPos(*item.m_menu);
 					}
 
 					m_currentIndex = i;
@@ -73,4 +88,4 @@ namespace bb {
 		ImGui::End();
 	}
 
-}
+}}

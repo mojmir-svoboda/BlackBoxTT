@@ -2,6 +2,7 @@
 #include <vector>
 #include <memory>
 #include <bblib/bbstring.h>
+#include <blackbox/WidgetConfig.h>
 namespace YAML { class Node; }
 namespace bb {
 
@@ -27,9 +28,8 @@ namespace bb {
 		MenuConfigItem & operator= (MenuConfigItem const & rhs);
 	};
 
-	struct MenuConfig
+	struct MenuConfig : WidgetConfig
 	{
-		bbstring m_name;
 		std::vector<MenuConfigItem> m_items;
 
 		//void clear () { m_items.clear(); }

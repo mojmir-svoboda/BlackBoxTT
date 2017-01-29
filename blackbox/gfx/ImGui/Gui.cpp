@@ -35,10 +35,10 @@ namespace imgui {
 		}
 	}
 
-	GuiWidget * Gui::FindWidget (bbstring const & name)
+	GuiWidget * Gui::FindWidget (wchar_t const * widgetId)
 	{
 		for (GuiWidgetPtr & w : m_widgets)
-			if (name == w->GetId())
+			if (widgetId == w->GetId())
 				return w.get();
 		return nullptr;
 	}

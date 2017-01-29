@@ -272,17 +272,6 @@ namespace bb {
 				TRACE_MSG(LL_ERROR, CTX_BB | CTX_CONFIG, "* failed to load tasks section");
 			}
 
-			MenuConfig menu_cfg;
-			if (loadMenuConfig(*m_y_config, menu_cfg))
-			{
-				TRACE_MSG(LL_INFO, CTX_BB | CTX_CONFIG, "* loaded Menu section");
-				m_config.m_menu = std::move(menu_cfg);
-			}
-			else
-			{
-				TRACE_MSG(LL_ERROR, CTX_BB | CTX_CONFIG, "* failed to load Menu section");
-			}
-
 			TRACE_MSG(LL_INFO, CTX_BB | CTX_CONFIG, "Config loaded");
 			return true;
 		}

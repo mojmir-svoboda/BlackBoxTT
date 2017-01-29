@@ -76,6 +76,8 @@ namespace imgui {
 	using widgetNewFnT = std::unique_ptr<GuiWidget> (*)();
 	static constexpr std::pair<wchar_t const *, widgetNewFnT> const table[] = {
 			{ PagerWidget::c_type, newWidget<PagerWidget> }
+			, { MenuWidget::c_type, newWidget<MenuWidget> }
+			
 		//,	{}
 	};
 
@@ -118,24 +120,11 @@ namespace imgui {
 		return false;
 	}
 
-	GuiWidget * Gfx::MkWidget (WidgetConfig & cfg)
-	{
-		if (cfg.m_show)
-		{
-// 			std::unique_ptr<GuiWidget> widget_ptr(new T(cfg));
-// 			GfxWindow * win = MkWidgetWindow(cfg.m_x, cfg.m_y, cfg.m_w, cfg.m_h, cfg.m_alpha, widget_ptr->GetNameW(), widget_ptr->GetNameW(), cfg.m_show);
-// 			widget_ptr->m_gfxWindow = win;
-// 			win->m_gui->m_widgets.push_back(std::move(widget_ptr));
-// 			return static_cast<T *>(win->m_gui->m_widgets.back().get());
-		}
-		return nullptr;
-	}
-
-	GuiWidget * Gfx::FindWidget (bbstring const & name)
+	GuiWidget * Gfx::FindWidget (wchar_t const * widgetId)
 	{
 		for (GfxWindowPtr & win : m_windows)
 		{
-			if (GuiWidget * w = win->FindWidget(name))
+			if (GuiWidget * w = win->FindWidget(widgetId))
 			{
 				return w;
 			}

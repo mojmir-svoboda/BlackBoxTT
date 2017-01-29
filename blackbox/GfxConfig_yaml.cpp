@@ -19,7 +19,8 @@ namespace YAML {
 			try
 			{
 				rhs.m_use = node["use"].as<bbstring>();
-				rhs.m_startWidgets = node["start"].as<std::vector<bbstring>>();
+				if (node["start"])
+					rhs.m_startWidgets = node["start"].as<std::vector<bbstring>>();
 				return true;
 			}
 			catch (std::exception const & e)

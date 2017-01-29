@@ -12,7 +12,7 @@ namespace bb {
 		int m_w { 512 };
 		int m_h { 512 };
 		int m_alpha { 255 - 16 };
-		bool m_show { false };
+		bool m_show { true };
 		bool m_titlebar { true };
 	};
 

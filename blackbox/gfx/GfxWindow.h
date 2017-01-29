@@ -24,7 +24,7 @@ namespace bb {
 
 		virtual Gui * GetGui () = 0;
 		virtual Gui const * GetGui () const = 0;
-		virtual GuiWidget * FindWidget (bbstring const & name) = 0;
+		virtual GuiWidget * FindWidget (wchar_t const * widgetId) = 0;
 
 		bbstring const & GetName () const { return m_wName; }
 	};

@@ -47,7 +47,6 @@ namespace bb {
 		ServerConfig m_server;
 		SchemeConfig m_scheme;
 		DesktopWallpaperConfig m_wallpapers;
-		MenuConfig m_menu;
 	};
 }
 

@@ -57,11 +57,10 @@ namespace imgui {
 		bool UpdateIconResourceView (IconSlab & slab);
 		void UpdateIconCache ();
 
-		virtual GuiWidget * FindWidget (bbstring const & name) override;
+		virtual GuiWidget * FindWidget (wchar_t const * widgetId) override;
 
-		virtual GuiWidget * MkWidget (WidgetConfig & cfg) override;
 		std::unique_ptr<GuiWidget> MkWidgetFromType (wchar_t const * widgetType);
-		bool MkWidgetFromId (wchar_t const * widgetId);
+		virtual bool MkWidgetFromId (wchar_t const * widgetId) override;
 	};
 
 }}

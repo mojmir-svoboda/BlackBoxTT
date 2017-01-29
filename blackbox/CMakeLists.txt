@@ -90,6 +90,7 @@ set (blackbox_HEADERS
 	plugin/PluginConfig.h
 	plugin/PluginsConfig.h
 	menu/Menuconfig.h
+	menu/MenuConfig_yaml.h
 )
 
 set (blackbox_ImGui_SOURCES
@@ -108,6 +109,7 @@ set (blackbox_ImGui_SOURCES
 	gfx/widgets/ImGui/TrayWidget.cpp
 	gfx/widgets/ImGui/PagerWidget.cpp
 	gfx/widgets/ImGui/QuickBarWidget.cpp
+	gfx/widgets/ImGui/MenuWidget.cpp
 )
 
 set (blackbox_ImGui_HEADERS
@@ -128,6 +130,7 @@ set (blackbox_ImGui_HEADERS
 	gfx/widgets/ImGui/TrayWidget.h
 	gfx/widgets/ImGui/PagerWidget.h
 	gfx/widgets/ImGui/QuickBarWidget.h
+	gfx/widgets/ImGui/MenuWidget.h
 )
 
 if (NOT MINGW)

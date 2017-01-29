@@ -59,33 +59,6 @@ Tasks:
 
 # folder ids: https://msdn.microsoft.com/en-us/library/windows/desktop/dd378457(v=vs.85).aspx
 Menu:
-  name: 'bbTT'
-  items:
-    - name: 'Start'
-      folder: 'StartMenu'
-    - name: 'Desktop'
-      folder: 'Desktop'
-    - name: 'Explorer'
-      exec: 'explorer.exe'
-    - name: 'System'
-      menu:
-        name: 'Win'
-        items:
-          - name: 'Drives'
-            folder: 'Drives'
-          - name: 'Controls'
-            folder: 'Controls'
-    - name: 'bbTT'
-      menu:
-        name: 'bbTT'
-        items:
-          - name: 'Cfg'
-          - name: 'Reconfigure'
-          - name: 'About'
-            script: '(ShowAbout)'
-          - name: 'Quit'
-            script: '(SetQuit 0)'
-
 Plugins:
   - plugin: 'bbSlit'
     path: 'c:/bb_devel/plugins/bbSlit/bbSlit.dll'
@@ -174,7 +147,38 @@ Widgets:
     w: 512
     h: 768
     show: false
-
+  - widget: 'Menu'
+    id: 'bbTT Menu'
+    w: 256
+    h: 256
+    alpha: 192
+    items:
+      - name: 'Start'
+        folder: 'StartMenu'
+      - name: 'Desktop'
+        folder: 'Desktop'
+      - name: 'Explorer'
+        exec: 'explorer.exe'
+      - name: 'System'
+        menu:
+          id: 'Win Submenu'
+          widget: 'Menu'
+          items:
+            - name: 'Drives'
+              folder: 'Drives'
+            - name: 'Controls'
+              folder: 'Controls'
+      - name: 'bbTT'
+        menu:
+          id: 'bbTT Submenu'
+          widget: 'Menu'
+          items:
+            - name: 'Cfg'
+            - name: 'Reconfigure'
+            - name: 'About'
+              script: '(ShowAbout)'
+            - name: 'Quit'
+              script: '(SetQuit 0)'
 
 
 
