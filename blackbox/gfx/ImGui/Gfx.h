@@ -58,6 +58,7 @@ namespace imgui {
 		void UpdateIconCache ();
 
 		virtual GuiWidget * FindWidget (wchar_t const * widgetId) override;
+		virtual bool RmWidget (GuiWidget * widget) override;
 
 		std::unique_ptr<GuiWidget> MkWidgetFromType (wchar_t const * widgetType);
 		virtual bool MkWidgetFromId (wchar_t const * widgetId) override;

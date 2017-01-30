@@ -24,6 +24,7 @@ namespace bb {
 		virtual bool MkWidgetFromId (wchar_t const * widgetId) = 0;
 		virtual GfxWindow * MkWidgetWindow (int x, int y, int w, int h, int alpha, wchar_t const * clname, wchar_t const * wname, bool show) = 0;
 		virtual HWND MkWindow (void * gui, int x, int y, int w, int h, int alpha, wchar_t const * clname, wchar_t const * wname) = 0;
+		virtual bool RmWidget (GuiWidget * widget) = 0;
 	};
 
 }

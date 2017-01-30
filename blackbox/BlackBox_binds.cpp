@@ -17,10 +17,26 @@ namespace bb {
 
 	void BlackBox::ToggleMenu (bbstring const & widget_name)
 	{
-		m_menu = !m_menu;
 		if (GuiWidget * w = m_gfx->FindWidget(widget_name.c_str()))
 		{
-			;
+			POINT p;
+			if (::GetCursorPos(&p))
+			{
+				RECT r;
+				::GetWindowRect(w->m_gfxWindow->m_hwnd, &r);
+				if (::PtInRect(&r, p))
+				{
+					m_gfx->RmWidget(w);
+				}
+				else
+				{
+					int const width = r.right - r.left;
+					int const height = r.bottom - r.top;
+					::MoveWindow(w->m_gfxWindow->m_hwnd, p.x, p.y, width, height, false);
+					m_tasks.Focus(w->m_gfxWindow->m_hwnd);
+					w->Show(true);
+				}
+			}
 		}
 		else
 		{

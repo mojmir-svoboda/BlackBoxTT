@@ -114,7 +114,6 @@ namespace bb {
 		HANDLE m_job { nullptr };
 		bool m_inJob { false };
 		bool m_quit { false };
-		bool m_menu { false };
 		std::unique_ptr<YAML::Node> m_y_config;
 		BlackBoxConfig m_config;
 		CommandLine m_cmdLine;

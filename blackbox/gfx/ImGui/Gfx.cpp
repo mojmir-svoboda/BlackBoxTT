@@ -94,6 +94,22 @@ namespace imgui {
 		return w;
 	}
 
+	bool Gfx::RmWidget (GuiWidget * widget)
+	{
+		for (GfxWindowPtr & win : m_windows)
+		{
+			for (Gui::GuiWidgetPtr & w : win->m_gui->m_widgets)
+			{
+				if (widget == w.get())
+				{
+					w.reset();
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	bool Gfx::MkWidgetFromId (wchar_t const * widgetId)
 	{
 		YAML::Node & y_widgets = m_y_root["Widgets"];
