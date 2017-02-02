@@ -14,10 +14,13 @@ namespace imgui {
 
 	void GfxWindow::Render ()
 	{
-		m_gui->m_gfx->m_dx11->m_pd3dDeviceContext->OMSetRenderTargets(1, &m_view, nullptr);
-		m_gui->m_gfx->m_dx11->m_pd3dDeviceContext->ClearRenderTargetView(m_view, (float*)&m_clrCol);
-		m_gui->Render();
-		m_chain->Present(0, 0);
+		if (m_chain && m_view)
+		{
+			m_gui->m_gfx->m_dx11->m_pd3dDeviceContext->OMSetRenderTargets(1, &m_view, nullptr);
+			m_gui->m_gfx->m_dx11->m_pd3dDeviceContext->ClearRenderTargetView(m_view, (float*)&m_clrCol);
+			m_gui->Render();
+			m_chain->Present(0, 0);
+		}
 	}
 
 	void GfxWindow::Show (bool on)

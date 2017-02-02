@@ -103,7 +103,6 @@ namespace bb {
 		bool DetectConfig ();
 		bool Win32RegisterClass (wchar_t const * classname, WNDPROC wndproc, int flags);
 		void HandleServerMessages ();
-		void HandleMenuState ();
 		std::unique_ptr<Command> HandleServerMessage (std::unique_ptr<Command> const & request);
 		HWND FindTopLevelWindow () const;
 

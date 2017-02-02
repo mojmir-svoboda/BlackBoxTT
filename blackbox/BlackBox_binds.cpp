@@ -25,7 +25,7 @@ namespace bb {
 				::GetWindowRect(w->m_gfxWindow->m_hwnd, &r);
 				if (::PtInRect(&r, p))
 				{
-					m_gfx->RmWidget(w);
+					m_gfx->DestroyWindow(widget_name.c_str());
 				}
 				else
 				{

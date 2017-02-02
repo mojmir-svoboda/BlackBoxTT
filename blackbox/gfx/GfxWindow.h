@@ -9,6 +9,7 @@ namespace bb {
 	struct GfxWindow
 	{
 		HWND m_hwnd { nullptr };
+		bool m_destroy { false };
 		bbstring m_clName { };
 		bbstring m_wName { };
 
@@ -27,6 +28,7 @@ namespace bb {
 		virtual GuiWidget * FindWidget (wchar_t const * widgetId) = 0;
 
 		bbstring const & GetName () const { return m_wName; }
+		void SetDestroy (bool destroy) { m_destroy = destroy; }
 	};
 }
 
