@@ -79,6 +79,7 @@ namespace bb {
 		bool GetConfigDir (wchar_t * dir, size_t dir_sz) const;
 
 		bool FindTargetVertexViaEdge (bbstring const & edge_property, bbstring & dst_vertex_id) const;
+		bool MoveWindowToVertex (HWND hwnd, bbstring const & dst_vertex_id);
 		bool MoveTopWindowToVertexViaEdge (bbstring const & edge_property);
 		/**@fn WorkSpacesSetCurrentVertexId
 		 * @brief finds vertex_id in the graph and switches to it. no edge from current is required.

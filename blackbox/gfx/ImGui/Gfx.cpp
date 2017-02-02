@@ -148,7 +148,7 @@ namespace imgui {
 		return nullptr;
 	}
 
-	bool Gfx::FindIconCoords (IconId & id, void * & texture, float & u0, float & v0, float & u1, float & v1) const
+	bool Gfx::FindIconCoords (IconId id, void * & texture, float & u0, float & v0, float & u1, float & v1) const
 	{
 		bb::imgui::IconSlab const * slab = nullptr;
 		if (m_iconCache.GetSlab(id, slab))

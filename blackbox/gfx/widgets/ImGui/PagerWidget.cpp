@@ -110,6 +110,14 @@ namespace imgui {
 						BlackBox::Instance().WorkSpacesSetCurrentVertexId(vertex_id);
 					}
 
+					if (m_dragged && ImGui::IsItemHoveredRect() && ImGui::IsMouseReleased(0))
+					{
+						// dropped item
+						HWND const hwnd = m_dragged;
+						m_dragged = nullptr;
+						BlackBox::Instance().MoveWindowToVertex(hwnd, vertex_id);
+					}
+
 					int tmp = 0;
 					for (TaskInfo & t : m_tasks)
 					{
@@ -141,6 +149,34 @@ namespace imgui {
 								ImColor const col_int_skip_taskman = ImColor(0, 0, 0, 128);
 								ImColor const col_border_skip = ImColor(0, 0, 0, 128);
 								bool const clkd = ImGui::IconButton(icoid, skip_taskman ? col_int_skip_taskman : col_int, skip_taskman ? col_border_skip : col_border, framing);
+
+								if (ImGui::IsMouseDragging() && ImGui::IsItemActive())
+								{
+									if (!m_dragged)
+									{
+										m_dragged = t.m_hwnd;
+									}
+									void * texid = nullptr;
+									float u0 = 0.0f;
+									float v0 = 0.0f;
+									float u1 = 0.0f;
+									float v1 = 0.0f;
+									/// @TODO: @NOTE: PERFORMANCE !!!
+									if (bb::BlackBox::Instance().GetGfx().FindIconCoords(icoid, texid, u0, v0, u1, v1))
+									{
+										ImDrawList* draw_list = ImGui::GetWindowDrawList();
+										draw_list->PushClipRectFullScreen();
+										ImVec2 const mp = ImGui::GetIO().MousePos;
+										ImVec2 const p1(mp.x - icoid.m_size / 2, mp.y - icoid.m_size / 2);
+										ImVec2 const p2(mp.x + icoid.m_size / 2, mp.y + icoid.m_size / 2);
+										ImVec2 const rp1(p1.x - 1, p1.y - 1);
+										ImVec2 const rp2(p2.x - 1, p2.y - 1);
+										draw_list->AddImage(texid, p1, p2, ImVec2(u0, v0), ImVec2(u1, v1), col_border);
+										draw_list->AddRect(rp1, rp2, col_border);
+										draw_list->PopClipRect();
+									}
+								}
+
 								if (ImGui::BeginPopupContextItem(""))
 								{
 									if (ImGui::Selectable(is_sticky ? "UnStick" : "Stick"))

@@ -606,17 +606,16 @@ bool Tasks::MoveWindowToVertex (HWND hwnd, bbstring const & vertex_id)
 		{
 			ti_ptr->SetWorkSpace(vertex_id.c_str());
 
-			bbstring const * current_ws = m_wspaces.GetCurrentVertexId();
-			bool const same_ws = *current_ws == ti_ptr->m_wspace;
-			bool const is_sticky = ti_ptr->m_config ? ti_ptr->m_config->m_sticky : false;
-			bool const is_current_ws = same_ws || is_sticky;
+			//bbstring const * current_ws = m_wspaces.GetCurrentVertexId();
+			bool const same_ws = vertex_id == ti_ptr->m_wspace;
+			bool const is_sticky = ti_ptr->IsSticky();
+			bool const is_same_ws = same_ws || is_sticky;
 
-			if (is_current_ws)
+			if (is_same_ws)
 			{
 			}
 			else
 			{
-				//m_tasks[e_OtherWS].push_back(std::move(ti_ptr));
 				size_t vdm_idx = 0;
 				if (!m_wspaces.IsVertexVDM(vertex_id, vdm_idx))
 					::ShowWindow(hwnd, SW_HIDE);

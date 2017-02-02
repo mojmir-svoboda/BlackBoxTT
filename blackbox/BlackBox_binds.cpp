@@ -12,7 +12,6 @@ namespace bb {
 
 	void BlackBox::ShowMenu (bbstring const & widget_name)
 	{
-		m_menu = true;
 	}
 
 	void BlackBox::ToggleMenu (bbstring const & widget_name)
@@ -144,18 +143,22 @@ namespace bb {
 			return true;
 		return false;
 	}
+	bool BlackBox::MoveWindowToVertex (HWND hwnd, bbstring const & vertex_id)
+	{
+		TRACE_MSG(LL_DEBUG, CTX_BB | CTX_WSPACE | CTX_BIND, "MoveWindowToVertex edge=%ws", vertex_id.c_str());
+		if (bbstring const * curr_vtx_id = m_wspaces.GetCurrentVertexId())
+		{
+			return m_tasks.MoveWindowToVertex(hwnd, vertex_id);
+		}
+		return false;
+	}
 	bool BlackBox::MoveTopWindowToVertexViaEdge (bbstring const & edge_property)
 	{
 		TRACE_MSG(LL_DEBUG, CTX_BB | CTX_WSPACE | CTX_BIND, "MoveTopWindowToVertexViaEdge edge=%ws", edge_property.c_str());
 		bbstring new_vertex_id;
 		if (HWND hwnd = FindTopLevelWindow())
 			if (FindTargetVertexViaEdge(edge_property, new_vertex_id))
-				if (bbstring const * curr_vtx_id = m_wspaces.GetCurrentVertexId())
-				{
-					bbstring const curr_ws = *curr_vtx_id;
-					m_tasks.MoveWindowToVertex(hwnd, new_vertex_id);
-					return true;
-				}
+				return m_tasks.MoveWindowToVertex(hwnd, new_vertex_id);
 		return false;
 	}
 

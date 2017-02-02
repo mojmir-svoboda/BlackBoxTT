@@ -16,6 +16,7 @@ namespace imgui {
 		PagerWidgetConfig m_config;
 		ImVec2 m_contentSize { 0 , 0 };
 		std::vector<TaskInfo> m_tasks;
+		HWND m_dragged { nullptr };
 
 		PagerWidget ();
 		virtual ~PagerWidget () { }
