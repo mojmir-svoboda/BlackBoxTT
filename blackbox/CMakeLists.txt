@@ -99,17 +99,18 @@ set (blackbox_ImGui_SOURCES
 	gfx/ImGui/IconCache.cpp
 	gfx/ImGui/GfxWindow.cpp
 	gfx/ImGui/Gui.cpp
-	gfx/widgets/ImGui/PluginsWidget.cpp
-	gfx/widgets/ImGui/StyleEditorWidget.cpp
-	gfx/widgets/ImGui/ControlPanelWidget.cpp
-	gfx/widgets/ImGui/DebugWidget.cpp
-	gfx/widgets/ImGui/TasksWidget.cpp
-	gfx/widgets/ImGui/MenuWidget.cpp
-	gfx/widgets/ImGui/RecoverWindowsWidget.cpp
-	gfx/widgets/ImGui/TrayWidget.cpp
+	#gfx/widgets/ImGui/PluginsWidget.cpp
+	#gfx/widgets/ImGui/StyleEditorWidget.cpp
+	#gfx/widgets/ImGui/ControlPanelWidget.cpp
+	#gfx/widgets/ImGui/DebugWidget.cpp
+	#gfx/widgets/ImGui/TasksWidget.cpp
+	#gfx/widgets/ImGui/MenuWidget.cpp
+	#gfx/widgets/ImGui/RecoverWindowsWidget.cpp
+	#gfx/widgets/ImGui/TrayWidget.cpp
 	gfx/widgets/ImGui/PagerWidget.cpp
-	gfx/widgets/ImGui/QuickBarWidget.cpp
+	#gfx/widgets/ImGui/QuickBarWidget.cpp
 	gfx/widgets/ImGui/MenuWidget.cpp
+	#gfx/widgets/ImGui/QuickBarWidget.cpp
 )
 
 set (blackbox_ImGui_HEADERS
@@ -120,17 +121,18 @@ set (blackbox_ImGui_HEADERS
 	gfx/ImGui/GfxWindow.h
 	gfx/ImGui/Gui.h
 	gfx/ImGui/IconCache.h
-	gfx/widgets/ImGui/PluginsWidget.h
-	gfx/widgets/ImGui/StyleEditorWidget.h
-	gfx/widgets/ImGui/ControlPanelWidget.h
-	gfx/widgets/ImGui/DebugWidget.h
-	gfx/widgets/ImGui/TasksWidget.h
-	gfx/widgets/ImGui/MenuWidget.h
-	gfx/widgets/ImGui/RecoverWindowsWidget.h
-	gfx/widgets/ImGui/TrayWidget.h
+	#gfx/widgets/ImGui/PluginsWidget.h
+	#gfx/widgets/ImGui/StyleEditorWidget.h
+	#gfx/widgets/ImGui/ControlPanelWidget.h
+	#gfx/widgets/ImGui/DebugWidget.h
+	#gfx/widgets/ImGui/TasksWidget.h
+	#gfx/widgets/ImGui/MenuWidget.h
+	#gfx/widgets/ImGui/RecoverWindowsWidget.h
+	#gfx/widgets/ImGui/TrayWidget.h
 	gfx/widgets/ImGui/PagerWidget.h
-	gfx/widgets/ImGui/QuickBarWidget.h
+	#gfx/widgets/ImGui/QuickBarWidget.h
 	gfx/widgets/ImGui/MenuWidget.h
+	#gfx/widgets/ImGui/QuickBarWidget.h
 )
 
 if (NOT MINGW)

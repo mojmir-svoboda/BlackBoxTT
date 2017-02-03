@@ -6,15 +6,16 @@
 #include <utils_window.h>
 #include <utils_dwm.h>
 #include <bblib/logging.h>
-#include <gfx/widgets/ImGui/StyleEditorWidget.h>
-#include <gfx/widgets/ImGui/PluginsWidget.h>
-#include <gfx/widgets/ImGui/ControlPanelWidget.h>
-#include <gfx/widgets/ImGui/RecoverWindowsWidget.h>
-#include <gfx/widgets/ImGui/TasksWidget.h>
+// #include <gfx/widgets/ImGui/StyleEditorWidget.h>
+// #include <gfx/widgets/ImGui/PluginsWidget.h>
+// #include <gfx/widgets/ImGui/ControlPanelWidget.h>
+// #include <gfx/widgets/ImGui/RecoverWindowsWidget.h>
+// #include <gfx/widgets/ImGui/TasksWidget.h>
+// #include <gfx/widgets/ImGui/DebugWidget.h>
+// #include <gfx/widgets/ImGui/QuickBarWidget.h>
+// #include <gfx/widgets/ImGui/TrayWidget.h>
 #include <gfx/widgets/ImGui/PagerWidget.h>
-#include <gfx/widgets/ImGui/DebugWidget.h>
-#include <gfx/widgets/ImGui/QuickBarWidget.h>
-#include <gfx/widgets/ImGui/TrayWidget.h>
+#include <gfx/widgets/ImGui/MenuWidget.h>
 #include <yaml-cpp/yaml.h>
 #include "utils_yaml.h"
 #include "WidgetConfig_yaml.h"
