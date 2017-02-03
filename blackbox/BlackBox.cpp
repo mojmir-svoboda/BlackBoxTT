@@ -442,7 +442,6 @@ namespace bb {
 					}
 				}
 
-				HandleMenuState();
 				if (m_gfx)
 					m_gfx->NewFrame();
 
@@ -584,19 +583,4 @@ namespace bb {
 		return nullptr;
 	}
 
-	void BlackBox::HandleMenuState ()
-	{
-// 		if (m_menu)
-// 		{
-// 			if (!m_menuWidget)
-// 				m_menuWidget = CreateMenuOnPointerPos(m_config.m_menu);
-// 			else if (!m_menuWidget->Enabled())
-// 				ShowMenuOnPointerPos(true);
-// 		}
-// 		else if (!m_menu && m_menuWidget)
-// 		{
-// 			if (m_menuWidget->Enabled())
-// 				ShowMenuOnPointerPos(false);
-// 		}
-	}
 }
