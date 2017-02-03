@@ -49,6 +49,7 @@ namespace imgui {
 		virtual void Show (bool on) { m_show = on; }
 		virtual bool Visible () const { return m_show; }
 		virtual GuiWidget * FindWidget (wchar_t const * widgetId) override;
+		virtual bool RmWidget (GuiWidget * widget) override;
 
 		//bool InitDX (GfxWindow * w, DX11 * dx11);
 		void RenderImGui ();

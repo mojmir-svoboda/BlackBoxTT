@@ -95,21 +95,26 @@ namespace imgui {
 		return w;
 	}
 
-	bool Gfx::RmWidget (GuiWidget * widget)
+	bool Gfx::DestroyWindow (wchar_t const * widgetId)
 	{
 		for (GfxWindowPtr & win : m_windows)
 		{
-			for (Gui::GuiWidgetPtr & w : win->m_gui->m_widgets)
+			if (win->GetName() == widgetId)
 			{
-				if (widget == w.get())
-				{
-					w.reset();
+				win->SetDestroy(true);
 					return true;
 				}
 			}
-		}
 		return false;
 	}
+// 			for (Gui::GuiWidgetPtr & w : win->m_gui->m_widgets)
+// 			{
+// 				if (widget == w.get())
+// 				{
+// 					//w.reset();
+// 					return true;
+// 				}
+// 			}
 
 	bool Gfx::MkWidgetFromId (wchar_t const * widgetId)
 	{
@@ -271,6 +276,18 @@ namespace imgui {
 				w->Render();
 			}
 		}
+
+		for (GfxWindowPtr & w : m_windows)
+		{
+			if (w->m_destroy)
+			{
+				w->Done();
+				w.reset();
+			}
+		}
+
+		m_windows.erase(std::remove_if(m_windows.begin(), m_windows.end(),
+			[] (GfxWindowPtr const & ti_ptr) { return ti_ptr.get() == nullptr; }), m_windows.end());
 	}
 
 	void Gfx::UpdateIconCache ()

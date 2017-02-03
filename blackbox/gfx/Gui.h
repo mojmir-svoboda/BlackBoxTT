@@ -22,6 +22,7 @@ namespace bb {
 		virtual bool Init (GfxWindow * w) = 0;
 		virtual bool Done () = 0;
 		virtual GuiWidget * FindWidget (wchar_t const * widgetId) = 0;
+		virtual bool RmWidget (GuiWidget * widget) = 0;
 
 		virtual void Show (bool on) { m_show = on; }
 		virtual bool Visible () const { return m_show; }

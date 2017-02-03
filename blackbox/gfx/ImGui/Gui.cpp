@@ -43,6 +43,12 @@ namespace imgui {
 		return nullptr;
 	}
 
+	bool Gui::RmWidget (GuiWidget * widget)
+	{
+		// TODO
+		return 123;
+	}
+
 	void Gui::Render ()
 	{
 		if (m_show)
@@ -505,6 +511,8 @@ namespace imgui {
 	bool Gui::Done ()
 	{
 		TRACE_MSG(LL_INFO, CTX_BB | CTX_GFX, "Terminating GUI");
+		m_widgets.clear();
+		TRACE_MSG(LL_DEBUG, CTX_BB | CTX_GFX, "destroying ImGui context");
 		ImGuiContext * const old_ctx = ImGui::GetCurrentContext();
 		ImGui::SetCurrentContext(m_context);
 		scope_guard_t on_exit = bb::mkScopeGuard(std::ptr_fun(&ImGui::SetCurrentContext), old_ctx);
@@ -515,6 +523,8 @@ namespace imgui {
 
 		ImGui::DestroyContext(m_context);
 		m_context = nullptr;
+		m_gfxWindow = nullptr;
+		m_gfx = nullptr;
 		return true;
 	}
 

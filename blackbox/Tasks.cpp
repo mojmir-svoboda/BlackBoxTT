@@ -604,8 +604,6 @@ bool Tasks::MoveWindowToVertex (HWND hwnd, bbstring const & vertex_id)
 		TaskInfoPtr & ti_ptr = m_tasks[idx];
 		if (ti_ptr)
 		{
-			ti_ptr->SetWorkSpace(vertex_id.c_str());
-
 			//bbstring const * current_ws = m_wspaces.GetCurrentVertexId();
 			bool const same_ws = vertex_id == ti_ptr->m_wspace;
 			bool const is_sticky = ti_ptr->IsSticky();
@@ -616,6 +614,8 @@ bool Tasks::MoveWindowToVertex (HWND hwnd, bbstring const & vertex_id)
 			}
 			else
 			{
+				ti_ptr->SetWorkSpace(vertex_id.c_str());
+
 				size_t vdm_idx = 0;
 				if (!m_wspaces.IsVertexVDM(vertex_id, vdm_idx))
 					::ShowWindow(hwnd, SW_HIDE);
