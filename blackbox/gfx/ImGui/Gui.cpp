@@ -480,19 +480,68 @@ namespace imgui {
 		if (!m_gfx->m_dx11)
 				return;
 
-		if (m_pFontSampler) { m_pFontSampler->Release(); m_pFontSampler = NULL; }
-		if (m_pFontTextureView) { m_pFontTextureView->Release(); m_pFontTextureView = NULL; ImGui::GetIO().Fonts->TexID = 0; }
-		if (m_pIB) { m_pIB->Release(); m_pIB = NULL; }
-		if (m_pVB) { m_pVB->Release(); m_pVB = NULL; }
+		if (m_pFontSampler)
+		{
+			m_pFontSampler->Release();
+			m_pFontSampler = NULL;
+		}
+		if (m_pFontTextureView)
+		{
+			m_pFontTextureView->Release();
+			m_pFontTextureView = NULL;
+			ImGui::GetIO().Fonts->TexID = 0;
+		}
+		if (m_pIB)
+		{
+			m_pIB->Release();
+			m_pIB = NULL;
+		}
+		if (m_pVB)
+		{
+			m_pVB->Release();
+			m_pVB = NULL;
+		}
 
-		if (m_pBlendState) { m_pBlendState->Release(); m_pBlendState = NULL; }
-		if (m_pRasterizerState) { m_pRasterizerState->Release(); m_pRasterizerState = NULL; }
-		if (m_pPixelShader) { m_pPixelShader->Release(); m_pPixelShader = NULL; }
-		if (m_pPixelShaderBlob) { m_pPixelShaderBlob->Release(); m_pPixelShaderBlob = NULL; }
-		if (m_pVertexConstantBuffer) { m_pVertexConstantBuffer->Release(); m_pVertexConstantBuffer = NULL; }
-		if (m_pInputLayout) { m_pInputLayout->Release(); m_pInputLayout = NULL; }
-		if (m_pVertexShader) { m_pVertexShader->Release(); m_pVertexShader = NULL; }
-		if (m_pVertexShaderBlob) { m_pVertexShaderBlob->Release(); m_pVertexShaderBlob = NULL; }
+		if (m_pBlendState)
+		{
+			m_pBlendState->Release();
+			m_pBlendState = NULL;
+		}
+		if (m_pRasterizerState)
+		{
+			m_pRasterizerState->Release();
+			m_pRasterizerState = NULL;
+		}
+		if (m_pPixelShader)
+		{
+			m_pPixelShader->Release();
+			m_pPixelShader = NULL;
+		}
+		if (m_pPixelShaderBlob)
+		{
+			m_pPixelShaderBlob->Release();
+			m_pPixelShaderBlob = NULL;
+		}
+		if (m_pVertexConstantBuffer)
+		{
+			m_pVertexConstantBuffer->Release();
+			m_pVertexConstantBuffer = NULL;
+		}
+		if (m_pInputLayout)
+		{
+			m_pInputLayout->Release();
+			m_pInputLayout = NULL;
+		}
+		if (m_pVertexShader)
+		{
+			m_pVertexShader->Release();
+			m_pVertexShader = NULL;
+		}
+		if (m_pVertexShaderBlob)
+		{
+			m_pVertexShaderBlob->Release();
+			m_pVertexShaderBlob = NULL;
+		}
 
 		m_hasDeviceObjects = false;
 	}
