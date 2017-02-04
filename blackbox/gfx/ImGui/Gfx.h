@@ -26,12 +26,32 @@ namespace imgui {
 		std::vector<GfxWindowPtr> m_windows;
 		std::vector<GfxWindowPtr> m_newWindows;
 		IconCache m_iconCache;
+		bool m_hasDeviceObjects { false };
+		ID3D11Buffer *						m_pVB { nullptr };
+		ID3D11Buffer *						m_pIB { nullptr };
+		ID3D10Blob *							m_pVertexShaderBlob { nullptr };
+		ID3D11VertexShader *			m_pVertexShader { nullptr };
+		ID3D11InputLayout *				m_pInputLayout { nullptr };
+		ID3D11Buffer *						m_pVertexConstantBuffer { nullptr };
+		ID3D10Blob *							m_pPixelShaderBlob { nullptr };
+		ID3D11PixelShader *				m_pPixelShader { nullptr };
+		ID3D11SamplerState *			m_pFontSampler { nullptr };
+		ID3D11ShaderResourceView * m_pFontTextureView { nullptr };
+		ID3D11RasterizerState *		m_pRasterizerState { nullptr };
+		ID3D11BlendState *				m_pBlendState { nullptr };
+		int												m_VertexBufferSize { 5000 };
+		int												m_IndexBufferSize { 10000 };
 
 		Gfx (Tasks & t, YAML::Node & y_root) : m_tasks(t), m_y_root(y_root) { }
 		virtual ~Gfx ();
 		virtual bool Init (GfxConfig & config) override;
 		bool CreateWidgets (GfxConfig & config);
 		bool IsReady () const { return m_dx11 != nullptr; }
+		void DeviceLost ();
+		bool CreateDeviceObjects ();
+		void ReleaseDeviceObjects ();
+		void CreateFontsTexture ();
+		void RenderImGui ();
 
 		virtual void Render () override;
 		virtual void NewFrame () override;
