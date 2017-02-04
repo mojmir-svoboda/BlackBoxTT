@@ -18,7 +18,6 @@ namespace imgui {
 	{
 		if (m_gfxWindow->IsReady())
 		{
-			ReleaseDeviceObjects();
 			if (m_gfxWindow->m_view)
 			{
 				m_gfxWindow->m_view->Release();
@@ -31,7 +30,8 @@ namespace imgui {
 
 			m_gfxWindow->m_view = m_gfx->m_dx11->CreateRenderTarget(m_gfxWindow->m_chain);
 
-			CreateDeviceObjects();
+			if (!m_hasDeviceObjects)
+				CreateDeviceObjects();
 		}
 	}
 
