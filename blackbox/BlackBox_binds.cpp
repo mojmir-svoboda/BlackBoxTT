@@ -16,31 +16,34 @@ namespace bb {
 
 	void BlackBox::ToggleMenu (bbstring const & widget_name)
 	{
-		if (GuiWidget * w = m_gfx->FindWidget(widget_name.c_str()))
+		bool new_menu = false;
+		GuiWidget * w = m_gfx->FindWidget(widget_name.c_str());
+		if (!w)
 		{
-			POINT p;
-			if (::GetCursorPos(&p))
+			w = m_gfx->MkWidgetFromId(widget_name.c_str());
+			new_menu = true;
+		}
+
+		POINT p;
+		if (::GetCursorPos(&p))
+		{
+			RECT r;
+			::GetWindowRect(w->m_gfxWindow->m_hwnd, &r);
+			if (::PtInRect(&r, p))
 			{
-				RECT r;
-				::GetWindowRect(w->m_gfxWindow->m_hwnd, &r);
-				if (::PtInRect(&r, p))
-				{
+				if (!new_menu)
 					m_gfx->DestroyWindow(widget_name.c_str());
-				}
-				else
-				{
-					int const width = r.right - r.left;
-					int const height = r.bottom - r.top;
-					::MoveWindow(w->m_gfxWindow->m_hwnd, p.x, p.y, width, height, false);
-					m_tasks.Focus(w->m_gfxWindow->m_hwnd);
-					w->Show(true);
-				}
+			}
+			else
+			{
+				int const width = r.right - r.left;
+				int const height = r.bottom - r.top;
+				::MoveWindow(w->m_gfxWindow->m_hwnd, p.x, p.y, width, height, false);
+				m_tasks.Focus(w->m_gfxWindow->m_hwnd);
+				w->Show(true);
 			}
 		}
-		else
-		{
-			m_gfx->MkWidgetFromId(widget_name.c_str());
-		}
+
 	}
 
 	void BlackBox::MakeSticky (HWND hwnd)

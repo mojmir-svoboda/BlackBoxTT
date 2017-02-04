@@ -21,7 +21,7 @@ namespace bb {
 		virtual bool FindIconCoords (IconId id, void * & texture, float & u0, float & v0, float & u1, float & v1) const = 0;
 
 		virtual GuiWidget * FindWidget (wchar_t const * name) = 0;
-		virtual bool MkWidgetFromId (wchar_t const * widgetId) = 0;
+		virtual GuiWidget * MkWidgetFromId (wchar_t const * widgetId) = 0;
 		//virtual GfxWindow * MkWidgetWindow (int x, int y, int w, int h, int alpha, wchar_t const * clname, wchar_t const * wname, bool show) = 0;
 		//virtual HWND MkWindow (void * gui, int x, int y, int w, int h, int alpha, wchar_t const * clname, wchar_t const * wname) = 0;
 		virtual bool DestroyWindow (wchar_t const * widgetId) = 0;

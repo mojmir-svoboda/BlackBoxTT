@@ -59,8 +59,8 @@ namespace imgui {
 			bbstring const & id = config.m_startWidgets[i];
 			if (!id.empty())
 			{
-				bool const ok = MkWidgetFromId(id.c_str());
-				if (!ok)
+				GuiWidget * w = MkWidgetFromId(id.c_str());
+				if (!w)
 					TRACE_MSG(LL_ERROR, CTX_BB | CTX_GFX, "Cannot create widget with id=%ws", id.c_str());
 			}
 		}
@@ -117,7 +117,7 @@ namespace imgui {
 // 				}
 // 			}
 
-	bool Gfx::MkWidgetFromId (wchar_t const * widgetId)
+	GuiWidget * Gfx::MkWidgetFromId (wchar_t const * widgetId)
 	{
 		YAML::Node & y_widgets = m_y_root["Widgets"];
 		if (y_widgets)
@@ -135,7 +135,7 @@ namespace imgui {
 						GfxWindow * win = MkWidgetWindow(tmp.m_x, tmp.m_y, tmp.m_w, tmp.m_h, tmp.m_alpha, w->GetWidgetTypeName(), w->GetId().c_str(), tmp.m_show);
 						w->m_gfxWindow = win;
 						win->m_gui->m_widgets.push_back(std::move(w));
-						return true;
+						return win->m_gui->m_widgets.back().get();
 					}
 				}
 			}
