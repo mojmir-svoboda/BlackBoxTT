@@ -1,6 +1,6 @@
 #include "commands.h"
+#include <blackbox/common.h>
 #include <bbproto/decoder.h>
-#include <bblib/logging.h>
 
 namespace bb {
 

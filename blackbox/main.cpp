@@ -1,6 +1,6 @@
 #include <cstdio>
 #include "BlackBox.h"
-#include <bblib/logging.h>
+#include <blackbox/common.h>
 
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {

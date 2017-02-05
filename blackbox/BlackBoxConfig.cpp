@@ -1,6 +1,5 @@
 #include "BlackBoxConfig.h"
-#include <platform_win.h>
-#include <bblib/logging.h>
+#include <blackbox/common.h>
 #include <VersionHelpers.h>
 
 namespace bb {

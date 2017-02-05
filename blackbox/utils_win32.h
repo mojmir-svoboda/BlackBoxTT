@@ -1,6 +1,5 @@
 #pragma once
-#include <platform_win.h>
-#include <bblib/logging.h>
+#include <blackbox/common.h>
 
 inline bool mkJobObject (HANDLE & job, bool & in_job)
 {

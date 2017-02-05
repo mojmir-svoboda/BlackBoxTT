@@ -1,14 +1,13 @@
 #include <platform_win.h>
 #include <hooks/taskhook.h>
 #include <hooks/trayhook.h>
+#include <blackbox/common.h>
 #include <vector>
 #include <SpinLock.h>
 #include <utils_window.h>
 #include <Tasks.h>
 #include <BlackBox.h>
-//#include <Gfx/Gui.h>
 #include <utils_paths.h>
-#include <bblib/logging.h>
 
 namespace bb {
 

@@ -1,7 +1,7 @@
 #include "WorkSpaces.h"
 #include "WorkSpacesConfig.h"
 #include "BlackBox.h"
-#include <bblib/logging.h>
+#include <blackbox/common.h>
 #include <regex>
 #include <tuple>
 #include "utils_window.h"

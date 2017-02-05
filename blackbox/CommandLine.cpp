@@ -1,5 +1,5 @@
 #include "CommandLine.h"
-#include <bblib/logging.h>
+#include <blackbox/common.h>
 
 namespace bb {
 

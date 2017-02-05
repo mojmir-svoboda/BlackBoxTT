@@ -1,6 +1,5 @@
 #include "DX11.h"
-#include <bblib/logging.h>
-#include <bblib/ScopeGuard.h>
+#include <blackbox/common.h>
 #include <functional>
 
 namespace bb {

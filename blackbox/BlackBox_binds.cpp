@@ -1,6 +1,6 @@
 #include "BlackBox.h"
+#include <blackbox/common.h>
 #include <bblib/utils_paths.h>
-#include <bblib/logging.h>
 #include "utils_window.h"
 
 namespace bb {
@@ -43,7 +43,6 @@ namespace bb {
 				w->Show(true);
 			}
 		}
-
 	}
 
 	void BlackBox::MakeSticky (HWND hwnd)

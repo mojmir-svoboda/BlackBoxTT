@@ -1,8 +1,6 @@
 #pragma once
 #include <yaml-cpp/yaml.h>
-#include <bbstring.h>
-#include <codecvt.h>
-#include <bblib/logging.h>
+#include <blackbox/common.h>
 
 namespace YAML {
 

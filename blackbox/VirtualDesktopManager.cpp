@@ -1,7 +1,6 @@
 #include "VirtualDesktopManager.h"
 #include "utils_vdm.h"
-#include <bblib/ScopeGuard.h>
-#include <bblib/logging.h>
+#include <blackbox/common.h>
 #include <memory>
 #include <functional>
 #include <BlackBox.h>

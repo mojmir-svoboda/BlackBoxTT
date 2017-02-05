@@ -1,7 +1,6 @@
 #include "Tray.h"
-#include "platform_win.h"
+#include <blackbox/common.h>
 #include <hooks/trayhook.h>
-#include <bblib/logging.h>
 
 namespace bb {
 

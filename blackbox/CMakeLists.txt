@@ -62,6 +62,7 @@ set(blackbox_SOURCES
 )
 
 set (blackbox_HEADERS
+	common.h
 	BlackBox.h
 	BlackBoxConfig.h
 	CommandLine.h

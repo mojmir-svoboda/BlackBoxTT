@@ -16,7 +16,7 @@ bbLean is free software, released under the GNU General Public License
 #include "PluginLoaderNative.h"
 #include "Types.h"
 #include "PluginsConfig.h"
-#include <bblib/logging.h>
+#include <blackbox/common.h>
 
 namespace bb {
 

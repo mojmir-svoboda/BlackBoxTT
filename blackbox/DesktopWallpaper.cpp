@@ -1,6 +1,5 @@
 #include "DesktopWallpaper.h"
-#include <bblib/ScopeGuard.h>
-#include <bblib/logging.h>
+#include <blackbox/common.h>
 #include <bblib/utils_paths.h>
 #include <BlackBox.h>
 #include "Shobjidl.h"

@@ -149,9 +149,6 @@ Widgets:
     show: false
   - widget: 'Menu'
     id: 'bbTT Menu'
-    w: 256
-    h: 256
-    alpha: 192
     items:
       - name: 'Start'
         folder: 'StartMenu'

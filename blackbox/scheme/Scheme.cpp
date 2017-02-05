@@ -1,9 +1,7 @@
 #include "Scheme.h"
-#include <bblib/logging.h>
+#include <blackbox/common.h>
 #include <3rd_party/s7/s7.h>
 #include <blackbox/bind/bind.h>
-#include <bblib/codecvt.h>
-#include <bblib/bbstring.h>
 #include <BlackBox.h>
 
 //typedef s7_pointer(*s7_function)(s7_scheme *sc, s7_pointer args);   /* that is, obj = func(s7, args) -- args is a list of arguments */

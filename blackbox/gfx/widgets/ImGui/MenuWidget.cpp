@@ -50,7 +50,13 @@ namespace imgui {
 
 		char name[256];
 		codecvt_utf16_utf8(GetId(), name, 256);
-		ImGui::Begin(name, &m_config.m_show, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);
+		bool close_menu = false;
+		if (!ImGui::Begin(name, &close_menu, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize))
+		{
+			ImGui::End();
+			m_gfxWindow->SetDestroy(true);
+			return;
+		}
 
 		size_t const sz = m_config.m_items.size();
 
@@ -72,6 +78,10 @@ namespace imgui {
 					if (item.m_type == e_MenuItemMenu)
 					{	
 						//MenuWidget * w = bb::BlackBox::Instance().CreateMenuOnPointerPos(*item.m_menu);
+
+						MenuConfig const * const cfg = item.m_menu;
+						GuiWidget * w = bb::BlackBox::Instance().GetGfx().MkWidget(*cfg);
+
 					}
 
 					m_currentIndex = i;
