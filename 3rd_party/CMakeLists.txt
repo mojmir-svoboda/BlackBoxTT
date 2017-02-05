@@ -3,6 +3,7 @@ add_subdirectory(imgui)
 add_subdirectory(s7)
 add_subdirectory(DirectXTex)
 add_subdirectory(yaml-cpp)
+add_subdirectory(Assert)
 
 if (OPTION_USE_TCL)
 	add_subdirectory(tcl8.6.4/win)

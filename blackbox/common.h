@@ -4,4 +4,5 @@
 #include <bblib/codecvt.h>
 #include <bblib/bbstring.h>
 #include <bblib/ScopeGuard.h>
+#include <Assert/Assert.h>
 
