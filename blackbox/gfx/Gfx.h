@@ -22,9 +22,22 @@ namespace bb {
 
 		virtual GuiWidget * FindWidget (wchar_t const * name) = 0;
 		virtual GuiWidget * MkWidgetFromId (wchar_t const * widgetId) = 0;
-		//virtual GfxWindow * MkWidgetWindow (int x, int y, int w, int h, int alpha, wchar_t const * clname, wchar_t const * wname, bool show) = 0;
-		//virtual HWND MkWindow (void * gui, int x, int y, int w, int h, int alpha, wchar_t const * clname, wchar_t const * wname) = 0;
 		virtual bool DestroyWindow (wchar_t const * widgetId) = 0;
+
+		template <class WidgetConfigT>
+		GuiWidget * MkWidgetFromConfig (WidgetConfigT const & cfg)
+		{
+			std::unique_ptr<GuiWidget> w = MkWidgetFromType(cfg.m_widgetType.c_str(), cfg);
+			if (w)
+			{
+				GuiWidget * widget = MkWindowForWidget(cfg.m_x, cfg.m_y, cfg.m_w, cfg.m_h, cfg.m_alpha, std::move(w));
+				return widget;
+			}
+		}
+
+	protected:
+		virtual std::unique_ptr<GuiWidget> MkWidgetFromType (wchar_t const * widgetType) = 0;
+		virtual GuiWidget * MkWindowForWidget (int x, int y, int w, int h, int a, std::unique_ptr<GuiWidget> && widget) = 0;
 	};
 
 }
