@@ -37,6 +37,7 @@ namespace bb {
 
 	protected:
 		virtual std::unique_ptr<GuiWidget> MkWidgetFromType (wchar_t const * widgetType) = 0;
+		virtual std::unique_ptr<GuiWidget> MkWidgetFromType (wchar_t const * widgetType, WidgetConfig const & cfg) = 0;
 		virtual GuiWidget * MkWindowForWidget (int x, int y, int w, int h, int a, std::unique_ptr<GuiWidget> && widget) = 0;
 	};
 

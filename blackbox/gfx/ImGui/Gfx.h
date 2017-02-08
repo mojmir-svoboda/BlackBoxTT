@@ -80,6 +80,7 @@ namespace imgui {
 
 		virtual GuiWidget * FindWidget (wchar_t const * widgetId) override;
 		virtual std::unique_ptr<GuiWidget> MkWidgetFromType (wchar_t const * widgetType) override;
+		virtual std::unique_ptr<GuiWidget> MkWidgetFromType (wchar_t const * widgetType, WidgetConfig const & cfg) override;
 		virtual GuiWidget * MkWidgetFromId (wchar_t const * widgetId) override;
 		virtual bool DestroyWindow (wchar_t const * widgetId) override;
 	};

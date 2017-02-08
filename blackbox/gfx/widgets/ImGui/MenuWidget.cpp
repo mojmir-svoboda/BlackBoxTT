@@ -20,11 +20,6 @@ namespace imgui {
 	{
 	}
 
-	void MenuWidget::CreateMenuFromConfig (MenuConfig const & cfg)
-	{
-		m_config = cfg;
-	}
-
 	bool MenuWidget::loadConfig (YAML::Node & y_cfg_node)
 	{
 		if (!y_cfg_node.IsNull())

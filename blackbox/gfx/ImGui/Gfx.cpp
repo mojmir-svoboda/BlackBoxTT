@@ -18,6 +18,7 @@
 #include <yaml-cpp/yaml.h>
 #include "utils_yaml.h"
 #include "WidgetConfig_yaml.h"
+#include <tmpl/tmpl.h>
 
 namespace bb {
 namespace imgui {
@@ -72,8 +73,6 @@ namespace imgui {
 		return std::unique_ptr<T>(new T);
 	}
 
-// 	template <typename T>
-// 	using config_of = decltype(T::m_config);
 	using widgetNewFnT = std::unique_ptr<GuiWidget> (*)();
 	static constexpr std::pair<wchar_t const *, widgetNewFnT> const table[] = {
 			{ PagerWidget::c_type, newWidget<PagerWidget> }
@@ -92,6 +91,24 @@ namespace imgui {
 				return w;
 			}
 
+		return w;
+	}
+
+	using widgets = typelist<PagerWidget, MenuWidget>;
+
+	template <typename T>
+	using config_of = decltype(T::m_config);
+
+	template<class T>
+	std::unique_ptr<GuiWidget> mkNewWidget (WidgetConfig const & cfg)
+	{
+		std::unique_ptr<GuiWidget> w(new T(static_cast<config_of<T> const &>(cfg)));
+		return std::move(w);
+	}
+
+	std::unique_ptr<GuiWidget> Gfx::MkWidgetFromType (wchar_t const * widgetType, WidgetConfig const & cfg)
+	{
+		std::unique_ptr<GuiWidget> w;
 		return w;
 	}
 
