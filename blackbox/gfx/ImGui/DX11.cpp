@@ -14,7 +14,15 @@ namespace bb {
 		render_target_view_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		render_target_view_desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 		chain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
-		m_pd3dDevice->CreateRenderTargetView(pBackBuffer, &render_target_view_desc, &view);
+		HRESULT hr = m_pd3dDevice->CreateRenderTargetView(pBackBuffer, &render_target_view_desc, &view);
+		if (!SUCCEEDED(hr))
+		{
+			Assert(view);
+			TRACE_MSG(LL_ERROR, CTX_BB | CTX_GFX | CTX_INIT, "DX11 device CreateRenderTargetView failed, hresult=0x%x", hr);
+			pBackBuffer->Release();
+			return nullptr;
+		}
+
 		m_pd3dDeviceContext->OMSetRenderTargets(1, &view, NULL);
 		pBackBuffer->Release();
 		TRACE_MSG(LL_INFO, CTX_BB | CTX_GFX | CTX_INIT, "Created render target @ 0x%x for chain @ 0x%x", view, chain);
