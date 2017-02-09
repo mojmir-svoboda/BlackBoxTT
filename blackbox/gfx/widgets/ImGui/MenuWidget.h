@@ -13,6 +13,7 @@ namespace imgui {
 		size_t m_currentIndex { 0 };
 		ImVec2 m_contentSize { 0, 0 };
 		MenuWidget ();
+		MenuWidget (MenuConfig const & cfg) : m_config(cfg) { }
 		virtual ~MenuWidget ();
 
 		virtual wchar_t const * GetWidgetTypeName () override { return c_type; }

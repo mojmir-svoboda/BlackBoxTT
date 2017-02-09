@@ -18,6 +18,7 @@
 #include <yaml-cpp/yaml.h>
 #include "utils_yaml.h"
 #include "WidgetConfig_yaml.h"
+#include <tmpl/tmpl.h>
 
 namespace bb {
 namespace imgui {
@@ -72,8 +73,6 @@ namespace imgui {
 		return std::unique_ptr<T>(new T);
 	}
 
-// 	template <typename T>
-// 	using config_of = decltype(T::m_config);
 	using widgetNewFnT = std::unique_ptr<GuiWidget> (*)();
 	static constexpr std::pair<wchar_t const *, widgetNewFnT> const table[] = {
 			{ PagerWidget::c_type, newWidget<PagerWidget> }
@@ -92,6 +91,24 @@ namespace imgui {
 				return w;
 			}
 
+		return w;
+	}
+
+	using widgets = typelist<PagerWidget, MenuWidget>;
+
+	template <typename T>
+	using config_of = decltype(T::m_config);
+
+	template<class T>
+	std::unique_ptr<GuiWidget> mkNewWidget (WidgetConfig const & cfg)
+	{
+		std::unique_ptr<GuiWidget> w(new T(static_cast<config_of<T> const &>(cfg)));
+		return std::move(w);
+	}
+
+	std::unique_ptr<GuiWidget> Gfx::MkWidgetFromType (wchar_t const * widgetType, WidgetConfig const & cfg)
+	{
+		std::unique_ptr<GuiWidget> w;
 		return w;
 	}
 
@@ -125,16 +142,14 @@ namespace imgui {
 			for (int i = 0; i < n; ++i)
 			{
 				YAML::Node & y_widgets_i = y_widgets[i];
-				bb::WidgetConfig tmp = y_widgets[i].as<bb::WidgetConfig>();
-				if (tmp.m_id == widgetId)
+				bb::WidgetConfig cfg = y_widgets[i].as<bb::WidgetConfig>();
+				if (cfg.m_id == widgetId)
 				{
-					std::unique_ptr<GuiWidget> w = MkWidgetFromType(tmp.m_widgetType.c_str());
+					std::unique_ptr<GuiWidget> w = MkWidgetFromType(cfg.m_widgetType.c_str());
 					if (w && w->loadConfig(y_widgets_i))
 					{
-						GfxWindow * win = MkWidgetWindow(tmp.m_x, tmp.m_y, tmp.m_w, tmp.m_h, tmp.m_alpha, w->GetWidgetTypeName(), w->GetId().c_str(), tmp.m_show);
-						w->m_gfxWindow = win;
-						win->m_gui->m_widgets.push_back(std::move(w));
-						return win->m_gui->m_widgets.back().get();
+						GuiWidget * widget = MkWindowForWidget(cfg.m_x, cfg.m_y, cfg.m_w, cfg.m_h, cfg.m_alpha, std::move(w));
+						return widget;
 					}
 				}
 			}
@@ -183,24 +198,26 @@ namespace imgui {
 		return hwnd;
 	}
 
-	GfxWindow * Gfx::MkWidgetWindow (int x, int y, int w, int h, int alpha, wchar_t const * clname, wchar_t const * wname, bool show)
+	GuiWidget * Gfx::MkWindowForWidget (int x, int y, int w, int h, int a, std::unique_ptr<GuiWidget> && widget)
 	{
 		TRACE_SCOPE(LL_INFO, CTX_BB | CTX_GFX);
+		bool const show = widget->Visible(); // ???
+
 		std::unique_ptr<Gui> gui(new Gui);
 		gui->m_gfx = this;
 		std::unique_ptr<GfxWindow> gw(new GfxWindow);
 		gui->m_gfxWindow = gw.get();
-		TRACE_MSG(LL_INFO, CTX_BB | CTX_GFX, "Created new gui @ 0x%x wname=%ws", gui, wname);
-		HWND hwnd = MkWindow(static_cast<void *>(gui.get()), x, y, w, h, alpha, clname, wname);
+		TRACE_MSG(LL_INFO, CTX_BB | CTX_GFX, "Created new gui @ 0x%x iud=%ws", gui, widget->GetId().c_str());
+		HWND hwnd = MkWindow(static_cast<void *>(gui.get()), x, y, w, h, a, widget->GetWidgetTypeName(), widget->GetId().c_str());
 		gw->m_hwnd = hwnd;
 		gw->m_chain = m_dx11->CreateSwapChain(hwnd);
 		gw->m_view = nullptr; // created in WM_SIZE @see Gui::WndProcHandler
-		gw->m_clName = std::move(bbstring(clname));
-		gw->m_wName = std::move(bbstring(wname));
+		gw->m_clName = std::move(bbstring(widget->GetWidgetTypeName()));
+		gw->m_wName = std::move(bbstring(widget->GetId()));
 		if (!gw->m_gui)
 		{
 			gw->m_gui = std::move(gui);
-			gw->m_gui->m_name = wname;
+			gw->m_gui->m_name = widget->GetWidgetTypeName();
 			gw->m_gui->m_show = show;
 			gw->m_gui->m_gfxWindow = gw.get();
 			gw->m_gui->Init(gw.get());
@@ -217,7 +234,10 @@ namespace imgui {
 		::ShowWindow(hwnd, show ? SW_SHOW : SW_HIDE);
 		showInFromTaskBar(hwnd, false);
 		m_tasks.AddWidgetTask(m_newWindows.back().get());
-		return m_newWindows.back().get();
+		GfxWindow * win = m_newWindows.back().get();
+		widget->m_gfxWindow = win;
+		win->m_gui->m_widgets.push_back(std::move(widget));
+		return win->m_gui->m_widgets.back().get();
 	}
 
 	bool Gfx::Done ()

@@ -19,6 +19,7 @@ namespace imgui {
 		HWND m_dragged { nullptr };
 
 		PagerWidget ();
+		PagerWidget (PagerWidgetConfig const & cfg) : m_config(cfg) { }
 		virtual ~PagerWidget () { }
 		virtual void DrawUI () override;
 		virtual wchar_t const * GetWidgetTypeName () override { return c_type; }

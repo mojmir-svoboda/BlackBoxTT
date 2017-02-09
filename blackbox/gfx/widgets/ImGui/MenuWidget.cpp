@@ -20,11 +20,6 @@ namespace imgui {
 	{
 	}
 
-	void MenuWidget::CreateMenuFromConfig (MenuConfig const & cfg)
-	{
-		m_config = cfg;
-	}
-
 	bool MenuWidget::loadConfig (YAML::Node & y_cfg_node)
 	{
 		if (!y_cfg_node.IsNull())
@@ -79,8 +74,8 @@ namespace imgui {
 					{	
 						//MenuWidget * w = bb::BlackBox::Instance().CreateMenuOnPointerPos(*item.m_menu);
 
-						MenuConfig const * const cfg = item.m_menu;
-						GuiWidget * w = bb::BlackBox::Instance().GetGfx().MkWidget(*cfg);
+						MenuConfig const * const cfg = item.m_menu.get();
+						GuiWidget * w = bb::BlackBox::Instance().GetGfx().MkWidgetFromConfig(*cfg);
 
 					}
 

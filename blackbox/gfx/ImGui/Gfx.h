@@ -57,8 +57,9 @@ namespace imgui {
 		virtual void NewFrame () override;
 		virtual bool Done () override;
 
-		GfxWindow * MkWidgetWindow (int x, int y, int w, int h, int alpha, wchar_t const * clname, wchar_t const * wname, bool show);
+		//GfxWindow * MkWidgetWindow (int x, int y, int w, int h, int alpha, wchar_t const * clname, wchar_t const * wname, bool show);
 		HWND MkWindow (void * gui, int x, int y, int w, int h, int alpha, wchar_t const * clname, wchar_t const * wname);
+		virtual GuiWidget * MkWindowForWidget (int x, int y, int w, int h, int a, std::unique_ptr<GuiWidget> && widget) override;
 
 		GfxWindow * GetGfxWindow (size_t n) { return m_windows[n].get(); }
 		GfxWindow const * GetGfxWindow (size_t n) const { return m_windows[n].get(); }
@@ -78,7 +79,8 @@ namespace imgui {
 		void UpdateIconCache ();
 
 		virtual GuiWidget * FindWidget (wchar_t const * widgetId) override;
-		std::unique_ptr<GuiWidget> MkWidgetFromType (wchar_t const * widgetType);
+		virtual std::unique_ptr<GuiWidget> MkWidgetFromType (wchar_t const * widgetType) override;
+		virtual std::unique_ptr<GuiWidget> MkWidgetFromType (wchar_t const * widgetType, WidgetConfig const & cfg) override;
 		virtual GuiWidget * MkWidgetFromId (wchar_t const * widgetId) override;
 		virtual bool DestroyWindow (wchar_t const * widgetId) override;
 	};
