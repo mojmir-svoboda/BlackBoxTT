@@ -106,10 +106,47 @@ namespace imgui {
 		return std::move(w);
 	}
 
+	template<int... Is> struct seq { };
+	template<int N, int... Is> struct gen_seq : gen_seq<N - 1, N - 1, Is...> { };
+	template<int... Is> struct gen_seq<0, Is...> : seq<Is...> { };
+	template<class L>
+	struct tmpl_sizeof_impl;
+	template<template<class...> class L, class... T>
+	struct tmpl_sizeof_impl<L<T...>>
+	{
+		using type = std::integral_constant<std::size_t, sizeof...(T)>;
+	};
+	template<class L>
+	using tmpl_size = typename tmpl_sizeof_impl<L>::type;
+
+	template<size_t Idx>
+	using idx2type = tmpl_at_c<widgets, Idx>;
+
+	template<int N>
+	std::unique_ptr<GuiWidget> mkNth (WidgetConfig const & cfg) { return mkNewWidget<idx2type<N>>(cfg); }
+	template<int... Ns>
+	std::unique_ptr<GuiWidget> mkWidgetFromType (wchar_t const * widgetType, WidgetConfig const & cfg, seq<Ns...>)
+	{
+		using mk_fn_prototype = std::unique_ptr<GuiWidget> (*) (WidgetConfig const & cfg);
+		constexpr static wchar_t const * const names[] = { idx2type<Ns>::c_type... };
+		constexpr static mk_fn_prototype const funcs[] = { &mkNth<Ns>... };
+		constexpr size_t const sz = sizeof...(Ns);
+
+		for (size_t i = 0; i < sz; ++i)
+		{
+			if (0 == wcscmp(names[i], widgetType))
+				return (*funcs[i])(cfg);
+		}
+		return std::unique_ptr<GuiWidget>();
+	}
+	inline std::unique_ptr<GuiWidget> mkWidgetFromType (wchar_t const * widgetType, WidgetConfig const & cfg)
+	{
+		return mkWidgetFromType(widgetType, cfg, gen_seq<tmpl_size<widgets>::value>{ });
+	}
+
 	std::unique_ptr<GuiWidget> Gfx::MkWidgetFromType (wchar_t const * widgetType, WidgetConfig const & cfg)
 	{
-		std::unique_ptr<GuiWidget> w;
-		return w;
+		return mkWidgetFromType(widgetType, cfg);
 	}
 
 	bool Gfx::DestroyWindow (wchar_t const * widgetId)
