@@ -36,9 +36,7 @@ namespace bb {
 			}
 			else
 			{
-				int const width = r.right - r.left;
-				int const height = r.bottom - r.top;
-				::MoveWindow(w->m_gfxWindow->m_hwnd, p.x, p.y, width, height, false);
+				w->MoveWindow(p.x, p.y);
 				m_tasks.Focus(w->m_gfxWindow->m_hwnd);
 				w->Show(true);
 			}

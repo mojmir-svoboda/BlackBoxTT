@@ -29,6 +29,19 @@ namespace bb {
 
 		bbstring const & GetName () const { return m_wName; }
 		void SetDestroy (bool destroy) { m_destroy = destroy; }
+
+		bool MoveWindow (int x, int y)
+		{
+			RECT r;
+			::GetWindowRect(m_hwnd, &r);
+			{
+				int const width = r.right - r.left;
+				int const height = r.bottom - r.top;
+				::MoveWindow(m_hwnd, x, y, width, height, false);
+				return true;
+			}
+			return false;
+		}
 	};
 }
 
