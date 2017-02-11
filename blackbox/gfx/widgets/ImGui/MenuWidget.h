@@ -22,7 +22,6 @@ namespace imgui {
 		virtual void Show (bool on) override { m_config.m_show = on; }
 		virtual bool Visible () const override { return m_config.m_show; }
 		virtual bbstring const & GetId () const override { return m_config.m_id; }
-		void CreateMenuFromConfig (MenuConfig const & cfg);
 	};
 
 	/*struct FolderMenuWidget : MenuWidget
