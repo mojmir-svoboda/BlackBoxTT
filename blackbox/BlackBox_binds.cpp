@@ -10,6 +10,11 @@ namespace bb {
 		m_quit = true;
 	}
 
+	void BlackBox::CreateWidgetFromId (bbstring const & widget_id)
+	{
+		m_gfx->MkWidgetFromId(widget_id.c_str());
+	}
+
 	void BlackBox::ShowMenu (bbstring const & widget_name)
 	{
 	}

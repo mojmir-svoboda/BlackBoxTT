@@ -5,7 +5,7 @@
 #include <imgui/imgui.h>
 #include <utils_window.h>
 #include <utils_dwm.h>
-// #include <gfx/widgets/ImGui/StyleEditorWidget.h>
+#include <gfx/widgets/ImGui/StyleEditorWidget.h>
 // #include <gfx/widgets/ImGui/PluginsWidget.h>
 // #include <gfx/widgets/ImGui/ControlPanelWidget.h>
 // #include <gfx/widgets/ImGui/RecoverWindowsWidget.h>
@@ -60,10 +60,18 @@ namespace imgui {
 			if (!id.empty())
 			{
 				GuiWidget * w = MkWidgetFromId(id.c_str());
-				if (!w)
+				if (w)
+					w->Show(true);
+				else
 					TRACE_MSG(LL_ERROR, CTX_BB | CTX_GFX, "Cannot create widget with id=%ws", id.c_str());
 			}
 		}
+		return true;
+	}
+
+	bool Gfx::SaveConfig ()
+	{
+		//ImGui::SaveIniSettingsToDisk(g.IO.IniFilename);
 		return true;
 	}
 
@@ -75,8 +83,9 @@ namespace imgui {
 
 	using widgetNewFnT = std::unique_ptr<GuiWidget> (*)();
 	static constexpr std::pair<wchar_t const *, widgetNewFnT> const table[] = {
-			{ PagerWidget::c_type, newWidget<PagerWidget> }
+				{ PagerWidget::c_type, newWidget<PagerWidget> }
 			, { MenuWidget::c_type, newWidget<MenuWidget> }
+			, { StyleEditorWidget::c_type, newWidget<StyleEditorWidget> }
 			
 		//,	{}
 	};
@@ -94,7 +103,7 @@ namespace imgui {
 		return w;
 	}
 
-	using widgets = typelist<PagerWidget, MenuWidget>;
+	using widgets = typelist<PagerWidget, MenuWidget, StyleEditorWidget>;
 
 	template <typename T>
 	using config_of = decltype(T::m_config);
@@ -151,15 +160,21 @@ namespace imgui {
 
 	bool Gfx::DestroyWindow (wchar_t const * widgetId)
 	{
-		for (GfxWindowPtr & win : m_windows)
-		{
-			if (win->GetName() == widgetId)
+		GfxWindow * win = nullptr;
+		for (GfxWindowPtr & wptr : m_windows)
+		{			
+			if (wptr->GetName() == widgetId)
 			{
-					win->SetDestroy(true);
-					return true;
-				}
+				win = wptr.get();
 			}
-		return false;
+		}
+		bb::GfxWindow * root = win->GetRoot();
+		root->ForEach(
+			[] (bb::GfxWindow * w)
+			{
+				w->SetDestroy(true);
+			});
+		return true;
 	}
 // 			for (Gui::GuiWidgetPtr & w : win->m_gui->m_widgets)
 // 			{
@@ -268,7 +283,6 @@ namespace imgui {
 		int const cst = style.WindowRounding; // dumb correction
 		createRoundedRect(hwnd, rect.right, rect.bottom, style.WindowRounding, cst);
 
-		::ShowWindow(hwnd, show ? SW_SHOW : SW_HIDE);
 		showInFromTaskBar(hwnd, false);
 		m_tasks.AddWidgetTask(m_newWindows.back().get());
 		GfxWindow * win = m_newWindows.back().get();

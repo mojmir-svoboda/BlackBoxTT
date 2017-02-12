@@ -101,7 +101,7 @@ set (blackbox_ImGui_SOURCES
 	gfx/ImGui/GfxWindow.cpp
 	gfx/ImGui/Gui.cpp
 	#gfx/widgets/ImGui/PluginsWidget.cpp
-	#gfx/widgets/ImGui/StyleEditorWidget.cpp
+	gfx/widgets/ImGui/StyleEditorWidget.cpp
 	#gfx/widgets/ImGui/ControlPanelWidget.cpp
 	#gfx/widgets/ImGui/DebugWidget.cpp
 	#gfx/widgets/ImGui/TasksWidget.cpp
@@ -123,7 +123,7 @@ set (blackbox_ImGui_HEADERS
 	gfx/ImGui/Gui.h
 	gfx/ImGui/IconCache.h
 	#gfx/widgets/ImGui/PluginsWidget.h
-	#gfx/widgets/ImGui/StyleEditorWidget.h
+	gfx/widgets/ImGui/StyleEditorWidget.h
 	#gfx/widgets/ImGui/ControlPanelWidget.h
 	#gfx/widgets/ImGui/DebugWidget.h
 	#gfx/widgets/ImGui/TasksWidget.h

@@ -158,7 +158,7 @@ Widgets:
         exec: 'explorer.exe'
       - name: 'System'
         menu:
-          id: 'Win Submenu'
+          id: 'Win'
           widget: 'Menu'
           items:
             - name: 'Drives'
@@ -167,16 +167,28 @@ Widgets:
               folder: 'Controls'
       - name: 'bbTT'
         menu:
-          id: 'bbTT Submenu'
+          id: 'bbTT'
           widget: 'Menu'
           items:
             - name: 'Cfg'
-            - name: 'Reconfigure'
             - name: 'About'
-              script: '(ShowAbout)'
+              script: '(CreateWidgetFromId "bbTT About")'
+            - name: 'Edit Style'
+              script: '(CreateWidgetFromId "bbTT StyleEditor")'
+            - name: 'Reconfigure'
+              script: '(Reconfigure)'
+            - name: 'Save Config'
+              script: '(SaveConfig)'
             - name: 'Quit'
               script: '(SetQuit 0)'
-
+  - widget: 'StyleEditor'
+    id: 'bbTT StyleEditor'
+    show: true
+    x: 0
+    y: 0
+    w: 800
+    h: 600
+    alpha: 192
 
 
 ...

@@ -57,6 +57,8 @@ namespace bb {
 		Gfx const & GetGfx () const { return *m_gfx; }
 		Explorer & GetExplorer () { return *m_explorer; }
 		Explorer const & GetExplorer () const { return *m_explorer; }
+		Scheme const & GetScheme () const { return m_scheme; }
+		Scheme & GetScheme () { return m_scheme; }
 
 		MenuWidget * CreateMenu (WidgetConfig & wcfg, MenuConfig const & config);
 		MenuWidget * CreateMenuOnPointerPos (MenuConfig const & config);
@@ -68,7 +70,9 @@ namespace bb {
 		bool GetPointerPos (int & x, int & y);
 		// binds
 		void Quit (uint32_t arg);
+		bool SaveConfig ();
 		void ShowMenu (bbstring const & vertex_id);
+		void CreateWidgetFromId (bbstring const & widget_id);
 		void ToggleMenu (bbstring const & vertex_id);
 		void MakeSticky (HWND hwnd);
 		void RemoveSticky (HWND hwnd);

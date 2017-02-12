@@ -12,6 +12,8 @@ namespace bb {
 		bool m_destroy { false };
 		bbstring m_clName { };
 		bbstring m_wName { };
+		GfxWindow * m_parent { nullptr };
+		std::vector<GfxWindow *> m_children;
 
 		GfxWindow () { }
 		virtual ~GfxWindow () { }
@@ -41,6 +43,34 @@ namespace bb {
 				return true;
 			}
 			return false;
+		}
+		void SetParent (GfxWindow * parent) { m_parent = parent; }
+		GfxWindow * GetParent () { return m_parent; }
+		GfxWindow const * GetParent () const { return m_parent; }
+		bool AddChild (GfxWindow * child) { m_children.push_back(child); return true; }
+		GfxWindow * GetRoot ()
+		{
+			GfxWindow * root = this;
+			while (GfxWindow * parent = root->GetParent())
+			{
+				root = parent;
+			}
+			return root;
+		}
+		template<class FnT>
+		void ForEach (FnT && fn)
+		{
+			fn(this);
+			for (GfxWindow * ch : m_children)
+				ch->ForEach(fn);
+		}
+		void SetDestroyTree ()
+		{
+			this->ForEach(
+				[] (bb::GfxWindow * w)
+				{
+					w->SetDestroy(true);
+				});
 		}
 	};
 }

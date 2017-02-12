@@ -6,6 +6,14 @@
 
 //typedef s7_pointer(*s7_function)(s7_scheme *sc, s7_pointer args);   /* that is, obj = func(s7, args) -- args is a list of arguments */
 
+s7_pointer bind_SaveConfig (s7_scheme * sc, s7_pointer args)
+{
+	bb::BlackBox * const bb = getBlackBoxInstanceRW();
+	bb->SaveConfig();
+
+	return s7_nil(sc);
+}
+
 s7_pointer bind_SetQuit (s7_scheme * sc, s7_pointer args)
 {
 	if (s7_is_integer(s7_car(args)))
@@ -28,6 +36,19 @@ bbstring toString (char const * src)
 	bbstring b(bbcmd_u16, bbcmd_u16_ln);
 	return std::move(b);
 }
+
+s7_pointer bind_CreateWidgetFromId (s7_scheme * sc, s7_pointer args)
+{
+	if (s7_is_string(s7_car(args)))
+	{
+		char const * widget_name = s7_string(s7_car(args));
+		bbstring name = toString(widget_name);
+		getBlackBoxInstanceRW()->CreateWidgetFromId(name);
+		return s7_nil(sc);
+	}
+	return s7_wrong_type_arg_error(sc, "CreateWidgetFromId", 1, s7_car(args), "utf8 string id in config section [Widgets]");
+}
+
 
 s7_pointer bind_ShowMenu (s7_scheme * sc, s7_pointer args)
 {
@@ -132,7 +153,9 @@ namespace bb {
 		m_scheme = s7_init();
 
 		s7_define_function(m_scheme, "SetQuit", bind_SetQuit, 1, 0, false, "(SetQuit int) Quits with code int");
+		s7_define_function(m_scheme, "SaveConfig", bind_SaveConfig, 0, 0, false, "(SaveConfig) Saves main bbTT config");
 		s7_define_function(m_scheme, "ShowMenu", bind_ShowMenu, 1, 0, false, "(ShowMenu widget_name) Show/Hide menu with name widget_name");
+		s7_define_function(m_scheme, "CreateWidgetFromId", bind_CreateWidgetFromId, 1, 0, false, "(CreateWidgetFromId widget_id) Creates widget from id (id from yaml config)");
 		s7_define_function(m_scheme, "ToggleMenu", bind_ToggleMenu, 1, 0, false, "(ToggleMenu widget_name) Show/Hide menu with widget_name if hidden/shown");
 		s7_define_function(m_scheme, "SetCurrentVertexId", bind_SetCurrentVertexId, 1, 0, false, "(SetCurrentVertexId vertex_id_string) Sets WorkSpace Graph to specified VertexId");
 		s7_define_function(m_scheme, "SwitchVertexViaEdge", bind_SwitchVertexViaEdge, 1, 0, false, "(SwitchVertexViaEdge edge_id_string) Switch WorkSpace via edge to destination vertex_id");
