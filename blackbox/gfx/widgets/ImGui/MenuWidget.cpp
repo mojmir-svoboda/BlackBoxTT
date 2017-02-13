@@ -59,49 +59,49 @@ namespace imgui {
 			//bool value_changed = false;
 			for (size_t i = 0; i < sz; ++i)
 			{
-				MenuConfigItem const & item = m_config.m_items[i];
+				MenuConfigItem const * item = m_config.m_items[i].get();
 				const bool item_selected = (i == m_currentIndex);
 				char item_text[1024];
-				codecvt_utf16_utf8(item.m_name.c_str(), item_text, 1024);
+				codecvt_utf16_utf8(item->m_name.c_str(), item_text, 1024);
 
-				if (item.m_type == e_MenuItemSeparator)
+				if (item->m_type == e_MenuItemSeparator)
 				{
 					ImGui::Separator();
 					continue;
 				}
 
-				if (item.m_type == e_MenuItemCheckBox)
+				if (item->m_type == e_MenuItemCheckBox)
 				{
 					bb::GfxWindow * r = m_gfxWindow->GetRoot();
 					r->SetDestroyTree();
 
-					MenuConfigItemCheckBox const & chk_item = static_cast<MenuConfigItem const &>(item);
-					char item_val[1024];
-					codecvt_utf16_utf8(chk_item.m_getScript.c_str(), item_val, 1024);
-					char response[4096];
-					bb::BlackBox::Instance().GetScheme().Eval(item_val, response, 4096);
-
-					// @TODO: parse response!!!
-
-					bool state = false;
-					if (ImGui::Checkbox(item_text, &state))
-					{
-						if (state)
-						{
-							char item_val[1024];
-							codecvt_utf16_utf8(chk_item.m_onCheckScript.c_str(), item_val, 1024);
-							char response[4096];
-							bb::BlackBox::Instance().GetScheme().Eval(item_val, response, 4096);
-						}
-						else
-						{
-							char item_val[1024];
-							codecvt_utf16_utf8(chk_item.m_onUncheckScript.c_str(), item_val, 1024);
-							char response[4096];
-							bb::BlackBox::Instance().GetScheme().Eval(item_val, response, 4096);
-						}
-
-					}
+// 					MenuConfigItemCheckBox const * chk_item = static_cast<MenuConfigItem const *>(item);
+// 					char item_val[1024];
+// 					codecvt_utf16_utf8(chk_item->m_getScript.c_str(), item_val, 1024);
+// 					char response[4096];
+// 					bb::BlackBox::Instance().GetScheme().Eval(item_val, response, 4096);
+// 
+// 					// @TODO: parse response!!!
+// 
+// 					bool state = false;
+// 					if (ImGui::Checkbox(item_text, &state))
+// 					{
+// 						if (state)
+// 						{
+// 							char item_val[1024];
+// 							codecvt_utf16_utf8(chk_item->m_onCheckScript.c_str(), item_val, 1024);
+// 							char response[4096];
+// 							bb::BlackBox::Instance().GetScheme().Eval(item_val, response, 4096);
+// 						}
+// 						else
+// 						{
+// 							char item_val[1024];
+// 							codecvt_utf16_utf8(chk_item->m_onUncheckScript.c_str(), item_val, 1024);
+// 							char response[4096];
+// 							bb::BlackBox::Instance().GetScheme().Eval(item_val, response, 4096);
+// 						}
+// 
+// 					}
 				}
 				else
 				{
@@ -117,17 +117,17 @@ namespace imgui {
 						}
 						m_gfxWindow->m_children.clear();
 
-						if (item.m_type == e_MenuItemScript)
+						if (item->m_type == e_MenuItemScript)
 						{
 							bb::GfxWindow * r = m_gfxWindow->GetRoot();
 							r->SetDestroyTree();
 
 							char item_val[1024];
-							codecvt_utf16_utf8(item.m_value.c_str(), item_val, 1024);
+							codecvt_utf16_utf8(item->m_value.c_str(), item_val, 1024);
 							char response[4096];
 							bb::BlackBox::Instance().GetScheme().Eval(item_val, response, 4096);
 						}
-						else if (item.m_type == e_MenuItemMenu)
+						else if (item->m_type == e_MenuItemSubMenu)
 						{	
 
 							// pos of submenu
@@ -137,9 +137,9 @@ namespace imgui {
 							ImVec2 b = ImGui::GetContentRegionMax();
  							draw_list->PopClipRect();
 
-							MenuConfig const * const cfg = item.m_menu.get();
+							MenuConfigItemSubMenu const * submenu = static_cast<MenuConfigItemSubMenu const *>(item);
 							// open menu
-							GuiWidget * w = bb::BlackBox::Instance().GetGfx().FindWidget(cfg->m_id.c_str());
+							GuiWidget * w = bb::BlackBox::Instance().GetGfx().FindWidget(submenu->m_menu->m_id.c_str());
 							if (w == nullptr)
 							{
 								w = bb::BlackBox::Instance().GetGfx().MkWidgetFromConfig(*cfg);

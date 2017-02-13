@@ -44,8 +44,6 @@ namespace YAML {
 			node.push_back(rhs.m_name);
 			node.push_back(static_cast<uint32_t>(rhs.m_type));
 			node.push_back(rhs.m_value);
-			if (rhs.m_menu)
-				node.push_back(*rhs.m_menu);
 			return node;
 		}
 
@@ -75,16 +73,45 @@ namespace YAML {
 					rhs.m_value = node["folder"].as<bbstring>();
 					rhs.m_type = bb::e_MenuItemFolder;
 				}
-				else if (node["menu"])
+				else if (YAML::Node n = node["menu"])
 				{
-					bb::MenuConfig m = node["menu"].as<bb::MenuConfig>();
-					rhs.m_menu = std::move(std::unique_ptr<bb::MenuConfig>(new bb::MenuConfig(m)));
-					rhs.m_type = bb::e_MenuItemMenu;
+					rhs = std::move(n.as<bb::MenuConfigItemSubMenu>());
 				}
 				else if (YAML::Node n = node["checkbox"])
 				{
-					rhs = n.as<bb::MenuConfigItemCheckBox>();
+					rhs = std::move(n.as<bb::MenuConfigItemCheckBox>());
 					//rhs.m_type = bb::e_MenuItemCheckBox;
+				}
+			}
+			catch (std::exception const & e)
+			{
+				TRACE_MSG(LL_ERROR, CTX_CONFIG, "YAML exception in source %s: %s", __FILE__, e.what());
+				return false;
+			}
+			return true;
+		}
+	};
+
+	template<>
+	struct convert<bb::MenuConfigItemSubMenu>
+	{
+		static Node encode (bb::MenuConfigItemSubMenu const & rhs)
+		{
+			Node node = convert<bb::MenuConfigItem>::encode(rhs);
+			if (rhs.m_menu)
+				node.push_back(*rhs.m_menu);
+			return node;
+		}
+
+		static bool decode (Node const & node, bb::MenuConfigItemSubMenu & rhs)
+		{
+			try
+			{
+				if (convert<bb::MenuConfigItem>::decode(node, rhs))
+				{
+					bb::MenuConfig m = node.as<bb::MenuConfig>();
+					rhs.m_menu = std::move(std::unique_ptr<bb::MenuConfig>(new bb::MenuConfig(m)));
+					rhs.m_type = bb::e_MenuItemSubMenu;
 				}
 			}
 			catch (std::exception const & e)

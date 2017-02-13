@@ -10,7 +10,7 @@ namespace bb {
 		e_MenuItemSeparator,
 		e_MenuItemFolder,
 		e_MenuItemExec,
-		e_MenuItemMenu,
+		e_MenuItemSubMenu,
 		e_MenuItemScript,
 		e_MenuItemCheckBox,
 	};
@@ -22,11 +22,17 @@ namespace bb {
 		bbstring m_name;
 		MenuItemType m_type { e_MenuItemSeparator };
 		bbstring m_value;
-		std::unique_ptr<MenuConfig> m_menu;
 
 		MenuConfigItem () { }
-		MenuConfigItem (MenuConfigItem const & rhs);
-		MenuConfigItem & operator= (MenuConfigItem const & rhs);
+	};
+
+	struct MenuConfigItemSubMenu : MenuConfigItem
+	{
+		std::unique_ptr<MenuConfig> m_menu;
+
+		MenuConfigItemSubMenu () { }
+		// 		MenuConfigItem (MenuConfigItem const & rhs);
+		// 		MenuConfigItem & operator= (MenuConfigItem const & rhs);
 	};
 
 	struct MenuConfigItemCheckBox : MenuConfigItem
@@ -34,7 +40,8 @@ namespace bb {
 		bbstring m_getScript;
 		bbstring m_onCheckScript;
 		bbstring m_onUncheckScript;
-		MenuConfigItemCheckBox () : MenuConfigItem() { m_type = e_MenuItemCheckBox; }
+
+		MenuConfigItemCheckBox () { m_type = e_MenuItemCheckBox; }
 	};
 
 	struct MenuConfig : WidgetConfig
@@ -44,28 +51,28 @@ namespace bb {
 		//void clear () { m_items.clear(); }
 	};
 
-	inline MenuConfigItem::MenuConfigItem (MenuConfigItem const & rhs)
-		: m_name(rhs.m_name)
-		, m_type(rhs.m_type)
-		, m_value(rhs.m_value)
-		, m_menu(rhs.m_menu ? new MenuConfig(*rhs.m_menu) : nullptr)
-	{ }
-
-	inline MenuConfigItem & MenuConfigItem::operator= (MenuConfigItem const & rhs)
-	{
-		if (this != &rhs)
-		{
-			m_name = rhs.m_name;
-			m_type = rhs.m_type;
-			m_value = rhs.m_value;
-			if (rhs.m_menu)
-			{
-				std::unique_ptr<MenuConfig> cpy(new MenuConfig(*rhs.m_menu));
-				m_menu = std::move(cpy);
-			}
-		}
-		return *this;
-	}
+// 	inline MenuConfigItem::MenuConfigItem (MenuConfigItem const & rhs)
+// 		: m_name(rhs.m_name)
+// 		, m_type(rhs.m_type)
+// 		, m_value(rhs.m_value)
+// 		, m_menu(rhs.m_menu ? new MenuConfig(*rhs.m_menu) : nullptr)
+// 	{ }
+// 
+// 	inline MenuConfigItem & MenuConfigItem::operator= (MenuConfigItem const & rhs)
+// 	{
+// 		if (this != &rhs)
+// 		{
+// 			m_name = rhs.m_name;
+// 			m_type = rhs.m_type;
+// 			m_value = rhs.m_value;
+// 			if (rhs.m_menu)
+// 			{
+// 				std::unique_ptr<MenuConfig> cpy(new MenuConfig(*rhs.m_menu));
+// 				m_menu = std::move(cpy);
+// 			}
+// 		}
+// 		return *this;
+// 	}
 	
 
 	bool loadMenuConfig (YAML::Node & y_root, MenuConfig & config);
