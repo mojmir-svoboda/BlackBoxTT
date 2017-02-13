@@ -69,8 +69,10 @@ namespace bb {
 		// probably future binds
 		bool GetPointerPos (int & x, int & y);
 		// binds
+		void LoadPlugin (bbstring const & plugin_id);
+		void UnloadPlugin (bbstring const & plugin_id);
+		bool IsPluginLoaded (bbstring const & plugin_id) const;
 		void Quit (uint32_t arg);
-		bool SaveConfig ();
 		void ShowMenu (bbstring const & vertex_id);
 		void CreateWidgetFromId (bbstring const & widget_id);
 		void ToggleMenu (bbstring const & vertex_id);

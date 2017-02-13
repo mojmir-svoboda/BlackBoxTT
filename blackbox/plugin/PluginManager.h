@@ -73,12 +73,16 @@ namespace bb {
 		PluginsConfig m_config;
 		PluginInfos m_infos;
 		std::vector<PluginInfoPtr> m_tmp;
+		HWND m_hSlit { nullptr };
 
     bool Init (PluginsConfig const & cfg);
 		bool Unload ();
     bool Done ();
-    void AboutPlugins ();
+		void LoadPlugin (bbstring const & plugin_id);
+		void UnloadPlugin (bbstring const & plugin_id);
+		bool IsPluginLoaded (bbstring const & plugin_id) const;
 
+    void AboutPlugins ();
     // handle the "@BBCfg.plugin.xxx" bro@ms from the config->plugins menu
     int HandleBroam (const char * submessage);
     //Menu * GetMenu (const char * text, char * menu_id, bool pop, int mode);

@@ -12,6 +12,7 @@ namespace bb {
 		e_MenuItemExec,
 		e_MenuItemMenu,
 		e_MenuItemScript,
+		e_MenuItemCheckBox,
 	};
 
 	struct MenuConfig;
@@ -28,9 +29,17 @@ namespace bb {
 		MenuConfigItem & operator= (MenuConfigItem const & rhs);
 	};
 
+	struct MenuConfigItemCheckBox : MenuConfigItem
+	{
+		bbstring m_getScript;
+		bbstring m_onCheckScript;
+		bbstring m_onUncheckScript;
+		MenuConfigItemCheckBox () : MenuConfigItem() { m_type = e_MenuItemCheckBox; }
+	};
+
 	struct MenuConfig : WidgetConfig
 	{
-		std::vector<MenuConfigItem> m_items;
+		std::vector<std::unique_ptr<MenuConfigItem>> m_items;
 
 		//void clear () { m_items.clear(); }
 	};

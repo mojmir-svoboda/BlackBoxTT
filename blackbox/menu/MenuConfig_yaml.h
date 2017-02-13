@@ -5,6 +5,7 @@
 
 namespace YAML {
 
+
 	template<>
 	struct convert<bb::MenuConfig>
 	{
@@ -21,7 +22,7 @@ namespace YAML {
 			{
 				if (convert<bb::WidgetConfig>::decode(node, rhs))
 				{
-					rhs.m_items = node["items"].as<std::vector<bb::MenuConfigItem>>();
+					rhs.m_items = node["items"].as<std::vector<std::unique_ptr<bb::MenuConfigItem>>>();
 					return true;
 				}
 			}
@@ -52,32 +53,38 @@ namespace YAML {
 		{
 			try
 			{
-				rhs.m_name = node["name"].as<bbstring>();
 				rhs.m_type = bb::e_MenuItemSeparator;
-				if (node["type"])
+				if (node["separator"])
 				{
-					rhs.m_type = static_cast<bb::MenuItemType>(node["type"].as<uint32_t>());
+					return true;
 				}
+
+				rhs.m_name = node["name"].as<bbstring>();
 				if (node["exec"])
 				{
 					rhs.m_value = node["exec"].as<bbstring>();
 					rhs.m_type = bb::e_MenuItemExec;
 				}
-				if (node["script"])
+				else if (node["script"])
 				{
 					rhs.m_value = node["script"].as<bbstring>();
 					rhs.m_type = bb::e_MenuItemScript;
 				}
-				if (node["folder"])
+				else if (node["folder"])
 				{
 					rhs.m_value = node["folder"].as<bbstring>();
 					rhs.m_type = bb::e_MenuItemFolder;
 				}
-				if (node["menu"])
+				else if (node["menu"])
 				{
 					bb::MenuConfig m = node["menu"].as<bb::MenuConfig>();
 					rhs.m_menu = std::move(std::unique_ptr<bb::MenuConfig>(new bb::MenuConfig(m)));
 					rhs.m_type = bb::e_MenuItemMenu;
+				}
+				else if (YAML::Node n = node["checkbox"])
+				{
+					rhs = n.as<bb::MenuConfigItemCheckBox>();
+					//rhs.m_type = bb::e_MenuItemCheckBox;
 				}
 			}
 			catch (std::exception const & e)
@@ -88,6 +95,41 @@ namespace YAML {
 			return true;
 		}
 	};
+
+	template<>
+	struct convert<bb::MenuConfigItemCheckBox>
+	{
+		static Node encode (bb::MenuConfigItemCheckBox const & rhs)
+		{
+			Node node = convert<bb::MenuConfigItem>::encode(rhs);
+			node.push_back(rhs.m_getScript);
+			node.push_back(rhs.m_onCheckScript);
+			node.push_back(rhs.m_onUncheckScript);
+			return node;
+		}
+
+		static bool decode (Node const & node, bb::MenuConfigItemCheckBox & rhs)
+		{
+			try
+			{
+				if (convert<bb::MenuConfigItem>::decode(node, rhs))
+				{
+					rhs.m_getScript = node["get"].as<bbstring>();
+					rhs.m_onCheckScript = node["onCheck"].as<bbstring>();
+					rhs.m_onUncheckScript = node["onUncheck"].as<bbstring>();
+					rhs.m_type = bb::e_MenuItemCheckBox;
+				}
+			}
+			catch (std::exception const & e)
+			{
+				TRACE_MSG(LL_ERROR, CTX_CONFIG, "YAML exception in source %s: %s", __FILE__, e.what());
+				return false;
+			}
+			return true;
+		}
+	};
+
+
 }
 
 

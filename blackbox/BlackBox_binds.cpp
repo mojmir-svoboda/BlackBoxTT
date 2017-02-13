@@ -10,6 +10,19 @@ namespace bb {
 		m_quit = true;
 	}
 
+	void BlackBox::LoadPlugin (bbstring const & plugin_id)
+	{
+		m_plugins.LoadPlugin(plugin_id);
+	}
+	void BlackBox::UnloadPlugin (bbstring const & plugin_id)
+	{
+		m_plugins.UnloadPlugin(plugin_id);
+	}
+	bool BlackBox::IsPluginLoaded (bbstring const & plugin_id) const
+	{
+		return m_plugins.IsPluginLoaded(plugin_id);
+	}
+
 	void BlackBox::CreateWidgetFromId (bbstring const & widget_id)
 	{
 		m_gfx->MkWidgetFromId(widget_id.c_str());

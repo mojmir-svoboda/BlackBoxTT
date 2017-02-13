@@ -20,6 +20,39 @@ bbLean is free software, released under the GNU General Public License
 
 namespace bb {
 
+void PluginManager::LoadPlugin (bbstring const & plugin_id)
+{
+	for (PluginInfoPtr & pi : m_infos.m_infos)
+	{
+		if (plugin_id == pi->m_config.m_name && !pi->m_enabled)
+		{
+			TRACE_MSG(LL_INFO, CTX_BB | CTX_PLUGINMGR, "Loading plugin: %ws", pi->m_config.m_name.c_str());
+			plugin_errors const ret = pi->LoadPlugin(m_hSlit);
+			if (ret == error_plugin_success)
+			{
+			}
+		}
+	}
+}
+void PluginManager::UnloadPlugin (bbstring const & plugin_id)
+{
+	for (PluginInfoPtr & pi : m_tmp)
+	{
+		TRACE_MSG(LL_INFO, CTX_BB | CTX_PLUGINMGR, "Unloading plugin: %ws", pi->m_config.m_name.c_str());
+		if (pi->m_isSlit)
+			m_hSlit = nullptr;
+
+		pi->UnloadPlugin();
+	}
+}
+bool PluginManager::IsPluginLoaded (bbstring const & plugin_id) const
+{
+	for (PluginInfoPtr const & pi : m_infos.m_infos)
+		if (plugin_id == pi->m_config.m_name && pi->m_enabled)
+			return true;
+	return false;
+}
+
 bool PluginManager::Init (PluginsConfig const & cfg)
 {
 	TRACE_SCOPE(LL_INFO, CTX_BB | CTX_PLUGINMGR | CTX_INIT);
@@ -47,7 +80,6 @@ bool PluginManager::Init (PluginsConfig const & cfg)
 		}
 	}
 
-	HWND hSlit = nullptr;
 	// @TODO: find slit, run slit first, then load the rest and unload slit last
 	for (PluginInfoPtr & pi : m_infos.m_infos)
 	{
@@ -57,8 +89,8 @@ bool PluginManager::Init (PluginsConfig const & cfg)
 			plugin_errors const ret = pi->LoadPlugin(nullptr);
 			if (ret == error_plugin_success)
 			{
-				hSlit = FindWindow(L"bbSlit", NULL); // OMFG
-				TRACE_MSG(LL_DEBUG, CTX_BB | CTX_PLUGINMGR, "ok, slit hwnd=0x%x", hSlit);
+				m_hSlit = FindWindow(L"bbSlit", NULL); // OMFG
+				TRACE_MSG(LL_DEBUG, CTX_BB | CTX_PLUGINMGR, "ok, slit hwnd=0x%x", m_hSlit);
 			}
 			else
 			{
@@ -72,7 +104,7 @@ bool PluginManager::Init (PluginsConfig const & cfg)
 		if (pi->m_module == nullptr && pi->m_config.m_enabled)
 		{
 			TRACE_MSG(LL_INFO, CTX_BB | CTX_PLUGINMGR, "Loading plugin: %ws", pi->m_config.m_name.c_str());
-			plugin_errors const ret = pi->LoadPlugin(hSlit);
+			plugin_errors const ret = pi->LoadPlugin(m_hSlit);
 			if (ret == error_plugin_success)
 			{
 			}

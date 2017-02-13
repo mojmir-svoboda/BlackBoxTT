@@ -69,12 +69,6 @@ namespace imgui {
 		return true;
 	}
 
-	bool Gfx::SaveConfig ()
-	{
-		//ImGui::SaveIniSettingsToDisk(g.IO.IniFilename);
-		return true;
-	}
-
 	template <typename T>
 	std::unique_ptr<GuiWidget> newWidget ()
 	{

@@ -165,12 +165,37 @@ Widgets:
               folder: 'Drives'
             - name: 'Controls'
               folder: 'Controls'
+      - separator:
       - name: 'bbTT'
         menu:
           id: 'bbTT'
           widget: 'Menu'
           items:
-            - name: 'Cfg'
+            - name: 'Configuration'
+              menu:
+                id: 'bbTT Config'
+                widget: 'Menu'
+                items:
+                  - name: 'bbSDK'
+                    checkbox:
+                      get: '(IsPluginLoaded "bbSDK")'
+                      set0: '(UnloadPlugin "bbSDK")'
+                      set1: '(LoadPlugin "bbSDK")'
+                  - name: 'bbSlit'
+                    checkbox:
+                      get: '(IsPluginLoaded "bbSlit")'
+                      set0: '(UnloadPlugin "bbSlit")'
+                      set1: '(LoadPlugin "bbSlit")'
+                  - name: 'bbAnalog'
+                    checkbox:
+                      get: '(IsPluginLoaded "bbAnalog")'
+                      set0: '(UnloadPlugin "bbAnalog")'
+                      set1: '(LoadPlugin "bbAnalog")'
+                  - name: 'bbFooMP'
+                    checkbox:
+                      get: '(IsPluginLoaded "bbFooMP")'
+                      set0: '(UnloadPlugin "bbFooMP")'
+                      set1: '(LoadPlugin "bbFooMP")'
             - name: 'About'
               script: '(CreateWidgetFromId "bbTT About")'
             - name: 'Edit Style'

@@ -5,13 +5,58 @@
 #include <BlackBox.h>
 
 //typedef s7_pointer(*s7_function)(s7_scheme *sc, s7_pointer args);   /* that is, obj = func(s7, args) -- args is a list of arguments */
+bbstring toString (char const * src)
+{
+	size_t const ln = strlen(src);
+	size_t const sz = bb::codecvt_utf8_utf16_dst_size(src, ln);
+	wchar_t * const bbcmd_u16 = static_cast<wchar_t *>(alloca(sz * sizeof(wchar_t)));
+	size_t const bbcmd_u16_ln = bb::codecvt_utf8_utf16(src, ln, bbcmd_u16, sz);
+	bbstring b(bbcmd_u16, bbcmd_u16_ln);
+	return std::move(b);
+}
 
 s7_pointer bind_SaveConfig (s7_scheme * sc, s7_pointer args)
 {
-	bb::BlackBox * const bb = getBlackBoxInstanceRW();
-	bb->SaveConfig();
+// 	bb::BlackBox * const bb = getBlackBoxInstanceRW();
+// 	bb->SaveConfig();
 
 	return s7_nil(sc);
+}
+
+s7_pointer bind_LoadPlugin (s7_scheme * sc, s7_pointer args)
+{
+	if (s7_is_string(s7_car(args)))
+	{
+		char const * plugin_id = s7_string(s7_car(args));
+		bbstring name = toString(plugin_id);
+		getBlackBoxInstanceRW()->LoadPlugin(name);
+		return s7_nil(sc);
+	}
+	return s7_wrong_type_arg_error(sc, "ShowMenu", 1, s7_car(args), "utf8 string");
+}
+s7_pointer bind_UnloadPlugin (s7_scheme * sc, s7_pointer args)
+{
+	if (s7_is_string(s7_car(args)))
+	{
+		char const * plugin_id = s7_string(s7_car(args));
+		bbstring name = toString(plugin_id);
+		getBlackBoxInstanceRW()->UnloadPlugin(name);
+		return s7_nil(sc);
+	}
+	return s7_wrong_type_arg_error(sc, "ShowMenu", 1, s7_car(args), "utf8 string");
+}
+s7_pointer bind_IsPluginLoaded (s7_scheme * sc, s7_pointer args)
+{
+	if (s7_is_string(s7_car(args)))
+	{
+		char const * widget_name = s7_string(s7_car(args));
+		bbstring name = toString(widget_name);
+		bb::BlackBox * const bb = getBlackBoxInstanceRW();
+
+		bool const loaded = bb->IsPluginLoaded(name);
+		return s7_make_boolean(sc, loaded);
+	}
+	return s7_wrong_type_arg_error(sc, "IsPluginLoaded", 1, s7_car(args), "utf8 string id of plugin from config section Plugins");
 }
 
 s7_pointer bind_SetQuit (s7_scheme * sc, s7_pointer args)
@@ -27,15 +72,6 @@ s7_pointer bind_SetQuit (s7_scheme * sc, s7_pointer args)
 	return s7_wrong_type_arg_error(sc, "SetQuit", 1, s7_car(args), "integer code");
 }
 
-bbstring toString (char const * src)
-{
-	size_t const ln = strlen(src);
-	size_t const sz = bb::codecvt_utf8_utf16_dst_size(src, ln);
-	wchar_t * const bbcmd_u16 = static_cast<wchar_t *>(alloca(sz * sizeof(wchar_t)));
-	size_t const bbcmd_u16_ln = bb::codecvt_utf8_utf16(src, ln, bbcmd_u16, sz);
-	bbstring b(bbcmd_u16, bbcmd_u16_ln);
-	return std::move(b);
-}
 
 s7_pointer bind_CreateWidgetFromId (s7_scheme * sc, s7_pointer args)
 {
@@ -155,6 +191,9 @@ namespace bb {
 		s7_define_function(m_scheme, "SetQuit", bind_SetQuit, 1, 0, false, "(SetQuit int) Quits with code int");
 		s7_define_function(m_scheme, "SaveConfig", bind_SaveConfig, 0, 0, false, "(SaveConfig) Saves main bbTT config");
 		s7_define_function(m_scheme, "ShowMenu", bind_ShowMenu, 1, 0, false, "(ShowMenu widget_name) Show/Hide menu with name widget_name");
+		s7_define_function(m_scheme, "LoadPlugin", bind_LoadPlugin, 1, 0, false, "(LoadPlugin plugin_id) Load plugin with id from config section [Plugins]");
+		s7_define_function(m_scheme, "UnloadPlugin", bind_UnloadPlugin, 1, 0, false, "(UnloadPlugin plugin_id) Unload plugin with id from config section [Plugins]");
+		s7_define_function(m_scheme, "IsPluginLoaded", bind_IsPluginLoaded, 1, 0, false, "(IsPluginLoaded plugin_id) returns true if plugin is loaded");
 		s7_define_function(m_scheme, "CreateWidgetFromId", bind_CreateWidgetFromId, 1, 0, false, "(CreateWidgetFromId widget_id) Creates widget from id (id from yaml config)");
 		s7_define_function(m_scheme, "ToggleMenu", bind_ToggleMenu, 1, 0, false, "(ToggleMenu widget_name) Show/Hide menu with widget_name if hidden/shown");
 		s7_define_function(m_scheme, "SetCurrentVertexId", bind_SetCurrentVertexId, 1, 0, false, "(SetCurrentVertexId vertex_id_string) Sets WorkSpace Graph to specified VertexId");
