@@ -72,36 +72,41 @@ namespace imgui {
 
 				if (item->m_type == e_MenuItemCheckBox)
 				{
-					bb::GfxWindow * r = m_gfxWindow->GetRoot();
-					r->SetDestroyTree();
 
-// 					MenuConfigItemCheckBox const * chk_item = static_cast<MenuConfigItem const *>(item);
-// 					char item_val[1024];
-// 					codecvt_utf16_utf8(chk_item->m_getScript.c_str(), item_val, 1024);
-// 					char response[4096];
-// 					bb::BlackBox::Instance().GetScheme().Eval(item_val, response, 4096);
-// 
-// 					// @TODO: parse response!!!
-// 
-// 					bool state = false;
-// 					if (ImGui::Checkbox(item_text, &state))
-// 					{
-// 						if (state)
-// 						{
-// 							char item_val[1024];
-// 							codecvt_utf16_utf8(chk_item->m_onCheckScript.c_str(), item_val, 1024);
-// 							char response[4096];
-// 							bb::BlackBox::Instance().GetScheme().Eval(item_val, response, 4096);
-// 						}
-// 						else
-// 						{
-// 							char item_val[1024];
-// 							codecvt_utf16_utf8(chk_item->m_onUncheckScript.c_str(), item_val, 1024);
-// 							char response[4096];
-// 							bb::BlackBox::Instance().GetScheme().Eval(item_val, response, 4096);
-// 						}
-// 
-// 					}
+					MenuConfigItemCheckBox const * chk_item = static_cast<MenuConfigItemCheckBox const *>(item);
+					char item_val[1024];
+					codecvt_utf16_utf8(chk_item->m_getScript.c_str(), item_val, 1024);
+					char response[4096];
+					bb::BlackBox::Instance().GetScheme().Eval(item_val, response, 4096);
+
+					// @TODO: parse response!!!
+
+					bool state = false;
+					if (ImGui::Checkbox(item_text, &state))
+					{
+						if (state)
+						{
+							char item_val[1024];
+							codecvt_utf16_utf8(chk_item->m_onCheckScript.c_str(), item_val, 1024);
+							char response[4096];
+							bb::BlackBox::Instance().GetScheme().Eval(item_val, response, 4096);
+
+							bb::GfxWindow * r = m_gfxWindow->GetRoot();
+							r->SetDestroyTree();
+
+						}
+						else
+						{
+							char item_val[1024];
+							codecvt_utf16_utf8(chk_item->m_onUncheckScript.c_str(), item_val, 1024);
+							char response[4096];
+							bb::BlackBox::Instance().GetScheme().Eval(item_val, response, 4096);
+
+							bb::GfxWindow * r = m_gfxWindow->GetRoot();
+							r->SetDestroyTree();
+						}
+
+					}
 				}
 				else
 				{
@@ -119,17 +124,17 @@ namespace imgui {
 
 						if (item->m_type == e_MenuItemScript)
 						{
-							bb::GfxWindow * r = m_gfxWindow->GetRoot();
-							r->SetDestroyTree();
-
+							MenuConfigItemScript const * script = static_cast<MenuConfigItemScript const *>(item);
 							char item_val[1024];
-							codecvt_utf16_utf8(item->m_value.c_str(), item_val, 1024);
+							codecvt_utf16_utf8(script->m_script.c_str(), item_val, 1024);
 							char response[4096];
 							bb::BlackBox::Instance().GetScheme().Eval(item_val, response, 4096);
+
+							bb::GfxWindow * r = m_gfxWindow->GetRoot();
+							r->SetDestroyTree();
 						}
 						else if (item->m_type == e_MenuItemSubMenu)
 						{	
-
 							// pos of submenu
 							ImDrawList* draw_list = ImGui::GetWindowDrawList();
 							draw_list->PushClipRectFullScreen();
@@ -142,7 +147,7 @@ namespace imgui {
 							GuiWidget * w = bb::BlackBox::Instance().GetGfx().FindWidget(submenu->m_menu->m_id.c_str());
 							if (w == nullptr)
 							{
-								w = bb::BlackBox::Instance().GetGfx().MkWidgetFromConfig(*cfg);
+								w = bb::BlackBox::Instance().GetGfx().MkWidgetFromConfig(*submenu->m_menu);
 								m_gfxWindow->AddChild(w->m_gfxWindow);
 								w->m_gfxWindow->SetParent(m_gfxWindow);
 							}

@@ -19,20 +19,25 @@ namespace bb {
 
 	struct MenuConfigItem
 	{
-		bbstring m_name;
 		MenuItemType m_type { e_MenuItemSeparator };
-		bbstring m_value;
+		bbstring m_name;
 
 		MenuConfigItem () { }
+		MenuConfigItem (MenuItemType type) : m_type(type) { }
+		MenuConfigItem (MenuItemType type, bbstring const & name) : m_type(type), m_name(name) { }
+	};
+
+	struct MenuConfigItemScript : MenuConfigItem
+	{
+		bbstring m_script;
+		MenuConfigItemScript (bbstring const & name, bbstring const & script) : MenuConfigItem(e_MenuItemScript, name), m_script(script) { }
 	};
 
 	struct MenuConfigItemSubMenu : MenuConfigItem
 	{
-		std::unique_ptr<MenuConfig> m_menu;
+		std::shared_ptr<MenuConfig> m_menu;
 
-		MenuConfigItemSubMenu () { }
-		// 		MenuConfigItem (MenuConfigItem const & rhs);
-		// 		MenuConfigItem & operator= (MenuConfigItem const & rhs);
+		MenuConfigItemSubMenu (bbstring const & name, std::shared_ptr<MenuConfig> menu) : MenuConfigItem(e_MenuItemSubMenu, name), m_menu(menu) { }
 	};
 
 	struct MenuConfigItemCheckBox : MenuConfigItem
@@ -41,39 +46,16 @@ namespace bb {
 		bbstring m_onCheckScript;
 		bbstring m_onUncheckScript;
 
-		MenuConfigItemCheckBox () { m_type = e_MenuItemCheckBox; }
+		MenuConfigItemCheckBox () : MenuConfigItem(e_MenuItemCheckBox) { }
+		MenuConfigItemCheckBox (bbstring const & name, bbstring const & get, bbstring const & chk, bbstring const & uchk) : MenuConfigItem(e_MenuItemCheckBox, name), m_getScript(get), m_onCheckScript(chk), m_onUncheckScript(uchk) { }
 	};
 
 	struct MenuConfig : WidgetConfig
 	{
-		std::vector<std::unique_ptr<MenuConfigItem>> m_items;
+		std::vector<std::shared_ptr<MenuConfigItem>> m_items;
 
-		//void clear () { m_items.clear(); }
+		void clear () { m_items.clear(); }
 	};
-
-// 	inline MenuConfigItem::MenuConfigItem (MenuConfigItem const & rhs)
-// 		: m_name(rhs.m_name)
-// 		, m_type(rhs.m_type)
-// 		, m_value(rhs.m_value)
-// 		, m_menu(rhs.m_menu ? new MenuConfig(*rhs.m_menu) : nullptr)
-// 	{ }
-// 
-// 	inline MenuConfigItem & MenuConfigItem::operator= (MenuConfigItem const & rhs)
-// 	{
-// 		if (this != &rhs)
-// 		{
-// 			m_name = rhs.m_name;
-// 			m_type = rhs.m_type;
-// 			m_value = rhs.m_value;
-// 			if (rhs.m_menu)
-// 			{
-// 				std::unique_ptr<MenuConfig> cpy(new MenuConfig(*rhs.m_menu));
-// 				m_menu = std::move(cpy);
-// 			}
-// 		}
-// 		return *this;
-// 	}
-	
 
 	bool loadMenuConfig (YAML::Node & y_root, MenuConfig & config);
 }
