@@ -483,8 +483,13 @@ bool ReadBool(const TCHAR * fileName, const TCHAR * szKey, bool bDefault)
 
 int ReadInt (const TCHAR * fileName, const TCHAR * szKey, int nDefault)
 {
-	const TCHAR * szValue = read_value(fileName, szKey, NULL);
-	return szValue ? _ttoi(szValue) : nDefault;
+// 	const TCHAR * szValue = read_value(fileName, szKey, NULL);
+// 	return szValue ? _ttoi(szValue) : nDefault;
+
+	int result = nDefault;
+	rc::readInt(fileName, szKey, nDefault, result);
+	return result;
+
 }
 
 //===========================================================================

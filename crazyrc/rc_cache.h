@@ -34,26 +34,37 @@ namespace rc {
 		template <class T>
 		bool Lookup (tstring const & fname, tstring const & key, T & result)
 		{
-			std::vector<std::pair<tstring, size_t>> candidates;
-			if (m_index.Lookup(fname, key, candidates))
+			try
 			{
-				tstring const & file = candidates[0].first;
-				size_t const line = candidates[0].second;
-				cache_t::iterator it = m_cache.find(file);
-				if (it != m_cache.end())
+				std::vector<std::pair<tstring, size_t>> candidates;
+				if (m_index.Lookup(fname, key, candidates))
 				{
-					if (it->second.m_parsedFile[line].which() == e_line_pair)
+					tstring const & file = candidates[0].first;
+					size_t const line = candidates[0].second;
+					cache_t::iterator it = m_cache.find(file);
+					if (it != m_cache.end())
 					{
-						pair_type const & p = boost::get<pair_type const &>(it->second.m_parsedFile[line]);
-
-						if (p.second) // optional check
+						if (it->second.m_parsedFile[line].which() == e_line_pair)
 						{
-							value_variant_type const & val = *p.second;
-							return GetAs<T>(val, result);
+							pair_type const & p = boost::get<pair_type const &>(it->second.m_parsedFile[line]);
+
+							if (p.second) // optional check
+							{
+								value_variant_type const & val = *p.second;
+								return GetAs<T>(val, result);
+							}
 						}
 					}
+					return true;
 				}
-				return true;
+			}
+			catch (boost::exception & e)
+			{
+				return false;
+			}
+			catch (std::exception & e)
+			{
+				return false;
 			}
 			return false;
 		}
