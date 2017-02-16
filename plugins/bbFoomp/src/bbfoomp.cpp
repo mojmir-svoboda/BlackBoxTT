@@ -75,12 +75,6 @@ bool SlitExists = false;
 
 int beginPlugin (HINSTANCE hPluginInstance)
 {
-	if (!hwndSlit)
-	{
-		MessageBox(0, TEXT("bbFoomp wants to be placed in slit!\nModify your plugins.rc, please."), szVersionW, MB_OK | MB_ICONINFORMATION);
-		return 1;
-	}
-
 	WNDCLASS wc;
 	hwndBlackbox = GetBBWnd();
 	hInstance = hPluginInstance;
@@ -99,6 +93,12 @@ int beginPlugin (HINSTANCE hPluginInstance)
 	// Get plugin and style settings...
 	getSettings().ReadRCSettings();
 	getStyles().GetStyleSettings();
+
+	if (getSettings().FooDockedToSlit && !hwndSlit)
+	{
+		MessageBox(0, TEXT("bbFoomp wants to be placed in slit!\nModify your plugins.rc, please."), szVersionW, MB_OK | MB_ICONINFORMATION);
+		return 1;
+	}
 	
 	// Tap into the FooClass! (It's variables are going to be used
 	// throughout the plugins. Window, handle etc.)
