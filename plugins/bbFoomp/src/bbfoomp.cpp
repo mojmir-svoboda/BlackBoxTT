@@ -332,13 +332,13 @@ void handleBroamMsg (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 // 			// Show window and force update...
 // 			ShowWindow(hwndPlugin, SW_SHOW);
 // 			InvalidateRect(hwndPlugin, NULL, true);
-// 			break;
+// 			return;
 // 		}
 // 		else if (!_stricmp(temp, "@BBHidePlugins"))
 // 		{
 // 			// Hide window...
 // 			ShowWindow(hwndPlugin, SW_HIDE);
-// 			break;
+// 			return;
 // 		}
 // 	}
 // 
@@ -375,7 +375,7 @@ void handleBroamMsg (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 // 			_tcscpy(temp, szVersion);
 // 			_tcscat(temp, TEXT("\n\n© 2005 isidoros.passadis@gmail.com\n\nhttp://freeb0rn.com/\n#bb4win on irc.freenode.net	"));
 // 			MessageBox(0, temp, TEXT("About this plugin..."), MB_OK | MB_ICONINFORMATION);
-// 			break;
+// 			return;
 // 		}
 // 
 // 		if (!_stricmp(token2, "EditSettings"))
@@ -397,7 +397,7 @@ void handleBroamMsg (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 // 		{
 // 			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath, foobar_v9 ? "/command:\"Activate or hide\"" : "/command:\"foobar2000/Activate or hide\"", NULL, SW_SHOWNORMAL, false);
 // 			SetForegroundWindow(FooClass->FooHandle);
-// 			break;
+// 			return;
 // 		}
 // 		else if (!_stricmp(token2, "ToggDispMode"))
 // 		{
@@ -409,7 +409,7 @@ void handleBroamMsg (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 // 			UpdatePosition(); // Get new settings and resize window if needed...
 // 			SendMessage(hwndSlit, SLIT_UPDATE, NULL, NULL);
 // 			InvalidateRect(hwndPlugin, NULL, false);
-// 			break;
+// 			return;
 // 		}
 // 		else if (!_stricmp(token2, "ChangeInnerStyle"))
 // 		{
@@ -422,7 +422,7 @@ void handleBroamMsg (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 // 				SendMessage(hwndSlit, SLIT_UPDATE, NULL, NULL);
 // 				InvalidateRect(hwndPlugin, NULL, false);
 // 			}
-// 			break;
+// 			return;
 // 		}
 // 		else if (!_stricmp(token2, "ChangeOuterStyle"))
 // 		{
@@ -435,7 +435,7 @@ void handleBroamMsg (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 // 				SendMessage(hwndSlit, SLIT_UPDATE, NULL, NULL);
 // 				InvalidateRect(hwndPlugin, NULL, false);
 // 			}
-// 			break;
+// 			return;
 // 		}
 // 		else if (!_stricmp(token2, "ChangeMegaAlign"))
 // 		{
@@ -453,7 +453,7 @@ void handleBroamMsg (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 // 			UpdatePosition(); // Get new settings and resize window if needed...
 // 			SendMessage(hwndSlit, SLIT_UPDATE, NULL, NULL);
 // 			InvalidateRect(hwndPlugin, NULL, false);
-// 			break;
+// 			return;
 // 		}
 // 		else if (!_stricmp(token2, "ToggFooMode"))
 // 		{
@@ -471,7 +471,7 @@ void handleBroamMsg (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 // 			UpdatePosition(); // Get new settings and resize window if needed...
 // 			SendMessage(hwndSlit, SLIT_UPDATE, NULL, NULL);
 // 			InvalidateRect(hwndPlugin, NULL, false);
-// 			break;
+// 			return;
 // 		}
 // 		else if (!_stricmp(token2, "ToggFooMega"))
 // 		{
@@ -499,18 +499,18 @@ void handleBroamMsg (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 // 				SendMessage(hwndSlit, SLIT_UPDATE, NULL, NULL);
 // 				InvalidateRect(hwndPlugin, NULL, false);
 // 			}
-// 			break;
+// 			return;
 // 		}
 // 		else if (!_stricmp(token2, "ToggleDockedToSlit"))
 // 		{
 // 			ToggleDockedToSlit();
-// 			break;
+// 			return;
 // 		}
 // 		else if (!_stricmp(token2, "ToggleShadows"))
 // 		{
 // 			getSettings().FooShadowsEnabled = !getSettings().FooShadowsEnabled;
 // 			WriteBool(getSettings().rcpath, "bbfoomp.Shadows:", getSettings().FooShadowsEnabled);
-// 			break;
+// 			return;
 // 		}
 // 		else if (!_stricmp(token2, "ScrollSpeed"))
 // 		{
@@ -520,7 +520,7 @@ void handleBroamMsg (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 // 				getSettings().FooScrollSpeed = val;
 // 				WriteInt(getSettings().rcpath, "bbfoomp.ScrollSpeed:", getSettings().FooScrollSpeed);
 // 			}
-// 			break;
+// 			return;
 // 		}
 // 		else if (!_stricmp(token2, "ToggleOnTop"))
 // 		{
@@ -538,7 +538,7 @@ void handleBroamMsg (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 // 				SendMessage(hwndBlackbox, BB_SETTOOLBARLABEL, 0, (LPARAM)L"BBFoomp -> Always On Top enabled");
 // 				WriteBool(getSettings().rcpath, "bbfoomp.OnTop:", getSettings().FooOnTop);
 // 			}
-// 			break;
+// 			return;
 // 		}
 // 		else if (!_stricmp(token2, "ToggleTrans"))
 // 		{
@@ -569,73 +569,73 @@ void handleBroamMsg (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 // 			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath, foobar_v9 ? "/command:\"Volume up\"" : "/command:\"Playback/Volume up\"", NULL, SW_SHOWNORMAL, false);
 // 			//SendMessage(GetBBWnd(), BB_BRINGTOFRONT, 0, (LPARAM)FooClass->FooHandle);
 // 			//SetForegroundWindow(FooClass->FooHandle);
-// 			break;
+// 			return;
 // 		}
 // 		else if (!_stricmp(token2, "VolDown"))
 // 		{
 // 			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath, foobar_v9 ? "/command:\"Volume down\"" : "/command:\"Playback/Volume down\"", NULL, SW_SHOWNORMAL, false);
 // 			//SendMessage(GetBBWnd(), BB_BRINGTOFRONT, 0, (LPARAM)FooClass->FooHandle);
 // 			//SetForegroundWindow(FooClass->FooHandle);
-// 			break;
+// 			return;
 // 		}
 // 		else if (!_stricmp(token2, "Play_Pause"))
 // 		{
 // 			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath, "/playpause", NULL, SW_SHOWNORMAL, false);
 // 			//SendMessage(GetBBWnd(), BB_BRINGTOFRONT, 0, (LPARAM)FooClass->FooHandle);
 // 			//SetForegroundWindow(FooClass->FooHandle);
-// 			break;
+// 			return;
 // 		}
 // 		else if (!_stricmp(token2, "Play"))
 // 		{
 // 			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath, "/play", NULL, SW_SHOWNORMAL, false);
 // 			//SendMessage(GetBBWnd(), BB_BRINGTOFRONT, 0, (LPARAM)FooClass->FooHandle);
 // 			//SetForegroundWindow(FooClass->FooHandle);
-// 			break;
+// 			return;
 // 		}
 // 		else if (!_stricmp(token2, "Stop"))
 // 		{
 // 			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath, "/stop", NULL, SW_SHOWNORMAL, false);
 // 			//SendMessage(GetBBWnd(), BB_BRINGTOFRONT, 0, (LPARAM)FooClass->FooHandle);
 // 			//SetForegroundWindow(FooClass->FooHandle);
-// 			break;
+// 			return;
 // 		}
 // 		else if (!_stricmp(token2, "Previous"))
 // 		{
 // 			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath, "/prev", NULL, SW_SHOWNORMAL, false);
 // 			//SendMessage(GetBBWnd(), BB_BRINGTOFRONT, 0, (LPARAM)FooClass->FooHandle);
 // 			//SetForegroundWindow(FooClass->FooHandle);
-// 			break;
+// 			return;
 // 		}
 // 		else if (!_stricmp(token2, "Next"))
 // 		{
 // 			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath, "/next", NULL, SW_SHOWNORMAL, false);
 // 			//SendMessage(GetBBWnd(), BB_BRINGTOFRONT, 0, (LPARAM)FooClass->FooHandle);
 // 			//SetForegroundWindow(FooClass->FooHandle);
-// 			break;
+// 			return;
 // 		}
 // 		else if (!_stricmp(token2, "Random"))
 // 		{
 // 			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath, "/rand", NULL, SW_SHOWNORMAL, false);
 // 			//SendMessage(GetBBWnd(), BB_BRINGTOFRONT, 0, (LPARAM)FooClass->FooHandle);
 // 			//SetForegroundWindow(FooClass->FooHandle);
-// 			break;
+// 			return;
 // 		}
 // 		else if (!_stricmp(token2, "Add"))
 // 		{
 // 			SendMessage(hwndPlugin, BB_BROADCAST, 0, (LPARAM)"@bbfoomp Show_Hide");
 // 			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath, foobar_v9 ? "/command:\"Add files...\"" : "/command:\"Playlist/Add files...\"", NULL, SW_SHOWNORMAL, false);
-// 			break;
+// 			return;
 // 		}
 // 		else if (!_stricmp(token2, "Open"))
 // 		{
 // 			SendMessage(hwndPlugin, BB_BROADCAST, 0, (LPARAM)"@bbfoomp Show_Hide");
 // 			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath, foobar_v9 ? "/command:\"Open...\"" : "/command:\"Playlist/Open...\"", NULL, SW_SHOWNORMAL, false);
-// 			break;
+// 			return;
 // 		}
 // 		else if (!_stricmp(token2, "FooOff"))
 // 		{
 // 			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath, "/exit", NULL, SW_SHOWNORMAL, false);
-// 			break;
+// 			return;
 // 		}
 // 		// ========== END CONTROLS BROAMS // BEGIN PLAYBACK ORDER BROAMS
 // 		else if (!_stricmp(token2, "Order_Default"))
@@ -643,28 +643,28 @@ void handleBroamMsg (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 // 			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath, foobar_v9 ? "/command:\"Default\"" : "/command:\"Playback/Order/Default\"", NULL, SW_SHOWNORMAL, false);
 // 			//SendMessage(GetBBWnd(), BB_BRINGTOFRONT, 0, (LPARAM)FooClass->FooHandle);
 // 			//SetForegroundWindow(FooClass->FooHandle);
-// 			break;
+// 			return;
 // 		}
 // 		else if (!_stricmp(token2, "Order_Random"))
 // 		{
 // 			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath, foobar_v9 ? "/command:\"Shuffle (tracks)\"" : "/command:\"Playback/Order/Random\"", NULL, SW_SHOWNORMAL, false);
 // 			//SendMessage(GetBBWnd(), BB_BRINGTOFRONT, 0, (LPARAM)FooClass->FooHandle);
 // 			//SetForegroundWindow(FooClass->FooHandle);
-// 			break;
+// 			return;
 // 		}
 // 		else if (!_stricmp(token2, "Order_Repeat"))
 // 		{
 // 			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath, foobar_v9 ? "/command:\"Repeat (playlist)\"" : "/command:\"Playback/Order/Repeat\"", NULL, SW_SHOWNORMAL, false);
 // 			//SendMessage(GetBBWnd(), BB_BRINGTOFRONT, 0, (LPARAM)FooClass->FooHandle);
 // 			//SetForegroundWindow(FooClass->FooHandle);
-// 			break;
+// 			return;
 // 		}
 // 		else if (!_stricmp(token2, "Order_RepeatOne"))
 // 		{
 // 			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath, foobar_v9 ? "/command:\"Repeat (track)\"" : "/command:\"Playback/Order/Repeat One\"", NULL, SW_SHOWNORMAL, false);
 // 			//SendMessage(GetBBWnd(), BB_BRINGTOFRONT, 0, (LPARAM)FooClass->FooHandle);
 // 			//SetForegroundWindow(FooClass->FooHandle);
-// 			break;
+// 			return;
 // 		}
 // 		// ========== CUSTOM COMMAND BROAMS
 // 		else if (!_strnicmp(token2, "Press", 5))
@@ -672,7 +672,7 @@ void handleBroamMsg (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 // 			int const button_idx = atoi(token2 + 5);
 // 			if (button_idx > 0 && button_idx < e_last_button_item && getSettings().buttons[button_idx - 1].cmdarg[0])
 // 				BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath, getSettings().buttons[button_idx - 1].cmdarg, NULL, SW_SHOWNORMAL, false);
-// 			break;
+// 			return;
 // 		}
 // 		else if (!_strnicmp(token2, "AltPress", 8))
 // 		{
@@ -681,7 +681,7 @@ void handleBroamMsg (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 // 			{
 // 				BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath, getSettings().buttons[button_idx - 1].altcmdarg, NULL, SW_SHOWNORMAL, false);
 // 			}
-// 			break;
+// 			return;
 // 		}
 // 	}
 }
