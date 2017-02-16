@@ -461,45 +461,35 @@ bool SetTransparency(HWND hwnd, BYTE alpha)
 // API: ReadBool
 //===========================================================================
 
-bool ReadBool(const TCHAR * fileName, const TCHAR * szKey, bool bDefault)
+bool ReadBool(const TCHAR * fileName, const TCHAR * key, bool defaultValue)
 {
-	bool result = bDefault;
-	rc::readBool(fileName, szKey, bDefault, result);
+	bool result = defaultValue;
+	rc::readBool(fileName, key, defaultValue, result);
 	return result;
-// 	const TCHAR * szValue = read_value(fileName, szKey, NULL);
-// 	if (szValue)
-// 	{
-// 		if (!_tcsicmp(szValue, TEXT("true")))
-// 			return true;
-// 		if (!_tcsicmp(szValue, TEXT("false")))
-// 			return false;
-// 	}
-// 	return bDefault;
 }
 
 //===========================================================================
 // API: ReadInt
 //===========================================================================
 
-int ReadInt (const TCHAR * fileName, const TCHAR * szKey, int nDefault)
+int ReadInt (const TCHAR * fileName, const TCHAR * key, int defaultValue)
 {
-// 	const TCHAR * szValue = read_value(fileName, szKey, NULL);
-// 	return szValue ? _ttoi(szValue) : nDefault;
-
-	int result = nDefault;
-	rc::readInt(fileName, szKey, nDefault, result);
+	int result = defaultValue;
+	rc::readInt(fileName, key, defaultValue, result);
 	return result;
-
 }
 
 //===========================================================================
 // API: ReadString
 //===========================================================================
 
-const TCHAR * ReadString(const TCHAR * fileName, const TCHAR * szKey, const TCHAR * szDefault)
+const TCHAR * ReadString(const TCHAR * fileName, const TCHAR * key, const TCHAR * defaultValue)
 {
-	const TCHAR * szValue = read_value(fileName, szKey, NULL);
-	return szValue ? szValue : szDefault;
+// 	const TCHAR * szValue = read_value(fileName, szKey, NULL);
+// 	return szValue ? szValue : szDefault;
+	TCHAR const * result = defaultValue;
+	rc::readConstString(fileName, key, defaultValue, result);
+	return result;
 }
 
 //===========================================================================

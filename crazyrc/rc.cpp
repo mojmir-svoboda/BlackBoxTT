@@ -51,6 +51,21 @@ namespace rc {
 		return true;
 	}
 
+	bool readConstString (wchar_t const * fname, wchar_t const * key, wchar_t const * defaultString, wchar_t const * & result)
+	{
+		if (!rc::getParsedFileCacheConst().IsFileCached(tstring(fname)))
+		{
+			bool const parsed = rc::parseFile(fname);
+			if (!parsed)
+			{
+				return false;
+			}
+		}
+
+		// query cache
+		return rc::getParsedFileCache().Lookup(tstring(fname), tstring(key), result);
+	}
+
 	bool readInt (wchar_t const * fname, wchar_t const * key, int default_value, int & value)
 	{
 		value = default_value;

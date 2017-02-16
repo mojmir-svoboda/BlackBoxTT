@@ -1057,22 +1057,23 @@ bool BBP_read_window_modes(struct plugin_info *PI, const wchar_t * rcfile)
 	PI->hMon = GetMonitorRect(&PI->xpos, &PI->mon_rect, GETMON_FROM_POINT);
 	set_place(PI);
 
-	PI->useSlit = BBP_read_bool(PI, "useSlit", false);
-	PI->alwaysOnTop = BBP_read_bool(PI, "alwaysOnTop", false);
-	PI->autoHide = BBP_read_bool(PI, "autoHide", false);
-	PI->snapWindow = BBP_read_int(PI, "snapWindow", 20);
-	PI->pluginToggle = BBP_read_bool(PI, "pluginToggle", true);
-	PI->clickRaise = BBP_read_bool(PI, "clickRaise", true);
-	PI->alphaEnabled = BBP_read_bool(PI, "alpha.enabled", false);
-	PI->alphaValue = (BYTE)BBP_read_int(PI, "alpha.value", 192);
+	PI->useSlit = BBP_read_bool(PI, L"useSlit", false);
+	PI->alwaysOnTop = BBP_read_bool(PI, L"alwaysOnTop", false);
+	PI->autoHide = BBP_read_bool(PI, L"autoHide", false);
+	PI->snapWindow = BBP_read_int(PI, L"snapWindow", 20);
+	PI->pluginToggle = BBP_read_bool(PI, L"pluginToggle", true);
+	PI->clickRaise = BBP_read_bool(PI, L"clickRaise", true);
+	PI->alphaEnabled = BBP_read_bool(PI, L"alpha.enabled", false);
+	PI->alphaValue = (BYTE)BBP_read_int(PI, L"alpha.value", 192);
 	//PI->alphaValue      = (BYTE)eightScale_up(BBP_read_int(PI,  "alpha.value",  *(int *)GetSettingPtr(SN_MENUALPHA))); // bb4win
-	PI->orient_vertical = PI->is_bar || 0 == _stricmp("vertical", BBP_read_string(PI, NULL, "orientation", "vertical"));
+	wchar_t const * tmp_orient = ReadString(PI->rcpath, L"orientation", L"vertical");
+	PI->orient_vertical = PI->is_bar || 0 == _tcsicmp(L"vertical", tmp_orient);
 	if (false == PI->no_icons)
 	{
 		//PI->saturation      = eightScale_up(BBP_read_int(PI,  "icon.saturation", 3));
 		//PI->hue             = eightScale_up(BBP_read_int(PI,  "icon.hue", 2));
-		PI->saturation = BBP_read_int(PI, "icon.saturation", 80);
-		PI->hue = BBP_read_int(PI, "icon.hue", 60);
+		PI->saturation = BBP_read_int(PI, L"icon.saturation", 80);
+		PI->hue = BBP_read_int(PI, L"icon.hue", 60);
 	}
 	if (NULL == place_string) {
 		BBP_write_window_modes(PI);

@@ -78,7 +78,19 @@ namespace rc {
 			//BB_ASSERT(val.which() == e_val_string, "type mismatch. getting string, but value is not. value type=%i", val.which());
 			if (val.which() == e_val_string)
 			{
-				result = boost::get<decltype(result) const &>(val);
+				result = boost::get<tstring const &>(val);
+				return true;
+			}
+			return false;
+		}
+		template<>
+		bool GetAs (value_variant_type const & val, wchar_t const *& result)
+		{
+			//BB_ASSERT(val.which() == e_val_string, "type mismatch. getting string, but value is not. value type=%i", val.which());
+			if (val.which() == e_val_string)
+			{
+				tstring const & r = boost::get<tstring const &>(val);
+				result = r.c_str();
 				return true;
 			}
 			return false;
@@ -89,7 +101,7 @@ namespace rc {
 			//BB_ASSERT(val.which() == e_val_string, "type mismatch. getting string, but value is not. value type=%i", val.which());
 			if (val.which() == e_val_int)
 			{
-				result = boost::get<decltype(result) const &>(val);
+				result = boost::get<int>(val);
 				return true;
 			}
 			return false;
@@ -100,7 +112,7 @@ namespace rc {
 			//BB_ASSERT(val.which() == e_val_string, "type mismatch. getting string, but value is not. value type=%i", val.which());
 			if (val.which() == e_val_bool)
 			{
-				result = boost::get<decltype(result) const &>(val);
+				result = boost::get<bool>(val);
 				return true;
 			}
 			return false;
