@@ -45,9 +45,9 @@ int FooModePrev;
 // Style items
 
 // Miscellaneous
-bool usingWin2kXP;
+bool usingWin2kXP = false;
 const int button_spacing = 12;
-bool FirstUpdate; // Moved this up here from below.
+bool FirstUpdate = false; // Moved this up here from below.
 
 // Menu Class
 // Menu * scMenu = 0;

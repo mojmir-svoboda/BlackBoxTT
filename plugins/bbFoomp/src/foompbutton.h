@@ -1,5 +1,6 @@
 #pragma once
 #include <blackbox/plugin/bb.h>
+#include <bblib/bbstring.h>
 
 enum ButtonType
 {
@@ -20,8 +21,8 @@ struct FoompButton
 	RECT hitrect;
 	int x, y;
 	ButtonType type;
-	char cmdarg[256];
-	char altcmdarg[256];
+	bbstring cmdarg;
+	bbstring altcmdarg;
 	bool pressed;
 
 	void draw (HDC buf);

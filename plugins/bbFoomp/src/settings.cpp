@@ -2,6 +2,7 @@
 #include <blackbox/plugin/bb.h>
 #include <tchar.h>
 #include <bblibcompat/bblibcompat.h>
+#include <bblibcompat/bbPlugin.h>
 
 Settings g_settings;
 Settings & getSettings () { return g_settings; } // "singleton"
@@ -48,47 +49,51 @@ void Settings::WriteDefaultRCSettings ()
 
 void Settings::ReadRCSettings ()
 {
-// 	// NOTE: make a 0.8.3 compatible RC file
-// 	const char *default_commands[] =
-// 	{
-// 		"/prev",
-// 		"/play",
-// 		"/playpause",
-// 		"/stop",
-// 		"/next",
-// 		"/command:\"Activate or hide\"",
-// 		"/command:\"Volume up\"",
-// 		"/command:\"Volume down\"",
-// 		"/command:\"Open...\""
-// 	};
-// 	const char *default_altcommands[] =
-// 	{
-// 		"",
-// 		"/rand",
-// 		"",
-// 		"",
-// 		"",
-// 		"",
-// 		"",
-// 		"",
-// 		"/command:\"Add files...\""
-// 	};
-// 
-// 
-// 	TCHAR pluginDir[MAX_LINE_LENGTH];
-// 	int nLen;
-// 
-// 	// First we extract the plugin directory...
-// 	GetModuleFileName(hInstance, pluginDir, sizeof(pluginDir));
-// 	nLen = _tcslen(pluginDir)-1;
-// 	while (nLen >0 && pluginDir[nLen] != '\\') nLen--;
-// 	pluginDir[nLen + 1] = 0;
-// 
-// 	// ...then we search for the bbfoomp.rc config file...
-// 	// (-> $UserAppData$\Blackbox -> plugin directory -> Blackbox directory)
-// 	_tcscpy(rcpath, ConfigFileExists("bbfoomp.rc", pluginDir));
-// 	if (!_tcslen(rcpath)) strcpy(rcpath, ConfigFileExists("bbfoomprc", pluginDir));
-// 	if (!_tcslen(rcpath))
+	// NOTE: make a 0.8.3 compatible RC file
+	const wchar_t *default_commands[] =
+	{
+		L"/prev",
+		L"/play",
+		L"/playpause",
+		L"/stop",
+		L"/next",
+		L"/command:\"Activate or hide\"",
+		L"/command:\"Volume up\"",
+		L"/command:\"Volume down\"",
+		L"/command:\"Open...\""
+	};
+	const wchar_t *default_altcommands[] =
+	{
+		L"",
+		L"/rand",
+		L"",
+		L"",
+		L"",
+		L"",
+		L"",
+		L"",
+		L"/command:\"Add files...\""
+	};
+
+
+	TCHAR pluginDir[MAX_LINE_LENGTH];
+	int nLen;
+
+	// First we extract the plugin directory...
+	GetModuleFileName(hInstance, pluginDir, sizeof(pluginDir));
+	nLen = _tcslen(pluginDir)-1;
+	while (nLen >0 && pluginDir[nLen] != '\\') nLen--;
+	pluginDir[nLen + 1] = 0;
+
+	// ...then we search for the bbfoomp.rc config file...
+	// (-> $UserAppData$\Blackbox -> plugin directory -> Blackbox directory)
+	if (rcpath.empty())
+		BBP_get_rcpath(rcpath, hInstance, L"bbfoomp.rc");
+
+	if (rcpath.empty())
+		BBP_get_rcpath(rcpath, hInstance, L"bbfoomprc");
+	
+// 	if (rcpath.empty())
 // 	{
 // 		// If bbfoomp.rc could not be found we create a new
 // 		// config file in the same folder as the plugin...
@@ -96,61 +101,61 @@ void Settings::ReadRCSettings ()
 // 		_tcscat(rcpath, "bbfoomp.rc");
 // 		WriteDefaultRCSettings();
 // 	}
-// 
-// 	//====================
-// 
-// 	// Read bbfoomp settings from config file...
-// #if defined _WIN64
-// 	_tcscpy(FooPath, ReadString(rcpath, "bbfoomp.foobar.path:", "C:\\Program Files (x86)\\foobar2000\\foobar2000.exe"));
-// #else
-// 	_tcscpy(FooPath, ReadString(rcpath, "bbfoomp.foobar.path:", "C:\\Progra~1\\foobar2000\\foobar2000.exe"));
-// #endif
-// 	const char * def_text = ReadString(rcpath, "bbfoomp.DefaultText:", "Nothing is playing");
-// 
-// 	bbMB2WC(def_text, NoInfoText, MAX_LINE_LENGTH);
-// 	FooWidth = ReadInt(rcpath, "bbfoomp.foowidth:" , 200);
-// 	height = ReadInt(rcpath, "bbfoomp.height:", 20);
-// 	FooMode = ReadInt(rcpath, "bbfoomp.displaytype:", 2);
-// 	InnerStyleIndex = ReadInt(rcpath, "bbfoomp.InnerStyle:", 2);
-// 	OuterStyleIndex = ReadInt(rcpath, "bbfoomp.OuterStyle:", 4);
-// 	FooOnTop = ReadBool(rcpath, "bbfoomp.OnTop:", false);
-// 	transparencyAlpha = ReadInt(rcpath, "bbfoomp.transparencyAlpha:", 220);
-// 	BorderWidth = ReadInt(rcpath, "bbfoomp.borderwidth:", 3);
-// 	FooTrans = ReadBool(rcpath, "bbfoomp.transparency:", false);
-// 	FooAlign = ReadBool(rcpath, "bbfoomp.MegaLeftAlign:", true);
-// 	FooShadowsEnabled = ReadBool(rcpath, "bbfoomp.Shadows:", false);
-// 	FooScrollSpeed = ReadInt(rcpath, "bbfoomp.ScrollSpeed:", 5);
-// 
-// 	for (int i = 0; i < e_last_button_item; ++i)
-// 	{
-// 		FoompButton &b = buttons[i];
-// 		char picname[100], cmdname[100], altcmdname[100];
-// 		sprintf(picname,"bbfoomp.button%d.image:",i+1);
-// 		sprintf(cmdname,"bbfoomp.button%d.command:",i+1);
-// 		sprintf(altcmdname,"bbfoomp.button%d.altcommand:",i+1);
-// 		b.type = ButtonType(ReadInt(rcpath, picname, i));
-// 		_tcscpy(b.cmdarg, ReadString(rcpath, cmdname, default_commands[i]));
-// 		_tcscpy(b.altcmdarg, ReadString(rcpath, altcmdname, default_altcommands[i]));
-// 	}
-// 
-// 	xpos = ReadInt(rcpath, "bbfoomp.xpos:", 10);
-// 	if (xpos >= GetSystemMetrics(SM_CXSCREEN)) xpos = 0;
-// 	ypos = ReadInt(rcpath, "bbfoomp.ypos:", 10);
-// 	if (ypos >= GetSystemMetrics(SM_CYSCREEN)) ypos = 0;
-// 
-// 	if (SlitExists)
-// 		FooDockedToSlit = ReadBool(rcpath, "bbfoomp.dockedtoslit:", false);
-// 	else
-// 		FooDockedToSlit = false;
-// 
-// 	// Minimum settings checks.
-// 	if (height < (15 + BorderWidth) || width < 0 || BorderWidth < 0)
-// 	{
-// 		MessageBox(0, TEXT("The value you have inputted for either: \nheight, width or border-width is below the minimum.\nThe values will default. Please consult the Readme for the minimums."), "ERROR: Illegal value set.", MB_OK | MB_TOPMOST | MB_SETFOREGROUND);
-// 		FooWidth = 200;
-// 		height = 22;
-// 		BorderWidth = 3;
-// 	}
+
+	//====================
+
+	// Read bbfoomp settings from config file...
+#if defined _WIN64
+	const wchar_t * path = ReadString(rcpath.c_str(), L"bbfoomp.foobar.path", L"C:\\Program Files (x86)\\foobar2000\\foobar2000.exe");
+	FooPath = bbstring(path);
+#else
+	_tcscpy(FooPath, ReadString(rcpath, "bbfoomp.foobar.path", "C:\\Progra~1\\foobar2000\\foobar2000.exe"));
+#endif
+	NoInfoText = bbstring(ReadString(rcpath.c_str(), L"bbfoomp.DefaultText", L"Nothing is playing"));
+
+	FooWidth = ReadInt(rcpath.c_str(), L"bbfoomp.foowidth" , 200);
+	height = ReadInt(rcpath.c_str(), L"bbfoomp.height", 20);
+	FooMode = ReadInt(rcpath.c_str(), L"bbfoomp.displaytype", 2);
+	InnerStyleIndex = ReadInt(rcpath.c_str(), L"bbfoomp.InnerStyle", 2);
+	OuterStyleIndex = ReadInt(rcpath.c_str(), L"bbfoomp.OuterStyle", 4);
+	FooOnTop = ReadBool(rcpath.c_str(), L"bbfoomp.OnTop", false);
+	transparencyAlpha = ReadInt(rcpath.c_str(), L"bbfoomp.transparencyAlpha", 220);
+	BorderWidth = ReadInt(rcpath.c_str(), L"bbfoomp.borderwidth", 3);
+	FooTrans = ReadBool(rcpath.c_str(), L"bbfoomp.transparency", false);
+	FooAlign = ReadBool(rcpath.c_str(), L"bbfoomp.MegaLeftAlign", true);
+	FooShadowsEnabled = ReadBool(rcpath.c_str(), L"bbfoomp.Shadows", false);
+	FooScrollSpeed = ReadInt(rcpath.c_str(), L"bbfoomp.ScrollSpeed", 5);
+
+	for (int i = 0; i < e_last_button_item; ++i)
+	{
+		FoompButton & b = buttons[i];
+		wchar_t picname[100], cmdname[100], altcmdname[100];
+		wsprintf(picname, L"bbfoomp.button%d.image", i+1);
+		wsprintf(cmdname, L"bbfoomp.button%d.command", i+1);
+		wsprintf(altcmdname, L"bbfoomp.button%d.altcommand", i+1);
+		b.type = static_cast<ButtonType>(ReadInt(rcpath.c_str(), picname, i));
+		b.cmdarg = bbstring(ReadString(rcpath.c_str(), cmdname, default_commands[i]));
+		b.altcmdarg = bbstring(ReadString(rcpath.c_str(), altcmdname, default_altcommands[i]));
+	}
+
+	xpos = ReadInt(rcpath.c_str(), L"bbfoomp.xpos", 10);
+	if (xpos >= GetSystemMetrics(SM_CXSCREEN)) xpos = 0;
+	ypos = ReadInt(rcpath.c_str(), L"bbfoomp.ypos", 10);
+	if (ypos >= GetSystemMetrics(SM_CYSCREEN)) ypos = 0;
+
+	if (SlitExists)
+		FooDockedToSlit = ReadBool(rcpath.c_str(), L"bbfoomp.dockedtoslit", false);
+	else
+		FooDockedToSlit = false;
+
+	// Minimum settings checks.
+	if (height < (15 + BorderWidth) || width < 0 || BorderWidth < 0)
+	{
+		MessageBox(0, TEXT("The value you have inputted for either: \nheight, width or border-width is below the minimum.\nThe values will default. Please consult the Readme for the minimums."), L"ERROR: Illegal value set.", MB_OK | MB_TOPMOST | MB_SETFOREGROUND);
+		FooWidth = 200;
+		height = 22;
+		BorderWidth = 3;
+	}
 }
 
 void Settings::WriteRCSettings ()
