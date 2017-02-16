@@ -30,6 +30,15 @@ void PluginManager::LoadPlugin (bbstring const & plugin_id)
 			plugin_errors const ret = pi->LoadPlugin(m_hSlit);
 			if (ret == error_plugin_success)
 			{
+				if (pi->m_config.m_isSlit)
+				{
+					m_hSlit = FindWindow(L"bbSlit", NULL); // OMFG 2
+				}
+				TRACE_MSG(LL_DEBUG, CTX_BB | CTX_PLUGINMGR, "ok, slit hwnd=0x%x", m_hSlit);
+			}
+			else
+			{
+				TRACE_MSG(LL_ERROR, CTX_BB | CTX_PLUGINMGR, "error, code=0x%x", ret);
 			}
 		}
 	}
