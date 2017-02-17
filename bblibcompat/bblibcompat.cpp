@@ -1,5 +1,9 @@
 #include "bblibcompat.h"
 #include <crazyrc/crazyrc.h>
+#include <bblib/utils_paths.h>
+#include <Shlwapi.h>
+#include <shellapi.h>
+#include <bblibcompat/winutils.h>
 
 int Settings_snapThreshold = 7;
 int Settings_snapPadding = 2;
@@ -547,4 +551,50 @@ void WriteColor (const TCHAR * fileName, const TCHAR * szKey, COLORREF value)
 const wchar_t * ReadValue (const wchar_t * path, const wchar_t * szKey, long * ptr)
 {
 	return read_value(path, szKey, ptr);
+}
+
+BOOL BBExecute (HWND Owner, const wchar_t * szVerb, const wchar_t * szFile, const wchar_t * szArgs, const wchar_t * szDirectory, int nShowCmd, int flags)
+{
+	SHELLEXECUTEINFO sei;
+	wchar_t workdir[MAX_PATH];
+
+	if (NULL == szDirectory || 0 == szDirectory[0])
+	{
+		bb::getExePath(workdir, MAX_PATH);
+		szDirectory = workdir;
+		//szDirectory = GetBlackboxPath(workdir, sizeof workdir);
+	}
+
+	memset(&sei, 0, sizeof(sei));
+	sei.cbSize = sizeof(sei);
+	sei.hwnd = Owner;
+	sei.lpVerb = szVerb;
+	sei.lpParameters = szArgs;
+	sei.lpDirectory = szDirectory;
+	sei.nShow = nShowCmd;
+
+	if (flags & RUN_ISPIDL) {
+		sei.fMask = SEE_MASK_INVOKEIDLIST | SEE_MASK_FLAG_NO_UI;
+		sei.lpIDList = (void*)szFile;
+	}
+	else {
+		sei.fMask = SEE_MASK_DOENVSUBST | SEE_MASK_FLAG_NO_UI;
+		sei.lpFile = szFile;
+		if (NULL == szFile || 0 == szFile[0])
+			goto skip;
+	}
+
+	if (ShellExecuteEx(&sei))
+		return TRUE;
+
+skip:
+	if (0 == (flags & RUN_NOERRORS)) {
+// 		char msg[200];
+// 		BBMessageBox(MB_OK, NLS2("$Error_Execute$",
+// 			"Error: Could not execute: %s\n(%s)"),
+// 			szFile && szFile[0] ? szFile : NLS1("<empty>"),
+// 			win_error(msg, sizeof msg));
+	}
+
+	return FALSE;
 }

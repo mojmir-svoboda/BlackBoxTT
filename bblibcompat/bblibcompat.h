@@ -106,3 +106,15 @@ API_EXPORT void WriteBool(const char* fileName, const char* szKey, bool value);
 API_EXPORT void WriteInt(const char* fileName, const char* szKey, int value);
 API_EXPORT void WriteString(const char* fileName, const char* szKey, const char* value);
 API_EXPORT void WriteColor(const char* fileName, const char* szKey, COLORREF value);
+
+/* ------------------------------------ */
+/* Shell execute a command */
+API_EXPORT BOOL BBExecute(
+	HWND Owner,         /*  normally NULL */
+	const wchar_t * szVerb,      /*  normally NULL */
+	const wchar_t * szFile,      /*  required */
+	const wchar_t * szArgs,      /*  or NULL */
+	const wchar_t * szDirectory, /*  or NULL */
+	int nShowCmd,       /*  normally SW_SHOWNORMAL */
+	int noErrorMsgs    /*  if true, suppresses errors */
+);
