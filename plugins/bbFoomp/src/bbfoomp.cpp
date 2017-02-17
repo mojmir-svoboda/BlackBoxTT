@@ -369,37 +369,37 @@ void handleBroamMsg (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			if (bb::fileExists(path))
 				BBExecute(GetDesktopWindow(), NULL, path, L"", directory, SW_SHOWNORMAL, true);
 		}
-		else if (!_stricmp(token2, L"About"))
+		else if (!wcsicmp(token2, L"About"))
 		{
 			TCHAR temp[MAX_LINE_LENGTH];
-			_tcscpy(temp, szVersion);
+			_tcscpy(temp, szVersionW);
 			_tcscat(temp, TEXT("\n\n© 2005 isidoros.passadis@gmail.com\n\nhttp://freeb0rn.com/\n#bb4win on irc.freenode.net	"));
 			MessageBox(0, temp, TEXT("About this plugin..."), MB_OK | MB_ICONINFORMATION);
 			return;
 		}
 
-		if (!_stricmp(token2, "EditSettings"))
+		if (!wcsicmp(token2, L"EditSettings"))
 		{
 			wchar_t temp[MAX_LINE_LENGTH];
 			GetBlackboxEditor(temp);
 			if (FileExists(getSettings().rcpath))
-				BBExecute(GetDesktopWindow(), NULL, temp, getSettings().rcpath, NULL, SW_SHOWNORMAL, true);
+				BBExecute(GetDesktopWindow(), NULL, temp, getSettings().rcpath.c_str(), NULL, SW_SHOWNORMAL, true);
 		}
 
-		if (!_stricmp(token2, "ReadSettings"))
+		if (!wcsicmp(token2, L"ReadSettings"))
 		{
 			getSettings().ReadRCSettings();
 			UpdatePosition(); // Get new settings and resize window if needed...
 			SendMessage(hwndSlit, SLIT_UPDATE, NULL, NULL);
 			InvalidateRect(hwndPlugin, NULL, false);
 		}
-		else if (!_stricmp(token2, "Show_Hide"))
+		else if (!wcsicmp(token2, L"Show_Hide"))
 		{
-			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath, foobar_v9 ? "/command:\"Activate or hide\"" : "/command:\"foobar2000/Activate or hide\"", NULL, SW_SHOWNORMAL, false);
+			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath.c_str(), foobar_v9 ? L"/command:\"Activate or hide\"" : L"/command:\"foobar2000/Activate or hide\"", NULL, SW_SHOWNORMAL, false);
 			SetForegroundWindow(FooClass->FooHandle);
 			return;
 		}
-		else if (!_stricmp(token2, "ToggDispMode"))
+		else if (!wcsicmp(token2, L"ToggDispMode"))
 		{
 			if (DisplayMode == 1)
 				DisplayMode = 2;
@@ -411,12 +411,12 @@ void handleBroamMsg (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			InvalidateRect(hwndPlugin, NULL, false);
 			return;
 		}
-		else if (!_stricmp(token2, "ChangeInnerStyle"))
+		else if (!wcsicmp(token2, L"ChangeInnerStyle"))
 		{
-			int const val = atoi(extra);
+			int const val = _wtoi(extra);
 			if (val > 0 && val <= 6)
 			{
-				WriteInt(getSettings().rcpath, "bbfoomp.InnerStyle:", val);
+				WriteInt(getSettings().rcpath, L"bbfoomp.InnerStyle:", val);
 				getSettings().ReadRCSettings();
 				UpdatePosition(); // Get new settings and resize window if needed...
 				SendMessage(hwndSlit, SLIT_UPDATE, NULL, NULL);
@@ -424,12 +424,12 @@ void handleBroamMsg (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 			return;
 		}
-		else if (!_stricmp(token2, "ChangeOuterStyle"))
+		else if (!wcsicmp(token2, L"ChangeOuterStyle"))
 		{
-			int const val = atoi(extra);
+			int const val = _wtoi(extra);
 			if (val > 0 && val <= 6)
 			{
-				WriteInt(getSettings().rcpath, "bbfoomp.OuterStyle:", val);
+				WriteInt(getSettings().rcpath, L"bbfoomp.OuterStyle:", val);
 				getSettings().ReadRCSettings();
 				UpdatePosition(); // Get new settings and resize window if needed...
 				SendMessage(hwndSlit, SLIT_UPDATE, NULL, NULL);
@@ -437,17 +437,17 @@ void handleBroamMsg (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 			return;
 		}
-		else if (!_stricmp(token2, "ChangeMegaAlign"))
+		else if (!wcsicmp(token2, L"ChangeMegaAlign"))
 		{
-			if (!_stricmp(extra, "1"))
+			if (!wcsicmp(extra, L"1"))
 			{
 				getSettings().FooAlign = false;
-				WriteBool(getSettings().rcpath, "bbfoomp.MegaLeftAlign:", getSettings().FooAlign);
+				WriteBool(getSettings().rcpath.c_str(), L"bbfoomp.MegaLeftAlign:", getSettings().FooAlign);
 			}
-			else if (!_stricmp(extra, "2"))
+			else if (!wcsicmp(extra, L"2"))
 			{
 				getSettings().FooAlign = true;
-				WriteBool(getSettings().rcpath, "bbfoomp.MegaLeftAlign:", getSettings().FooAlign);
+				WriteBool(getSettings().rcpath.c_str(), L"bbfoomp.MegaLeftAlign:", getSettings().FooAlign);
 			}
 			getSettings().ReadRCSettings();
 			UpdatePosition(); // Get new settings and resize window if needed...
@@ -455,7 +455,7 @@ void handleBroamMsg (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			InvalidateRect(hwndPlugin, NULL, false);
 			return;
 		}
-		else if (!_stricmp(token2, "ToggFooMode"))
+		else if (!wcsicmp(token2, L"ToggFooMode"))
 		{
 			if (getSettings().FooMode == 1)
 			{
@@ -473,10 +473,10 @@ void handleBroamMsg (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			InvalidateRect(hwndPlugin, NULL, false);
 			return;
 		}
-		else if (!_stricmp(token2, "ToggFooMega"))
+		else if (!wcsicmp(token2, L"ToggFooMega"))
 		{
 			if (getSettings().width < 300)
-				MessageBox(0, TEXT("Please assign a Width greater than 300\nin the bbfoomp.rc for this feature to work."), "ERROR: Feature Unusable at this Width", MB_OK | MB_TOPMOST | MB_SETFOREGROUND);
+				MessageBox(0, TEXT("Please assign a Width greater than 300\nin the bbfoomp.rc for this feature to work."), L"ERROR: Feature Unusable at this Width", MB_OK | MB_TOPMOST | MB_SETFOREGROUND);
 			else
 			{
 				if (getSettings().FooMode != 3)
@@ -501,46 +501,46 @@ void handleBroamMsg (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 			return;
 		}
-		else if (!_stricmp(token2, "ToggleDockedToSlit"))
+		else if (!wcsicmp(token2, L"ToggleDockedToSlit"))
 		{
 			ToggleDockedToSlit();
 			return;
 		}
-		else if (!_stricmp(token2, "ToggleShadows"))
+		else if (!wcsicmp(token2, L"ToggleShadows"))
 		{
 			getSettings().FooShadowsEnabled = !getSettings().FooShadowsEnabled;
 			WriteBool(getSettings().rcpath, "bbfoomp.Shadows:", getSettings().FooShadowsEnabled);
 			return;
 		}
-		else if (!_stricmp(token2, "ScrollSpeed"))
+		else if (!wcsicmp(token2, L"ScrollSpeed"))
 		{
-			int val = atoi(extra);
+			int val = _wtoi(extra);
 			if (val > 0 && val <= 10)
 			{
 				getSettings().FooScrollSpeed = val;
-				WriteInt(getSettings().rcpath, "bbfoomp.ScrollSpeed:", getSettings().FooScrollSpeed);
+				WriteInt(getSettings().rcpath, L"bbfoomp.ScrollSpeed:", getSettings().FooScrollSpeed);
 			}
 			return;
 		}
-		else if (!_stricmp(token2, "ToggleOnTop"))
+		else if (!wcsicmp(token2, L"ToggleOnTop"))
 		{
 			if (getSettings().FooOnTop == true)
 			{
 				getSettings().FooOnTop = false;
 				SetWindowPos(hwndPlugin, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOSIZE | SWP_NOMOVE);
 				SendMessage(hwndBlackbox, BB_SETTOOLBARLABEL, 0, (LPARAM)L"BBFoomp -> Always On Top disabled");
-				WriteBool(getSettings().rcpath, "bbfoomp.OnTop:", getSettings().FooOnTop);
+				WriteBool(getSettings().rcpath, L"bbfoomp.OnTop:", getSettings().FooOnTop);
 			}
 			else
 			{
 				getSettings().FooOnTop = true;
 				SetWindowPos(hwndPlugin, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOSIZE | SWP_NOMOVE);
 				SendMessage(hwndBlackbox, BB_SETTOOLBARLABEL, 0, (LPARAM)L"BBFoomp -> Always On Top enabled");
-				WriteBool(getSettings().rcpath, "bbfoomp.OnTop:", getSettings().FooOnTop);
+				WriteBool(getSettings().rcpath, L"bbfoomp.OnTop:", getSettings().FooOnTop);
 			}
 			return;
 		}
-		else if (!_stricmp(token2, "ToggleTrans"))
+		else if (!wcsicmp(token2, L"ToggleTrans"))
 		{
 			if (usingWin2kXP)
 			{
@@ -549,14 +549,14 @@ void handleBroamMsg (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					getSettings().FooTrans = false;
 					SetTransparency(hwndPlugin, 255);
 					SendMessage(hwndBlackbox, BB_SETTOOLBARLABEL, 0, (LPARAM)L"BBFoomp -> Transparency disabled");
-					WriteBool(getSettings().rcpath, "bbfoomp.transparency:", getSettings().FooTrans);
+					WriteBool(getSettings().rcpath, L"bbfoomp.transparency:", getSettings().FooTrans);
 				}
 				else if (!getSettings().FooDockedToSlit)
 				{
 					getSettings().FooTrans = true;
 					SetTransparency(hwndPlugin, (unsigned char)getSettings().transparencyAlpha);
 					SendMessage(hwndBlackbox, BB_SETTOOLBARLABEL, 0, (LPARAM)L"BBFoomp -> Transparency enabled");
-					WriteBool(getSettings().rcpath, "bbfoomp.transparency:", getSettings().FooTrans);
+					WriteBool(getSettings().rcpath, L"bbfoomp.transparency:", getSettings().FooTrans);
 				}
 			}
 		}
@@ -564,122 +564,122 @@ void handleBroamMsg (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		// You will note a few commented lines under each broam,
 		// should you wish to uncomment them they will focus Foobar2000
 		// whenever a command is given to it.
-		else if (!_stricmp(token2, "VolUp"))
+		else if (!wcsicmp(token2, L"VolUp"))
 		{
-			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath, foobar_v9 ? "/command:\"Volume up\"" : "/command:\"Playback/Volume up\"", NULL, SW_SHOWNORMAL, false);
+			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath.c_str(), foobar_v9 ? L"/command:\"Volume up\"" : L"/command:\"Playback/Volume up\"", NULL, SW_SHOWNORMAL, false);
 			//SendMessage(GetBBWnd(), BB_BRINGTOFRONT, 0, (LPARAM)FooClass->FooHandle);
 			//SetForegroundWindow(FooClass->FooHandle);
 			return;
 		}
-		else if (!_stricmp(token2, "VolDown"))
+		else if (!wcsicmp(token2, L"VolDown"))
 		{
-			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath, foobar_v9 ? "/command:\"Volume down\"" : "/command:\"Playback/Volume down\"", NULL, SW_SHOWNORMAL, false);
+			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath.c_str(), foobar_v9 ? L"/command:\"Volume down\"" : L"/command:\"Playback/Volume down\"", NULL, SW_SHOWNORMAL, false);
 			//SendMessage(GetBBWnd(), BB_BRINGTOFRONT, 0, (LPARAM)FooClass->FooHandle);
 			//SetForegroundWindow(FooClass->FooHandle);
 			return;
 		}
-		else if (!_stricmp(token2, "Play_Pause"))
+		else if (!wcsicmp(token2, L"Play_Pause"))
 		{
-			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath, "/playpause", NULL, SW_SHOWNORMAL, false);
+			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath.c_str(), L"/playpause", NULL, SW_SHOWNORMAL, false);
 			//SendMessage(GetBBWnd(), BB_BRINGTOFRONT, 0, (LPARAM)FooClass->FooHandle);
 			//SetForegroundWindow(FooClass->FooHandle);
 			return;
 		}
-		else if (!_stricmp(token2, "Play"))
+		else if (!wcsicmp(token2, L"Play"))
 		{
-			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath, "/play", NULL, SW_SHOWNORMAL, false);
+			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath.c_str(), L"/play", NULL, SW_SHOWNORMAL, false);
 			//SendMessage(GetBBWnd(), BB_BRINGTOFRONT, 0, (LPARAM)FooClass->FooHandle);
 			//SetForegroundWindow(FooClass->FooHandle);
 			return;
 		}
-		else if (!_stricmp(token2, "Stop"))
+		else if (!wcsicmp(token2, L"Stop"))
 		{
-			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath, "/stop", NULL, SW_SHOWNORMAL, false);
+			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath.c_str(), L"/stop", NULL, SW_SHOWNORMAL, false);
 			//SendMessage(GetBBWnd(), BB_BRINGTOFRONT, 0, (LPARAM)FooClass->FooHandle);
 			//SetForegroundWindow(FooClass->FooHandle);
 			return;
 		}
-		else if (!_stricmp(token2, "Previous"))
+		else if (!wcsicmp(token2, L"Previous"))
 		{
-			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath, "/prev", NULL, SW_SHOWNORMAL, false);
+			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath.c_str(), L"/prev", NULL, SW_SHOWNORMAL, false);
 			//SendMessage(GetBBWnd(), BB_BRINGTOFRONT, 0, (LPARAM)FooClass->FooHandle);
 			//SetForegroundWindow(FooClass->FooHandle);
 			return;
 		}
-		else if (!_stricmp(token2, "Next"))
+		else if (!wcsicmp(token2, L"Next"))
 		{
-			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath, "/next", NULL, SW_SHOWNORMAL, false);
+			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath.c_str(), L"/next", NULL, SW_SHOWNORMAL, false);
 			//SendMessage(GetBBWnd(), BB_BRINGTOFRONT, 0, (LPARAM)FooClass->FooHandle);
 			//SetForegroundWindow(FooClass->FooHandle);
 			return;
 		}
-		else if (!_stricmp(token2, "Random"))
+		else if (!wcsicmp(token2, L"Random"))
 		{
-			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath, "/rand", NULL, SW_SHOWNORMAL, false);
+			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath.c_str(), L"/rand", NULL, SW_SHOWNORMAL, false);
 			//SendMessage(GetBBWnd(), BB_BRINGTOFRONT, 0, (LPARAM)FooClass->FooHandle);
 			//SetForegroundWindow(FooClass->FooHandle);
 			return;
 		}
-		else if (!_stricmp(token2, "Add"))
+		else if (!wcsicmp(token2, L"Add"))
 		{
-			SendMessage(hwndPlugin, BB_BROADCAST, 0, (LPARAM)"@bbfoomp Show_Hide");
-			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath, foobar_v9 ? "/command:\"Add files...\"" : "/command:\"Playlist/Add files...\"", NULL, SW_SHOWNORMAL, false);
+			SendMessage(hwndPlugin, BB_BROADCAST, 0, (LPARAM)L"@bbfoomp Show_Hide");
+			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath.c_str(), foobar_v9 ? L"/command:\"Add files...\"" : L"/command:\"Playlist/Add files...\"", NULL, SW_SHOWNORMAL, false);
 			return;
 		}
-		else if (!_stricmp(token2, "Open"))
+		else if (!wcsicmp(token2, L"Open"))
 		{
-			SendMessage(hwndPlugin, BB_BROADCAST, 0, (LPARAM)"@bbfoomp Show_Hide");
-			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath, foobar_v9 ? "/command:\"Open...\"" : "/command:\"Playlist/Open...\"", NULL, SW_SHOWNORMAL, false);
+			SendMessage(hwndPlugin, BB_BROADCAST, 0, (LPARAM)L"@bbfoomp Show_Hide");
+			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath.c_str(), foobar_v9 ? L"/command:\"Open...\"" : L"/command:\"Playlist/Open...\"", NULL, SW_SHOWNORMAL, false);
 			return;
 		}
-		else if (!_stricmp(token2, "FooOff"))
+		else if (!wcsicmp(token2, L"FooOff"))
 		{
-			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath, "/exit", NULL, SW_SHOWNORMAL, false);
+			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath.c_str(), L"/exit", NULL, SW_SHOWNORMAL, false);
 			return;
 		}
 		// ========== END CONTROLS BROAMS // BEGIN PLAYBACK ORDER BROAMS
-		else if (!_stricmp(token2, "Order_Default"))
+		else if (!wcsicmp(token2, L"Order_Default"))
 		{
-			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath, foobar_v9 ? "/command:\"Default\"" : "/command:\"Playback/Order/Default\"", NULL, SW_SHOWNORMAL, false);
+			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath.c_str(), foobar_v9 ? L"/command:\"Default\"" : L"/command:\"Playback/Order/Default\"", NULL, SW_SHOWNORMAL, false);
 			//SendMessage(GetBBWnd(), BB_BRINGTOFRONT, 0, (LPARAM)FooClass->FooHandle);
 			//SetForegroundWindow(FooClass->FooHandle);
 			return;
 		}
-		else if (!_stricmp(token2, "Order_Random"))
+		else if (!wcsicmp(token2, L"Order_Random"))
 		{
-			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath, foobar_v9 ? "/command:\"Shuffle (tracks)\"" : "/command:\"Playback/Order/Random\"", NULL, SW_SHOWNORMAL, false);
+			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath.c_str(), foobar_v9 ? L"/command:\"Shuffle (tracks)\"" : L"/command:\"Playback/Order/Random\"", NULL, SW_SHOWNORMAL, false);
 			//SendMessage(GetBBWnd(), BB_BRINGTOFRONT, 0, (LPARAM)FooClass->FooHandle);
 			//SetForegroundWindow(FooClass->FooHandle);
 			return;
 		}
-		else if (!_stricmp(token2, "Order_Repeat"))
+		else if (!wcsicmp(token2, L"Order_Repeat"))
 		{
-			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath, foobar_v9 ? "/command:\"Repeat (playlist)\"" : "/command:\"Playback/Order/Repeat\"", NULL, SW_SHOWNORMAL, false);
+			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath.c_str(), foobar_v9 ? L"/command:\"Repeat (playlist)\"" : L"/command:\"Playback/Order/Repeat\"", NULL, SW_SHOWNORMAL, false);
 			//SendMessage(GetBBWnd(), BB_BRINGTOFRONT, 0, (LPARAM)FooClass->FooHandle);
 			//SetForegroundWindow(FooClass->FooHandle);
 			return;
 		}
-		else if (!_stricmp(token2, "Order_RepeatOne"))
+		else if (!wcsicmp(token2, L"Order_RepeatOne"))
 		{
-			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath, foobar_v9 ? "/command:\"Repeat (track)\"" : "/command:\"Playback/Order/Repeat One\"", NULL, SW_SHOWNORMAL, false);
+			BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath.c_str(), foobar_v9 ? L"/command:\"Repeat (track)\"" : L"/command:\"Playback/Order/Repeat One\"", NULL, SW_SHOWNORMAL, false);
 			//SendMessage(GetBBWnd(), BB_BRINGTOFRONT, 0, (LPARAM)FooClass->FooHandle);
 			//SetForegroundWindow(FooClass->FooHandle);
 			return;
 		}
 		// ========== CUSTOM COMMAND BROAMS
-		else if (!_strnicmp(token2, "Press", 5))
+		else if (!wcsicmp(token2, L"Press", 5))
 		{
-			int const button_idx = atoi(token2 + 5);
+			int const button_idx = _wtoi(token2 + 5);
 			if (button_idx > 0 && button_idx < e_last_button_item && getSettings().buttons[button_idx - 1].cmdarg[0])
-				BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath, getSettings().buttons[button_idx - 1].cmdarg, NULL, SW_SHOWNORMAL, false);
+				BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath.c_str(), getSettings().buttons[button_idx - 1].cmdarg.c_str(), NULL, SW_SHOWNORMAL, false);
 			return;
 		}
-		else if (!_strnicmp(token2, "AltPress", 8))
+		else if (!wcsicmp(token2, L"AltPress", 8))
 		{
-			int button_idx = atoi(token2 + 8);
+			int button_idx = _wtoi(token2 + 8);
 			if (button_idx > 0 && button_idx < e_last_button_item && getSettings().buttons[button_idx - 1].altcmdarg[0])
 			{
-				BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath, getSettings().buttons[button_idx - 1].altcmdarg, NULL, SW_SHOWNORMAL, false);
+				BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath.c_str(), getSettings().buttons[button_idx - 1].altcmdarg.c_str(), NULL, SW_SHOWNORMAL, false);
 			}
 			return;
 		}
