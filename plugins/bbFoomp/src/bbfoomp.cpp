@@ -6,6 +6,7 @@
 #include <vector>
 #include <bblibcompat/bblibcompat.h>
 #include <bblibcompat/StyleStruct.h>
+#include <bblib/utils_paths.h>
 
 #define BBFOOMP_UPDATE_TIMER 1
 #define BB_BRINGTOFRONT 10504
@@ -135,7 +136,8 @@ int beginPlugin (HINSTANCE hPluginInstance)
 
 	// Should we dock to the slit?
 	// *** Thanks to qwilk for all things slit! ***
-	if (SlitExists && getSettings().FooDockedToSlit) SendMessage(hwndSlit, SLIT_ADD, NULL, (LPARAM)hwndPlugin);
+	if (SlitExists && getSettings().FooDockedToSlit)
+		SendMessage(hwndSlit, SLIT_ADD, NULL, (LPARAM)hwndPlugin);
 
 	// Set the update timer to 33 milliseconds...
 	const int UpdateInterval = 33;
@@ -380,10 +382,10 @@ void handleBroamMsg (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		if (!wcsicmp(token2, L"EditSettings"))
 		{
-			wchar_t temp[MAX_LINE_LENGTH];
-			GetBlackboxEditor(temp);
-			if (FileExists(getSettings().rcpath))
-				BBExecute(GetDesktopWindow(), NULL, temp, getSettings().rcpath.c_str(), NULL, SW_SHOWNORMAL, true);
+// 			wchar_t temp[MAX_LINE_LENGTH];
+// 			GetBlackboxEditor(temp);
+// 			if (FileExists(getSettings().rcpath))
+// 				BBExecute(GetDesktopWindow(), NULL, temp, getSettings().rcpath.c_str(), NULL, SW_SHOWNORMAL, true);
 		}
 
 		if (!wcsicmp(token2, L"ReadSettings"))
@@ -416,7 +418,7 @@ void handleBroamMsg (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			int const val = _wtoi(extra);
 			if (val > 0 && val <= 6)
 			{
-				WriteInt(getSettings().rcpath, L"bbfoomp.InnerStyle:", val);
+				WriteInt(getSettings().rcpath.c_str(), L"bbfoomp.InnerStyle:", val);
 				getSettings().ReadRCSettings();
 				UpdatePosition(); // Get new settings and resize window if needed...
 				SendMessage(hwndSlit, SLIT_UPDATE, NULL, NULL);
@@ -429,7 +431,7 @@ void handleBroamMsg (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			int const val = _wtoi(extra);
 			if (val > 0 && val <= 6)
 			{
-				WriteInt(getSettings().rcpath, L"bbfoomp.OuterStyle:", val);
+				WriteInt(getSettings().rcpath.c_str(), L"bbfoomp.OuterStyle:", val);
 				getSettings().ReadRCSettings();
 				UpdatePosition(); // Get new settings and resize window if needed...
 				SendMessage(hwndSlit, SLIT_UPDATE, NULL, NULL);
@@ -509,7 +511,7 @@ void handleBroamMsg (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		else if (!wcsicmp(token2, L"ToggleShadows"))
 		{
 			getSettings().FooShadowsEnabled = !getSettings().FooShadowsEnabled;
-			WriteBool(getSettings().rcpath, "bbfoomp.Shadows:", getSettings().FooShadowsEnabled);
+			WriteBool(getSettings().rcpath.c_str(), L"bbfoomp.Shadows:", getSettings().FooShadowsEnabled);
 			return;
 		}
 		else if (!wcsicmp(token2, L"ScrollSpeed"))
@@ -518,7 +520,7 @@ void handleBroamMsg (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			if (val > 0 && val <= 10)
 			{
 				getSettings().FooScrollSpeed = val;
-				WriteInt(getSettings().rcpath, L"bbfoomp.ScrollSpeed:", getSettings().FooScrollSpeed);
+				WriteInt(getSettings().rcpath.c_str(), L"bbfoomp.ScrollSpeed:", getSettings().FooScrollSpeed);
 			}
 			return;
 		}
@@ -529,14 +531,14 @@ void handleBroamMsg (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				getSettings().FooOnTop = false;
 				SetWindowPos(hwndPlugin, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOSIZE | SWP_NOMOVE);
 				SendMessage(hwndBlackbox, BB_SETTOOLBARLABEL, 0, (LPARAM)L"BBFoomp -> Always On Top disabled");
-				WriteBool(getSettings().rcpath, L"bbfoomp.OnTop:", getSettings().FooOnTop);
+				WriteBool(getSettings().rcpath.c_str(), L"bbfoomp.OnTop:", getSettings().FooOnTop);
 			}
 			else
 			{
 				getSettings().FooOnTop = true;
 				SetWindowPos(hwndPlugin, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOSIZE | SWP_NOMOVE);
 				SendMessage(hwndBlackbox, BB_SETTOOLBARLABEL, 0, (LPARAM)L"BBFoomp -> Always On Top enabled");
-				WriteBool(getSettings().rcpath, L"bbfoomp.OnTop:", getSettings().FooOnTop);
+				WriteBool(getSettings().rcpath.c_str(), L"bbfoomp.OnTop:", getSettings().FooOnTop);
 			}
 			return;
 		}
@@ -549,14 +551,14 @@ void handleBroamMsg (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					getSettings().FooTrans = false;
 					SetTransparency(hwndPlugin, 255);
 					SendMessage(hwndBlackbox, BB_SETTOOLBARLABEL, 0, (LPARAM)L"BBFoomp -> Transparency disabled");
-					WriteBool(getSettings().rcpath, L"bbfoomp.transparency:", getSettings().FooTrans);
+					WriteBool(getSettings().rcpath.c_str(), L"bbfoomp.transparency:", getSettings().FooTrans);
 				}
 				else if (!getSettings().FooDockedToSlit)
 				{
 					getSettings().FooTrans = true;
 					SetTransparency(hwndPlugin, (unsigned char)getSettings().transparencyAlpha);
 					SendMessage(hwndBlackbox, BB_SETTOOLBARLABEL, 0, (LPARAM)L"BBFoomp -> Transparency enabled");
-					WriteBool(getSettings().rcpath, L"bbfoomp.transparency:", getSettings().FooTrans);
+					WriteBool(getSettings().rcpath.c_str(), L"bbfoomp.transparency:", getSettings().FooTrans);
 				}
 			}
 		}
@@ -667,14 +669,14 @@ void handleBroamMsg (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			return;
 		}
 		// ========== CUSTOM COMMAND BROAMS
-		else if (!wcsicmp(token2, L"Press", 5))
+		else if (!wcsnicmp(token2, L"Press", 5))
 		{
 			int const button_idx = _wtoi(token2 + 5);
 			if (button_idx > 0 && button_idx < e_last_button_item && getSettings().buttons[button_idx - 1].cmdarg[0])
 				BBExecute(GetDesktopWindow(), NULL, getSettings().FooPath.c_str(), getSettings().buttons[button_idx - 1].cmdarg.c_str(), NULL, SW_SHOWNORMAL, false);
 			return;
 		}
-		else if (!wcsicmp(token2, L"AltPress", 8))
+		else if (!wcsnicmp(token2, L"AltPress", 8))
 		{
 			int button_idx = _wtoi(token2 + 8);
 			if (button_idx > 0 && button_idx < e_last_button_item && getSettings().buttons[button_idx - 1].altcmdarg[0])
@@ -889,7 +891,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case WM_LBUTTONDBLCLK:
 		{
 			if (DisplayMode == 1 || DisplayMode == 3)
-				SendMessage(hwndPlugin, BB_BROADCAST, 0, (LPARAM)"@bbfoomp Show_Hide");
+				SendMessage(hwndPlugin, BB_BROADCAST, 0, (LPARAM)L"@bbfoomp Show_Hide");
 			break;
 		}
 		case WM_LBUTTONDOWN:
@@ -903,11 +905,11 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			for (int i = 0; i < e_last_button_item; ++i)
 				if (getSettings().buttons[i].pressed)
 				{
-					char buffer[128];
+					wchar_t buffer[128];
 					if (GetAsyncKeyState(VK_MENU) & 0x8000)
-						sprintf(buffer,"@bbfoomp AltPress%d", i + 1);
+						wsprintf(buffer, L"@bbfoomp AltPress%d", i + 1);
 					else
-						sprintf(buffer,"@bbfoomp Press%d", i + 1);
+						wsprintf(buffer, L"@bbfoomp Press%d", i + 1);
 					SendMessage(hwndPlugin, BB_BROADCAST, 0, (LPARAM)buffer);
 				}
 			
