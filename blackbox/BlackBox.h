@@ -14,6 +14,7 @@
 #include <plugin/PluginManager.h>
 #include "blackbox_api.h"
 #include <bblibcompat/StyleStruct.h>
+#include "BroamServer.h"
 namespace bb { struct MenuWidget; }
 namespace YAML { class Node; }
 
@@ -108,6 +109,7 @@ namespace bb {
 		friend LRESULT CALLBACK mainWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 		bool DetectConfig ();
 		bool Win32RegisterClass (wchar_t const * classname, WNDPROC wndproc, int flags);
+		bool HandleBroamMessage (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 		void HandleServerMessages ();
 		std::unique_ptr<Command> HandleServerMessage (std::unique_ptr<Command> const & request);
 		HWND FindTopLevelWindow () const;
@@ -125,6 +127,7 @@ namespace bb {
 		CommandLine m_cmdLine;
 		Scheme m_scheme;
 		Server m_server;
+		BroamServer m_broamServer;
 
 		std::unique_ptr<StyleStruct> m_defaultStyle; /// legacy style
 		std::unique_ptr<StyleStruct> m_style; /// legacy style

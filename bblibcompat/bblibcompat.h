@@ -102,14 +102,14 @@ API_EXPORT int FoundLastValue(void);
 /* Returns: 0=not found, 1=found exact value, 2=found matching wildcard */
 
 /* Write Settings */
-API_EXPORT void WriteBool(const char* fileName, const char* szKey, bool value);
-API_EXPORT void WriteInt(const char* fileName, const char* szKey, int value);
-API_EXPORT void WriteString(const char* fileName, const char* szKey, const char* value);
-API_EXPORT void WriteColor(const char* fileName, const char* szKey, COLORREF value);
+API_EXPORT void WriteBool (const wchar_t * fileName, const wchar_t * szKey, bool value);
+API_EXPORT void WriteInt (const wchar_t * fileName, const wchar_t * szKey, int value);
+API_EXPORT void WriteString (const wchar_t * fileName, const wchar_t * szKey, const wchar_t * value);
+API_EXPORT void WriteColor (const wchar_t * fileName, const wchar_t * szKey, COLORREF value);
 
 /* ------------------------------------ */
 /* Shell execute a command */
-API_EXPORT BOOL BBExecute(
+API_EXPORT BOOL BBExecute (
 	HWND Owner,         /*  normally NULL */
 	const wchar_t * szVerb,      /*  normally NULL */
 	const wchar_t * szFile,      /*  required */
@@ -118,3 +118,87 @@ API_EXPORT BOOL BBExecute(
 	int nShowCmd,       /*  normally SW_SHOWNORMAL */
 	int noErrorMsgs    /*  if true, suppresses errors */
 );
+API_EXPORT int BBMessageBox (int flg, const wchar_t *fmt, ...);
+
+/* Put first 'numTokens' from 'source' into 'targets', copy rest into
+'remaining', if it's not NULL. The 'targets' and 'remaining' buffers
+are zero-terminated always. Returns the number of actual tokens found */
+API_EXPORT int BBTokenize ( const wchar_t* source, wchar_t** targets, unsigned numTokens, wchar_t* remaining);
+
+API_EXPORT bool BBExecute_string (const wchar_t * s, int flags);
+
+/* ------------------------------------ */
+/* Plugin Menu API - See the SDK for application examples */
+
+/* creates a Menu or Submenu, Id must be unique, fshow indicates whether
+the menu should be shown (true) or redrawn (false) */
+// API_EXPORT Menu *MakeNamedMenu(const char* HeaderText, const char* Id, bool fshow);
+// API_EXPORT MenuItem * MakeMenuGrip (Menu * PluginMenu, LPCSTR Title ISNULL);
+// 
+// /* inserts an item to execute a command or to set a boolean value */
+// API_EXPORT MenuItem *MakeMenuItem(
+// 	Menu *PluginMenu, const char* Title, const char* Cmd, bool ShowIndicator);
+// 
+// /* inserts an inactive item, optionally with text. 'Title' may be NULL. */
+// API_EXPORT MenuItem *MakeMenuNOP(Menu *PluginMenu, const char* Title ISNULL);
+// 
+// /* inserts an item to adjust a numeric value */
+// API_EXPORT MenuItem *MakeMenuItemInt(
+// 	Menu *PluginMenu, const char* Title, const char* Cmd,
+// 	int val, int minval, int maxval);
+// 
+// /* inserts an item to edit a string value */
+// API_EXPORT MenuItem *MakeMenuItemString(
+// 	Menu *PluginMenu, const char* Title, const char* Cmd,
+// 	const char* init_string ISNULL);
+// 
+// /* inserts an item, which opens a submenu */
+// API_EXPORT MenuItem *MakeSubmenu(
+// 	Menu *ParentMenu, Menu *ChildMenu, const char* Title ISNULL);
+// 
+// /* inserts an item, which opens a submenu from a system folder.
+// 'Cmd' optionally may be a Broam which then is sent on user click
+// with "%s" in the broam string replaced by the selected filename */
+// API_EXPORT MenuItem* MakeMenuItemPath(
+// 	Menu *ParentMenu, const char* Title, const char* path, const char* Cmd ISNULL);
+// 
+// /* Context menu for filesystem items. One of path or pidl can be NULL */
+// API_EXPORT Menu *MakeContextMenu(const char *path, const void *pidl);
+// 
+// /* shows the menu */
+// API_EXPORT void ShowMenu(Menu *PluginMenu);
+// 
+// /* checks whether a menu with ID starting with 'IDString_start', still exists */
+// API_EXPORT bool MenuExists(const char* IDString_start);
+// 
+// /* set option for MenuItem  */
+// API_EXPORT void MenuItemOption(MenuItem *pItem, int option, ...);
+// #define BBMENUITEM_DISABLED   1 /* set disabled state */
+// #define BBMENUITEM_CHECKED    2 /* set checked state */
+// #define BBMENUITEM_LCOMMAND   3 /* next arg is command for left click */
+// #define BBMENUITEM_RCOMMAND   4 /* next arg is command for right click */
+// #define BBMENUITEM_OFFVAL     5 /* next args are offval, offstring (with Int-Items) */
+// #define BBMENUITEM_UPDCHECK   6 /* update checkmarks on the fly */
+// #define BBMENUITEM_JUSTIFY    7 /* next arg is DT_LEFT etc... */
+// #define BBMENUITEM_SETICON    8 /* next arg is "path\to\icon[,iconindex]" */
+// #define BBMENUITEM_SETHICON   9 /* next arg is HICON */
+// #define BBMENUITEM_RMENU     10 /* next arg is Menu* for right-click menu */
+// 
+// API_EXPORT void MenuOption(Menu *pMenu, int flags, ...);
+// #define BBMENU_XY             0x0001 /* next arg is x/y position */
+// #define BBMENU_RECT           0x0002 /* next arg is *pRect to show above/below */
+// #define BBMENU_CENTER         0x0003 /* center menu on screen */
+// #define BBMENU_CORNER         0x0004 /* align with corner on mouse */
+// #define BBMENU_POSMASK        0x0007 /* bit mask for above positions */
+// #define BBMENU_KBD            0x0008 /* use position from blackbox.rc */
+// #define BBMENU_XRIGHT         0x0010 /* x is menu's right */
+// #define BBMENU_YBOTTOM        0x0020 /* y is menu's bottom */
+// #define BBMENU_PINNED         0x0040 /* show menu initially pinned */
+// #define BBMENU_ONTOP          0x0080 /* show menu initially on top */
+// #define BBMENU_NOFOCUS        0x0100 /* dont set focus on menu */
+// #define BBMENU_NOTITLE        0x0200 /* no title */
+// #define BBMENU_MAXWIDTH       0x0400 /* next arg is maximal menu width */
+// #define BBMENU_SORT           0x0800 /* sort menu alphabetically */
+// #define BBMENU_ISDROPTARGET   0x1000 /* register as droptarget */
+// #define BBMENU_HWND           0x2000 /* next arg is HWND to send notification on menu-close */
+// #define BBMENU_SYSMENU        0x4000 /* is a system menu (for bbLeanSkin/Bar) */

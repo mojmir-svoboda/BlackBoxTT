@@ -40,6 +40,7 @@ set(blackbox_SOURCES
 	BlackBox.cpp
 	BlackBoxConfig.cpp
 	BlackBox_binds.cpp
+	BlackBox_broams.cpp
 	Explorer.cpp
 	VirtualDesktopManager.cpp
 	DesktopWallpaper.cpp

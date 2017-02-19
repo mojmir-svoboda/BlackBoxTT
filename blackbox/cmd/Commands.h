@@ -214,3 +214,29 @@
 
 	/* win9x: left/right winkey pressed */
 #define BB_WINKEY               10886
+
+#define BBOPT_QUIET 1
+#define BBOPT_PAUSE 1
+#define BB_GETBOOL              10870
+#define BB_SENDDATA             10890
+#define BB_GETSTYLE             10891
+#define BB_GETSTYLESTRUCT       10892
+#define BB_SETSTYLESTRUCT       10893
+#define BB_POSTSTRING           10899   /* asynchrone execute command */
+
+	/* Blackbox window timers */
+#define BB_RUNSTARTUP_TIMER     1
+#define BB_ENDSTARTUP_TIMER     2
+#define BB_TASKUPDATE_TIMER     3
+
+
+
+//====================
+// special menu broams
+#define MM_STYLE_BROAM "@BBCore.style %s"
+#define MM_EDIT_BROAM "@BBCore.edit %s"
+#define MM_THEME_BROAM "@BBCore.theme %s"
+#define MM_ROOT_BROAM "@BBCore.rootCommand %s"
+
+
+#define RUN_SHOWERRORS  0

@@ -7,6 +7,7 @@
 #include <bblibcompat/bblibcompat.h>
 #include <bblibcompat/StyleStruct.h>
 #include <bblib/utils_paths.h>
+#include <3rd_party/Assert/Assert.h>
 
 #define BBFOOMP_UPDATE_TIMER 1
 #define BB_BRINGTOFRONT 10504

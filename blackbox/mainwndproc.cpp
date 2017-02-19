@@ -65,6 +65,12 @@ LRESULT CALLBACK mainWndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 
 		default:
 		{
+			const bool handled = bb.HandleBroamMessage(hwnd, uMsg, wParam, lParam);
+			if (handled)
+			{
+				return 0;
+			}
+
 			if (uMsg == bb.m_taskHookWM || uMsg == bb.m_taskHook32on64WM)
 			{
 				LRESULT const res = bb::BlackBox::Instance().GetTasks().UpdateFromTaskHook(wParam, lParam);

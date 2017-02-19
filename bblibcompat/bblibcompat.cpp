@@ -1,9 +1,11 @@
 #include "bblibcompat.h"
 #include <crazyrc/crazyrc.h>
 #include <bblib/utils_paths.h>
+#include "utils_string.h"
 #include <Shlwapi.h>
 #include <shellapi.h>
 #include <bblibcompat/winutils.h>
+#include <algorithm>
 
 int Settings_snapThreshold = 7;
 int Settings_snapPadding = 2;
@@ -510,7 +512,7 @@ const TCHAR * ReadString(const TCHAR * fileName, const TCHAR * key, const TCHAR 
 // API: WriteBool
 //===========================================================================
 
-void WriteBool(const TCHAR * fileName, const TCHAR * szKey, bool value)
+void WriteBool (const TCHAR * fileName, const TCHAR * szKey, bool value)
 {
 	write_value(fileName, szKey, value ? TEXT("true") : TEXT("false"));
 }
@@ -598,3 +600,156 @@ skip:
 
 	return FALSE;
 }
+
+
+	bool BBExecute_string (const wchar_t * line, int flags)
+	{
+		char workdir[MAX_PATH];
+		char file[MAX_PATH];
+		const char *cmd, *args;
+		char *cmd_temp = NULL;
+		char *line_temp = NULL;
+		int n, ret;
+
+// 		workdir[0] = 0;
+// 		if (flags & RUN_WINDIR)
+// 			GetWindowsDirectory(workdir, sizeof workdir);
+// 		else
+// 			GetBlackboxPath(workdir, sizeof workdir);
+// 
+// 		if (0 == (flags & RUN_NOSUBST))
+// 			line = replace_environment_strings_alloc(&line_temp, line);
+// 
+// 		if (flags & RUN_NOARGS) {
+// 			cmd = line;
+// 			args = NULL;
+// 			strcpy(file, cmd);
+// 
+// 		} else {
+// 			for (args = line;; args += args[0] == ':')
+// 			{
+// 				cmd = args;
+// 				NextToken(file, &args, NULL);
+// 				if (file[0] != '-')
+// 					break;
+// 
+// 				// -hidden : run in a hidden window
+// 				if (0 == strcmp(file+1, "hidden")) {
+// 					flags |= RUN_HIDDEN;
+// 					continue;
+// 				}
+// 
+// 				// -in <path> ; specify working directory
+// 				if (0 == strcmp(file+1, "in")) {
+// 					NextToken(file, &args, NULL);
+// 					replace_shellfolders(workdir, file, true);
+// 					continue;
+// 				}
+// 
+// 				// -workspace1 : specify workspace
+// 				if (-1 != (n = get_workspace_number(file+1))) {
+// 					SendMessage(BBhwnd, BB_SWITCHTON, 0, n);
+// 					BBSleep(10);
+// 					continue;
+// 				}
+// 				break;
+// 			}
+// 			if (0 == args[0])
+// 				args = NULL;
+// 		}
+// 
+// 		if (0 == (flags & RUN_NOSUBST)) {
+// 			n = '\"' == file[0];
+// 			cmd_temp = (char*)m_alloc((args ? strlen(args) : 0) + MAX_PATH + 10);
+// 			strcpy(cmd_temp, replace_shellfolders(file, file, true));
+// 			if (n)
+// 				quote_path(cmd_temp);
+// 			if (args)
+// 				sprintf(strchr(cmd_temp, 0), " %s", args);
+// 			cmd = cmd_temp;
+// 		}
+// 
+// 		ret = -1 != run_process(cmd, workdir, flags);
+// 		if (ret) {
+// 			// dbg_printf("cmd (%d) <%s>", ret, cmd);
+// 		} else {
+// 			ret = BBExecute(NULL, NULL, file, args, workdir,
+// 				flags & RUN_HIDDEN ? SW_HIDE : SW_SHOWNORMAL,
+// 				flags & RUN_NOERRORS);
+// 			// dbg_printf("exec (%d) <%s> <%s>", ret, file, args);
+// 		}
+// 
+// 		free_str(&cmd_temp);
+// 		free_str(&line_temp);
+		return ret;
+	}
+
+
+	int nexttoken (const wchar_t **p_out, const wchar_t **p_in, const wchar_t *delims)
+	{
+		const wchar_t *s = nullptr, *a = nullptr, *e = nullptr;
+		wchar_t c, q;
+		int delim_spc;
+
+		delim_spc = NULL == delims || wcschr(delims, L' ');
+
+		for (a = e = s = *p_in, q = 0; 0 != (c = *s);)
+		{
+			++s;
+			if (0==q)
+			{
+				if (L'\"'==c || L'\''==c)
+					q = c;
+				else if (IS_SPC(c))
+				{
+					if (e == a)
+					{
+						a = e = s;
+						continue;
+					}
+					if (delim_spc)
+						break;
+				}
+				if (delims && wcschr(delims, c))
+					break;
+			}
+			else if (c==q)
+			{
+				q=0;
+			}
+			e = s;
+		}
+		while (e > a && IS_SPC(e[-1]))
+			--e;
+		skip_spc(s);
+		*p_out = a, *p_in = s;
+		return (int)(e - a);
+	}
+
+	int BBTokenize (
+		const wchar_t * srcString,
+		wchar_t ** lpszBuffers,
+		unsigned dwNumBuffers,
+		wchar_t * szExtraParameters)
+	{
+		const wchar_t * s = srcString;
+		int stored = 0;
+
+		//dbg_printf("BBTokenize [%d] <%s>", dwNumBuffers, srcString);
+		for (unsigned c = 0; c < dwNumBuffers; ++c)
+		{
+			const wchar_t * a = nullptr;
+			wchar_t *out = nullptr;
+			int n = nexttoken(&a, &s, NULL);
+			if (n) {
+				if ((L'\''  == a[0] || L'\"' == a[0]) && n >= 2 && a[n-1] == a[0])
+					++a, n -= 2; /* remove quotes */
+				++stored;
+			}
+			out = lpszBuffers[c];
+			extract_string(out, a, std::min(n, MAX_PATH-1));
+		}
+		if (szExtraParameters)
+			strcpy_max(szExtraParameters, s, MAX_PATH);
+		return stored;
+	}
