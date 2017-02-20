@@ -41,6 +41,7 @@ set(blackbox_SOURCES
 	BlackBoxConfig.cpp
 	BlackBox_binds.cpp
 	BlackBox_broams.cpp
+	BlackBox_compat.cpp
 	Explorer.cpp
 	VirtualDesktopManager.cpp
 	DesktopWallpaper.cpp
@@ -65,6 +66,7 @@ set(blackbox_SOURCES
 set (blackbox_HEADERS
 	common.h
 	BlackBox.h
+	BlackBox_compat.h
 	BlackBoxConfig.h
 	CommandLine.h
 	Explorer.h

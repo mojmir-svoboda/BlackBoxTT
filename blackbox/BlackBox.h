@@ -138,7 +138,6 @@ namespace bb {
 		std::unique_ptr<Gfx> m_gfx;
 		PluginManager m_plugins;
 		DesktopWallpaper m_wallpapers;
-		MenuWidget * m_menuWidget { nullptr };
 	};
 }
 

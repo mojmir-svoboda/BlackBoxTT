@@ -82,21 +82,21 @@ namespace bb {
 			//====================
 			// Execute a string (shellcommand or broam)
 		case BB_EXECUTE:
-			//exec_command((const char*)lParam);
+			//exec_command((wchar_t const *)lParam);
 			break;
 
 		case BB_POSTSTRING: // posted command-string, from menu click
-												//exec_command((const char*)lParam);
+												//exec_command((wchar_t const *)lParam);
 												//m_free((char*)lParam);
 			break;
 
 		case BB_EXECUTEASYNC:
-			//post_command((const char*)lParam);
+			//post_command((wchar_t const *)lParam);
 			break;
 
 			//====================
 		case BB_BROADCAST:
-			//if (false == exec_broam((const char*)lParam))
+			//if (false == exec_broam((wchar_t const *)lParam))
 			//	goto dispatch_bb_message;
 			break;
 
@@ -112,7 +112,7 @@ namespace bb {
 			//====================
 			// Menu
 		case BB_MENU:
-			//if (MenuMaker_ShowMenu(wParam, (const char*)lParam))
+			//if (MenuMaker_ShowMenu(wParam, (wchar_t const *)lParam))
 			//	goto dispatch_bb_message;
 			break;
 
@@ -122,7 +122,7 @@ namespace bb {
 
 			//======================================================
 		case BB_SETTHEME:
-			//str = (const char*)lParam;
+			//str = (wchar_t const *)lParam;
 			//goto do_restart;
 
 		case BB_RESTART:
