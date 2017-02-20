@@ -727,29 +727,62 @@ skip:
 	}
 
 	int BBTokenize (
-		const wchar_t * srcString,
-		wchar_t ** lpszBuffers,
-		unsigned dwNumBuffers,
-		wchar_t * szExtraParameters)
+		const wchar_t * src,
+		wchar_t ** buffs,
+		size_t * buff_sizes,
+		unsigned buff_count,
+		wchar_t * rest_of_string,
+		size_t rest_of_string_size,
+		bool unquote
+		)
 	{
-		const wchar_t * s = srcString;
-		int stored = 0;
+		const wchar_t * s = src;
+		const wchar_t delim = L' ';
 
-		//dbg_printf("BBTokenize [%d] <%s>", dwNumBuffers, srcString);
-		for (unsigned c = 0; c < dwNumBuffers; ++c)
+		size_t n_results = 0;
+		do
 		{
-			const wchar_t * a = nullptr;
-			wchar_t *out = nullptr;
-			int n = nexttoken(&a, &s, NULL);
-			if (n) {
-				if ((L'\''  == a[0] || L'\"' == a[0]) && n >= 2 && a[n-1] == a[0])
-					++a, n -= 2; /* remove quotes */
-				++stored;
+			const wchar_t * token_begin = s;
+
+			while (*s != delim && *s)
+				++s;
+
+			if (n_results < buff_count)
+			{
+				size_t const tok_sz = std::distance(token_begin, s);
+				wcsncpy(buffs[n_results], token_begin, tok_sz);
+				buffs[n_results][tok_sz] = 0;
+				++n_results;
 			}
-			out = lpszBuffers[c];
-			extract_string(out, a, std::min(n, MAX_PATH-1));
-		}
-		if (szExtraParameters)
-			strcpy_max(szExtraParameters, s, MAX_PATH);
-		return stored;
+			else
+			{
+				wcsncpy(rest_of_string, s, rest_of_string_size);
+				break;
+			}
+
+		} while (0 != *s++);
+
+		return n_results;
+
+
+// 		const wchar_t * s = srcString;
+// 		int stored = 0;
+// 
+// 		//dbg_printf("BBTokenize [%d] <%s>", dwNumBuffers, srcString);
+// 		for (unsigned c = 0; c < dwNumBuffers; ++c)
+// 		{
+// 			const wchar_t * a = nullptr;
+// 			wchar_t *out = nullptr;
+// 			int n = nexttoken(&a, &s, NULL);
+// 			if (n) {
+// 				if ((L'\''  == a[0] || L'\"' == a[0]) && n >= 2 && a[n-1] == a[0])
+// 					++a, n -= 2; /* remove quotes */
+// 				++stored;
+// 			}
+// 			out = lpszBuffers[c];
+// 			extract_string(out, a, std::min(n, MAX_PATH-1));
+// 		}
+// 		if (szExtraParameters)
+// 			strcpy_max(szExtraParameters, s, MAX_PATH);
+// 		return stored;
 	}

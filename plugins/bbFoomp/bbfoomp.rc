@@ -1,0 +1,42 @@
+bbfoomp.foobar.path: C:\Program Files (x86)\foobar2000\foobar2000.exe
+bbfoomp.displaytype: 1
+bbfoomp.FooWidth: 200
+bbfoomp.height: 22
+bbfoomp.borderwidth: 3
+bbfoomp.xpos: 2912
+bbfoomp.ypos: 13
+bbfoomp.dockedtoslit: false
+bbfoomp.OnTop: false
+bbfoomp.transparency: false
+bbfoomp.transparencyAlpha: 220
+bbfoomp.RectangleStyle: 2
+bbfoomp.MegaLeftAlign: true
+bbfoomp.DefaultText: ---
+bbfoomp.button1.image: 0
+bbfoomp.button1.command: /prev
+bbfoomp.button1.altcommand: 
+bbfoomp.button2.image: 1
+bbfoomp.button2.command: /play
+bbfoomp.button2.altcommand: /rand
+bbfoomp.button3.image: 2
+bbfoomp.button3.command: /playpause
+bbfoomp.button3.altcommand: 
+bbfoomp.button4.image: 3
+bbfoomp.button4.command: /stop
+bbfoomp.button4.altcommand: 
+bbfoomp.button5.image: 4
+bbfoomp.button5.command: /next
+bbfoomp.button5.altcommand: 
+bbfoomp.button6.image: 5
+bbfoomp.button6.command: /command:"Activate or hide"
+bbfoomp.button6.altcommand: 
+bbfoomp.button7.image: 6
+bbfoomp.button7.command: /command:"Volume up"
+bbfoomp.button7.altcommand: 
+bbfoomp.button8.image: 7
+bbfoomp.button8.command: /command:"Volume down"
+bbfoomp.button8.altcommand: 
+bbfoomp.button9.image: 8
+bbfoomp.button9.command: /command:"Open..."
+bbfoomp.button9.altcommand: /command:"Add files..."
+bbfoomp.ScrollSpeed: 5

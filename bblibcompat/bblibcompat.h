@@ -123,7 +123,16 @@ API_EXPORT int BBMessageBox (int flg, const wchar_t *fmt, ...);
 /* Put first 'numTokens' from 'source' into 'targets', copy rest into
 'remaining', if it's not NULL. The 'targets' and 'remaining' buffers
 are zero-terminated always. Returns the number of actual tokens found */
-API_EXPORT int BBTokenize ( const wchar_t* source, wchar_t** targets, unsigned numTokens, wchar_t* remaining);
+API_EXPORT 
+int BBTokenize (
+	const wchar_t * src,
+	wchar_t ** buffs,
+	size_t * buff_sizes,
+	unsigned buff_count,
+	wchar_t * rest_of_string,
+	size_t rest_of_string_size,
+	bool unquote
+);
 
 API_EXPORT bool BBExecute_string (const wchar_t * s, int flags);
 

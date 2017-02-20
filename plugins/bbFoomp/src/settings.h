@@ -4,17 +4,24 @@
 
 struct Settings
 {
-  int xpos, ypos;
-  int width, height, BorderWidth;
-  int FooMode, FooWidth;
+  int xpos { 0 };
+	int ypos { 0 };
+	int width { 0 };
+	int height { 22 };
+	int BorderWidth { 3 };
+  int FooMode { 2 };
+	int FooWidth { 200 };
   FoompButton buttons[e_last_button_item];
-  bool FooDockedToSlit;
-  bool FooOnTop, FooTrans, FooAlign, FooShadowsEnabled;
+  bool FooDockedToSlit { false };
+  bool FooOnTop { false };
+	bool FooTrans { false };
+	bool FooAlign { true };
+	bool FooShadowsEnabled { false };
   // Determines style:
-  int InnerStyleIndex;
-  int OuterStyleIndex;
-  int FooScrollSpeed;
-  int transparencyAlpha;
+	int InnerStyleIndex { 2 };
+	int OuterStyleIndex { 4 };
+	int FooScrollSpeed { 3 };
+	int transparencyAlpha { 220 };
   // paths
   bbstring rcpath;
   bbstring FooPath;
@@ -25,16 +32,7 @@ struct Settings
   void WriteDefaultRCSettings ();
 
 	Settings ()
-		: xpos(0), ypos(0)
-		, width(), height(22), BorderWidth(3)
-		, FooMode(2), FooWidth(200)
-		, FooDockedToSlit(false)
-		, FooOnTop(false), FooTrans(false), FooAlign(true), transparencyAlpha(220)
-		, InnerStyleIndex(2)
-		, OuterStyleIndex(4)
-		, FooShadowsEnabled(false)
-		, FooScrollSpeed(5)
-		, rcpath()
+		: rcpath()
 		
 #if defined _WIN64
 		, FooPath(L"C:\\Program Files (x86)\\foobar2000\\foobar2000.exe") // Foo Directory [FooPath]

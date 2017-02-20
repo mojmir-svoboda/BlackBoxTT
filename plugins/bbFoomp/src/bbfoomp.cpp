@@ -351,12 +351,11 @@ void handleBroamMsg (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		// bbFoomp internal commands (e.g. for the menu)...
 		static char msg[MAX_LINE_LENGTH];
 		wchar_t token1[4096], token2[4096], extra[4096];
-		LPWSTR tokens[2];
-		tokens[0] = token1;
-		tokens[1] = token2;
+		wchar_t * tokens[2] = { token1, token2 };
+		size_t sizes[2] = { 4096, 4096 };
 
 		token1[0] = token2[0] = extra[0] = '\0';
-		BBTokenize(temp, tokens, 2, extra);
+		BBTokenize(temp, tokens, sizes, 2, extra, 4096, true);
 
 		if (!wcsicmp(token2, L"Readme"))
 		{
