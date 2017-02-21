@@ -23,16 +23,16 @@ for more details.
 #include "gfx/MenuWidget.h"
 //===========================================================================
 // API: MakeNamedMenu
-// Purpose:         Create or refresh a Menu
+// Purpose:         Create or refresh a bb::MenuWidget
 // In: HeaderText:  the menu title
 // In: IDString:    An unique string that identifies the menu window
 // In: popup        true: menu is to be shown, false: menu is to be refreshed
-// Out: Menu *:     A pointer to a Menu structure (opaque for the client)
+// Out: bb::MenuWidget *:     A pointer to a bb::MenuWidget structure (opaque for the client)
 // Note:            A menu once it has been created must be passed to
 //                  either 'MakeSubMenu' or 'ShowMenu'.
 //===========================================================================
 
-Menu *MakeNamedMenu (wchar_t const * HeaderText, wchar_t const * IDString, bool popup)
+bb::MenuWidget * MakeNamedMenu (wchar_t const * HeaderText, wchar_t const * IDString, bool popup)
 {
 	bb::BlackBox & bb = bb::BlackBox::Instance();
 
@@ -42,30 +42,20 @@ Menu *MakeNamedMenu (wchar_t const * HeaderText, wchar_t const * IDString, bool 
 	{
 		w = bb.GetGfx().MkWidget(bb::MenuWidget::c_type, IDString);
 	}
-
-	POINT p;
-	if (::GetCursorPos(&p))
+	else
 	{
-		RECT r;
-		::GetWindowRect(w->m_gfxWindow->m_hwnd, &r);
-		if (::PtInRect(&r, p))
-		{
-			if (!new_menu)
-				bb.GetGfx().DestroyWindow(IDString);
-		}
-		else
-		{
-			w->MoveWindow(p.x, p.y);
-			//m_tasks.Focus(w->m_gfxWindow->m_hwnd);
-			w->Show(true);
-		}
+		Assert(0 && "todo");
+		//w->GetConfig().Clear();
 	}
-	return nullptr;
+
+	Assert(w && w->GetWidgetTypeName() == bb::MenuWidget::c_type);
+	bb::MenuWidget * menu = static_cast<bb::MenuWidget *>(w);
+	return menu;
 }
 
-// 	Menu *pMenu = NULL;
+// 	bb::MenuWidget *pMenu = NULL;
 // 	if (IDString)
-// 		pMenu = Menu::find_named_menu(IDString);
+// 		pMenu = bb::MenuWidget::find_named_menu(IDString);
 // 
 // 	if (pMenu) {
 // 		pMenu->incref();
@@ -74,7 +64,7 @@ Menu *MakeNamedMenu (wchar_t const * HeaderText, wchar_t const * IDString, bool 
 // 		if (HeaderText)
 // 			replace_str(&pMenu->m_pMenuItems->m_pszTitle, NLS1(HeaderText));
 // 	} else {
-// 		pMenu = new Menu(NLS1(HeaderText));
+// 		pMenu = new bb::MenuWidget(NLS1(HeaderText));
 // 		pMenu->m_IDString = new_str(IDString);
 // 	}
 // 	pMenu->m_bPopup = popup;
@@ -86,7 +76,7 @@ Menu *MakeNamedMenu (wchar_t const * HeaderText, wchar_t const * IDString, bool 
 // API: MakeMenu
 // Purpose: as above, for menus that dont need refreshing
 //===========================================================================
-Menu *MakeMenu (wchar_t const * HeaderText)
+bb::MenuWidget * MakeMenu (wchar_t const * HeaderText)
 {
 	static int menu_counter = 0;
 	wchar_t tmp[256];
@@ -99,7 +89,7 @@ Menu *MakeMenu (wchar_t const * HeaderText)
 // Purpose: obsolete
 //===========================================================================
 
-void DelMenu (Menu *PluginMenu)
+void DelMenu (bb::MenuWidget *PluginMenu)
 {
 	// Nothing here. We just dont know wether 'PluginMenu' still
 	// exists. The pointer may be invalid or even belong to
@@ -112,7 +102,7 @@ void DelMenu (Menu *PluginMenu)
 // IN: PluginMenu - pointer to the toplevel menu
 //===========================================================================
 
-void ShowMenu (Menu *PluginMenu)
+void ShowMenu (bb::MenuWidget *PluginMenu)
 {
 // 	if (NULL == PluginMenu)
 // 		return;
@@ -134,7 +124,7 @@ void ShowMenu (Menu *PluginMenu)
 // API: MakeSubmenu
 //===========================================================================
 
-MenuItem* MakeSubmenu (Menu *ParentMenu, Menu *ChildMenu, wchar_t const * Title)
+bb::MenuConfigItem* MakeSubmenu (bb::MenuWidget *ParentMenu, bb::MenuWidget *ChildMenu, wchar_t const * Title)
 {
 	return nullptr;
 // 	//dbg_printf("MakeSubmenu %x %s - %x %s", ParentMenu, ParentMenu->m_pMenuItems->m_pszTitle, ChildMenu, Title);
@@ -149,9 +139,11 @@ MenuItem* MakeSubmenu (Menu *ParentMenu, Menu *ChildMenu, wchar_t const * Title)
 // API: MakeMenuItem
 //===========================================================================
 
-MenuItem *MakeMenuItem(Menu *PluginMenu, wchar_t const * Title, wchar_t const * Cmd, bool ShowIndicator)
+bb::MenuConfigItem * MakeMenuItem (bb::MenuWidget * menu, wchar_t const * Title, wchar_t const * Cmd, bool ShowIndicator)
 {
-	return nullptr;
+	std::shared_ptr<bb::MenuConfigItemBroam> item(new bb::MenuConfigItemBroam(Title, Cmd));
+	menu->m_config.m_items.push_back(item);
+	return item.get();
 // 	//dbg_printf("MakeMenuItem %x %s", PluginMenu, Title);
 // 	return PluginMenu->AddMenuItem(new CommandItem(Cmd, NLS1(Title), ShowIndicator));
 }
@@ -160,7 +152,7 @@ MenuItem *MakeMenuItem(Menu *PluginMenu, wchar_t const * Title, wchar_t const * 
 // API: MakeMenuItemInt
 //===========================================================================
 
-MenuItem *MakeMenuItemInt(Menu *PluginMenu, wchar_t const * Title, wchar_t const * Cmd, int val, int minval, int maxval)
+bb::MenuConfigItem *MakeMenuItemInt(bb::MenuWidget *PluginMenu, wchar_t const * Title, wchar_t const * Cmd, int val, int minval, int maxval)
 {
 	return nullptr;
 // 	return helper_menu(PluginMenu, Title, MENU_ID_INT,
@@ -171,7 +163,7 @@ MenuItem *MakeMenuItemInt(Menu *PluginMenu, wchar_t const * Title, wchar_t const
 // API: MakeMenuItemString
 //===========================================================================
 
-MenuItem *MakeMenuItemString(Menu *PluginMenu, wchar_t const * Title, wchar_t const * Cmd, wchar_t const * init_string)
+bb::MenuConfigItem *MakeMenuItemString(bb::MenuWidget *PluginMenu, wchar_t const * Title, wchar_t const * Cmd, wchar_t const * init_string)
 {
 	return nullptr;
 // 	return helper_menu(PluginMenu, Title, MENU_ID_STRING,
@@ -182,13 +174,13 @@ MenuItem *MakeMenuItemString(Menu *PluginMenu, wchar_t const * Title, wchar_t co
 // API: MakeMenuNOP
 //===========================================================================
 
-MenuItem* MakeMenuNOP(Menu *PluginMenu, wchar_t const * Title)
+bb::MenuConfigItem* MakeMenuNOP(bb::MenuWidget *PluginMenu, wchar_t const * Title)
 {
 	return nullptr;
 // 	/* BlackboxZero 1.8.2012 - For separator graident? */
-// 	MenuItem *pItem;
+// 	bb::MenuConfigItem *pItem;
 // 	if (Title && Title[0]) {
-// 		pItem = new MenuItem(NLS1(Title));
+// 		pItem = new bb::MenuConfigItem(NLS1(Title));
 // 	} else {
 // 		pItem = new SeparatorItem();
 // 	}
@@ -200,7 +192,7 @@ MenuItem* MakeMenuNOP(Menu *PluginMenu, wchar_t const * Title)
 // API: MakeMenuGrip
 //===========================================================================
 
-MenuItem* MakeMenuGrip(Menu *PluginMenu, LPCSTR Title)
+bb::MenuConfigItem* MakeMenuGrip(bb::MenuWidget *PluginMenu, LPCSTR Title)
 {
 	return nullptr;
 // 	if ( Settings_menusGripEnabled )
@@ -213,17 +205,17 @@ MenuItem* MakeMenuGrip(Menu *PluginMenu, LPCSTR Title)
 // API: MakeMenuItemPath
 //===========================================================================
 
-MenuItem* MakeMenuItemPath (Menu *ParentMenu, wchar_t const * Title, wchar_t const * path, wchar_t const * Cmd)
+bb::MenuConfigItem* MakeMenuItemPath (bb::MenuWidget *ParentMenu, wchar_t const * Title, wchar_t const * path, wchar_t const * Cmd)
 {
 	return nullptr;
-// 	MenuItem * pItem = new SpecialFolderItem(NLS1(Title), path, NULL, Cmd);
+// 	bb::MenuConfigItem * pItem = new SpecialFolderItem(NLS1(Title), path, NULL, Cmd);
 // 	return ParentMenu->AddMenuItem(pItem);
 }
 
-MenuItem* MakeMenuInsertPath (Menu *ParentMenu, wchar_t const * Title, wchar_t const * path, wchar_t const * Cmd)
+bb::MenuConfigItem* MakeMenuInsertPath (bb::MenuWidget *ParentMenu, wchar_t const * Title, wchar_t const * path, wchar_t const * Cmd)
 {
 	return nullptr;
-// 	MenuItem * items = NULL;
+// 	bb::MenuConfigItem * items = NULL;
 // 	pidl_node * p = get_folder_pidl_list(path);
 // 	ParentMenu->AddFolderContents(p, Cmd);
 // 	delete_pidl_list(&p);
@@ -237,14 +229,14 @@ MenuItem* MakeMenuInsertPath (Menu *ParentMenu, wchar_t const * Title, wchar_t c
 bool MenuExists(wchar_t const * IDString_part)
 {
 	return false;
-/*	return NULL != Menu::find_named_menu(IDString_part, true);*/
+/*	return NULL != bb::MenuWidget::find_named_menu(IDString_part, true);*/
 }
 
 //===========================================================================
 // API: MenuItemOption - set some options for a menuitem
 //===========================================================================
 
-void MenuItemOption(MenuItem *pItem, int option, ...)
+void MenuItemOption(bb::MenuConfigItem *pItem, int option, ...)
 {
 // 	va_list vl;
 // 	if (NULL == pItem)
@@ -277,7 +269,7 @@ void MenuItemOption(MenuItem *pItem, int option, ...)
 // 		// set a command for right click
 // 	case BBMENUITEM_RMENU:
 // 	{
-// 		Menu *pSub = pItem->m_pRightmenu = va_arg(vl, Menu*);
+// 		bb::MenuWidget *pSub = pItem->m_pRightmenu = va_arg(vl, bb::MenuWidget*);
 // 		pSub->m_MenuID = MENU_ID_RMENU;
 // 		break;
 // 	}
@@ -329,7 +321,7 @@ void MenuItemOption(MenuItem *pItem, int option, ...)
 // API: MenuOption - set some special features for a individual menu
 //===========================================================================
 
-void MenuOption(Menu *pMenu, int flags, ...)
+void MenuOption(bb::MenuWidget *pMenu, int flags, ...)
 {
 // 	va_list vl;
 // 	int pos;
@@ -357,6 +349,6 @@ void MenuOption(Menu *pMenu, int flags, ...)
 // 		pMenu->m_bIsDropTarg = true;
 // 
 // 	if (flags & BBMENU_SORT)
-// 		Menu::Sort(&pMenu->m_pMenuItems->next, item_compare);
+// 		bb::MenuWidget::Sort(&pMenu->m_pMenuItems->next, item_compare);
 }
 

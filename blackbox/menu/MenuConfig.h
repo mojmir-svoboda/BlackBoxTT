@@ -12,6 +12,7 @@ namespace bb {
 		e_MenuItemExec,
 		e_MenuItemSubMenu,
 		e_MenuItemScript,
+		e_MenuItemBroam,
 		e_MenuItemCheckBox,
 	};
 
@@ -31,6 +32,12 @@ namespace bb {
 	{
 		bbstring m_script;
 		MenuConfigItemScript (bbstring const & name, bbstring const & script) : MenuConfigItem(e_MenuItemScript, name), m_script(script) { }
+	};
+
+	struct MenuConfigItemBroam : MenuConfigItem
+	{
+		bbstring m_broam;
+		MenuConfigItemBroam (bbstring const & name, bbstring const & broam) : MenuConfigItem(e_MenuItemBroam, name), m_broam(broam) { }
 	};
 
 	struct MenuConfigItemSubMenu : MenuConfigItem

@@ -53,9 +53,9 @@ const int button_spacing = 12;
 bool FirstUpdate = false; // Moved this up here from below.
 
 // Menu Class
-Menu * scMenu = 0;
-Menu * scSubMenu = 0;
-Menu * scSubMenu2 = 0;
+bb::MenuWidget * scMenu = 0;
+bb::MenuWidget * scSubMenu = 0;
+bb::MenuWidget * scSubMenu2 = 0;
 
 // Display/graphic variables
 int DisplayMode;	// If 1 = display mode, then mode = title; if 2 = display mode, then mode = controls.
@@ -251,9 +251,9 @@ void show_foomp_menu ()
 	scMenu = MakeMenu(L"bbFoomp");
 
 // 	//	<<	BEGIN	-- Controls Submenu
-// 	scSubMenu = MakeMenu(L"Controls");
-// 	MakeMenuItem(scSubMenu, L"Previous", L"@bbfoomp Previous", false);
-// 	MakeMenuItem(scSubMenu, L"Play/Pause", L"@bbfoomp Play_Pause", false);
+	scSubMenu = MakeMenu(L"Controls");
+	MakeMenuItem(scSubMenu, L"Previous", L"@bbfoomp Previous", false);
+	MakeMenuItem(scSubMenu, L"Play/Pause", L"@bbfoomp Play_Pause", false);
 // 	MakeMenuItem(scSubMenu, L"Stop", L"@bbfoomp Stop", false);
 // 	MakeMenuItem(scSubMenu, L"Next", L"@bbfoomp Next", false);
 // 	MakeMenuItem(scSubMenu, L"Random", L"@bbfoomp Random", false);
@@ -264,7 +264,7 @@ void show_foomp_menu ()
 // 		MakeMenuNOP(scSubMenu, L""); // Separator
 // 		MakeMenuItem(scSubMenu, L"Foobar > Off", L"@bbfoomp FooOff", false);
 // 	}
-// 	MakeSubmenu(scMenu, scSubMenu, L"Controls");
+ 	MakeSubmenu(scMenu, scSubMenu, L"Controls");
 // 	//	>>	END		-- Controls Submenu
 // 
 // 	//	<<	BEGIN	-- Playback Order Submenu

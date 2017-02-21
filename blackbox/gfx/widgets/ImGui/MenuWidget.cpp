@@ -133,6 +133,17 @@ namespace imgui {
 							bb::GfxWindow * r = m_gfxWindow->GetRoot();
 							r->SetDestroyTree();
 						}
+						else if (item->m_type == e_MenuItemBroam)
+						{
+							MenuConfigItemBroam const * script = static_cast<MenuConfigItemBroam const *>(item);
+							char item_val[1024];
+							codecvt_utf16_utf8(script->m_broam.c_str(), item_val, 1024);
+							char response[4096];
+							//bb::BlackBox::Instance().m_broamServer.HandleBroam()
+
+							bb::GfxWindow * r = m_gfxWindow->GetRoot();
+							r->SetDestroyTree();
+						}
 						else if (item->m_type == e_MenuItemSubMenu)
 						{	
 							// pos of submenu

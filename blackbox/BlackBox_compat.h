@@ -1,48 +1,46 @@
 #pragma once
 #include "common.h"
 #include "blackbox_api.h"
-//#include "gfx/GuiWidget.h"
-struct Menu { };
-struct MenuItem {};
+#include "gfx/MenuWidget.h"
 /* ------------------------------------ */
-/* Plugin Menu API - See the SDK for application examples */
+/* Plugin bb::MenuWidget API - See the SDK for application examples */
 
-/* creates a Menu or Submenu, Id must be unique, fshow indicates whether
+/* creates a bb::MenuWidget or Submenu, Id must be unique, fshow indicates whether
 the menu should be shown (true) or redrawn (false) */
-BB_API Menu * MakeNamedMenu (const wchar_t * HeaderText, const wchar_t * Id, bool fshow);
-BB_API MenuItem * MakeMenuGrip (Menu * PluginMenu, const wchar_t * Title);
+BB_API bb::MenuWidget * MakeNamedMenu (const wchar_t * HeaderText, const wchar_t * Id, bool fshow);
+BB_API bb::MenuConfigItem * MakeMenuGrip (bb::MenuWidget * PluginMenu, const wchar_t * Title);
 
 /* inserts an item to execute a command or to set a boolean value */
-BB_API MenuItem * MakeMenuItem (Menu * PluginMenu, const wchar_t * Title, const wchar_t * Cmd, bool ShowIndicator);
+BB_API bb::MenuConfigItem * MakeMenuItem (bb::MenuWidget * PluginMenu, const wchar_t * Title, const wchar_t * Cmd, bool ShowIndicator);
 
 /* inserts an inactive item, optionally with text. 'Title' may be NULL. */
-BB_API MenuItem * MakeMenuNOP (Menu * PluginMenu, const wchar_t * Title);
+BB_API bb::MenuConfigItem * MakeMenuNOP (bb::MenuWidget * PluginMenu, const wchar_t * Title);
 
 /* inserts an item to adjust a numeric value */
-BB_API MenuItem * MakeMenuItemInt (Menu * PluginMenu, const wchar_t * Title, const wchar_t * Cmd, int val, int minval, int maxval);
+BB_API bb::MenuConfigItem * MakeMenuItemInt (bb::MenuWidget * PluginMenu, const wchar_t * Title, const wchar_t * Cmd, int val, int minval, int maxval);
 
 /* inserts an item to edit a string value */
-BB_API MenuItem * MakeMenuItemString (Menu * PluginMenu, const wchar_t * Title, const wchar_t * Cmd, const wchar_t * init_string);
+BB_API bb::MenuConfigItem * MakeMenuItemString (bb::MenuWidget * PluginMenu, const wchar_t * Title, const wchar_t * Cmd, const wchar_t * init_string);
 
 /* inserts an item, which opens a submenu */
-BB_API MenuItem * MakeSubmenu (Menu * ParentMenu, Menu * ChildMenu, const wchar_t * Title);
+BB_API bb::MenuConfigItem * MakeSubmenu (bb::MenuWidget * ParentMenu, bb::MenuWidget * ChildMenu, const wchar_t * Title);
 
 /* inserts an item, which opens a submenu from a system folder.
 'Cmd' optionally may be a Broam which then is sent on user click
 with "%s" in the broam string replaced by the selected filename */
-BB_API MenuItem * MakeMenuItemPath (Menu * ParentMenu, const wchar_t * Title, const wchar_t * path, const wchar_t * Cmd);
+BB_API bb::MenuConfigItem * MakeMenuItemPath (bb::MenuWidget * ParentMenu, const wchar_t * Title, const wchar_t * path, const wchar_t * Cmd);
 
 /* Context menu for filesystem items. One of path or pidl can be NULL */
-BB_API Menu * MakeContextMenu (const wchar_t * path, const void * pidl);
+BB_API bb::MenuWidget * MakeContextMenu (const wchar_t * path, const void * pidl);
 
 /* shows the menu */
-BB_API void ShowMenu (Menu * PluginMenu);
+BB_API void ShowMenu (bb::MenuWidget * PluginMenu);
 
 /* checks whether a menu with ID starting with 'IDString_start', still exists */
 BB_API bool MenuExists (const wchar_t * IDString_start);
 
-/* set option for MenuItem  */
-BB_API void MenuItemOption (MenuItem * pItem, int option, ...);
+/* set option for bb::MenuConfigItem  */
+BB_API void MenuItemOption (bb::MenuConfigItem * pItem, int option, ...);
 #define BBMENUITEM_DISABLED   1 /* set disabled state */
 #define BBMENUITEM_CHECKED    2 /* set checked state */
 #define BBMENUITEM_LCOMMAND   3 /* next arg is command for left click */
@@ -52,9 +50,9 @@ BB_API void MenuItemOption (MenuItem * pItem, int option, ...);
 #define BBMENUITEM_JUSTIFY    7 /* next arg is DT_LEFT etc... */
 #define BBMENUITEM_SETICON    8 /* next arg is "path\to\icon[,iconindex]" */
 #define BBMENUITEM_SETHICON   9 /* next arg is HICON */
-#define BBMENUITEM_RMENU     10 /* next arg is Menu* for right-click menu */
+#define BBMENUITEM_RMENU     10 /* next arg is bb::MenuWidget* for right-click menu */
 
-BB_API void MenuOption (Menu * pMenu, int flags, ...);
+BB_API void MenuOption (bb::MenuWidget * pMenu, int flags, ...);
 #define BBMENU_XY             0x0001 /* next arg is x/y position */
 #define BBMENU_RECT           0x0002 /* next arg is *pRect to show above/below */
 #define BBMENU_CENTER         0x0003 /* center menu on screen */
@@ -74,5 +72,5 @@ BB_API void MenuOption (Menu * pMenu, int flags, ...);
 #define BBMENU_SYSMENU        0x4000 /* is a system menu (for bbLeanSkin/Bar) */
 
 /* obsolete: */
-BB_API Menu * MakeMenu (const wchar_t * HeaderText);
-BB_API void DelMenu (Menu * PluginMenu); /* does nothing */
+BB_API bb::MenuWidget * MakeMenu (const wchar_t * HeaderText);
+BB_API void DelMenu (bb::MenuWidget * PluginMenu); /* does nothing */
