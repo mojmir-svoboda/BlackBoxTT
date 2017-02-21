@@ -19,7 +19,8 @@ for more details.
 
 ========================================================================== */
 #include "BlackBox_compat.h"
-
+#include "BlackBox.h"
+#include "gfx/MenuWidget.h"
 //===========================================================================
 // API: MakeNamedMenu
 // Purpose:         Create or refresh a Menu
@@ -33,7 +34,35 @@ for more details.
 
 Menu *MakeNamedMenu (wchar_t const * HeaderText, wchar_t const * IDString, bool popup)
 {
+	bb::BlackBox & bb = bb::BlackBox::Instance();
+
+	bool new_menu = false;
+	bb::GuiWidget * w = bb.GetGfx().FindWidget(IDString);
+	if (!w)
+	{
+		w = bb.GetGfx().MkWidget(bb::MenuWidget::c_type, IDString);
+	}
+
+	POINT p;
+	if (::GetCursorPos(&p))
+	{
+		RECT r;
+		::GetWindowRect(w->m_gfxWindow->m_hwnd, &r);
+		if (::PtInRect(&r, p))
+		{
+			if (!new_menu)
+				bb.GetGfx().DestroyWindow(IDString);
+		}
+		else
+		{
+			w->MoveWindow(p.x, p.y);
+			//m_tasks.Focus(w->m_gfxWindow->m_hwnd);
+			w->Show(true);
+		}
+	}
 	return nullptr;
+}
+
 // 	Menu *pMenu = NULL;
 // 	if (IDString)
 // 		pMenu = Menu::find_named_menu(IDString);
@@ -51,7 +80,7 @@ Menu *MakeNamedMenu (wchar_t const * HeaderText, wchar_t const * IDString, bool 
 // 	pMenu->m_bPopup = popup;
 // 	//dbg_printf("MakeNamedMenu (%d) %x %s <%s>", popup, pMenu, HeaderText, IDString);
 // 	return pMenu;
-}
+//}
 
 //===========================================================================
 // API: MakeMenu
@@ -59,7 +88,10 @@ Menu *MakeNamedMenu (wchar_t const * HeaderText, wchar_t const * IDString, bool 
 //===========================================================================
 Menu *MakeMenu (wchar_t const * HeaderText)
 {
-	return MakeNamedMenu(HeaderText, NULL, true);
+	static int menu_counter = 0;
+	wchar_t tmp[256];
+	swprintf(tmp, 256, L"Menu_%i", menu_counter++);
+	return MakeNamedMenu(HeaderText, tmp, true);
 }
 
 //===========================================================================

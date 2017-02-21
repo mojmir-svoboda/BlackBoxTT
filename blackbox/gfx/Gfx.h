@@ -24,8 +24,8 @@ namespace bb {
 		virtual GuiWidget * MkWidgetFromId (wchar_t const * widgetId) = 0;
 		virtual bool DestroyWindow (wchar_t const * widgetId) = 0;
 
-		template <class WidgetConfigT>
-		GuiWidget * MkWidgetFromConfig (WidgetConfigT const & cfg)
+		template <class ConfigT>
+		GuiWidget * MkWidgetFromConfig (ConfigT const & cfg)
 		{
 			std::unique_ptr<GuiWidget> w = MkWidgetFromType(cfg.m_widgetType.c_str(), cfg);
 			if (w)
@@ -33,6 +33,19 @@ namespace bb {
 				GuiWidget * widget = MkWindowForWidget(cfg.m_x, cfg.m_y, cfg.m_w, cfg.m_h, cfg.m_alpha, std::move(w));
 				return widget;
 			}
+		}
+
+		GuiWidget * MkWidget (wchar_t const * widgetType, wchar_t const * id)
+		{
+			std::unique_ptr<GuiWidget> w = MkWidgetFromType(widgetType);
+			if (w)
+			{
+				WidgetConfig & cfg = w->GetConfig();
+				cfg.m_id = std::move(bbstring(id));
+				GuiWidget * widget = MkWindowForWidget(cfg.m_x, cfg.m_y, cfg.m_w, cfg.m_h, cfg.m_alpha, std::move(w));
+				return widget;
+			}
+			return nullptr;
 		}
 
 	protected:

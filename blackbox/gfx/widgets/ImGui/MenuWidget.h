@@ -1,19 +1,15 @@
 #pragma once
-#include <blackbox/gfx/GuiWidget.h>
+#include <blackbox/gfx/MenuWidget.h>
 #include <imgui/imgui.h>
-#include <blackbox/menu/MenuConfig.h>
 
 namespace bb {
 namespace imgui {
 
-	struct MenuWidget : GuiWidget
+	struct MenuWidget : bb::MenuWidget
 	{
-		constexpr static wchar_t const * const c_type = L"Menu";
-		MenuConfig m_config;
-		size_t m_currentIndex { 0 };
 		ImVec2 m_contentSize { 0, 0 };
 		MenuWidget ();
-		MenuWidget (MenuConfig const & cfg) : m_config(cfg) { }
+		MenuWidget (MenuConfig const & cfg) : bb::MenuWidget(cfg) { }
 		virtual ~MenuWidget ();
 
 		virtual wchar_t const * GetWidgetTypeName () override { return c_type; }
@@ -23,13 +19,4 @@ namespace imgui {
 		virtual bool Visible () const override { return m_config.m_show; }
 		virtual bbstring const & GetId () const override { return m_config.m_id; }
 	};
-
-	/*struct FolderMenuWidget : MenuWidget
-	{
-	};
-
-	struct ControlPanelMenuWidget : FolderMenuWidget
-	{
-		virtual char const * GetName () { return "CtrlPanel"; }
-	};*/
 }}

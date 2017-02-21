@@ -43,6 +43,7 @@ set(blackbox_SOURCES
 	BlackBox_broams.cpp
 	BlackBox_compat.cpp
 	Explorer.cpp
+	gfx/MenuWidget.cpp
 	VirtualDesktopManager.cpp
 	DesktopWallpaper.cpp
 	DesktopWallpaperConfig_yaml.cpp
@@ -86,6 +87,7 @@ set (blackbox_HEADERS
 	utils_vdm.h
 	GfxConfig.h
 	gfx/GuiWidget.h
+	gfx/MenuWidget.h
 	gfx/IconId.h
 	gfx/GfxWindow.h
 	gfx/utils_gdi.h

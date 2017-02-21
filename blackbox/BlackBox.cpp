@@ -540,46 +540,4 @@ namespace bb {
 		}
 		return false;
 	}
-
-	void BlackBox::ShowMenuOnPointerPos (bool show)
-	{
-// 		POINT p;
-// 		if (::GetCursorPos(&p))
-// 		{
-// 			RECT r;
-// 			::GetWindowRect(m_menuWidget->m_hwnd, &r);
-// 			if (::PtInRect(&r, p))
-// 			{
-// 				m_menuWidget->Show(show);
-// 			}
-// 			else
-// 			{
-// 				int const width = r.right - r.left;
-// 				int const height = r.bottom - r.top;
-// 				::MoveWindow(m_menuWidget->m_hwnd, p.x, p.y, width, height, false);
-// 				m_tasks.Focus(m_menuWidget->m_hwnd);
-// 				m_menuWidget->Show(true);
-// 				m_menu = true;
-// 			}
-// 		}
-	}
-
-	MenuWidget * BlackBox::CreateMenuOnPointerPos (MenuConfig const & config)
-	{
-// 		POINT p;
-// 		if (GetCursorPos(&p))
-// 		{
-// 			// #%@%#$^!#$^!#$^!#^#^# ^#% 
-// 			WidgetConfig wc;
-// 			wc.m_show = true;
-// 			wc.m_x = p.x;
-// 			wc.m_y = p.y;
-// 			wc.m_w = 32;
-// 			wc.m_h = 32;
-// 			wc.m_titlebar = true;
-// 			return CreateMenu(wc, config);
-// 		}
-		return nullptr;
-	}
-
 }
