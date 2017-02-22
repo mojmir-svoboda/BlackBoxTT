@@ -59,7 +59,7 @@ namespace imgui {
 			//bool value_changed = false;
 			for (size_t i = 0; i < sz; ++i)
 			{
-				MenuConfigItem const * item = m_config.m_items[i].get();
+				MenuConfigItem * item = m_config.m_items[i].get();
 				const bool item_selected = (i == m_currentIndex);
 				char item_text[1024];
 				codecvt_utf16_utf8(item->m_name.c_str(), item_text, 1024);
@@ -105,8 +105,17 @@ namespace imgui {
 							bb::GfxWindow * r = m_gfxWindow->GetRoot();
 							r->SetDestroyTree();
 						}
-
 					}
+				}
+				else if (item->m_type == e_MenuItemInt)
+				{
+					MenuConfigItemInt * intitem = static_cast<MenuConfigItemInt *>(item);
+					//char item_val[1024];
+					//codecvt_utf16_utf8(script->m_script.c_str(), item_val, 1024);
+					//char response[4096];
+					//bb::BlackBox::Instance().GetScheme().Eval(item_val, response, 4096);
+
+					ImGui::SliderInt(item_text, &intitem->m_val, intitem->m_min, intitem->m_max);
 				}
 				else
 				{

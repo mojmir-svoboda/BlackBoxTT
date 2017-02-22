@@ -54,8 +54,8 @@ bool FirstUpdate = false; // Moved this up here from below.
 
 // Menu Class
 std::shared_ptr<bb::MenuConfig> scMenu = 0;
-std::shared_ptr<bb::MenuConfig> scSubMenu = 0;
-std::shared_ptr<bb::MenuConfig> scSubMenu2 = 0;
+//std::shared_ptr<bb::MenuConfig> scSubMenu = 0;
+//std::shared_ptr<bb::MenuConfig> scSubMenu2 = 0;
 
 // Display/graphic variables
 int DisplayMode;	// If 1 = display mode, then mode = title; if 2 = display mode, then mode = controls.
@@ -251,74 +251,88 @@ void show_foomp_menu ()
 
 	scMenu = MakeMenu(L"bbFoomp");
 
-// 	//	<<	BEGIN	-- Controls Submenu
-	scSubMenu = MakeMenu(L"Controls");
-	MakeMenuItem(scSubMenu, L"Previous", L"@bbfoomp Previous", false);
-	MakeMenuItem(scSubMenu, L"Play/Pause", L"@bbfoomp Play_Pause", false);
-// 	MakeMenuItem(scSubMenu, L"Stop", L"@bbfoomp Stop", false);
-// 	MakeMenuItem(scSubMenu, L"Next", L"@bbfoomp Next", false);
-// 	MakeMenuItem(scSubMenu, L"Random", L"@bbfoomp Random", false);
-// 	MakeMenuItem(scSubMenu, L"Open file", L"@bbfoomp Open", false);
-// 	MakeMenuItem(scSubMenu, L"Add files", L"@bbfoomp Add", false);
-// 	if (FooClass->FooHandle)
-// 	{
-// 		MakeMenuNOP(scSubMenu, L""); // Separator
-// 		MakeMenuItem(scSubMenu, L"Foobar > Off", L"@bbfoomp FooOff", false);
-// 	}
- 	MakeSubmenu(scMenu, scSubMenu, L"Controls");
-// 	//	>>	END		-- Controls Submenu
-// 
-// 	//	<<	BEGIN	-- Playback Order Submenu
-// 	scSubMenu = MakeMenu(L"Playback Order");
-// 	MakeMenuItem(scSubMenu, L"Default", L"@bbfoomp Order_Default", false);
-// 	MakeMenuItem(scSubMenu, L"Random", L"@bbfoomp Order_Random", false);
-// 	MakeMenuItem(scSubMenu, L"Repeat", L"@bbfoomp Order_Repeat", false);
-// 	MakeMenuItem(scSubMenu, L"Repeat One", L"@bbfoomp Order_RepeatOne", false);
-// 	MakeSubmenu(scMenu, scSubMenu, L"Playback Order");
-// 	//	>>	END		-- Playback Order Submenu
-// 	
-// 	//	<<	BEGIN	-- Options Submenu
-// 	scSubMenu = MakeMenu(L"Options");
-// 	if (getSettings().FooMode != 3)MakeMenuItem(scSubMenu, L"Toggle Display Mode", L"@bbfoomp ToggDispMode", false);
-// 	if (getSettings().FooMode != 3) MakeMenuItem(scSubMenu, L"FooMouseOver Mode", L"@bbfoomp ToggFooMode", (getSettings().FooMode == 1));
-// 	MakeMenuItem(scSubMenu, L"FooMega Mode", L"@bbfoomp ToggFooMega", (getSettings().FooMode == 3));
-// 	MakeMenuNOP(scSubMenu, L""); // Septarator
-// 	MakeMenuItem(scSubMenu, L"Edit RC Settings", L"@bbfoomp EditSettings", false);
-// 	MakeMenuItem(scSubMenu, L"Read RC Settings", L"@bbfoomp ReadSettings", false);
-// 	MakeSubmenu(scMenu, scSubMenu, L"Options");
-// 	//	>>	END		-- Options Submenu
-// 
-// 	MakeMenuNOP(scMenu, L"");// Separator
-// 
-// 	//	<<	BEGIN	-- Preferences Submenu
-// 	scSubMenu = MakeMenu(L"Preferences");
-// 		scSubMenu2 = MakeMenu(L"Inset Rectangle Style");
-// 			MakeMenuItem(scSubMenu2, L"Label", L"@bbfoomp ChangeInnerStyle 1", (getSettings().InnerStyleIndex == 1));
-// 			MakeMenuItem(scSubMenu2, L"Window Label", L"@bbfoomp ChangeInnerStyle 2", (getSettings().InnerStyleIndex == 2));
-// 			MakeMenuItem(scSubMenu2, L"Clock", L"@bbfoomp ChangeInnerStyle 3", (getSettings().InnerStyleIndex == 3));
-// 			MakeMenuItem(scSubMenu2, L"Toolbar", L"@bbfoomp ChangeInnerStyle 4", (getSettings().InnerStyleIndex == 4));
-// 			MakeMenuItem(scSubMenu2, L"Button", L"@bbfoomp ChangeInnerStyle 5", (getSettings().InnerStyleIndex == 5));
-// 			MakeMenuItem(scSubMenu2, L"Button.Pressed", L"@bbfoomp ChangeInnerStyle 6", (getSettings().InnerStyleIndex == 6));
-// 			MakeSubmenu(scSubMenu, scSubMenu2, L"Inset Rectangle Style");
-// 		scSubMenu2 = MakeMenu(L"Outer Rectangle Style");
-// 			MakeMenuItem(scSubMenu2, L"Label", L"@bbfoomp ChangeOuterStyle 1", (getSettings().OuterStyleIndex == 1));
-// 			MakeMenuItem(scSubMenu2, L"Window Label", L"@bbfoomp ChangeOuterStyle 2", (getSettings().OuterStyleIndex == 2));
-// 			MakeMenuItem(scSubMenu2, L"Clock", L"@bbfoomp ChangeOuterStyle 3", (getSettings().OuterStyleIndex == 3));
-// 			MakeMenuItem(scSubMenu2, L"Toolbar", L"@bbfoomp ChangeOuterStyle 4", (getSettings().OuterStyleIndex == 4));
-// 			MakeMenuItem(scSubMenu2, L"Button", L"@bbfoomp ChangeOuterStyle 5", (getSettings().OuterStyleIndex == 5));
-// 			MakeMenuItem(scSubMenu2, L"Button.Pressed", L"@bbfoomp ChangeOuterStyle 6", (getSettings().OuterStyleIndex == 6));
-// 			MakeSubmenu(scSubMenu, scSubMenu2, L"Outer Rectangle Style");
-// 		scSubMenu2 = MakeMenu(L"FooMegaMode Alignment");
-// 			MakeMenuItem(scSubMenu2, L"Buttons on Right", L"@bbfoomp ChangeMegaAlign 1", (getSettings().FooAlign == false));
-// 			MakeMenuItem(scSubMenu2, L"Buttons on Left", L"@bbfoomp ChangeMegaAlign 2", (getSettings().FooAlign == true));
-// 		MakeSubmenu(scSubMenu, scSubMenu2, L"FooMegaMode Alignment");
-// 	MakeMenuItem(scSubMenu, L"Shadows enabled", L"@bbfoomp ToggleShadows", getSettings().FooShadowsEnabled);
-// 	MakeMenuItemInt(scSubMenu,L"Scroll speed", L"@bbfoomp ScrollSpeed", getSettings().FooScrollSpeed, 1,10);
-// 	if (SlitExists) MakeMenuItem(scSubMenu, L"Docked to slit", L"@bbfoomp ToggleDockedToSlit", getSettings().FooDockedToSlit);
-// 	if (!getSettings().FooDockedToSlit) MakeMenuItem(scSubMenu, L"Always on top", L"@bbfoomp ToggleOnTop", getSettings().FooOnTop);
-// 	if (!getSettings().FooDockedToSlit) MakeMenuItem(scSubMenu, L"Transparency", L"@bbfoomp ToggleTrans", getSettings().FooTrans);
-// 	MakeSubmenu(scMenu, scSubMenu, L"Preferences");
-// 	//	>>	END		-- Preferences Submenu
+	{
+ 		//	<<	BEGIN	-- Controls Submenu
+		std::shared_ptr<bb::MenuConfig> scSubMenu = MakeMenu(L"Controls");
+		MakeMenuItem(scSubMenu, L"Previous", L"@bbfoomp Previous", false);
+		MakeMenuItem(scSubMenu, L"Play/Pause", L"@bbfoomp Play_Pause", false);
+		MakeMenuItem(scSubMenu, L"Stop", L"@bbfoomp Stop", false);
+		MakeMenuItem(scSubMenu, L"Next", L"@bbfoomp Next", false);
+		MakeMenuItem(scSubMenu, L"Random", L"@bbfoomp Random", false);
+		MakeMenuItem(scSubMenu, L"Open file", L"@bbfoomp Open", false);
+		MakeMenuItem(scSubMenu, L"Add files", L"@bbfoomp Add", false);
+		if (FooClass->FooHandle)
+		{
+			MakeMenuNOP(scSubMenu, L""); // Separator
+			MakeMenuItem(scSubMenu, L"Foobar > Off", L"@bbfoomp FooOff", false);
+		}
+ 		MakeSubmenu(scMenu, scSubMenu, L"Controls");
+		//	>>	END		-- Controls Submenu
+	}
+
+	{
+		//	<<	BEGIN	-- Playback Order Submenu
+		std::shared_ptr<bb::MenuConfig> scSubMenu = MakeMenu(L"Playback Order");
+		MakeMenuItem(scSubMenu, L"Default", L"@bbfoomp Order_Default", false);
+		MakeMenuItem(scSubMenu, L"Random", L"@bbfoomp Order_Random", false);
+		MakeMenuItem(scSubMenu, L"Repeat", L"@bbfoomp Order_Repeat", false);
+		MakeMenuItem(scSubMenu, L"Repeat One", L"@bbfoomp Order_RepeatOne", false);
+		MakeSubmenu(scMenu, scSubMenu, L"Playback Order");
+		//	>>	END		-- Playback Order Submenu
+	}
+	
+	{
+		//	<<	BEGIN	-- Options Submenu
+		std::shared_ptr<bb::MenuConfig> scSubMenu = MakeMenu(L"Options");
+		if (getSettings().FooMode != 3)MakeMenuItem(scSubMenu, L"Toggle Display Mode", L"@bbfoomp ToggDispMode", false);
+		if (getSettings().FooMode != 3) MakeMenuItem(scSubMenu, L"FooMouseOver Mode", L"@bbfoomp ToggFooMode", (getSettings().FooMode == 1));
+		MakeMenuItem(scSubMenu, L"FooMega Mode", L"@bbfoomp ToggFooMega", (getSettings().FooMode == 3));
+		MakeMenuNOP(scSubMenu, L""); // Septarator
+		MakeMenuItem(scSubMenu, L"Edit RC Settings", L"@bbfoomp EditSettings", false);
+		MakeMenuItem(scSubMenu, L"Read RC Settings", L"@bbfoomp ReadSettings", false);
+		MakeSubmenu(scMenu, scSubMenu, L"Options");
+		//	>>	END		-- Options Submenu
+	}
+
+	MakeMenuNOP(scMenu, L"");// Separator
+
+	{
+		//	<<	BEGIN	-- Preferences Submenu
+		std::shared_ptr<bb::MenuConfig> scSubMenu = MakeMenu(L"Preferences");
+		{
+			std::shared_ptr<bb::MenuConfig> scSubMenu2 = MakeMenu(L"Inset Rectangle Style");
+			MakeMenuItem(scSubMenu2, L"Label", L"@bbfoomp ChangeInnerStyle 1", (getSettings().InnerStyleIndex == 1));
+			MakeMenuItem(scSubMenu2, L"Window Label", L"@bbfoomp ChangeInnerStyle 2", (getSettings().InnerStyleIndex == 2));
+			MakeMenuItem(scSubMenu2, L"Clock", L"@bbfoomp ChangeInnerStyle 3", (getSettings().InnerStyleIndex == 3));
+			MakeMenuItem(scSubMenu2, L"Toolbar", L"@bbfoomp ChangeInnerStyle 4", (getSettings().InnerStyleIndex == 4));
+			MakeMenuItem(scSubMenu2, L"Button", L"@bbfoomp ChangeInnerStyle 5", (getSettings().InnerStyleIndex == 5));
+			MakeMenuItem(scSubMenu2, L"Button.Pressed", L"@bbfoomp ChangeInnerStyle 6", (getSettings().InnerStyleIndex == 6));
+			MakeSubmenu(scSubMenu, scSubMenu2, L"Inset Rectangle Style");
+		}
+		{
+			std::shared_ptr<bb::MenuConfig> scSubMenu2 = MakeMenu(L"Outer Rectangle Style");
+			MakeMenuItem(scSubMenu2, L"Label", L"@bbfoomp ChangeOuterStyle 1", (getSettings().OuterStyleIndex == 1));
+			MakeMenuItem(scSubMenu2, L"Window Label", L"@bbfoomp ChangeOuterStyle 2", (getSettings().OuterStyleIndex == 2));
+			MakeMenuItem(scSubMenu2, L"Clock", L"@bbfoomp ChangeOuterStyle 3", (getSettings().OuterStyleIndex == 3));
+			MakeMenuItem(scSubMenu2, L"Toolbar", L"@bbfoomp ChangeOuterStyle 4", (getSettings().OuterStyleIndex == 4));
+			MakeMenuItem(scSubMenu2, L"Button", L"@bbfoomp ChangeOuterStyle 5", (getSettings().OuterStyleIndex == 5));
+			MakeMenuItem(scSubMenu2, L"Button.Pressed", L"@bbfoomp ChangeOuterStyle 6", (getSettings().OuterStyleIndex == 6));
+			MakeSubmenu(scSubMenu, scSubMenu2, L"Outer Rectangle Style");
+		}
+		{
+			std::shared_ptr<bb::MenuConfig> scSubMenu2 = MakeMenu(L"FooMegaMode Alignment");
+			MakeMenuItem(scSubMenu2, L"Buttons on Right", L"@bbfoomp ChangeMegaAlign 1", (getSettings().FooAlign == false));
+			MakeMenuItem(scSubMenu2, L"Buttons on Left", L"@bbfoomp ChangeMegaAlign 2", (getSettings().FooAlign == true));
+			MakeSubmenu(scSubMenu, scSubMenu2, L"FooMegaMode Alignment");
+		}
+		MakeMenuItem(scSubMenu, L"Shadows enabled", L"@bbfoomp ToggleShadows", getSettings().FooShadowsEnabled);
+		MakeMenuItemInt(scSubMenu,L"Scroll speed", L"@bbfoomp ScrollSpeed", getSettings().FooScrollSpeed, 1,10);
+		if (SlitExists) MakeMenuItem(scSubMenu, L"Docked to slit", L"@bbfoomp ToggleDockedToSlit", getSettings().FooDockedToSlit);
+		if (!getSettings().FooDockedToSlit) MakeMenuItem(scSubMenu, L"Always on top", L"@bbfoomp ToggleOnTop", getSettings().FooOnTop);
+		if (!getSettings().FooDockedToSlit) MakeMenuItem(scSubMenu, L"Transparency", L"@bbfoomp ToggleTrans", getSettings().FooTrans);
+		MakeSubmenu(scMenu, scSubMenu, L"Preferences");
+		//	>>	END		-- Preferences Submenu
+	}
 	MakeMenuItem(scMenu, L"Readme", L"@bbfoomp Readme", false);
 	MakeMenuItem(scMenu, L"About bbFoomp", L"@bbfoomp About", false);
 	ShowMenu(scMenu);

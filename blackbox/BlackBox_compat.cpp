@@ -92,6 +92,15 @@ void DelMenu (std::shared_ptr<bb::MenuConfig> pluginMenu)
 // IN: PluginMenu - pointer to the toplevel menu
 //===========================================================================
 
+void moveWidgetToPointerPos (bb::MenuWidget * w)
+{
+	POINT p;
+	if (::GetCursorPos(&p))
+	{
+		w->MoveWindow(p.x, p.y);
+	}
+}
+
 void ShowMenu (std::shared_ptr<bb::MenuConfig> pluginMenu)
 {
 	bb::BlackBox & bb = bb::BlackBox::Instance();
@@ -110,6 +119,7 @@ void ShowMenu (std::shared_ptr<bb::MenuConfig> pluginMenu)
 
 	Assert(w && w->GetWidgetTypeName() == bb::MenuWidget::c_type);
 	bb::MenuWidget * menu = static_cast<bb::MenuWidget *>(w);
+	moveWidgetToPointerPos(menu);
 	menu->Show(true);
 
 // 	if (NULL == PluginMenu)
@@ -162,11 +172,11 @@ bb::MenuConfigItem * MakeMenuItem (std::shared_ptr<bb::MenuConfig> menu, wchar_t
 // API: MakeMenuItemInt
 //===========================================================================
 
-bb::MenuConfigItem *MakeMenuItemInt(std::shared_ptr<bb::MenuConfig>PluginMenu, wchar_t const * Title, wchar_t const * Cmd, int val, int minval, int maxval)
+bb::MenuConfigItem * MakeMenuItemInt (std::shared_ptr<bb::MenuConfig> menu, wchar_t const * title, wchar_t const * cmd, int val, int minval, int maxval)
 {
-	return nullptr;
-// 	return helper_menu(PluginMenu, Title, MENU_ID_INT,
-// 		new IntegerItem(Cmd, val, minval, maxval));
+	std::shared_ptr<bb::MenuConfigItemInt> item(new bb::MenuConfigItemInt(title, minval, val, maxval));
+	menu->m_items.push_back(item);
+	return item.get();
 }
 
 //===========================================================================
@@ -184,9 +194,11 @@ bb::MenuConfigItem *MakeMenuItemString(std::shared_ptr<bb::MenuConfig>PluginMenu
 // API: MakeMenuNOP
 //===========================================================================
 
-bb::MenuConfigItem* MakeMenuNOP(std::shared_ptr<bb::MenuConfig>PluginMenu, wchar_t const * Title)
+bb::MenuConfigItem* MakeMenuNOP(std::shared_ptr<bb::MenuConfig> menu, wchar_t const * title)
 {
-	return nullptr;
+	std::shared_ptr<bb::MenuConfigItemSeparator> item(new bb::MenuConfigItemSeparator(title));
+	menu->m_items.push_back(item);
+	return item.get();
 // 	/* BlackboxZero 1.8.2012 - For separator graident? */
 // 	bb::MenuConfigItem *pItem;
 // 	if (Title && Title[0]) {

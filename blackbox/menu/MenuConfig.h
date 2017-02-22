@@ -12,6 +12,7 @@ namespace bb {
 		e_MenuItemExec,
 		e_MenuItemSubMenu,
 		e_MenuItemScript,
+		e_MenuItemInt,
 		e_MenuItemBroam,
 		e_MenuItemCheckBox,
 	};
@@ -28,10 +29,27 @@ namespace bb {
 		MenuConfigItem (MenuItemType type, bbstring const & name) : m_type(type), m_name(name) { }
 	};
 
+	struct MenuConfigItemSeparator : MenuConfigItem
+	{
+		MenuConfigItemSeparator () : MenuConfigItem(e_MenuItemSeparator) { }
+		MenuConfigItemSeparator (bbstring const & name) : MenuConfigItem(e_MenuItemSeparator, name) { }
+	};
+
 	struct MenuConfigItemScript : MenuConfigItem
 	{
 		bbstring m_script;
 		MenuConfigItemScript (bbstring const & name, bbstring const & script) : MenuConfigItem(e_MenuItemScript, name), m_script(script) { }
+	};
+
+	struct MenuConfigItemInt : MenuConfigItem
+	{
+		int m_min { 0 };
+		int m_val { 0 };
+		int m_max { 0 };
+//		bbstring m_cmd;
+
+		MenuConfigItemInt () : MenuConfigItem(e_MenuItemInt) { }
+		MenuConfigItemInt (bbstring const & name/*, bbstring const & cmd*/, int min, int val, int max) : MenuConfigItem(e_MenuItemInt, name), m_min(min), m_val(val), m_max(max) { }
 	};
 
 	struct MenuConfigItemBroam : MenuConfigItem
