@@ -53,9 +53,9 @@ const int button_spacing = 12;
 bool FirstUpdate = false; // Moved this up here from below.
 
 // Menu Class
-bb::MenuWidget * scMenu = 0;
-bb::MenuWidget * scSubMenu = 0;
-bb::MenuWidget * scSubMenu2 = 0;
+std::shared_ptr<bb::MenuConfig> scMenu = 0;
+std::shared_ptr<bb::MenuConfig> scSubMenu = 0;
+std::shared_ptr<bb::MenuConfig> scSubMenu2 = 0;
 
 // Display/graphic variables
 int DisplayMode;	// If 1 = display mode, then mode = title; if 2 = display mode, then mode = controls.
@@ -246,7 +246,8 @@ LPCSTR pluginInfo (int field)
 void show_foomp_menu ()
 {
 	// Delete the main plugin menu if it exists (PLEASE NOTE that this takes care of submenus as well!)
-	if (scMenu) DelMenu(scMenu);
+	if (scMenu)
+		DelMenu(scMenu);
 
 	scMenu = MakeMenu(L"bbFoomp");
 
