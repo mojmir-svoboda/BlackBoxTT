@@ -33,6 +33,7 @@ namespace bb {
 				GuiWidget * widget = MkWindowForWidget(cfg.m_x, cfg.m_y, cfg.m_w, cfg.m_h, cfg.m_alpha, std::move(w));
 				return widget;
 			}
+			return nullptr;
 		}
 
 		GuiWidget * MkWidget (wchar_t const * widgetType, wchar_t const * id)
