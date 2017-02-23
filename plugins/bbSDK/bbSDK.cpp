@@ -37,6 +37,12 @@
 #include <bblibcompat/StyleStruct.h>
 #include <cstdlib>
 #include <cstdio>
+#include <bblibcompat/bblibcompat.h>
+#include <bblibcompat/StyleStruct.h>
+#include <bblib/utils_paths.h>
+#include <3rd_party/Assert/Assert.h>
+#include <blackbox/BlackBox_compat.h>
+
 #if defined (bbSDK_EXPORTS)
 #	define BBSDK_API __declspec(dllexport)
 #else
@@ -83,7 +89,7 @@ void about_box(void)
 /* Dependencies on the plugin-name */
 
 /* prefix for our broadcast messages */
-#define BROAM_PREFIX "@bbSDK."
+#define BROAM_PREFIX L"@bbSDK."
 #define BROAM(key) (BROAM_PREFIX key) /* concatenation */
 
 /* configuration file */
@@ -94,7 +100,7 @@ void about_box(void)
 #define RC_KEY(key) (RC_PREFIX key ":")
 
 /* prefix for unique menu id's */
-#define MENU_ID(key) ("bbSDK_ID" key)
+#define MENU_ID(key) (L"bbSDK_ID" key)
 
 /* ---------------------------------- */
 /* Interface declaration */
@@ -887,49 +893,49 @@ void GetStyleSettings(void)
 /* Show or update configuration menu */
 void ShowMyMenu(bool popup)
 {
-//	   Menu *pMenu, *pSub;
-// 
-//	   /* Create the main menu, with a title and an unique IDString */
-//	   pMenu = MakeNamedMenu(szAppName, MENU_ID("Main"), popup);
-// 
-//	   /* Create a submenu, also with title and unique IDString */
-//	   pSub = MakeNamedMenu("Configuration", MENU_ID("Config"), popup);
-// 
-//	   /* Insert first Item */
-//	   MakeMenuItem(pSub, "Draw Border", BROAM("drawBorder"), my.drawBorder);
-// 
-//	   if (g_hSlit)
-//		   MakeMenuItem(pSub, "Use Slit", BROAM("useSlit"), my.useSlit);
-// 
-//	   if (false == my.is_inslit)
-//	   {
-//		   /* these are only available if outside the slit */
-//		   MakeMenuItem(pSub, "Always On Top", BROAM("alwaysOnTop"), my.alwaysOnTop);
-//		   MakeMenuItem(pSub, "Snap To Edges", BROAM("snapWindow"), my.snapWindow);
-//		   MakeMenuItem(pSub, "Toggle With Plugins", BROAM("pluginToggle"), my.pluginToggle);
-//		   MakeMenuItem(pSub, "Transparency", BROAM("alphaEnabled"), my.alphaEnabled);
-//		   MakeMenuItemInt(pSub, "Alpha Value", BROAM("alphaValue"), my.alphaValue, 0, 255);
-//	   }
-// 
-//	   /* Insert the submenu into the main menu */
-//	   MakeSubmenu(pMenu, pSub, "Configuration");
-// 
-//	   /* The configurable text string */
-//	   MakeMenuItemString(pMenu, "Display Text", BROAM("windowText"), my.windowText);
-// 
-//	   /* ---------------------------------- */
-//	   /* add an empty line */
-//	   MakeMenuNOP(pMenu, NULL);
-// 
-//	   /* add an entry to let the user edit the setting file */
-//	   MakeMenuItem(pMenu, "Edit Settings", BROAM("editRC"), false);
-// 
-//	   /* and an about box */
-//	   MakeMenuItem(pMenu, "About", BROAM("About"), false);
-// 
-//	   /* ---------------------------------- */
-//	   /* Finally, show the menu... */
-//	   ShowMenu(pMenu);
+	std::shared_ptr<bb::MenuConfig> pMenu, pSub;
+
+	   /* Create the main menu, with a title and an unique IDString */
+	   pMenu = MakeNamedMenu(szAppNameW, MENU_ID(L"Main"), popup);
+
+	   /* Create a submenu, also with title and unique IDString */
+	   pSub = MakeNamedMenu(L"Configuration", MENU_ID(L"Config"), popup);
+
+	   /* Insert first Item */
+	   MakeMenuItemBool(pSub, L"Draw Border", BROAM(L"drawBorder"), my.drawBorder);
+
+	   if (g_hSlit)
+		   MakeMenuItemBool(pSub, L"Use Slit", BROAM(L"useSlit"), my.useSlit);
+
+	   if (false == my.is_inslit)
+	   {
+		   /* these are only available if outside the slit */
+		   MakeMenuItemBool(pSub, L"Always On Top", BROAM(L"alwaysOnTop"), my.alwaysOnTop);
+		   MakeMenuItemBool(pSub, L"Snap To Edges", BROAM(L"snapWindow"), my.snapWindow);
+		   MakeMenuItemBool(pSub, L"Toggle With Plugins", BROAM(L"pluginToggle"), my.pluginToggle);
+		   MakeMenuItemBool(pSub, L"Transparency", BROAM(L"alphaEnabled"), my.alphaEnabled);
+		   MakeMenuItemInt(pSub, L"Alpha Value", BROAM(L"alphaValue"), my.alphaValue, 0, 255);
+	   }
+
+	   /* Insert the submenu into the main menu */
+	   MakeSubmenu(pMenu, pSub, L"Configuration");
+
+	   /* The configurable text string */
+	   MakeMenuItemString(pMenu, L"Display Text", BROAM(L"windowText"), my.windowText);
+
+	   /* ---------------------------------- */
+	   /* add an empty line */
+	   MakeMenuNOP(pMenu, NULL);
+
+	   /* add an entry to let the user edit the setting file */
+	   MakeMenuItem(pMenu, L"Edit Settings", BROAM(L"editRC"));
+
+	   /* and an about box */
+	   MakeMenuItem(pMenu, L"About", BROAM(L"About"));
+
+	   /* ---------------------------------- */
+	   /* Finally, show the menu... */
+	   ShowMenu(pMenu);
 }
 
 /* ------------------------------------------------------------------ */

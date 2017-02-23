@@ -54,101 +54,10 @@ namespace imgui {
 		}
 
 		size_t const sz = m_config.m_items.size();
-
+		for (size_t i = 0; i < sz; ++i)
 		{
-			//bool value_changed = false;
-			for (size_t i = 0; i < sz; ++i)
-			{
-				std::shared_ptr<MenuConfigItem> item = m_config.m_items[i];
-				MenuItemDrawUI(i, item);
-
-// 				const bool item_selected = (i == m_currentIndex);
-// 				char item_text[1024];
-// 				codecvt_utf16_utf8(item->m_name.c_str(), item_text, 1024);
-// 
-// 				if (item->m_type == e_MenuItemSubMenu)
-// 				{	
-// 					ImGui::Bullet();
-// 				}
-// 				else
-// 				{
-// 					ImGui::Indent();
-// 				}
-// 
-// 				ImGui::PushID(i);
-// 				//ImGui::SameLine();
-// 				if (ImGui::Selectable(item_text, item_selected))
-// 				{
-// 					// close other
-// 					for (bb::GfxWindow * w : m_gfxWindow->m_children)
-// 					{
-// 						w->SetDestroyTree();
-// 					}
-// 					m_gfxWindow->m_children.clear();
-// 
-// 					if (item->m_type == e_MenuItemScript)
-// 					{
-// 						MenuConfigItemScript const * script = static_cast<MenuConfigItemScript const *>(item);
-// 						char item_val[1024];
-// 						codecvt_utf16_utf8(script->m_script.c_str(), item_val, 1024);
-// 						char response[4096];
-// 						bb::BlackBox::Instance().GetScheme().Eval(item_val, response, 4096);
-// 
-// 						bb::GfxWindow * r = m_gfxWindow->GetRoot();
-// 						r->SetDestroyTree();
-// 					}
-// 					else if (item->m_type == e_MenuItemBroam)
-// 					{
-// 						MenuConfigItemBroam const * script = static_cast<MenuConfigItemBroam const *>(item);
-// 						char item_val[1024];
-// 						codecvt_utf16_utf8(script->m_broam.c_str(), item_val, 1024);
-// 						char response[4096];
-// 						//bb::BlackBox::Instance().m_broamServer.HandleBroam()
-// 
-// 						bb::GfxWindow * r = m_gfxWindow->GetRoot();
-// 						r->SetDestroyTree();
-// 					}
-// 					else if (item->m_type == e_MenuItemSubMenu)
-// 					{	
-// 						ImGui::SameLine();
-// 						ImGui::Bullet();
-// 						// pos of submenu
-// 						ImDrawList* draw_list = ImGui::GetWindowDrawList();
-// 						draw_list->PushClipRectFullScreen();
-// 						ImVec2 a = ImGui::CalcItemRectClosestPoint(ImGui::GetIO().MousePos, true, -2.0f);
-// 						ImVec2 b = ImGui::GetContentRegionMax();
-//  						draw_list->PopClipRect();
-// 
-// 						MenuConfigItemSubMenu const * submenu = static_cast<MenuConfigItemSubMenu const *>(item);
-// 						// open menu
-// 						GuiWidget * w = bb::BlackBox::Instance().GetGfx().FindWidget(submenu->m_menu->m_id.c_str());
-// 						if (w == nullptr)
-// 						{
-// 							w = bb::BlackBox::Instance().GetGfx().MkWidgetFromConfig(*submenu->m_menu);
-// 							m_gfxWindow->AddChild(w->m_gfxWindow);
-// 							w->m_gfxWindow->SetParent(m_gfxWindow);
-// 						}
-// 						RECT r;
-// 						::GetWindowRect(m_gfxWindow->m_hwnd, &r);
-// 						{
-// 							int const hdr_size = 24;
-// 							w->MoveWindow(r.left + r.right - r.left, r.top + a.y - hdr_size);
-// 						}
-// 					}
-// 
-// 
-// 					m_currentIndex = i;
-// 				}
-// 				ImGui::PopID();
-// 
-// 				if (item->m_type == e_MenuItemSubMenu)
-// 				{
-// 				}
-// 				else
-// 				{
-// 					ImGui::Unindent();
-// 				}
-			}
+			std::shared_ptr<MenuConfigItem> item = m_config.m_items[i];
+			MenuItemDrawUI(i, item);
 		}
 
 		ImGuiWindow * w = ImGui::GetCurrentWindowRead();
@@ -163,8 +72,6 @@ namespace imgui {
 		switch (item->m_type)
 		{
 			case e_MenuItemSeparator: DrawSeparator(idx, item); return;
-					// 		e_MenuItemFolder,
-					// 		e_MenuItemExec,
 			case e_MenuItemSubMenu: DrawSubMenu(idx, item); return;
 			case e_MenuItemScript: DrawScript(idx, item); return;
 			case e_MenuItemInt: DrawInt(idx, item); return;
@@ -172,36 +79,60 @@ namespace imgui {
 			case e_MenuItemBroam: DrawBroam(idx, item); return;
 			case e_MenuItemBroamBool: DrawBroamBool(idx, item); return;
 			case e_MenuItemBroamInt: DrawBroamInt(idx, item); return;
+// 		e_MenuItemFolder,
+// 		e_MenuItemExec,
 			default:
-			{
 				Assert(0);
 				break;
-			}
 		}
 	}
 	void MenuWidget::DrawBroam (size_t idx, std::shared_ptr<MenuConfigItem> item)
 	{
+		const bool item_selected = (idx == m_currentIndex);
+		char item_text[1024];
+		codecvt_utf16_utf8(item->m_name.c_str(), item_text, 1024);
 
+		ImGui::PushID(idx);
+		if (ImGui::Selectable(item_text, item_selected))
+		{
+			MenuConfigItemBroam const * script = static_cast<MenuConfigItemBroam const *>(item.get());
+			//char broam_u8[1024];
+			//codecvt_utf16_utf8(bbroam->m_broam.c_str(), broam_u8, 1024);
+			//bb::BlackBox::Instance().m_broamServer.HandleBroam()
+
+			bb::GfxWindow * r = m_gfxWindow->GetRoot();
+			r->SetDestroyTree();
+
+			m_currentIndex = idx;
+		}
+		ImGui::PopID();
 	}
 	void MenuWidget::DrawBroamInt (size_t idx, std::shared_ptr<MenuConfigItem> item)
 	{
 		Assert(item->m_type == e_MenuItemBroamInt);
 		MenuConfigItemBroamInt * ibroam = static_cast<MenuConfigItemBroamInt *>(item.get());
 
-// 		if (ImGui::SliderInt(item_text, &ibroam->m_val, ibroam->m_min, ibroam->m_max))
-// 		{
-// 			//bb::BlackBox::Instance().m_broamServer.HandleBroam()
-// 		}
+		char item_text[1024];
+		codecvt_utf16_utf8(item->m_name.c_str(), item_text, 1024);
+		if (ImGui::SliderInt(item_text, &ibroam->m_val, ibroam->m_min, ibroam->m_max))
+		{
+			//char broam_u8[1024];
+			//codecvt_utf16_utf8(bbroam->m_broam.c_str(), broam_u8, 1024);
+			//bb::BlackBox::Instance().m_broamServer.HandleBroam()
+		}
 	}
 	void MenuWidget::DrawBroamBool (size_t idx, std::shared_ptr<MenuConfigItem> item)
 	{
 		Assert(item->m_type == e_MenuItemBroamBool);
 		MenuConfigItemBroamBool * bbroam = static_cast<MenuConfigItemBroamBool *>(item.get());
-		char broam_u8[1024];
-		codecvt_utf16_utf8(bbroam->m_broam.c_str(), broam_u8, 1024);
 
+		const bool item_selected = (idx == m_currentIndex);
+		char item_text[1024];
+		codecvt_utf16_utf8(item->m_name.c_str(), item_text, 1024);
 		if (ImGui::Checkbox(item_text, &bbroam->m_checked))
 		{
+		//char broam_u8[1024];
+		//codecvt_utf16_utf8(bbroam->m_broam.c_str(), broam_u8, 1024);
 			//bb::BlackBox::Instance().m_broamServer.HandleBroam()
 
 			bb::GfxWindow * r = m_gfxWindow->GetRoot();
@@ -213,13 +144,15 @@ namespace imgui {
 	{
 		Assert(item->m_type == e_MenuItemCheckBox);
 
-		MenuConfigItemCheckBox const * chk_item = static_cast<MenuConfigItemCheckBox const *>(item);
+		MenuConfigItemCheckBox const * chk_item = static_cast<MenuConfigItemCheckBox const *>(item.get());
 		char item_val[1024];
 		codecvt_utf16_utf8(chk_item->m_getScript.c_str(), item_val, 1024);
 		char response[4096];
 		bb::BlackBox::Instance().GetScheme().Eval(item_val, response, 4096);
 
 		// @TODO: parse response!!!
+		char item_text[1024];
+		codecvt_utf16_utf8(item->m_name.c_str(), item_text, 1024);
 
 		bool state = false;
 		if (ImGui::Checkbox(item_text, &state))
@@ -250,13 +183,11 @@ namespace imgui {
 
 	void MenuWidget::DrawInt (size_t idx, std::shared_ptr<MenuConfigItem> item)
 	{
-								else if (item->m_type == e_MenuItemInt)
-								{
-									MenuConfigItemInt * intitem = static_cast<MenuConfigItemInt *>(item);
+		MenuConfigItemInt * intitem = static_cast<MenuConfigItemInt *>(item.get());
 
-
-									ImGui::SliderInt(item_text, &intitem->m_val, intitem->m_min, intitem->m_max);
-								}
+		char item_text[1024];
+		codecvt_utf16_utf8(item->m_name.c_str(), item_text, 1024);
+		ImGui::SliderInt(item_text, &intitem->m_val, intitem->m_min, intitem->m_max);
 	}
 	void MenuWidget::DrawScript (size_t idx, std::shared_ptr<MenuConfigItem> item)
 	{
@@ -264,102 +195,37 @@ namespace imgui {
 		char item_text[1024];
 		codecvt_utf16_utf8(item->m_name.c_str(), item_text, 1024);
 
-		ImGui::PushID(i);
+		ImGui::PushID(idx);
 		if (ImGui::Selectable(item_text, item_selected))
 		{
-			// close other
-			for (bb::GfxWindow * w : m_gfxWindow->m_children)
-			{
-				w->SetDestroyTree();
-			}
-			m_gfxWindow->m_children.clear();
+			MenuConfigItemScript const * script = static_cast<MenuConfigItemScript const *>(item.get());
+			char item_val[1024];
+			codecvt_utf16_utf8(script->m_script.c_str(), item_val, 1024);
+			char response[4096];
+			bb::BlackBox::Instance().GetScheme().Eval(item_val, response, 4096);
 
-			if (item->m_type == e_MenuItemScript)
-			{
-				MenuConfigItemScript const * script = static_cast<MenuConfigItemScript const *>(item);
-				char item_val[1024];
-				codecvt_utf16_utf8(script->m_script.c_str(), item_val, 1024);
-				char response[4096];
-				bb::BlackBox::Instance().GetScheme().Eval(item_val, response, 4096);
+			bb::GfxWindow * r = m_gfxWindow->GetRoot();
+			r->SetDestroyTree();
 
-				bb::GfxWindow * r = m_gfxWindow->GetRoot();
-				r->SetDestroyTree();
-			}
-			else if (item->m_type == e_MenuItemBroam)
-			{
-				MenuConfigItemBroam const * script = static_cast<MenuConfigItemBroam const *>(item);
-				char item_val[1024];
-				codecvt_utf16_utf8(script->m_broam.c_str(), item_val, 1024);
-				char response[4096];
-				//bb::BlackBox::Instance().m_broamServer.HandleBroam()
-
-				bb::GfxWindow * r = m_gfxWindow->GetRoot();
-				r->SetDestroyTree();
-			}
-			else if (item->m_type == e_MenuItemSubMenu)
-			{
-				ImGui::SameLine();
-				ImGui::Bullet();
-				// pos of submenu
-				ImDrawList* draw_list = ImGui::GetWindowDrawList();
-				draw_list->PushClipRectFullScreen();
-				ImVec2 a = ImGui::CalcItemRectClosestPoint(ImGui::GetIO().MousePos, true, -2.0f);
-				ImVec2 b = ImGui::GetContentRegionMax();
-				draw_list->PopClipRect();
-
-				MenuConfigItemSubMenu const * submenu = static_cast<MenuConfigItemSubMenu const *>(item);
-				// open menu
-				GuiWidget * w = bb::BlackBox::Instance().GetGfx().FindWidget(submenu->m_menu->m_id.c_str());
-				if (w == nullptr)
-				{
-					w = bb::BlackBox::Instance().GetGfx().MkWidgetFromConfig(*submenu->m_menu);
-					m_gfxWindow->AddChild(w->m_gfxWindow);
-					w->m_gfxWindow->SetParent(m_gfxWindow);
-				}
-				RECT r;
-				::GetWindowRect(m_gfxWindow->m_hwnd, &r);
-				{
-					int const hdr_size = 24;
-					w->MoveWindow(r.left + r.right - r.left, r.top + a.y - hdr_size);
-				}
-			}
-
-
-			m_currentIndex = i;
+			m_currentIndex = idx;
 		}
 		ImGui::PopID();
-
-
-
-		if (item->m_type == e_MenuItemSubMenu)
-		{
-		}
-		else
-		{
-			ImGui::Unindent(); /// #@#$#$#  UGH!!!
-		}
 	}
+
 	void MenuWidget::DrawSeparator (size_t idx, std::shared_ptr<MenuConfigItem> item)
 	{
 		ImGui::Separator();
 	}
+
 	void MenuWidget::DrawSubMenu (size_t idx, std::shared_ptr<MenuConfigItem> item)
 	{
 		const bool item_selected = (idx == m_currentIndex);
 		char item_text[1024];
 		codecvt_utf16_utf8(item->m_name.c_str(), item_text, 1024);
 
-		if (item->m_type == e_MenuItemSubMenu)
-		{
-			ImGui::Bullet();
-		}
-		else
-		{
-			ImGui::Indent();
-		}
+		ImGui::Bullet();
 
-		ImGui::PushID(i);
-
+		ImGui::PushID(idx);
 		if (ImGui::Selectable(item_text, item_selected))
 		{
 			// close other
@@ -369,70 +235,34 @@ namespace imgui {
 			}
 			m_gfxWindow->m_children.clear();
 
-			if (item->m_type == e_MenuItemScript)
-			{
-				MenuConfigItemScript const * script = static_cast<MenuConfigItemScript const *>(item);
-				char item_val[1024];
-				codecvt_utf16_utf8(script->m_script.c_str(), item_val, 1024);
-				char response[4096];
-				bb::BlackBox::Instance().GetScheme().Eval(item_val, response, 4096);
+			ImGui::SameLine();
+			ImGui::Bullet();
+			// pos of submenu
+			ImDrawList* draw_list = ImGui::GetWindowDrawList();
+			draw_list->PushClipRectFullScreen();
+			ImVec2 a = ImGui::CalcItemRectClosestPoint(ImGui::GetIO().MousePos, true, -2.0f);
+			ImVec2 b = ImGui::GetContentRegionMax();
+			draw_list->PopClipRect();
 
-				bb::GfxWindow * r = m_gfxWindow->GetRoot();
-				r->SetDestroyTree();
+			MenuConfigItemSubMenu const * submenu = static_cast<MenuConfigItemSubMenu const *>(item.get());
+			// open menu
+			GuiWidget * w = bb::BlackBox::Instance().GetGfx().FindWidget(submenu->m_menu->m_id.c_str());
+			if (w == nullptr)
+			{
+				w = bb::BlackBox::Instance().GetGfx().MkWidgetFromConfig(*submenu->m_menu);
+				m_gfxWindow->AddChild(w->m_gfxWindow);
+				w->m_gfxWindow->SetParent(m_gfxWindow);
 			}
-			else if (item->m_type == e_MenuItemBroam)
+			RECT r;
+			::GetWindowRect(m_gfxWindow->m_hwnd, &r);
 			{
-				MenuConfigItemBroam const * script = static_cast<MenuConfigItemBroam const *>(item);
-				char item_val[1024];
-				codecvt_utf16_utf8(script->m_broam.c_str(), item_val, 1024);
-				char response[4096];
-				//bb::BlackBox::Instance().m_broamServer.HandleBroam()
-
-				bb::GfxWindow * r = m_gfxWindow->GetRoot();
-				r->SetDestroyTree();
-			}
-			else if (item->m_type == e_MenuItemSubMenu)
-			{
-				ImGui::SameLine();
-				ImGui::Bullet();
-				// pos of submenu
-				ImDrawList* draw_list = ImGui::GetWindowDrawList();
-				draw_list->PushClipRectFullScreen();
-				ImVec2 a = ImGui::CalcItemRectClosestPoint(ImGui::GetIO().MousePos, true, -2.0f);
-				ImVec2 b = ImGui::GetContentRegionMax();
-				draw_list->PopClipRect();
-
-				MenuConfigItemSubMenu const * submenu = static_cast<MenuConfigItemSubMenu const *>(item);
-				// open menu
-				GuiWidget * w = bb::BlackBox::Instance().GetGfx().FindWidget(submenu->m_menu->m_id.c_str());
-				if (w == nullptr)
-				{
-					w = bb::BlackBox::Instance().GetGfx().MkWidgetFromConfig(*submenu->m_menu);
-					m_gfxWindow->AddChild(w->m_gfxWindow);
-					w->m_gfxWindow->SetParent(m_gfxWindow);
-				}
-				RECT r;
-				::GetWindowRect(m_gfxWindow->m_hwnd, &r);
-				{
-					int const hdr_size = 24;
-					w->MoveWindow(r.left + r.right - r.left, r.top + a.y - hdr_size);
-				}
+				int const hdr_size = 24; // @TODO 
+				w->MoveWindow(r.left + r.right - r.left, r.top + a.y - hdr_size);
 			}
 
-
-			m_currentIndex = i;
+			m_currentIndex = idx;
 		}
 		ImGui::PopID();
-
-
-
-		if (item->m_type == e_MenuItemSubMenu)
-		{
-		}
-		else
-		{
-			ImGui::Unindent(); /// #@#$#$#  UGH!!!
-		}
 	}
 
 }}

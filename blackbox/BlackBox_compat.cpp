@@ -204,7 +204,7 @@ bb::MenuConfigItem *MakeMenuItemString(std::shared_ptr<bb::MenuConfig>PluginMenu
 
 bb::MenuConfigItem* MakeMenuNOP(std::shared_ptr<bb::MenuConfig> menu, wchar_t const * title)
 {
-	std::shared_ptr<bb::MenuConfigItemSeparator> item(new bb::MenuConfigItemSeparator(title));
+	std::shared_ptr<bb::MenuConfigItemSeparator> item(new bb::MenuConfigItemSeparator(title ? title : L""));
 	menu->m_items.push_back(item);
 	return item.get();
 // 	/* BlackboxZero 1.8.2012 - For separator graident? */
