@@ -11,7 +11,9 @@ BB_API std::shared_ptr<bb::MenuConfig> MakeNamedMenu (const wchar_t * HeaderText
 BB_API bb::MenuConfigItem * MakeMenuGrip (std::shared_ptr<bb::MenuConfig> PluginMenu, const wchar_t * Title);
 
 /* inserts an item to execute a command or to set a boolean value */
-BB_API bb::MenuConfigItem * MakeMenuItem (std::shared_ptr<bb::MenuConfig> PluginMenu, const wchar_t * Title, const wchar_t * Cmd, bool ShowIndicator);
+BB_API bb::MenuConfigItem * MakeMenuItem (std::shared_ptr<bb::MenuConfig> PluginMenu, const wchar_t * Title, const wchar_t * Cmd);
+/* inserts an item to execute a command or to set a boolean value */
+BB_API bb::MenuConfigItem * MakeMenuItemBool (std::shared_ptr<bb::MenuConfig> PluginMenu, const wchar_t * Title, const wchar_t * Cmd, bool ShowIndicator);
 
 /* inserts an inactive item, optionally with text. 'Title' may be NULL. */
 BB_API bb::MenuConfigItem * MakeMenuNOP (std::shared_ptr<bb::MenuConfig> PluginMenu, const wchar_t * Title);

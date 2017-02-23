@@ -76,14 +76,18 @@ std::shared_ptr<bb::MenuConfig> MakeMenu (wchar_t const * HeaderText)
 
 //===========================================================================
 // API: DelMenu
-// Purpose: obsolete
 //===========================================================================
 
 void DelMenu (std::shared_ptr<bb::MenuConfig> pluginMenu)
 {
-	// Nothing here. We just dont know wether 'PluginMenu' still
-	// exists. The pointer may be invalid or even belong to
-	// a totally different memory object.
+	bb::BlackBox & bb = bb::BlackBox::Instance();
+
+	if (bb::GuiWidget * w = bb.GetGfx().FindWidget(pluginMenu->m_id.c_str()))
+	{
+		bb::GfxWindow * r = w->m_gfxWindow->GetRoot();
+		r->SetDestroyTree();
+		pluginMenu.reset();
+	}
 }
 
 //===========================================================================
@@ -105,7 +109,6 @@ void ShowMenu (std::shared_ptr<bb::MenuConfig> pluginMenu)
 {
 	bb::BlackBox & bb = bb::BlackBox::Instance();
 
-	bool new_menu = false;
 	bb::GuiWidget * w = bb.GetGfx().FindWidget(pluginMenu->m_id.c_str());
 	if (!w)
 	{
@@ -159,13 +162,18 @@ bb::MenuConfigItem * MakeSubmenu (std::shared_ptr<bb::MenuConfig> parentMenu, st
 // API: MakeMenuItem
 //===========================================================================
 
-bb::MenuConfigItem * MakeMenuItem (std::shared_ptr<bb::MenuConfig> menu, wchar_t const * Title, wchar_t const * Cmd, bool ShowIndicator)
+bb::MenuConfigItem * MakeMenuItem (std::shared_ptr<bb::MenuConfig> menu, wchar_t const * title, wchar_t const * cmd)
 {
-	std::shared_ptr<bb::MenuConfigItemBroam> item(new bb::MenuConfigItemBroam(Title, Cmd));
+	std::shared_ptr<bb::MenuConfigItemBroam> item(new bb::MenuConfigItemBroam(title, cmd));
 	menu->m_items.push_back(item);
 	return item.get();
-// 	//dbg_printf("MakeMenuItem %x %s", PluginMenu, Title);
-// 	return PluginMenu->AddMenuItem(new CommandItem(Cmd, NLS1(Title), ShowIndicator));
+}
+
+bb::MenuConfigItem * MakeMenuItemBool (std::shared_ptr<bb::MenuConfig> menu, const wchar_t * title, const wchar_t * cmd, bool checked)
+{
+	std::shared_ptr<bb::MenuConfigItemBroamBool> item(new bb::MenuConfigItemBroamBool(title, cmd, checked));
+	menu->m_items.push_back(item);
+	return item.get();
 }
 
 //===========================================================================
@@ -174,7 +182,7 @@ bb::MenuConfigItem * MakeMenuItem (std::shared_ptr<bb::MenuConfig> menu, wchar_t
 
 bb::MenuConfigItem * MakeMenuItemInt (std::shared_ptr<bb::MenuConfig> menu, wchar_t const * title, wchar_t const * cmd, int val, int minval, int maxval)
 {
-	std::shared_ptr<bb::MenuConfigItemInt> item(new bb::MenuConfigItemInt(title, minval, val, maxval));
+	std::shared_ptr<bb::MenuConfigItemBroamInt> item(new bb::MenuConfigItemBroamInt(title, cmd, minval, val, maxval));
 	menu->m_items.push_back(item);
 	return item.get();
 }

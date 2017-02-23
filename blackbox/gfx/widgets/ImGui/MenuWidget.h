@@ -18,5 +18,16 @@ namespace imgui {
 		virtual void Show (bool on) override { m_config.m_show = on; }
 		virtual bool Visible () const override { return m_config.m_show; }
 		virtual bbstring const & GetId () const override { return m_config.m_id; }
+	protected:
+		void MenuItemDrawUI (size_t idx, std::shared_ptr<MenuConfigItem> item);
+		void DrawBroam (size_t idx, std::shared_ptr<MenuConfigItem> item);
+		void DrawBroamInt (size_t idx, std::shared_ptr<MenuConfigItem> item);
+		void DrawBroamBool (size_t idx, std::shared_ptr<MenuConfigItem> item);
+
+		void DrawCheckBox (size_t idx, std::shared_ptr<MenuConfigItem> item);
+		void DrawScript (size_t idx, std::shared_ptr<MenuConfigItem> item);
+		void DrawInt (size_t idx, std::shared_ptr<MenuConfigItem> item);
+		void DrawSeparator (size_t idx, std::shared_ptr<MenuConfigItem> item);
+		void DrawSubMenu (size_t idx, std::shared_ptr<MenuConfigItem> item);
 	};
 }}

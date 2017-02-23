@@ -8,13 +8,15 @@ namespace bb {
 
 	enum MenuItemType : uint32_t {
 		e_MenuItemSeparator,
-		e_MenuItemFolder,
-		e_MenuItemExec,
+// 		e_MenuItemFolder,
+// 		e_MenuItemExec,
 		e_MenuItemSubMenu,
 		e_MenuItemScript,
 		e_MenuItemInt,
-		e_MenuItemBroam,
 		e_MenuItemCheckBox,
+		e_MenuItemBroam,
+		e_MenuItemBroamBool,
+		e_MenuItemBroamInt,
 	};
 
 	struct MenuConfig;
@@ -52,12 +54,6 @@ namespace bb {
 		MenuConfigItemInt (bbstring const & name/*, bbstring const & cmd*/, int min, int val, int max) : MenuConfigItem(e_MenuItemInt, name), m_min(min), m_val(val), m_max(max) { }
 	};
 
-	struct MenuConfigItemBroam : MenuConfigItem
-	{
-		bbstring m_broam;
-		MenuConfigItemBroam (bbstring const & name, bbstring const & broam) : MenuConfigItem(e_MenuItemBroam, name), m_broam(broam) { }
-	};
-
 	struct MenuConfigItemSubMenu : MenuConfigItem
 	{
 		std::shared_ptr<MenuConfig> m_menu;
@@ -83,6 +79,28 @@ namespace bb {
 	};
 
 	bool loadMenuConfig (YAML::Node & y_root, MenuConfig & config);
+
+
+	// compatibility items
+	struct MenuConfigItemBroam : MenuConfigItem
+	{
+		bbstring m_broam;
+		MenuConfigItemBroam (bbstring const & name, bbstring const & broam) : MenuConfigItem(e_MenuItemBroam, name), m_broam(broam) { }
+	};
+	struct MenuConfigItemBroamBool : MenuConfigItem
+	{
+		bbstring m_broam;
+		bool m_checked{ false };
+		MenuConfigItemBroamBool (bbstring const & name, bbstring const & broam, bool chk) : MenuConfigItem(e_MenuItemBroamBool, name), m_broam(broam), m_checked(chk) { }
+	};
+	struct MenuConfigItemBroamInt : MenuConfigItem
+	{
+		bbstring m_broam;
+		int m_min { 0 };
+		int m_val { 0 };
+		int m_max { 0 };
+		MenuConfigItemBroamInt (bbstring const & name, bbstring const & broam, int min, int val, int max) : MenuConfigItem(e_MenuItemBroamInt, name), m_broam(broam), m_min(min), m_val(val), m_max(max) { }
+	};
 }
 
 
