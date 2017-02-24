@@ -30,18 +30,77 @@ namespace bb {
 
 	bool BlackBox::HandleBroamMessage (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
-		m_broamServer.HandleBroam(hwnd, uMsg, wParam, lParam);
-		return false;
+		return m_broamServer.HandleWndMessage(hwnd, uMsg, wParam, lParam);
 	}
 
 	int exec_cfg_command (const wchar_t * argument);
 
-	bool BroamServer::HandleBroam (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+	bool BroamServer::RegisterBroamListener (HWND handle, uint32_t const * msgs)
 	{
-		LRESULT r;
-		const char *str;
-		const WPARAM ID_HOTKEY = 3;
+		m_listeners.push_back(handle);
+		return true;
+	}
 
+	bool BroamServer::UnregisterBroamListener (HWND handle, uint32_t const * msgs)
+	{
+		m_listeners.erase(std::remove(m_listeners.begin(), m_listeners.end(), handle), m_listeners.end());
+		return true;
+	}
+
+	bool BroamServer::BroadcastBBMessage (UINT msgType, WPARAM wParam, LPARAM lParam)
+	{
+		if (msgType == BB_BROADCAST)
+		{
+			for (HWND listener : m_listeners)
+				::SendMessage(listener, msgType, wParam, lParam);
+		}
+		else
+		{
+		}
+		return true;
+	}
+
+	bool BroamServer::HandleWndMessage (HWND hwnd, UINT msgType, WPARAM wParam, LPARAM lParam)
+	{
+		wchar_t const * msg = reinterpret_cast<wchar_t const *>(lParam);
+		switch (msgType)
+		{
+			case BB_REGISTERMESSAGE:
+			{
+				UINT const * const messages = reinterpret_cast<UINT const *>(lParam);
+				HWND handle = (HWND)wParam;
+				RegisterBroamListener(handle, messages);
+				return true;
+			}
+			case BB_UNREGISTERMESSAGE:
+			{
+				UINT const * const messages = reinterpret_cast<UINT const *>(lParam);
+				HWND handle = (HWND)wParam;
+				RegisterBroamListener(handle, messages);
+				return true;
+			}
+			case BB_POSTSTRING:
+			{
+				// posted command-string, from menu click
+				exec_command(msg);
+				delete[] msg; // @NOTE: delete is mandatory
+				return true;
+			}
+			case BB_BROADCAST:
+			{
+				if (false == exec_broam(msg))
+					BroadcastBBMessage(msgType, wParam, lParam);
+				return true;
+			}
+		}
+
+		if (IsBroam(msgType))
+			return HandleCoreBroam(hwnd, msgType, wParam, msg);
+		return false;
+	}
+
+	bool BroamServer::HandleCoreBroam (HWND hwnd, uint32_t uMsg, WPARAM wParam, wchar_t const * msg)
+	{
 #ifdef LOG_BB_MESSAGES
 		//dbg_printf("hwnd %04x msg %d wp %x lp %x", hwnd, uMsg, wParam, lParam);
 		if (uMsg >= BB_MSGFIRST && uMsg < BB_MSGLAST)
@@ -58,47 +117,36 @@ namespace bb {
 			/* clean up */
 			//shutdown_blackbox();
 			//PostQuitMessage(0);
-			break;
+			return true;
 
 		case BB_SHUTDOWN:
-			break;
+			return true;
 
 		case BB_SETSTYLE:
-			break;
+			return true;
 
 		case BB_ABOUTPLUGINS:
-			break;
+			return true;
 
 		case BB_ABOUTSTYLE:
-			break;
+			return true;
 
 		case BB_EDITFILE:
-			break;
+			return true;
 
 		case BB_RUN:
 //			show_run_dlg();
-			break;
+			return true;
 
 			//====================
 			// Execute a string (shellcommand or broam)
 		case BB_EXECUTE:
-			//exec_command((wchar_t const *)lParam);
-			break;
-
-		case BB_POSTSTRING: // posted command-string, from menu click
-												//exec_command((wchar_t const *)lParam);
-												//m_free((char*)lParam);
-			break;
+			exec_command(msg);
+			return true;
 
 		case BB_EXECUTEASYNC:
-			//post_command((wchar_t const *)lParam);
-			break;
-
-			//====================
-		case BB_BROADCAST:
-			//if (false == exec_broam((wchar_t const *)lParam))
-			//	goto dispatch_bb_message;
-			break;
+			PostCommand(msg);
+			return true;
 
 			//====================
 		case BB_TOGGLEPLUGINS:
@@ -107,14 +155,14 @@ namespace bb {
 
 			//====================
 		case BB_DESKCLICK:
-			break;
+			return true;
 
 			//====================
 			// Menu
 		case BB_MENU:
 			//if (MenuMaker_ShowMenu(wParam, (wchar_t const *)lParam))
 			//	goto dispatch_bb_message;
-			break;
+			return true;
 
 		case BB_HIDEMENU:
 			//Menu_All_Hide();
@@ -126,9 +174,9 @@ namespace bb {
 			//goto do_restart;
 
 		case BB_RESTART:
-		case_bb_restart:
-			str = NULL;
-		do_restart:
+// 		case_bb_restart:
+// 			str = NULL;
+// 		do_restart:
 			// we dont want plugins being loaded twice.
 // 			if (g_in_restart)
 // 				break;
@@ -158,7 +206,7 @@ namespace bb {
 // 
 // 			BBSleep(100);
 // 			g_in_restart = false;
-			break;
+			return true;
 
 			//======================================================
 		case BB_RECONFIGURE:
@@ -177,8 +225,8 @@ namespace bb {
 		case BB_WINDOWSHADE:
 		case BB_WINDOWGROWHEIGHT:
 		case BB_WINDOWGROWWIDTH:
-			if (0 == lParam && IsWindow((HWND)wParam))
-				lParam = wParam;
+// 			if (0 == msg && ::IsWindow((HWND)wParam))
+// 				msg = wParam;
 
 		case BB_WORKSPACE:
 		case BB_SWITCHTON:
@@ -192,8 +240,9 @@ namespace bb {
 		case BB_WINDOWCLOSE:
 		case BB_WINDOWMOVE:
 		case BB_WINDOWSIZE:
-			//r = getWorkspaces().Command(uMsg, wParam, lParam);
-			if (r != -1) return r;
+// 			LRESULT r = getWorkspaces().Command(uMsg, wParam, lParam);
+// 			if (r != -1)
+// 				return r; // ??????
 			goto dispatch_bb_message;
 
 			//====================
@@ -204,26 +253,17 @@ namespace bb {
 			SetTimer(hwnd, BB_TASKUPDATE_TIMER, 200, NULL);
 			goto dispatch_bb_message;
 
-			//====================
-		case BB_REGISTERMESSAGE:
-//			MessageManager_Register((HWND)wParam, (UINT*)lParam, true);
-			break;
-
-		case BB_UNREGISTERMESSAGE:
-//			MessageManager_Register((HWND)wParam, (UINT*)lParam, false);
-			break;
-
 			//==============================================================
 			// COPYDATA stuff, for passing information from/to other processes
 			// (i.e. bbStyleMaker, BBNote)
 
 		case BB_GETSTYLE:
 //			return BBSendData((HWND)lParam, BB_SENDDATA, wParam, getStylePath().c_str(), -1);
-			return 0;
+			return true;
 
 		case BB_GETSTYLESTRUCT:
-			return 0;
 //			return BBSendData((HWND)lParam, BB_SENDDATA, wParam, &mStyle, STYLESTRUCTSIZE);
+			return true;
 
 			// done with BB_messages,
 			//==============================================================
@@ -231,9 +271,9 @@ namespace bb {
 			//====================
 	dispatch_bb_message:
 //			return MessageManager_Send(uMsg, wParam, lParam);
-			return 0;
+			return true;
 		}
-		return 0;
+		return false;
 	}
 
 	/* execute a command, wait until execution finished (unless it's a shell command) */
@@ -243,7 +283,7 @@ namespace bb {
 		if (NULL == cmd || 0 == cmd[0])
 			return;
 		if ('@' == cmd[0])
-			SendMessage(BBhwnd, BB_BROADCAST, 0, (LPARAM)cmd);
+			SendMessage(m_BBHwnd, BB_BROADCAST, 0, (LPARAM)cmd);
 		else
 			Assert(0);
 //			BBExecute_string(cmd, RUN_SHOWERRORS);
@@ -255,22 +295,27 @@ namespace bb {
 	}
 
 	/* post a formatted command, dont wait for execution but return immediately */
-	void BroamServer::post_command_fmt (const char * fmt, ...)
+	bool BroamServer::PostCommand (wchar_t const * fmt, ...)
 	{
 		va_list arg_list;
 		va_start(arg_list, fmt);
 		//TRACE_MSG_VA(trace::e_Info, trace::CTX_BBCore, "Post command: %s", );
-		//PostMessage(BBhwnd, BB_POSTSTRING, 0, (LPARAM)m_formatv(fmt, arg_list));
+		wchar_t buff[e_broamMsgLenMax];
+		size_t n = vswprintf(buff, e_broamMsgLenMax, fmt, arg_list);
+		if (n > 0 && n < e_broamMsgLenMax)
+		{
+			wchar_t * msg = new wchar_t[n + 1];
+			msg[n] = 0;
+			wcsncpy(msg, buff, n + 1);
+			PostMessage(m_BBHwnd, BB_POSTSTRING, 0, (LPARAM)msg);
+			return true;
+		}
+		return false;
 	}
 
-	/* post a command, dont wait for execution but return immediately */
-	void BroamServer::post_command (const char * cmd)
+	void BroamServer::PostCommand (bbstring const & cmd)
 	{
-		post_command_fmt("%s", cmd);
-	}
-	void BroamServer::post_command (tstring const & cmd)
-	{
-		post_command_fmt("%s", cmd.c_str());
+		PostCommand(L"%s", cmd.c_str());
 	}
 
 	/* check and parse "Workspace1" etc. strings */
@@ -286,7 +331,7 @@ namespace bb {
 	}
 
 	//===========================================================================
-	enum shutdown_modes {
+	enum E_ShutdownModes {
 		BBSD_SHUTDOWN	= 0,
 		BBSD_REBOOT		= 1,
 		BBSD_LOGOFF		= 2,
@@ -297,7 +342,7 @@ namespace bb {
 		BBSD_EXITWIN	= 7,
 	};
 
-	enum corebroam_cases {
+	enum E_CoreBroamCases {
 		e_false = 0,
 		e_true = 1,
 
@@ -318,7 +363,7 @@ namespace bb {
 		e_bool,
 	};
 
-	enum corebroam_flags {
+	enum E_CoreBroamFlags {
 		e_mask	 = 0x01F,
 		e_post	 = 0x020,
 		e_lpstr  = 0x040,
@@ -328,14 +373,14 @@ namespace bb {
 		e_lpint  = 0x400,
 	};
 
-	struct corebroam_table
+	struct CoreBroamItem
 	{
 		const wchar_t * m_str;
 		unsigned short m_msg;
 		unsigned short m_flag;
 		short m_wParam;
 	};
-	static const corebroam_table g_corebroam_table[] = {
+	static const CoreBroamItem g_CoreBroams[] = {
 		// one specific window
 		{ L"Raise",					BB_WINDOWRAISE,		e_lptask, 0 },
 		{ L"Lower",					BB_WINDOWLOWER,		e_lptask, 0 },
@@ -468,6 +513,18 @@ namespace bb {
 				return 0;
 		}
 		return -1;
+	}
+
+	bool BroamServer::IsBroam (uint32_t uMsg) const
+	{
+		for (CoreBroamItem const & item : g_CoreBroams)
+		{
+			if (item.m_msg == uMsg)
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 	//===========================================================================

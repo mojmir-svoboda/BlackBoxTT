@@ -359,6 +359,8 @@ namespace bb {
 			return false;
 		if (!m_explorer->Init())
 			return false;
+		if (!m_broamServer.Init(m_hwnd))
+			return false;
 		if (!m_plugins.Init(m_config.m_plugins))
 			return false;
 		if (!m_server.Init(m_config.m_server))

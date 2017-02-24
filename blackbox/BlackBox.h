@@ -60,6 +60,8 @@ namespace bb {
 		Explorer const & GetExplorer () const { return *m_explorer; }
 		Scheme const & GetScheme () const { return m_scheme; }
 		Scheme & GetScheme () { return m_scheme; }
+		BroamServer & GetBroamServer () { return m_broamServer; }
+		BroamServer const & GetBroamServer () const { return m_broamServer; }
 
 		MenuWidget * CreateMenu (WidgetConfig & wcfg, MenuConfig const & config);
 		MenuWidget * CreateMenuOnPointerPos (MenuConfig const & config);

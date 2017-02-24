@@ -95,13 +95,11 @@ namespace imgui {
 		ImGui::PushID(idx);
 		if (ImGui::Selectable(item_text, item_selected))
 		{
-			MenuConfigItemBroam const * script = static_cast<MenuConfigItemBroam const *>(item.get());
-			//char broam_u8[1024];
-			//codecvt_utf16_utf8(bbroam->m_broam.c_str(), broam_u8, 1024);
-			//bb::BlackBox::Instance().m_broamServer.HandleBroam()
+			MenuConfigItemBroam const * broam = static_cast<MenuConfigItemBroam const *>(item.get());
 
-			bb::GfxWindow * r = m_gfxWindow->GetRoot();
-			r->SetDestroyTree();
+			bb::BlackBox::Instance().GetBroamServer().PostCommand(broam->m_broam.c_str());
+
+			m_gfxWindow->GetRoot()->SetDestroyTree();
 
 			m_currentIndex = idx;
 		}
@@ -116,9 +114,11 @@ namespace imgui {
 		codecvt_utf16_utf8(item->m_name.c_str(), item_text, 1024);
 		if (ImGui::SliderInt(item_text, &ibroam->m_val, ibroam->m_min, ibroam->m_max))
 		{
-			//char broam_u8[1024];
-			//codecvt_utf16_utf8(bbroam->m_broam.c_str(), broam_u8, 1024);
-			//bb::BlackBox::Instance().m_broamServer.HandleBroam()
+			//bb::BlackBox::Instance().GetBroamServer().PostCommand(ibroam->m_broam.c_str());
+			if (ibroam->m_broam.find(L"%d") != std::string::npos)
+				bb::BlackBox::Instance().GetBroamServer().PostCommand(ibroam->m_broam.c_str(), ibroam->m_val);
+			else
+				bb::BlackBox::Instance().GetBroamServer().PostCommand(L"%s %d", ibroam->m_broam.c_str(), ibroam->m_val);
 		}
 	}
 	void MenuWidget::DrawBroamBool (size_t idx, std::shared_ptr<MenuConfigItem> item)
@@ -131,12 +131,9 @@ namespace imgui {
 		codecvt_utf16_utf8(item->m_name.c_str(), item_text, 1024);
 		if (ImGui::Checkbox(item_text, &bbroam->m_checked))
 		{
-		//char broam_u8[1024];
-		//codecvt_utf16_utf8(bbroam->m_broam.c_str(), broam_u8, 1024);
-			//bb::BlackBox::Instance().m_broamServer.HandleBroam()
+			bb::BlackBox::Instance().GetBroamServer().PostCommand(bbroam->m_broam.c_str());
 
-			bb::GfxWindow * r = m_gfxWindow->GetRoot();
-			r->SetDestroyTree();
+			m_gfxWindow->GetRoot()->SetDestroyTree();
 		}
 	}
 
@@ -164,9 +161,7 @@ namespace imgui {
 				char response[4096];
 				bb::BlackBox::Instance().GetScheme().Eval(item_val, response, 4096);
 
-				bb::GfxWindow * r = m_gfxWindow->GetRoot();
-				r->SetDestroyTree();
-
+				m_gfxWindow->GetRoot()->SetDestroyTree();
 			}
 			else
 			{
@@ -175,8 +170,7 @@ namespace imgui {
 				char response[4096];
 				bb::BlackBox::Instance().GetScheme().Eval(item_val, response, 4096);
 
-				bb::GfxWindow * r = m_gfxWindow->GetRoot();
-				r->SetDestroyTree();
+				m_gfxWindow->GetRoot()->SetDestroyTree();
 			}
 		}
 	}
@@ -204,8 +198,7 @@ namespace imgui {
 			char response[4096];
 			bb::BlackBox::Instance().GetScheme().Eval(item_val, response, 4096);
 
-			bb::GfxWindow * r = m_gfxWindow->GetRoot();
-			r->SetDestroyTree();
+			m_gfxWindow->GetRoot()->SetDestroyTree();
 
 			m_currentIndex = idx;
 		}

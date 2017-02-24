@@ -754,7 +754,11 @@ skip:
 				buffs[n_results][tok_sz] = 0;
 				++n_results;
 			}
-			else
+
+			while (*s != delim && *s)
+				++s;
+
+			if (n_results == buff_count)
 			{
 				wcsncpy(rest_of_string, s, rest_of_string_size);
 				break;
