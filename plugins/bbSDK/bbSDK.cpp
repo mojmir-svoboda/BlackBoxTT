@@ -93,10 +93,10 @@ void about_box(void)
 #define BROAM(key) (BROAM_PREFIX key) /* concatenation */
 
 /* configuration file */
-#define RC_FILE "bbSDK.rc"
+#define RC_FILE L"bbSDK.rc"
 
 /* prefix for items in the configuration file */
-#define RC_PREFIX "bbsdk."
+#define RC_PREFIX L"bbsdk."
 #define RC_KEY(key) (RC_PREFIX key ":")
 
 /* prefix for unique menu id's */
@@ -203,10 +203,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 /* helper to handle commands from the menu */
 struct msg_test
 {
-	const char * msg;
-	const char * test;
+	const wchar_t * msg;
+	const wchar_t * test;
 };
-int scan_broam (msg_test * msg_test, const char * test);
+int scan_broam (msg_test * msg_test, wchar_t const * test);
 void eval_broam (msg_test * msg_test, int mode, void * pValue);
 enum eval_broam_modes
 {
@@ -652,11 +652,11 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		case BB_BROADCAST:
 		{
-			const char *msg = (LPCSTR)lParam;
+			const wchar_t * msg = (LPWSTR)lParam;
 			struct msg_test msg_test;
 
 			/* check general broams */
-			if (!_stricmp(msg, "@BBShowPlugins"))
+			if (!_wcsicmp(msg, L"@BBShowPlugins"))
 			{
 				if (my.is_hidden)
 				{
@@ -666,7 +666,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				break;
 			}
 
-			if (!_stricmp(msg, "@BBHidePlugins"))
+			if (!_wcsicmp(msg, L"@BBHidePlugins"))
 			{
 				if (my.pluginToggle && false == my.is_inslit)
 				{
@@ -677,66 +677,66 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 
 			/* if the broam is not for us, return now */
-			if (0 != _memicmp(msg, BROAM_PREFIX, sizeof BROAM_PREFIX - 1))
+			if (0 != _wcsnicmp(msg, BROAM_PREFIX, wcslen(BROAM_PREFIX)))
 				break;
 
-			msg_test.msg = msg + sizeof BROAM_PREFIX - 1;
+			msg_test.msg = msg + wcslen(BROAM_PREFIX);
 
-			if (scan_broam(&msg_test, "useSlit"))
+			if (scan_broam(&msg_test, L"useSlit"))
 			{
 				eval_broam(&msg_test, M_BOL, &my.useSlit);
 				break;
 			}
 
-			if (scan_broam(&msg_test, "alwaysOnTop"))
+			if (scan_broam(&msg_test, L"alwaysOnTop"))
 			{
 				eval_broam(&msg_test, M_BOL, &my.alwaysOnTop);
 				break;
 			}
 
-			if (scan_broam(&msg_test, "drawBorder"))
+			if (scan_broam(&msg_test, L"drawBorder"))
 			{
 				eval_broam(&msg_test, M_BOL, &my.drawBorder);
 				break;
 			}
 
-			if (scan_broam(&msg_test, "snapWindow"))
+			if (scan_broam(&msg_test, L"snapWindow"))
 			{
 				eval_broam(&msg_test, M_BOL, &my.snapWindow);
 				break;
 			}
 
-			if (scan_broam(&msg_test, "pluginToggle"))
+			if (scan_broam(&msg_test, L"pluginToggle"))
 			{
 				eval_broam(&msg_test, M_BOL, &my.pluginToggle);
 				break;
 			}
 
-			if (scan_broam(&msg_test, "alphaEnabled"))
+			if (scan_broam(&msg_test, L"alphaEnabled"))
 			{
 				eval_broam(&msg_test, M_BOL, &my.alphaEnabled);
 				break;
 			}
 
-			if (scan_broam(&msg_test, "alphaValue"))
+			if (scan_broam(&msg_test, L"alphaValue"))
 			{
 				eval_broam(&msg_test, M_INT, &my.alphaValue);
 				break;
 			}
 
-			if (scan_broam(&msg_test, "windowText"))
+			if (scan_broam(&msg_test, L"windowText"))
 			{
 				eval_broam(&msg_test, M_STR, &my.windowText);
 				break;
 			}
 
-			if (scan_broam(&msg_test, "editRC"))
+			if (scan_broam(&msg_test, L"editRC"))
 			{
 				edit_rc(rcpath);
 				break;
 			}
 
-			if (scan_broam(&msg_test, "About"))
+			if (scan_broam(&msg_test, L"About"))
 			{
 				about_box();
 				break;
@@ -895,65 +895,65 @@ void ShowMyMenu(bool popup)
 {
 	std::shared_ptr<bb::MenuConfig> pMenu, pSub;
 
-	   /* Create the main menu, with a title and an unique IDString */
-	   pMenu = MakeNamedMenu(szAppNameW, MENU_ID(L"Main"), popup);
+	/* Create the main menu, with a title and an unique IDString */
+	pMenu = MakeNamedMenu(szAppNameW, MENU_ID(L"Main"), popup);
 
-	   /* Create a submenu, also with title and unique IDString */
-	   pSub = MakeNamedMenu(L"Configuration", MENU_ID(L"Config"), popup);
+	/* Create a submenu, also with title and unique IDString */
+	pSub = MakeNamedMenu(L"Configuration", MENU_ID(L"Config"), popup);
 
-	   /* Insert first Item */
-	   MakeMenuItemBool(pSub, L"Draw Border", BROAM(L"drawBorder"), my.drawBorder);
+	/* Insert first Item */
+	MakeMenuItemBool(pSub, L"Draw Border", BROAM(L"drawBorder"), my.drawBorder);
 
-	   if (g_hSlit)
-		   MakeMenuItemBool(pSub, L"Use Slit", BROAM(L"useSlit"), my.useSlit);
+	if (g_hSlit)
+		MakeMenuItemBool(pSub, L"Use Slit", BROAM(L"useSlit"), my.useSlit);
 
-	   if (false == my.is_inslit)
-	   {
-		   /* these are only available if outside the slit */
-		   MakeMenuItemBool(pSub, L"Always On Top", BROAM(L"alwaysOnTop"), my.alwaysOnTop);
-		   MakeMenuItemBool(pSub, L"Snap To Edges", BROAM(L"snapWindow"), my.snapWindow);
-		   MakeMenuItemBool(pSub, L"Toggle With Plugins", BROAM(L"pluginToggle"), my.pluginToggle);
-		   MakeMenuItemBool(pSub, L"Transparency", BROAM(L"alphaEnabled"), my.alphaEnabled);
-		   MakeMenuItemInt(pSub, L"Alpha Value", BROAM(L"alphaValue"), my.alphaValue, 0, 255);
-	   }
+	if (false == my.is_inslit)
+	{
+		/* these are only available if outside the slit */
+		MakeMenuItemBool(pSub, L"Always On Top", BROAM(L"alwaysOnTop"), my.alwaysOnTop);
+		MakeMenuItemBool(pSub, L"Snap To Edges", BROAM(L"snapWindow"), my.snapWindow);
+		MakeMenuItemBool(pSub, L"Toggle With Plugins", BROAM(L"pluginToggle"), my.pluginToggle);
+		MakeMenuItemBool(pSub, L"Transparency", BROAM(L"alphaEnabled"), my.alphaEnabled);
+		MakeMenuItemInt(pSub, L"Alpha Value", BROAM(L"alphaValue"), my.alphaValue, 0, 255);
+	}
 
-	   /* Insert the submenu into the main menu */
-	   MakeSubmenu(pMenu, pSub, L"Configuration");
+	/* Insert the submenu into the main menu */
+	MakeSubmenu(pMenu, pSub, L"Configuration");
 
-	   /* The configurable text string */
-	   MakeMenuItemString(pMenu, L"Display Text", BROAM(L"windowText"), my.windowText);
+	/* The configurable text string */
+	MakeMenuItemString(pMenu, L"Display Text", BROAM(L"windowText"), my.windowText);
 
-	   /* ---------------------------------- */
-	   /* add an empty line */
-	   MakeMenuNOP(pMenu, NULL);
+	/* ---------------------------------- */
+	/* add an empty line */
+	MakeMenuNOP(pMenu, NULL);
 
-	   /* add an entry to let the user edit the setting file */
-	   MakeMenuItem(pMenu, L"Edit Settings", BROAM(L"editRC"));
+	/* add an entry to let the user edit the setting file */
+	MakeMenuItem(pMenu, L"Edit Settings", BROAM(L"editRC"));
 
-	   /* and an about box */
-	   MakeMenuItem(pMenu, L"About", BROAM(L"About"));
+	/* and an about box */
+	MakeMenuItem(pMenu, L"About", BROAM(L"About"));
 
-	   /* ---------------------------------- */
-	   /* Finally, show the menu... */
-	   ShowMenu(pMenu);
+	/* ---------------------------------- */
+	/* Finally, show the menu... */
+	if (popup)
+		ShowMenu(pMenu);
+	else
+		UpdateMenu(pMenu);
 }
 
 /* ------------------------------------------------------------------ */
 /* helper to handle commands from the menu */
 
-int scan_broam(struct msg_test *msg_test, const char *test)
+int scan_broam(msg_test * msg_test, wchar_t const * test)
 {
-	int len;
-	const char *msg;
+	int const len = wcslen(test);
+	wchar_t const * msg = msg_test->msg;
 
-	len = strlen(test);
-	msg = msg_test->msg;
-
-	if (_strnicmp(msg, test, len) != 0)
+	if (_wcsnicmp(msg, test, len) != 0)
 		return 0;
 
 	msg += len;
-	if (*msg != 0 && *msg != ' ')
+	if (*msg != 0 && *msg != L' ')
 		return 0;
 
 	/* store for function below */
@@ -964,56 +964,55 @@ int scan_broam(struct msg_test *msg_test, const char *test)
 
 void eval_broam(struct msg_test *msg_test, int mode, void *pValue)
 {
-//	   char rc_key[80];
-//	   const char *msg;
-// 
-//	   /* Build the full rc_key. i.e. "@bbSDK.xxx:" */
-//	   sprintf(rc_key, "%s%s:", RC_PREFIX, msg_test->test);
-// 
-//	   msg = msg_test->msg;
-//	   /* skip possible whitespace after broam */
-//	   while (*msg == ' ')
-//		   ++msg;
-// 
-//	   switch (mode)
-//	   {
-//		   /* --- set boolean variable ---------------- */
-//		   case M_BOL:
-//			   if (0 == stricmp(msg, "true"))
-//				   *(bool*)pValue = true;
-//			   else
-//			   if (0 == stricmp(msg, "false"))
-//				   *(bool*)pValue = false;
-//			   else
-//				   /* just toggle */
-//				   *(bool*)pValue = false == *(bool*)pValue;
-// 
-//			   /* write the new setting to the rc - file */
-//			   WriteBool(rcpath, rc_key, *(bool*)pValue);
-//			   break;
-// 
-//		   /* --- set integer variable ------------------- */
-//		   case M_INT:
-//			   *(int*)pValue = atoi(msg);
-// 
-//			   /* write the new setting to the rc - file */
-//			   WriteInt(rcpath, rc_key, *(int*)pValue);
-//			   break;
-// 
-//		   /* --- set string variable ------------------- */
-//		   case M_STR:
-//			   strcpy((char*)pValue, msg);
-// 
-//			   /* write the new setting to the rc - file */
-//			   WriteString(rcpath, rc_key, (char*)pValue);
-//			   break;
-//	   }
-// 
-//	   /* Apply new settings */
-//	   set_window_modes();
-// 
-//	   /* Update the menu checkmarks */
-//	   ShowMyMenu(false);
+	wchar_t rc_key[80];
+
+	/* Build the full rc_key. i.e. "@bbSDK.xxx:" */
+	wsprintf(rc_key, L"%s%s:", RC_PREFIX, msg_test->test);
+
+	wchar_t const * msg = msg_test->msg;
+	/* skip possible whitespace after broam */
+	while (*msg == L' ')
+		++msg;
+
+	switch (mode)
+	{
+		/* --- set boolean variable ---------------- */
+		case M_BOL:
+			if (0 == _wcsicmp(msg, L"true"))
+				*(bool*)pValue = true;
+			else
+			if (0 == _wcsicmp(msg, L"false"))
+				*(bool*)pValue = false;
+			else
+				/* just toggle */
+				*(bool*)pValue = false == *(bool*)pValue;
+
+			/* write the new setting to the rc - file */
+//			WriteBool(rcpath, rc_key, *(bool*)pValue);
+			break;
+
+		/* --- set integer variable ------------------- */
+		case M_INT:
+			*(int*)pValue = _wtoi(msg);
+
+			/* write the new setting to the rc - file */
+//			WriteInt(rcpath, rc_key, *(int*)pValue);
+			break;
+
+		/* --- set string variable ------------------- */
+		case M_STR:
+//			wcscpy((wchar_t*)pValue, msg);
+
+			/* write the new setting to the rc - file */
+//			WriteString(rcpath, rc_key, (char*)pValue);
+			break;
+	}
+
+	/* Apply new settings */
+	set_window_modes();
+
+	/* Update the menu checkmarks */
+	ShowMyMenu(false);
 }
 
 /* ------------------------------------------------------------------ */
