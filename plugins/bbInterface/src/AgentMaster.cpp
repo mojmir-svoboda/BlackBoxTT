@@ -60,7 +60,7 @@ int agent_shutdown()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agent_create
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agent_create(agent **a, control *c, agent *parentagent, char *action, char *agenttypename, char *parameterstring, int dataformat)
+int agent_create(agent **a, control *c, agent *parentagent, wchar_t *action, wchar_t *agenttypename, wchar_t *parameterstring, int dataformat)
 {
 	//Create a new control
 	agent *agentpointer;
@@ -78,7 +78,7 @@ int agent_create(agent **a, control *c, agent *parentagent, char *action, char *
 	if (agentpointer->agenttypeptr == NULL || !(agentpointer->agenttypeptr->format & dataformat))
 	{
 		if (!plugin_suppresserrors)
-			BBMessageBox(NULL, "Error:  Agent type invalid!", szAppName, MB_OK|MB_SYSTEMMODAL);
+			BBMessageBox(NULL, L"Error:  Agent type invalid!", szAppName, MB_OK|MB_SYSTEMMODAL);
 		agent_destroy(&agentpointer);
 		return 1;
 	}
@@ -95,40 +95,40 @@ int agent_create(agent **a, control *c, agent *parentagent, char *action, char *
 	}
 
 	//Add to the list of agents
-	char temp[1000];
+	wchar_t temp[1000];
 	if (parentagent == NULL)
-		sprintf(temp, "%s:%s.%s", c->moduleptr->name, c->controlname, action);
+		swprintf(temp, 1000, L"%s:%s.%s", c->moduleptr->name, c->controlname, action);
 	else	
-		sprintf(temp, "%s.%s", parentagent->agentname, action);
+		swprintf(temp, 1000, L"%s.%s", parentagent->agentname, action);
 
 	if (list_add(agentlist, temp, (void *) agentpointer, NULL))
 	{
 		if (!plugin_suppresserrors)
-			BBMessageBox(NULL, "Error:  Could not add agent to list!", temp, MB_OK|MB_SYSTEMMODAL);
+			BBMessageBox(NULL, L"Error:  Could not add agent to list!", temp, MB_OK|MB_SYSTEMMODAL);
 		agent_destroy(&agentpointer);
 		return 1;
 	}
 
 	//If the agent name is too long
-	if (strlen(temp) > 255)
+	if (wcslen(temp) > 255)
 	{
 		if (!plugin_suppresserrors)
-			BBMessageBox(NULL, "Error:  Agent name is too long!\n\n(You can only embed agents so many levels deep.)", szAppName, MB_OK|MB_SYSTEMMODAL);
+			BBMessageBox(NULL, L"Error:  Agent name is too long!\n\n(You can only embed agents so many levels deep.)", szAppName, MB_OK|MB_SYSTEMMODAL);
 		agent_destroy(&agentpointer);
 		return 1;
 	}
 	
 	//Copy the agent name
-	strcpy(agentpointer->agentname, temp);
+	wcscpy(agentpointer->agentname, temp);
 
 	//Create the agent action
-	sprintf(temp, "%s%s%s",
-		(parentagent == NULL ? "" : parentagent->agentaction), 
-		(parentagent == NULL ? "" : "."), 
+	swprintf(temp, 1000, L"%s%s%s",
+		(parentagent == NULL ? L"" : parentagent->agentaction), 
+		(parentagent == NULL ? L"" : L"."), 
 		action);
 
 	//Copy the agent action
-	strcpy(agentpointer->agentaction, temp);	
+	wcscpy(agentpointer->agentaction, temp);	
 
 	*a = agentpointer;
 
@@ -201,7 +201,7 @@ int agent_message(int tokencount, char *tokens[], bool from_core, module* caller
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agent_message
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agent_message(agent *a, int tokencount, char *tokens[])
+int agent_message(agent *a, int tokencount, wchar_t * tokens[])
 {
 	//If no agent exists, forget about it
 	if (a == NULL) return 1;
@@ -213,38 +213,38 @@ int agent_message(agent *a, int tokencount, char *tokens[])
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agent_controlmessage
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agent_controlmessage(control *c, int tokencount, char *tokens[], int agentcount, agent *agents[], char *agentnames[], int agenttypes[])
+int agent_controlmessage(control *c, int tokencount, wchar_t *tokens[], int agentcount, agent *agents[], wchar_t *agentnames[], int agenttypes[])
 {
 	//Figure out what it is
 	int action = 0;
-	if (tokencount == 5 && !strcmp(tokens[2], szBActionRemoveAgent)) action = 1;
-	else if (tokencount == 7 && !strcmp(tokens[2], szBActionSetAgent)) action = 2;
-	else if (tokencount == 7 && !strcmp(tokens[2], szBActionSetAgentProperty)) action = 3;
+	if (tokencount == 5 && !wcscmp(tokens[2], szBActionRemoveAgent)) action = 1;
+	else if (tokencount == 7 && !wcscmp(tokens[2], szBActionSetAgent)) action = 2;
+	else if (tokencount == 7 && !wcscmp(tokens[2], szBActionSetAgentProperty)) action = 3;
 	else return 1;
 
 	//Get the agent name we are trying to set
-	char *fullactionstring = tokens[4];
+	wchar_t *fullactionstring = tokens[4];
 
 	//Find the index of the first "." in the message
-	char *dotptr = strstr(fullactionstring, ".");
+	wchar_t *dotptr = wcsstr(fullactionstring, L".");
 
 	//If there is a dot, set the character to null, so we can find the first one
 	if (dotptr != NULL)
 	{
-		dotptr[0] = '\0';
+		dotptr[0] = L'\0';
 	}
 
 	//The agent we are trying to find
 	agent **targetagentptr = NULL;
 	int targetagenttype = 0;
-	char *targetactionstring = NULL;
+	wchar_t *targetactionstring = NULL;
 	agent *parentagent = NULL;
 
 	//Figure out which agent
 	int agentindex = -1;
 	for (int i = 0; i < agentcount; i++)
 	{
-		if (!strcmp(fullactionstring, agentnames[i])) {agentindex = i; i = agentcount;}
+		if (!wcscmp(fullactionstring, agentnames[i])) {agentindex = i; i = agentcount;}
 	}
 
 	//If we couldn't find it, return failure
@@ -262,13 +262,13 @@ int agent_controlmessage(control *c, int tokencount, char *tokens[], int agentco
 		parentagent = *targetagentptr;
 
 		//Get the rest of the string
-		char *restofstring = dotptr+1;
+		wchar_t *restofstring = dotptr+1;
 
 		//Is there a dot here?  If so, chop it off in the same manner as before
-		dotptr = strstr(restofstring, ".");
+		dotptr = wcsstr(restofstring, L".");
 		if (dotptr != NULL)
 		{
-			dotptr[0] = '\0';
+			dotptr[0] = L'\0';
 		}
 
 		//Find the agent that this string points to by searching the agent's sub-agents
@@ -277,7 +277,7 @@ int agent_controlmessage(control *c, int tokencount, char *tokens[], int agentco
 		int subagentcount = *agentcountptr;
 
 		//Get the other pointers
-		char **agentnames = (char **) agent_getdata(*targetagentptr, DATAFETCH_SUBAGENTS_NAMES_ARRAY);
+		wchar_t **agentnames = (wchar_t **) agent_getdata(*targetagentptr, DATAFETCH_SUBAGENTS_NAMES_ARRAY);
 		int *agenttypes = (int *) agent_getdata(*targetagentptr, DATAFETCH_SUBAGENTS_TYPES_ARRAY);
 		agent **agents = (agent **) agent_getdata(*targetagentptr, DATAFETCH_SUBAGENTS_POINTERS_ARRAY);
 		if (agentnames == NULL || agenttypes == NULL || agents == NULL) return 1;
@@ -287,7 +287,7 @@ int agent_controlmessage(control *c, int tokencount, char *tokens[], int agentco
 		for (int i = 0; i < *agentcountptr; i++)
 		{
 			//If it matches the subagent name
-			if (!strcmp(restofstring, agentnames[i])) {agentindex = i; i = *agentcountptr;}
+			if (!wcscmp(restofstring, agentnames[i])) {agentindex = i; i = *agentcountptr;}
 		}
 		if (agentindex == -1) return 1;
 
@@ -338,7 +338,7 @@ void *agent_getdata(agent *a, int datatype)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agent_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agent_menu_set(Menu *m, control *c, agent *a, int controlformat, char *action)
+void agent_menu_set(Menu *m, control *c, agent *a, int controlformat, wchar_t *action)
 {
 	bool has_nothing = true;
 
@@ -358,7 +358,7 @@ void agent_menu_set(Menu *m, control *c, agent *a, int controlformat, char *acti
 	}
 
 	//Add the "Nothing" option
-	make_menuitem_bol(m, "Nothing", config_getfull_control_removeagent(c, action), has_nothing);
+	make_menuitem_bol(m, L"Nothing", config_getfull_control_removeagent(c, action), has_nothing);
 
 }
 
@@ -368,37 +368,37 @@ void agent_menu_set(Menu *m, control *c, agent *a, int controlformat, char *acti
 void agent_menu_context(Menu *m, control *c, agent *a)
 {
 	if (a) (a->agenttypeptr->func_menu_context)(m, a);
-	else make_menuitem_nop(m, "Not set.");
+	else make_menuitem_nop(m, L"Not set.");
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agent_registertype
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void agent_registertype(
-	char    *agenttypenamefriendly,
-	char    *agenttypename,
+	wchar_t    *agenttypenamefriendly,
+	wchar_t    *agenttypename,
 	int     format,
 	bool    writable,
-	int     (*func_create)(agent *a, char *parameterstring),
+	int     (*func_create)(agent *a, wchar_t *parameterstring),
 	int     (*func_destroy)(agent *a),
-	int     (*func_message)(agent *a, int tokencount, char *tokens[]),
+	int     (*func_message)(agent *a, int tokencount, wchar_t *tokens[]),
 	void    (*func_notify)(agent *a, int notifytype, void *messagedata),    
 	void*   (*func_getdata)(agent *a, int datatype),
-	void    (*func_menu_set)(Menu *m, control *c, agent *a, char *action, int controlformat),
+	void    (*func_menu_set)(Menu *m, control *c, agent *a, wchar_t *action, int controlformat),
 	void    (*func_menu_context)(Menu *m, agent *a),
 	void    (*func_notifytype)(int notifytype, void *messagedata)
 	)
 {
 	//Error conditions
-	if (strlen(agenttypenamefriendly) >= 64) return;
-	if (strlen(agenttypename) >= 64) return;
+	if (wcslen(agenttypenamefriendly) >= 64) return;
+	if (wcslen(agenttypename) >= 64) return;
 
 	//Copy the data
 	agenttype *agenttypepointer;
 	agenttypepointer = new agenttype;
 
-	strcpy(agenttypepointer->agenttypenamefriendly, agenttypenamefriendly);
-	strcpy(agenttypepointer->agenttypename, agenttypename);
+	wcscpy(agenttypepointer->agenttypenamefriendly, agenttypenamefriendly);
+	wcscpy(agenttypepointer->agenttypename, agenttypename);
 	
 	agenttypepointer->format = format;
 	agenttypepointer->writable = writable;

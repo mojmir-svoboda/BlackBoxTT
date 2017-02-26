@@ -34,8 +34,8 @@ void drawIcon (int px, int py, int size, HICON IconHop, HDC hDC, bool f);
 #define hueIntensity plugin_icon_hue
 
 //Constant strings
-const char *image_haligns[] = {"Center", "Left", "Right", NULL};
-const char *image_valigns[] = {"Center", "Top", "Bottom", NULL};
+const wchar_t *image_haligns[] = {L"Center", L"Left", L"Right", NULL};
+const wchar_t *image_valigns[] = {L"Center", L"Top", L"Bottom", NULL};
 
 //GDI+ structs
 Gdiplus::GdiplusStartupInput gdiplusStartupInput;
@@ -52,8 +52,8 @@ int agenttype_bitmap_startup()
 {
 	//Register this type with the ControlMaster
 	agent_registertype(
-		"Bitmap",                           //Friendly name of agent type
-		"Bitmap",                           //Name of agent type
+		L"Bitmap",                           //Friendly name of agent type
+		L"Bitmap",                           //Name of agent type
 		CONTROL_FORMAT_IMAGE,               //Control type
 		true,
 		&agenttype_bitmap_create,           
@@ -68,8 +68,8 @@ int agenttype_bitmap_startup()
 
 	//Register this type with the ControlMaster
 	agent_registertype(
-		"Icon",                             //Friendly name of agent type
-		"Icon",                             //Name of agent type
+		L"Icon",                             //Friendly name of agent type
+		L"Icon",                             //Name of agent type
 		CONTROL_FORMAT_IMAGE,               //Control type
 		true,
 		&agenttype_icon_create,         
@@ -85,7 +85,7 @@ int agenttype_bitmap_startup()
 	// Initialize GDI+
 	if(Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL) != 0)
 	{
-		BBMessageBox(0, "Error starting GdiPlus.dll", szAppName, MB_OK | MB_ICONERROR | MB_TOPMOST);
+		BBMessageBox(0, L"Error starting GdiPlus.dll", szAppName, MB_OK | MB_ICONERROR | MB_TOPMOST);
 		return 1;
 	}
 
@@ -135,45 +135,45 @@ int agenttype_bitmap_destroy(agent *a)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_bitmap_message
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agenttype_bitmap_message(agent *a, int tokencount, char *tokens[])
+int agenttype_bitmap_message(agent *a, int tokencount, wchar_t *tokens[])
 {
-	//Get the agent details
-	agenttype_bitmap_details *details = (agenttype_bitmap_details *) a->agentdetails;
-	if (details->is_icon && !_stricmp("Size", tokens[5]) && config_set_int(tokens[6], &details->width, 1, 256))
-	{
-		details->height = details->width;
-		control_notify(a->controlptr, NOTIFY_NEEDUPDATE, NULL);
-		return 0;
-	}
-	else if (details->filename && !_stricmp("Scale", tokens[5]) && config_set_int(tokens[6], &details->scale, 1, 500))
-	{
-		control_notify(a->controlptr, NOTIFY_NEEDUPDATE, NULL);
-		return 0;
-	}
-	else if (!_stricmp("Source", tokens[5]))
-	{
-		//Try to set the source
-		char *parameterstring = new_string(tokens[6]);
-		int setsource = agenttype_bitmaporicon_setsource(a, parameterstring);
-		free_string(&parameterstring);
-		if (setsource == 0) control_notify(a->controlptr, NOTIFY_NEEDUPDATE, NULL);
-		return 0;
-	}
-
-	int i;
-	if ( (!_stricmp("VAlign", tokens[5])) && (-1 != (i = get_string_index(tokens[6], image_valigns))) )
-	{
-		details->valign = i;
-		control_notify(a->controlptr, NOTIFY_NEEDUPDATE, NULL);
-		return 0;
-	}
-	else if (!_stricmp("HAlign", tokens[5]) && (-1 != (i = get_string_index(tokens[6], image_haligns))) )
-	{
-		details->halign = i;
-		control_notify(a->controlptr, NOTIFY_NEEDUPDATE, NULL);
-		return 0;
-	}
-
+// 	//Get the agent details
+// 	agenttype_bitmap_details *details = (agenttype_bitmap_details *) a->agentdetails;
+// 	if (details->is_icon && !_stricmp("Size", tokens[5]) && config_set_int(tokens[6], &details->width, 1, 256))
+// 	{
+// 		details->height = details->width;
+// 		control_notify(a->controlptr, NOTIFY_NEEDUPDATE, NULL);
+// 		return 0;
+// 	}
+// 	else if (details->filename && !_stricmp("Scale", tokens[5]) && config_set_int(tokens[6], &details->scale, 1, 500))
+// 	{
+// 		control_notify(a->controlptr, NOTIFY_NEEDUPDATE, NULL);
+// 		return 0;
+// 	}
+// 	else if (!_stricmp("Source", tokens[5]))
+// 	{
+// 		//Try to set the source
+// 		wchar_t *parameterstring = new_string(tokens[6]);
+// 		int setsource = agenttype_bitmaporicon_setsource(a, parameterstring);
+// 		free_string(&parameterstring);
+// 		if (setsource == 0) control_notify(a->controlptr, NOTIFY_NEEDUPDATE, NULL);
+// 		return 0;
+// 	}
+// 
+// 	int i;
+// 	if ( (!_stricmp("VAlign", tokens[5])) && (-1 != (i = get_string_index(tokens[6], image_valigns))) )
+// 	{
+// 		details->valign = i;
+// 		control_notify(a->controlptr, NOTIFY_NEEDUPDATE, NULL);
+// 		return 0;
+// 	}
+// 	else if (!_stricmp("HAlign", tokens[5]) && (-1 != (i = get_string_index(tokens[6], image_haligns))) )
+// 	{
+// 		details->halign = i;
+// 		control_notify(a->controlptr, NOTIFY_NEEDUPDATE, NULL);
+// 		return 0;
+// 	}
+// 
 
 
 	return 1;
@@ -197,7 +197,7 @@ void agenttype_bitmap_notify(agent *a, int notifytype, void *messagedata)
 
 			if (details->is_icon)
 			{
-				HICON load_sysicon(char *filepath, int size);
+				HICON load_sysicon(wchar_t *filepath, int size);
 				HICON hIcon = (HICON)LoadImage(plugin_instance_plugin, details->absolute_path, IMAGE_ICON, details->width, details->height, LR_LOADFROMFILE);
 				// this one can retrieve the standard system icons also:
 				if (NULL == hIcon) hIcon = load_sysicon(details->absolute_path, 32);
@@ -236,9 +236,7 @@ void agenttype_bitmap_notify(agent *a, int notifytype, void *messagedata)
 			}
 			else
 			{
-			  	WCHAR wTitle[256];
-			  	mbstowcs(wTitle, details->absolute_path, strlen(details->absolute_path) + 1);
-			  	pImage = new Gdiplus::Image(wTitle);
+			  	pImage = new Gdiplus::Image(details->absolute_path);
 
 				if (NULL != pImage)
 				{
@@ -289,10 +287,10 @@ void agenttype_bitmap_notify(agent *a, int notifytype, void *messagedata)
 			//Write existance
 			config_write(config_get_control_setagent_c(a->controlptr, a->agentaction, a->agenttypeptr->agenttypename, details->filename));
 			//Save properties
-			if (details->is_icon) config_write(config_get_control_setagentprop_i(a->controlptr, a->agentaction, "Size", &details->width));
-			else if (details->filename) config_write(config_get_control_setagentprop_i(a->controlptr, a->agentaction, "Scale", &details->scale));
-			config_write(config_get_control_setagentprop_c(a->controlptr, a->agentaction, "VAlign", image_valigns[details->valign]));
-			config_write(config_get_control_setagentprop_c(a->controlptr, a->agentaction, "HAlign", image_haligns[details->halign]));
+			if (details->is_icon) config_write(config_get_control_setagentprop_i(a->controlptr, a->agentaction, L"Size", &details->width));
+			else if (details->filename) config_write(config_get_control_setagentprop_i(a->controlptr, a->agentaction, L"Scale", &details->scale));
+			config_write(config_get_control_setagentprop_c(a->controlptr, a->agentaction, L"VAlign", image_valigns[details->valign]));
+			config_write(config_get_control_setagentprop_c(a->controlptr, a->agentaction, L"HAlign", image_haligns[details->halign]));
 			break;
 	}
 }
@@ -315,17 +313,17 @@ void *agenttype_bitmap_getdata(agent *a, int datatype)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_bitmap_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_bitmap_menu_set(Menu *m, control *c, agent *a,  char *action, int controlformat)
+void agenttype_bitmap_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
-	make_menuitem_cmd(m, "Browse...", config_getfull_control_setagent_c(c, action, "Bitmap", "*browse*"));
+	make_menuitem_cmd(m, L"Browse...", config_getfull_control_setagent_c(c, action, L"Bitmap", L"*browse*"));
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_icon_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_icon_menu_set(Menu *m, control *c, agent *a,  char *action, int controlformat)
+void agenttype_icon_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
-	make_menuitem_cmd(m, "Browse...", config_getfull_control_setagent_c(c, action, "Icon", "*browse*"));
+	make_menuitem_cmd(m, L"Browse...", config_getfull_control_setagent_c(c, action, L"Icon", L"*browse*"));
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -337,29 +335,29 @@ void agenttype_bitmap_menu_context(Menu *m, agent *a)
 	agenttype_bitmap_details *details = (agenttype_bitmap_details *) a->agentdetails;	
 
 	//For convenience, change the bitmap source without changing the settings
-	make_menuitem_cmd(m, "Change Source...", config_getfull_control_setagentprop_c(a->controlptr, a->agentaction, "Source", "*browse*"));
+	make_menuitem_cmd(m, L"Change Source...", config_getfull_control_setagentprop_c(a->controlptr, a->agentaction, L"Source", L"*browse*"));
 
 	if (details->is_icon)
 	{
-		make_menuitem_int(m, "Icon Size",
-                                          config_getfull_control_setagentprop_s(a->controlptr, a->agentaction, "Size"),
+		make_menuitem_int(m, L"Icon Size",
+                                          config_getfull_control_setagentprop_s(a->controlptr, a->agentaction, L"Size"),
                                           details->width, 1, 256);
 	}
 	else if (details->filename)
 	{
-		make_menuitem_int(m, "Scale",
-                                          config_getfull_control_setagentprop_s(a->controlptr, a->agentaction, "Scale"),
+		make_menuitem_int(m, L"Scale",
+                                          config_getfull_control_setagentprop_s(a->controlptr, a->agentaction, L"Scale"),
                                           details->scale, 1, 500);
 	}
-	Menu *submenu = make_menu("Image Alignment", a->controlptr);
-	make_menuitem_bol(submenu, "Left", config_getfull_control_setagentprop_c(a->controlptr, a->agentaction, "HAlign", "Left"), details->halign == 1);
-	make_menuitem_bol(submenu, "Center", config_getfull_control_setagentprop_c(a->controlptr, a->agentaction, "HAlign", "Center"), details->halign == 0);
-	make_menuitem_bol(submenu, "Right", config_getfull_control_setagentprop_c(a->controlptr, a->agentaction, "HAlign", "Right"), details->halign == 2);
-	make_menuitem_nop(submenu, "");
-	make_menuitem_bol(submenu, "Top", config_getfull_control_setagentprop_c(a->controlptr, a->agentaction, "VAlign", "Top"), details->valign == 1);
-	make_menuitem_bol(submenu, "Center", config_getfull_control_setagentprop_c(a->controlptr, a->agentaction, "VAlign", "Center"), details->valign == 0);
-	make_menuitem_bol(submenu, "Bottom", config_getfull_control_setagentprop_c(a->controlptr, a->agentaction, "VAlign", "Bottom"), details->valign == 2);
-	make_submenu_item(m, "Image Alignment", submenu);
+	Menu *submenu = make_menu(L"Image Alignment", a->controlptr);
+	make_menuitem_bol(submenu, L"Left", config_getfull_control_setagentprop_c(a->controlptr, a->agentaction, L"HAlign", L"Left"), details->halign == 1);
+	make_menuitem_bol(submenu, L"Center", config_getfull_control_setagentprop_c(a->controlptr, a->agentaction, L"HAlign", L"Center"), details->halign == 0);
+	make_menuitem_bol(submenu, L"Right", config_getfull_control_setagentprop_c(a->controlptr, a->agentaction, L"HAlign", L"Right"), details->halign == 2);
+	make_menuitem_nop(submenu, L"");
+	make_menuitem_bol(submenu, L"Top", config_getfull_control_setagentprop_c(a->controlptr, a->agentaction, L"VAlign", L"Top"), details->valign == 1);
+	make_menuitem_bol(submenu, L"Center", config_getfull_control_setagentprop_c(a->controlptr, a->agentaction, L"VAlign", L"Center"), details->valign == 0);
+	make_menuitem_bol(submenu, L"Bottom", config_getfull_control_setagentprop_c(a->controlptr, a->agentaction, L"VAlign", L"Bottom"), details->valign == 2);
+	make_submenu_item(m, L"Image Alignment", submenu);
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -421,13 +419,13 @@ int agenttype_bitmaporicon_create(agent *a, char *parameterstring, bool is_icon)
 //##################################################
 //agenttype_bitmaporicon_setsource
 //##################################################
-int agenttype_bitmaporicon_setsource(agent *a, char *parameterstring)
+int agenttype_bitmaporicon_setsource(agent *a, wchar_t *parameterstring)
 {
 	//Declare variables
-	const char *string_dialogtitles[2] = {"Select Image", "Select Icon"};
-	const char *string_dialogfilts[2] = {"Image Files(*.png;*.bmp;*.jpg;*.gif;*.tif)\0*.png;*.bmp;*.jpg;*.gif;*.tif\0PNG(*.png)\0*.png\0BMP(*.bmp)\0*.bmp\0JPG(*.jpg)\0*.jpg\0GIF(*.gif)\0*.gif\0All Files(*.*)\0*.*\0\0*.*\0\0",
-          "Icon Files(*.ico;*.exe;*.dll;*.icl;*.lnk)\0*.ico;*.exe;*.dll;*.icl;*.lnk\0All Files(*.*)\0*.*\0\0" };
-	const char *string_dialogext[2] = {"", ".ico"};
+	const wchar_t *string_dialogtitles[2] = {L"Select Image", L"Select Icon"};
+	const wchar_t *string_dialogfilts[2] = {L"Image Files(*.png;*.bmp;*.jpg;*.gif;*.tif)\0*.png;*.bmp;*.jpg;*.gif;*.tif\0PNG(*.png)\0*.png\0BMP(*.bmp)\0*.bmp\0JPG(*.jpg)\0*.jpg\0GIF(*.gif)\0*.gif\0All Files(*.*)\0*.*\0\0*.*\0\0",
+          L"Icon Files(*.ico;*.exe;*.dll;*.icl;*.lnk)\0*.ico;*.exe;*.dll;*.icl;*.lnk\0All Files(*.*)\0*.*\0\0" };
+	const wchar_t *string_dialogext[2] = {L"", L".ico"};
 	const UINT uint_loadtype[2] = {IMAGE_BITMAP, IMAGE_ICON};
 
 	//Get the agent details
@@ -435,7 +433,7 @@ int agenttype_bitmaporicon_setsource(agent *a, char *parameterstring)
 	int typeindex = (details->is_icon ? 1 : 0);
 
 	//If the browse option is chosen
-	if (!_stricmp(parameterstring, "*browse*"))
+	if (!_wcsicmp(parameterstring, L"*browse*"))
 	{       
 		parameterstring = dialog_file(string_dialogfilts[typeindex], string_dialogtitles[typeindex], NULL /*config_path_plugin*/, string_dialogext[typeindex], false);
 		if (!parameterstring)
@@ -445,24 +443,24 @@ int agenttype_bitmaporicon_setsource(agent *a, char *parameterstring)
 		}
 
 		//If we have an absolute path, and only a relative path is necessary
-		int lenpath = strlen(config_path_plugin);
-		if (!_strnicmp(config_path_plugin, parameterstring, lenpath))
+		int lenpath = wcslen(config_path_plugin);
+		if (!_wcsnicmp(config_path_plugin, parameterstring, lenpath))
 		{
-			strcpy(parameterstring, &parameterstring[lenpath]);
+			wcscpy(parameterstring, &parameterstring[lenpath]);
 		}
 	}
 
 	//Declare variables
-	char plugin_path[MAX_PATH];
-	char *temp = parameterstring;
+	wchar_t plugin_path[MAX_PATH];
+	wchar_t *temp = parameterstring;
 
 	//If we have an actual string...
-	if (temp[0] && temp[1] != ':')
+	if (temp[0] && temp[1] != L':')
 	{
 		// reconstruct from relative path
 		temp = plugin_path;
-		strcpy(temp, config_path_plugin);
-		strcat(temp, parameterstring);
+		wcscpy(temp, config_path_plugin);
+		wcscat(temp, parameterstring);
 	}
 
 	//Copy the parameter string
@@ -477,7 +475,7 @@ int agenttype_bitmaporicon_setsource(agent *a, char *parameterstring)
 //load_sysicon
 /*=================================================*/
 #include <commctrl.h>
-HICON load_sysicon(char *path, int size)
+HICON load_sysicon(wchar_t *path, int size)
 {
 	UINT cbfileinfo =
 	(size <= 16) ? SHGFI_SYSICONINDEX|SHGFI_SMALLICON : SHGFI_SYSICONINDEX;

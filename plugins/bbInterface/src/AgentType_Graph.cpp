@@ -25,9 +25,9 @@
 //Local variables
 const int agenttype_graph_subagentcount = AGENTTYPE_GRAPH_AGENTCOUNT;
 #define AGENTTYPE_GRAPH_AGENT_VALUE 0
-char *agenttype_graph_agentdescriptions[AGENTTYPE_GRAPH_AGENTCOUNT] =
+wchar_t *agenttype_graph_agentdescriptions[AGENTTYPE_GRAPH_AGENTCOUNT] =
 {
-	"Value"
+	L"Value"
 };
 
 const int agenttype_graph_agenttypes[AGENTTYPE_GRAPH_AGENTCOUNT] =
@@ -45,16 +45,16 @@ bool agenttype_graph_hastimer = false;
 #define AGENTTYPE_GRAPH_CHARTTYPECOUNT 2
 #define AGENTTYPE_GRAPH_CHARTTYPE_FILL 0
 #define AGENTTYPE_GRAPH_CHARTTYPE_LINE 1
-char *agenttype_graph_charttypes[AGENTTYPE_GRAPH_CHARTTYPECOUNT] =
+wchar_t *agenttype_graph_charttypes[AGENTTYPE_GRAPH_CHARTTYPECOUNT] =
 {
-	"FILLCHART",
-	"LINECHART"
+	L"FILLCHART",
+	L"LINECHART"
 };
 
-char *agenttype_graph_friendlycharttypes[AGENTTYPE_GRAPH_CHARTTYPECOUNT] =
+wchar_t *agenttype_graph_friendlycharttypes[AGENTTYPE_GRAPH_CHARTTYPECOUNT] =
 {
-	"Filled Chart",
-	"Line Chart"
+	L"Filled Chart",
+	L"Line Chart"
 };
 
 
@@ -68,8 +68,8 @@ int agenttype_graph_startup()
 
 	//Register this type with the ControlMaster
 	agent_registertype(
-		"Graph",                          //Friendly name of agent type
-		"Graph",                          //Name of agent type
+		L"Graph",                          //Friendly name of agent type
+		L"Graph",                          //Name of agent type
 		CONTROL_FORMAT_IMAGE,               //Control type
 		true,
 		&agenttype_graph_create,          
@@ -105,13 +105,13 @@ int agenttype_graph_shutdown()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_graph_create
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agenttype_graph_create(agent *a, char *parameterstring)
+int agenttype_graph_create(agent *a, wchar_t *parameterstring)
 {
 	//Get the chart type
 	int charttype = -1;
 	for (int  i = 0; i < AGENTTYPE_GRAPH_CHARTTYPECOUNT; i++)
 	{
-		if (!_stricmp(parameterstring, agenttype_graph_charttypes[i])) charttype = i; 
+		if (!_wcsicmp(parameterstring, agenttype_graph_charttypes[i])) charttype = i; 
 	}
 	if (charttype == -1) return 1;
 
@@ -123,8 +123,8 @@ int agenttype_graph_create(agent *a, char *parameterstring)
 	details->chartcolor = style_get_text_color(STYLETYPE_TOOLBAR);
 
 	//Create a unique string to assign to this (just a number from a counter)
-	char identifierstring[64];
-	sprintf(identifierstring, "%ul", agenttype_graph_counter);
+	wchar_t identifierstring[64];
+	swprintf(identifierstring, 64, L"%ul", agenttype_graph_counter);
 	details->internal_identifier = new_string(identifierstring);
 
 	//Nullify all agents
@@ -183,27 +183,27 @@ int agenttype_graph_destroy(agent *a)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_graph_message
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agenttype_graph_message(agent *a, int tokencount, char *tokens[])
+int agenttype_graph_message(agent *a, int tokencount, wchar_t *tokens[])
 {
 	agenttype_graph_details *details = (agenttype_graph_details *) a->agentdetails;
-	if (!_stricmp("GraphType", tokens[5]))
+	if (!_wcsicmp(L"GraphType", tokens[5]))
 	{
 		int charttype = -1;
 		for (int  i = 0; i < AGENTTYPE_GRAPH_CHARTTYPECOUNT; i++)
 		{
-			if (!_stricmp(tokens[6], agenttype_graph_charttypes[i])) charttype = i; 
+			if (!_wcsicmp(tokens[6], agenttype_graph_charttypes[i])) charttype = i; 
 		}
 		if (charttype == -1) return 1;
 		details->charttype = charttype;
 		control_notify(a->controlptr, NOTIFY_NEEDUPDATE, NULL);
 		return 0;
 	}
-	else if (!_stricmp("CustomChartColor", tokens[5]) && config_set_bool(tokens[6],&(details->use_custom_color)))
+	else if (!_wcsicmp(L"CustomChartColor", tokens[5]) && config_set_bool(tokens[6],&(details->use_custom_color)))
 	{
 		control_notify(a->controlptr, NOTIFY_NEEDUPDATE, NULL);
 		return 0;
 	}
-	else if (!_stricmp("ChartColor",tokens[5])){
+	else if (!_wcsicmp(L"ChartColor",tokens[5])){
 		details->use_custom_color = true;
 		COLORREF colorval;
 		if((colorval = ReadColorFromString(tokens[6])) != -1){
@@ -234,7 +234,7 @@ void agenttype_graph_notify(agent *a, int notifytype, void *messagedata)
 	double *currentvalue;
 	double finalvalue;
 	COLORREF cr;
-	char color[8];
+	wchar_t color[8];
 
 	switch(notifytype)
 	{
@@ -310,8 +310,8 @@ void agenttype_graph_notify(agent *a, int notifytype, void *messagedata)
 			//Write existance
 			config_write(config_get_control_setagent_c(a->controlptr, a->agentaction, a->agenttypeptr->agenttypename, agenttype_graph_charttypes[details->charttype]));
 			if(details->use_custom_color){
-	                        sprintf(color,"#%06X",switch_rgb(details->chartcolor));
-				config_write(config_getfull_control_setagentprop_c(a->controlptr,a->agentaction,"ChartColor",color));
+				swprintf(color, 8, L"#%06X",switch_rgb(details->chartcolor));
+				config_write(config_getfull_control_setagentprop_c(a->controlptr,a->agentaction, L"ChartColor",color));
 			}
 			//Save all child agents, if necessary
 			for (int i = 0; i < AGENTTYPE_GRAPH_AGENTCOUNT; i++) agent_notify(details->agents[i], NOTIFY_SAVE_AGENT, NULL);
@@ -345,11 +345,11 @@ void *agenttype_graph_getdata(agent *a, int datatype)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_graph_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_graph_menu_set(Menu *m, control *c, agent *a,  char *action, int controlformat)
+void agenttype_graph_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
 	for (int i = 0; i < AGENTTYPE_GRAPH_CHARTTYPECOUNT; i++)
 	{
-		make_menuitem_cmd(m, agenttype_graph_friendlycharttypes[i], config_getfull_control_setagent_c(c, action, "Graph", agenttype_graph_charttypes[i]));
+		make_menuitem_cmd(m, agenttype_graph_friendlycharttypes[i], config_getfull_control_setagent_c(c, action, L"Graph", agenttype_graph_charttypes[i]));
 	}
 }
 
@@ -362,24 +362,24 @@ void agenttype_graph_menu_context(Menu *m, agent *a)
 
 	for (int i = 0; i < AGENTTYPE_GRAPH_CHARTTYPECOUNT; i++)
 	{
-		make_menuitem_bol(m, agenttype_graph_friendlycharttypes[i], config_getfull_control_setagentprop_c(a->controlptr, a->agentaction, "GraphType", agenttype_graph_charttypes[i]), details->charttype == i);
+		make_menuitem_bol(m, agenttype_graph_friendlycharttypes[i], config_getfull_control_setagentprop_c(a->controlptr, a->agentaction, L"GraphType", agenttype_graph_charttypes[i]), details->charttype == i);
 	}
 	make_menuitem_nop(m, NULL);
 
-	char namedot[1000];
-	sprintf(namedot, "%s%s", a->agentaction, ".");
+	wchar_t namedot[1000];
+	swprintf(namedot, 1000, L"%s%s", a->agentaction, L".");
 
 	menu_controloptions(m, a->controlptr, AGENTTYPE_GRAPH_AGENTCOUNT, details->agents, namedot, agenttype_graph_agentdescriptions, agenttype_graph_agenttypes);
 	
-	char color[8];
-	sprintf(color,"#%06X",switch_rgb(details->chartcolor));
+	wchar_t color[8];
+	swprintf(color, 8, L"#%06X",switch_rgb(details->chartcolor));
 	bool temp = !(details->use_custom_color);
-	make_menuitem_bol(m,"Custom Chart Color",config_getfull_control_setagentprop_b(a->controlptr,a->agentaction,"CustomChartColor",&temp),!temp);
+	make_menuitem_bol(m, L"Custom Chart Color",config_getfull_control_setagentprop_b(a->controlptr,a->agentaction,L"CustomChartColor",&temp),!temp);
 	if(!temp){
 		make_menuitem_str(
 			m,
-			"Chart Color",
-			config_getfull_control_setagentprop_s(a->controlptr,a->agentaction,"ChartColor"),
+			L"Chart Color",
+			config_getfull_control_setagentprop_s(a->controlptr,a->agentaction,L"ChartColor"),
 			color
 		);
 	}		

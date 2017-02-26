@@ -35,7 +35,7 @@ bool agenttype_clock_windowclassregistered;
 
 //Local primitives
 unsigned long agenttype_clock_counter;
-const char agenttype_clock_timerclass[] = "BBInterfaceAgentClock";
+const wchar_t agenttype_clock_timerclass[] = L"BBInterfaceAgentClock";
 
 //A list of this type of agent
 list *agenttype_clock_agents;
@@ -44,7 +44,7 @@ list *agenttype_clock_agents;
 bool agenttype_clock_hastimer = false;
 struct tm *ltp;
 
-#define select_fmt(x) ((x) ? (x) : "%H:%M:%S")
+#define select_fmt(x) ((x) ? (x) : L"%H:%M:%S")
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //controltype_clock_startup
@@ -59,7 +59,7 @@ int agenttype_clock_startup()
 	if (window_helper_register(agenttype_clock_timerclass, &agenttype_clock_event))
 	{
 		//Couldn't register the window
-		BBMessageBox(NULL, "failed on register class", "test", MB_OK);
+		BBMessageBox(NULL, L"failed on register class", "test", MB_OK);
 		return 1;
 	}
 	agenttype_clock_windowclassregistered = true;
@@ -69,7 +69,7 @@ int agenttype_clock_startup()
 	if (!agenttype_clock_window)
 	{
 		//Couldn't create the window
-		BBMessageBox(NULL, "failed on window", "test", MB_OK);
+		BBMessageBox(NULL, L"failed on window", "test", MB_OK);
 		return 1;
 	}
 
@@ -77,8 +77,8 @@ int agenttype_clock_startup()
 	//If we got this far, we can successfully use this function
 	//Register this type with the AgentMaster
 	agent_registertype(
-		"Clock",                   //Friendly name of agent type
-		"Clock",                    //Name of agent type
+		L"Clock",                   //Friendly name of agent type
+		L"Clock",                    //Name of agent type
 		CONTROL_FORMAT_TEXT,      //Control type
 		false,
 		&agenttype_clock_create,
@@ -121,7 +121,7 @@ int agenttype_clock_shutdown()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_clock_create
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agenttype_clock_create(agent *a, char *parameterstring)
+int agenttype_clock_create(agent *a, wchar_t *parameterstring)
 {
 
 
@@ -133,8 +133,8 @@ int agenttype_clock_create(agent *a, char *parameterstring)
 	details->format = NULL;
 	
 	//Create a unique string to assign to this (just a number from a counter)
-	char identifierstring[64];
-	sprintf(identifierstring, "%ul", agenttype_clock_counter);
+	wchar_t identifierstring[64];
+	swprintf(identifierstring, 64, L"%ul", agenttype_clock_counter);
 	details->internal_identifier = new_string(identifierstring);
 
 	//Set the details
@@ -189,10 +189,10 @@ int agenttype_clock_destroy(agent *a)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_clock_message
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agenttype_clock_message(agent *a, int tokencount, char *tokens[])
+int agenttype_clock_message(agent *a, int tokencount, wchar_t *tokens[])
 {
 	agenttype_clock_details *details = (agenttype_clock_details *)a->agentdetails;
-	if (!strcmp("ClockFormat",tokens[5]) && config_set_str(tokens[6],&details->format)){
+	if (!wcscmp(L"ClockFormat",tokens[5]) && config_set_str(tokens[6],&details->format)){
 		agenttype_clock_updatevalue(details);
 		control_notify(a->controlptr,NOTIFY_NEEDUPDATE,NULL);
 	}
@@ -216,8 +216,8 @@ void agenttype_clock_notify(agent *a, int notifytype, void *messagedata)
 
 		case NOTIFY_SAVE_AGENT:
 			//Write existance
-			config_write(config_get_control_setagent_c(a->controlptr, a->agentaction, a->agenttypeptr->agenttypename, "Clock"));
-			config_write(config_get_control_setagentprop_c(a->controlptr, a->agentaction, "ClockFormat",select_fmt(details->format)));
+			config_write(config_get_control_setagent_c(a->controlptr, a->agentaction, a->agenttypeptr->agenttypename, L"Clock"));
+			config_write(config_get_control_setagentprop_c(a->controlptr, a->agentaction, L"ClockFormat",select_fmt(details->format)));
 			
 			break;
 	}
@@ -237,9 +237,9 @@ void *agenttype_clock_getdata(agent *a, int datatype)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_clock_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_clock_menu_set(Menu *m, control *c, agent *a,  char *action, int controlformat)
+void agenttype_clock_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
-	make_menuitem_cmd(m, "Clock", config_getfull_control_setagent_c(c, action, "Clock", "Clock"));
+	make_menuitem_cmd(m, L"Clock", config_getfull_control_setagent_c(c, action, L"Clock", L"Clock"));
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -248,7 +248,7 @@ void agenttype_clock_menu_set(Menu *m, control *c, agent *a,  char *action, int 
 void agenttype_clock_menu_context(Menu *m, agent *a)
 {
 	agenttype_clock_details *details = (agenttype_clock_details *)a->agentdetails;
-	make_menuitem_str(m, "Clock Format",config_getfull_control_setagentprop_s(a->controlptr, a->agentaction,"ClockFormat"),select_fmt(details->format));
+	make_menuitem_str(m, L"Clock Format",config_getfull_control_setagentprop_s(a->controlptr, a->agentaction, L"ClockFormat"),select_fmt(details->format));
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_clock_notifytype
@@ -324,12 +324,13 @@ void agenttype_clock_updatevalue(agenttype_clock_details *details)
 	_invalid_parameter_handler oldHandler, newHandler;
 	newHandler = myInvalidParameterHandler;
 	oldHandler = _set_invalid_parameter_handler(newHandler);
-	len = strftime(
+	len = wcsftime(
 		details->timestr,
 		sizeof(details->timestr), 
 		select_fmt(details->format),
 		ltp);
-	if(len == 0) strcpy(details->timestr,"Invalid Format");
+	if(len == 0)
+		wcscpy(details->timestr, L"Invalid Format");
 	_set_invalid_parameter_handler(oldHandler);
 	
 }

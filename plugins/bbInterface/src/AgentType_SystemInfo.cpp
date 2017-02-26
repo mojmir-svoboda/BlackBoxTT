@@ -41,7 +41,7 @@ VOID CALLBACK agenttype_systeminfo_timercall(HWND hwnd, UINT uMsg, UINT_PTR idEv
 LRESULT CALLBACK agenttype_systeminfo_event(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 void agenttype_systeminfo_propogatenewvalues();
 void agenttype_systeminfo_updatevalue(int monitor_type);
-char * GetOSDetailInfo(char *os_string,int type);
+wchar_t * GetOSDetailInfo(wchar_t * os_string, size_t n, int type);
 
 // Some windowing variables
 HWND agenttype_systeminfo_window;
@@ -49,7 +49,7 @@ bool agenttype_systeminfo_windowclassregistered;
 
 //Local primitives
 unsigned long agenttype_systeminfo_counter;
-const char agenttype_systeminfo_timerclass[] = "BBInterfaceAgentSystemInfo";
+const wchar_t agenttype_systeminfo_timerclass[] = L"BBInterfaceAgentSystemInfo";
 
 //A list of this type of agent
 list *agenttype_systeminfo_agents;
@@ -72,33 +72,33 @@ enum SYSTEMINFO_TYPE
 };
 
 //Must match the enum ordering above! Must have SYSTEMINFO_NUMTYPES entries
-const char *agenttype_systeminfo_types[] =
+const wchar_t *agenttype_systeminfo_types[] =
 {
-	"None", // Unused
-	"HostName",
-	"UserName",
-	"Uptime",
-	"OSName",
-	"OSBuildNum",
-	"BBVer",
-	"StyleName"
+	L"None", // Unused
+	L"HostName",
+	L"UserName",
+	L"Uptime",
+	L"OSName",
+	L"OSBuildNum",
+	L"BBVer",
+	L"StyleName"
 };
 
 //Must match the enum ordering above! Must have SYSTEMINFO_NUMTYPES entries
-const char *agenttype_systeminfo_friendlytypes[] =
+const wchar_t *agenttype_systeminfo_friendlytypes[] =
 {
-	"None", // Unused
-	"Host Name",
-	"User Name",
-	"Uptime",
-	"OS Name",
-	"OS Build Number",
-	"BB Version",
-	"Style Name"
+	L"None", // Unused
+	L"Host Name",
+	L"User Name",
+	L"Uptime",
+	L"OS Name",
+	L"OS Build Number",
+	L"BB Version",
+	L"Style Name"
 };
 
 //Must be the same size as the above array and enum
-char agenttype_systeminfo_values[SYSTEMINFO_NUMTYPES][256];
+wchar_t agenttype_systeminfo_values[SYSTEMINFO_NUMTYPES][256];
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //controltype_button_startup
@@ -113,7 +113,7 @@ int agenttype_systeminfo_startup()
 	if (window_helper_register(agenttype_systeminfo_timerclass, &agenttype_systeminfo_event))
 	{
 		//Couldn't register the window
-		BBMessageBox(NULL, "failed on register class", "test", MB_OK);
+		BBMessageBox(NULL, L"failed on register class", L"test", MB_OK);
 		return 1;
 	}
 	agenttype_systeminfo_windowclassregistered = true;
@@ -123,7 +123,7 @@ int agenttype_systeminfo_startup()
 	if (!agenttype_systeminfo_window)
 	{
 		//Couldn't create the window
-		BBMessageBox(NULL, "failed on window", "test", MB_OK);
+		BBMessageBox(NULL, L"failed on window", "test", MB_OK);
 		return 1;
 	}
 	
@@ -135,8 +135,8 @@ int agenttype_systeminfo_startup()
 	//If we got this far, we can successfully use this function
 	//Register this type with the AgentMaster
 	agent_registertype(
-		"System Information",                   //Friendly name of agent type
-		"SystemInfo",                    //Name of agent type
+		L"System Information",                   //Friendly name of agent type
+		L"SystemInfo",                    //Name of agent type
 		CONTROL_FORMAT_TEXT,				//Control type
 		false,
 		&agenttype_systeminfo_create,
@@ -179,7 +179,7 @@ int agenttype_systeminfo_shutdown()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_systeminfo_create
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agenttype_systeminfo_create(agent *a, char *parameterstring)
+int agenttype_systeminfo_create(agent *a, wchar_t *parameterstring)
 {
 
 
@@ -190,7 +190,7 @@ int agenttype_systeminfo_create(agent *a, char *parameterstring)
 	int monitor_type = SYSTEMINFO_TYPE_NONE;
 	for (int i = 1; i < SYSTEMINFO_NUMTYPES; i++)
 	{
-		if (_stricmp(agenttype_systeminfo_types[i], parameterstring) == 0)
+		if (_wcsicmp(agenttype_systeminfo_types[i], parameterstring) == 0)
 		{
 			monitor_type = i;
 			break;
@@ -203,8 +203,8 @@ int agenttype_systeminfo_create(agent *a, char *parameterstring)
 		//On an error
 		if (!plugin_suppresserrors)
 		{
-			char buffer[1000];
-			sprintf(buffer,	"There was an error setting the System Information agent:\n\nType \"%s\" is not a valid type.", parameterstring);
+			wchar_t buffer[1000];
+			swprintf(buffer,1000, L"There was an error setting the System Information agent:\n\nType \"%s\" is not a valid type.", parameterstring);
 			BBMessageBox(NULL, buffer, szAppName, MB_OK|MB_SYSTEMMODAL);
 		}
 		return 1;
@@ -215,8 +215,8 @@ int agenttype_systeminfo_create(agent *a, char *parameterstring)
 	details->monitor_type = monitor_type;
 	
 	//Create a unique string to assign to this (just a number from a counter)
-	char identifierstring[64];
-	sprintf(identifierstring, "%ul", agenttype_systeminfo_counter);
+	wchar_t identifierstring[64];
+	swprintf(identifierstring, L"%ul", agenttype_systeminfo_counter);
 	details->internal_identifier = new_string(identifierstring);
 
 	//Set the details
@@ -309,12 +309,12 @@ void *agenttype_systeminfo_getdata(agent *a, int datatype)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_systeminfo_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_systeminfo_menu_set(Menu *m, control *c, agent *a,  char *action, int controlformat)
+void agenttype_systeminfo_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
 	//Add a menu item for every type
 	for (int i = 1; i < SYSTEMINFO_NUMTYPES; i++)
 	{
-		make_menuitem_cmd(m, agenttype_systeminfo_friendlytypes[i], config_getfull_control_setagent_c(c, action, "SystemInfo", agenttype_systeminfo_types[i]));
+		make_menuitem_cmd(m, agenttype_systeminfo_friendlytypes[i], config_getfull_control_setagent_c(c, action, L"SystemInfo", agenttype_systeminfo_types[i]));
 	}
 }
 
@@ -323,7 +323,7 @@ void agenttype_systeminfo_menu_set(Menu *m, control *c, agent *a,  char *action,
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void agenttype_systeminfo_menu_context(Menu *m, agent *a)
 {
-	make_menuitem_nop(m, "No options available.");
+	make_menuitem_nop(m, L"No options available.");
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_systeminfo_notifytype
@@ -388,32 +388,32 @@ void agenttype_systeminfo_propogatenewvalues()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void agenttype_systeminfo_updatevalue(int monitor_type)
 {
-	char tmpstr[256];
+	wchar_t tmpstr[256];
 	DWORD len = 256;
 	DWORD time;
 	switch(monitor_type)
 	{
 		case SYSTEMINFO_TYPE_HOSTNAME:
 			if(GetComputerName(tmpstr,&len))
-				strncpy(agenttype_systeminfo_values[monitor_type],tmpstr,256);
+				wcsncpy(agenttype_systeminfo_values[monitor_type],tmpstr,256);
 			break;
 		case SYSTEMINFO_TYPE_USERNAME:
 			if(GetUserName(tmpstr,&len))
-				strncpy(agenttype_systeminfo_values[monitor_type],tmpstr,256);
+				wcsncpy(agenttype_systeminfo_values[monitor_type],tmpstr,256);
 			break;
 		case SYSTEMINFO_TYPE_UPTIME:
 			time = GetTickCount();
-			sprintf(agenttype_systeminfo_values[monitor_type],"%dd %2dh %2dm %2ds",time/86400000,(time/3600000)%24,(time/60000)%60,(time/1000)%60);
+			swprintf(agenttype_systeminfo_values[monitor_type],256, L"%dd %2dh %2dm %2ds",time/86400000,(time/3600000)%24,(time/60000)%60,(time/1000)%60);
 			break;
 		case SYSTEMINFO_TYPE_OSNAME:
 		case SYSTEMINFO_TYPE_OSBUILDNUM:
-			GetOSDetailInfo(agenttype_systeminfo_values[monitor_type],monitor_type);
+			GetOSDetailInfo(agenttype_systeminfo_values[monitor_type], 256, monitor_type);
 			break;
 		case SYSTEMINFO_TYPE_BBVER:
-			strncpy(agenttype_systeminfo_values[monitor_type],GetBBVersion(),256);
+			wcsncpy(agenttype_systeminfo_values[monitor_type],GetBBVersion(),256);
 			break;
 		case SYSTEMINFO_TYPE_STYLENAME:
-			strncpy(agenttype_systeminfo_values[monitor_type],ReadString(stylePath(),"style.name:","no name"),256);
+			wcsncpy(agenttype_systeminfo_values[monitor_type], ReadString(stylePath(), L"style.name:", L"no name"), 256);
 			break;
 	}
 
@@ -423,7 +423,7 @@ void agenttype_systeminfo_updatevalue(int monitor_type)
 //-------------------------------------------------------------
 //GetOSDetailInfo
 //-------------------------------------------------------------
-char * GetOSDetailInfo(char *os_string,int type){
+wchar_t * GetOSDetailInfo(wchar_t *os_string, size_t n, int type){
 	OSVERSIONINFOEX osver;
 	BOOL success_getver;
 	typedef BOOL (WINAPI *PFUNC_GetProductInfo)(DWORD, DWORD, DWORD, DWORD, PDWORD);
@@ -439,9 +439,9 @@ char * GetOSDetailInfo(char *os_string,int type){
 	}
 	if(type == SYSTEMINFO_TYPE_OSBUILDNUM){
 		if(osver.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS){
-			sprintf(os_string,"%d",LOWORD(osver.dwBuildNumber));
+			swprintf(os_string, n, L"%d",LOWORD(osver.dwBuildNumber));
 		}else{
-			sprintf(os_string,"%d",osver.dwBuildNumber);
+			swprintf(os_string, n, L"%d",osver.dwBuildNumber);
 		}
 		return os_string;
 	}
@@ -450,112 +450,112 @@ char * GetOSDetailInfo(char *os_string,int type){
 		switch(osver.dwMinorVersion){
 			case 0: 
 				if( LOWORD(osver.dwBuildNumber) == 1111){
-					strcpy(os_string,"Windows 95 OSR2");
+					wcscpy(os_string,L"Windows 95 OSR2");
 				}else if( LOWORD(osver.dwBuildNumber) >= 1214){
-					strcpy(os_string,"Windows 95 OSR2.5");
+					wcscpy(os_string,L"Windows 95 OSR2.5");
 				}else if( LOWORD(osver.dwBuildNumber) >= 1212){
-					strcpy(os_string,"Windows 95 OSR2.1");
+					wcscpy(os_string,L"Windows 95 OSR2.1");
 				}else{
-					strcpy(os_string,"Windows 95");
+					wcscpy(os_string,L"Windows 95");
 				}
 				break;
 			case 10:
 				if( LOWORD(osver.dwBuildNumber) >= 2222){
-					strcpy(os_string,"Windows 98 SE");
+					wcscpy(os_string,L"Windows 98 SE");
 				}else if( LOWORD(osver.dwBuildNumber) >= 2000){
-					strcpy(os_string,"Windows 98 SP1");
+					wcscpy(os_string,L"Windows 98 SP1");
 				}else{
-					strcpy(os_string,"Windows 98");
+					wcscpy(os_string,L"Windows 98");
 				}
 				break;
 			case 90:
-				strcpy(os_string,"Windows Me");
+				wcscpy(os_string,L"Windows Me");
 				break;
 			default:
-				strcpy(os_string,"Windows 9x");
+				wcscpy(os_string,L"Windows 9x");
 				break;
 		}
 	}
 	else if(osver.dwPlatformId == VER_PLATFORM_WIN32_NT)
 	{
 		if(osver.dwMajorVersion == 3){
-			sprintf(os_string,"Windows NT3.%d",osver.dwMinorVersion);
+			swprintf(os_string, n, L"Windows NT3.%d",osver.dwMinorVersion);
 		}else if(osver.dwMajorVersion == 4){
 			if(success_getver){
 				if(osver.wProductType == VER_NT_WORKSTATION){
-					strcpy(os_string,"Windows NT Workstation 4.0");
+					wcscpy(os_string, L"Windows NT Workstation 4.0");
 				}else if(osver.wProductType == VER_NT_SERVER){
-					strcpy(os_string,"Windows NT Server 4.0");
+					wcscpy(os_string, L"Windows NT Server 4.0");
 				}else{
-					strcpy(os_string,"Windows NT 4.0");
+					wcscpy(os_string, L"Windows NT 4.0");
 				}
 				if(osver.wSuiteMask & VER_SUITE_ENTERPRISE){
-					strcat(os_string," Enterprise Edition");
+					wcscat(os_string, L" Enterprise Edition");
 				}
 			}
 			else{
-				strcpy(os_string,"Windows NT 4.0");
+				wcscpy(os_string,L"Windows NT 4.0");
 			}
 		}else if(osver.dwMajorVersion == 5){
 			if(osver.dwMinorVersion == 0){ // Win2k
 				if(success_getver){
 					if(osver.wProductType == VER_NT_WORKSTATION){
-						strcpy(os_string,"Windows 2000 Professional");
+						wcscpy(os_string, L"Windows 2000 Professional");
 					}else if(osver.wProductType == VER_NT_SERVER){
 						if(osver.wSuiteMask & VER_SUITE_ENTERPRISE){
-							strcpy(os_string,"Windows 2000 Advanced Server");
+							wcscpy(os_string, L"Windows 2000 Advanced Server");
 						}else if(osver.wSuiteMask & VER_SUITE_DATACENTER){
-							strcpy(os_string,"Windows 2000 Datacenter Server");
+							wcscpy(os_string, L"Windows 2000 Datacenter Server");
 						}else{
-							strcpy(os_string,"Windows 2000 Server");
+							wcscpy(os_string, L"Windows 2000 Server");
 						}	
 					}else{
-						strcpy(os_string,"Windows 2000");
+						wcscpy(os_string,L"Windows 2000");
 					}
 				}else{
-					strcpy(os_string,"Windows 2000");
+					wcscpy(os_string,L"Windows 2000");
 				}
 			}else if(osver.dwMinorVersion == 1){ // WinXP
 				if(success_getver){
 					 if(GetSystemMetrics(SM_MEDIACENTER)){
-						 strcpy(os_string,"Windows XP Media Center Edition");
+						 wcscpy(os_string,L"Windows XP Media Center Edition");
 					 }else if(GetSystemMetrics(SM_TABLETPC)){
-						 strcpy(os_string,"Windows XP Tablet PC Edition");
+						 wcscpy(os_string,L"Windows XP Tablet PC Edition");
 					 }else if(GetSystemMetrics(SM_STARTER)){
-						 strcpy(os_string,"Windows XP Starter Edition");
+						 wcscpy(os_string,L"Windows XP Starter Edition");
 					 }else if(osver.wSuiteMask & VER_SUITE_PERSONAL){
-						 strcpy(os_string,"Windows XP Home Edition");
+						 wcscpy(os_string,L"Windows XP Home Edition");
 					 }else{
-						 strcpy(os_string,"Windows XP Professional");
+						 wcscpy(os_string,L"Windows XP Professional");
 					 }
 				}else{
-					strcpy(os_string,"Windows XP");
+					wcscpy(os_string,L"Windows XP");
 				}
 			}else if(osver.dwMinorVersion == 2){ //WinServer2003
 				if(success_getver){
-					char r2[4];
-					strcpy(r2,GetSystemMetrics(SM_SERVERR2)?" R2":"");
+					wchar_t r2[4];
+					wcscpy(r2, GetSystemMetrics(SM_SERVERR2)? L" R2": L"");
 					if(osver.wProductType == VER_NT_WORKSTATION){
-						strcpy(os_string,"Windows XP Professional x64 Edition");	
+						wcscpy(os_string,L"Windows XP Professional x64 Edition");	
 					}else if(osver.wSuiteMask & VER_SUITE_ENTERPRISE){
-						sprintf(os_string,"Windows Server 2003%s Enterprise Edition",r2);
+						swprintf(os_string,n,L"Windows Server 2003%s Enterprise Edition",r2);
 					}else if(osver.wSuiteMask & VER_SUITE_DATACENTER){
-						sprintf(os_string,"Windows Server 2003%s Datacenter Edition",r2);
+						swprintf(os_string,n,L"Windows Server 2003%s Datacenter Edition",r2);
 					}else if(osver.wSuiteMask & VER_SUITE_BLADE){
-						sprintf(os_string,"Windows Server 2003%s Web Edition",r2);
+						swprintf(os_string,n,L"Windows Server 2003%s Web Edition",r2);
 					}else if(osver.wSuiteMask & VER_SUITE_COMPUTE_SERVER){
-						sprintf(os_string,"Windows Server 2003%s Compute Cluster Edition",r2);
+						swprintf(os_string,n,L"Windows Server 2003%s Compute Cluster Edition",r2);
 					}else if(osver.wSuiteMask & VER_SUITE_STORAGE_SERVER){
-						sprintf(os_string,"Windows Storage Server 2003%s",r2);
+						swprintf(os_string,n,L"Windows Storage Server 2003%s",r2);
 					}else if(osver.wSuiteMask & VER_SUITE_SMALLBUSINESS_RESTRICTED){
-						sprintf(os_string,"Microsoft Small Business Server 2003%s",r2);
+						swprintf(os_string,n,L"Microsoft Small Business Server 2003%s",r2);
 					}else if(osver.wSuiteMask & VER_SUITE_WH_SERVER){
-						strcpy(os_string,"Windows Home Server");
+						wcscpy(os_string,L"Windows Home Server");
 					}else{
-						sprintf(os_string,"Windows Server 2003%s Standard Edition",r2);
+						swprintf(os_string,n,L"Windows Server 2003%s Standard Edition",r2);
 					}
 				}else{
-					strcpy(os_string,"Windows Server 2003");
+					wcscpy(os_string,L"Windows Server 2003");
 				}
 			}
 		}else if(osver.dwMajorVersion == 6){
@@ -565,99 +565,99 @@ char * GetOSDetailInfo(char *os_string,int type){
 					switch(dwReturnedProductType){
 						case 0x00000006://PRODUCT_BUSINESS
 						case 0x00000010://PRODUCT_BUSINESS
-							strcpy(os_string,"Windows Vista Business");
+							wcscpy(os_string,L"Windows Vista Business");
 							break;
 						case 0x00000012://PRODUCT_CLUSTER_SERVER
-							strcpy(os_string,"Cluster Server Edition");
+							wcscpy(os_string,L"Cluster Server Edition");
 							break;
 						case 0x00000008://PRODUCT_DATACENTER_SERVER
-							strcpy(os_string,"Datacenter Edition (full installation)");
+							wcscpy(os_string,L"Datacenter Edition (full installation)");
 							break;
 						case 0x0000000C://PRODUCT_DATACENTER_SERVER_CORE
-							strcpy(os_string,"Datacenter Edition (core installation)");
+							wcscpy(os_string,L"Datacenter Edition (core installation)");
 							break;
 						case 0x00000004://PRODUCT_ENTERPRISE
 						case 0x0000001B://PRODUCT_ENTERPRISE
-							strcpy(os_string,"Windows Vista Enterprise");
+							wcscpy(os_string,L"Windows Vista Enterprise");
 							break;
 						case 0x0000000A://PRODUCT_ENTERPRISE_SERVER
-							strcpy(os_string,"Server Enterprise Edition (full installation)");
+							wcscpy(os_string,L"Server Enterprise Edition (full installation)");
 							break;
 						case 0x0000000E://PRODUCT_ENTERPRISE_SERVER_CORE
-							strcpy(os_string,"Server Enterprise Edition (core installation)");
+							wcscpy(os_string,L"Server Enterprise Edition (core installation)");
 							break;
 						case 0x0000000F://PRODUCT_ENTERPRISE_SERVER_IA64
-							strcpy(os_string,"Server Enterprise Edition for Itanium-based Systems");
+							wcscpy(os_string,L"Server Enterprise Edition for Itanium-based Systems");
 							break;
 						case 0x00000002://PRODUCT_HOME_BASIC
 						case 0x00000005://PRODUCT_HOME_BASIC_N
-							strcpy(os_string,"Windows Vista Home Basic");
+							wcscpy(os_string,L"Windows Vista Home Basic");
 							break;
 						case 0x00000003://PRODUCT_HOME_PREMIUM
 						case 0x0000001A://PRODUCT_HOME_PREMIUM_N
-							strcpy(os_string,"Windows Vista Home Premium");
+							wcscpy(os_string,L"Windows Vista Home Premium");
 							break;
 						case 0x00000013://PRODUCT_HOME_SERVER
-							strcpy(os_string,"Home Server");
+							wcscpy(os_string,L"Home Server");
 							break;
 						case 0x00000018://PRODUCT_SERVER_FOR_SMALLBUSINESS
-							strcpy(os_string,"Server for Small Business Edition");
+							wcscpy(os_string,L"Server for Small Business Edition");
 							break;
 						case 0x00000009://PRODUCT_SMALLBUSINESS_SERVER
-							strcpy(os_string,"Small Business Server");
+							wcscpy(os_string,L"Small Business Server");
 							break;
 						case 0x00000019://PRODUCT_SMALLBUSINESS_SERVER_PREMIUM
-							strcpy(os_string,"Small Business Server Premium Edition");
+							wcscpy(os_string,L"Small Business Server Premium Edition");
 							break;
 						case 0x00000007://PRODUCT_STANDARD_SERVER
-							strcpy(os_string,"Server Standard Edition (full installation)");
+							wcscpy(os_string,L"Server Standard Edition (full installation)");
 							break;
 						case 0x0000000D://PRODUCT_STANDARD_SERVER_CORE
-							strcpy(os_string,"Server Standard Edition (core installation)");
+							wcscpy(os_string,L"Server Standard Edition (core installation)");
 							break;
 						case 0x0000000B://PRODUCT_STARTER
-							strcpy(os_string,"Windows Vista Starter");
+							wcscpy(os_string,L"Windows Vista Starter");
 							break;
 						case 0x00000017://PRODUCT_STORAGE_ENTERPRISE_SERVER
-							strcpy(os_string,"Storage Server Enterprise Edition");
+							wcscpy(os_string,L"Storage Server Enterprise Edition");
 							break;
 						case 0x00000014://PRODUCT_STORAGE_EXPRESS_SERVER
-							strcpy(os_string,"Storage Server Express Edition");
+							wcscpy(os_string,L"Storage Server Express Edition");
 							break;
 						case 0x00000015://PRODUCT_STORAGE_STANDARD_SERVER
-							strcpy(os_string,"Storage Server Standard Edition");
+							wcscpy(os_string,L"Storage Server Standard Edition");
 							break;
 						case 0x00000016://PRODUCT_STORAGE_WORKGROUP_SERVER
-							strcpy(os_string,"Storage Server Workgroup Edition");
+							wcscpy(os_string,L"Storage Server Workgroup Edition");
 							break;
 						case 0x00000001://PRODUCT_ULTIMATE
 						case 0x0000001C://PRODUCT_ULTIMATE_N
-							strcpy(os_string,"Windows Vista Ultimate");
+							wcscpy(os_string,L"Windows Vista Ultimate");
 							break;
 						case 0x00000011://PRODUCT_WEB_SERVER
-							strcpy(os_string,"Web Server Edition");
+							wcscpy(os_string,L"Web Server Edition");
 							break;
 						default:
-							strcpy(os_string,"Windows Vista");
+							wcscpy(os_string,L"Windows Vista");
 							break;
 					}//end switch
 				}// end if(pGetProductInfo ... )
 				else
 				{
-					strcpy(os_string,"Windows Vista");
+					wcscpy(os_string,L"Windows Vista");
 				}
 			}// end if(success_getver)
 			else
 			{
-				strcpy(os_string,"Windows Vista");
+				wcscpy(os_string,L"Windows Vista");
 			}
 		}//end if vista
 		if(success_getver && osver.wServicePackMajor){
 			//Service Pack Check
 			if(osver.wServicePackMinor){
-				sprintf(os_string,"%s SP%d.%d",os_string,osver.wServicePackMajor,osver.wServicePackMinor);
+				swprintf(os_string,n,L"%s SP%d.%d",os_string,osver.wServicePackMajor,osver.wServicePackMinor);
 			}else{
-				sprintf(os_string,"%s SP%d",os_string,osver.wServicePackMajor);
+				swprintf(os_string,n,L"%s SP%d",os_string,osver.wServicePackMajor);
 			}
 		}	
 	}//end if(WinNT)

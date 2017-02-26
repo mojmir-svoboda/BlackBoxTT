@@ -24,9 +24,9 @@
 //Local variables
 const int agenttype_autoscalegraph_subagentcount = AGENTTYPE_AUTOSCALEGRAPH_AGENTCOUNT;
 #define AGENTTYPE_AUTOSCALEGRAPH_AGENT_VALUE 0
-char *agenttype_autoscalegraph_agentdescriptions[AGENTTYPE_AUTOSCALEGRAPH_AGENTCOUNT] =
+wchar_t *agenttype_autoscalegraph_agentdescriptions[AGENTTYPE_AUTOSCALEGRAPH_AGENTCOUNT] =
 {
-	"Value"
+	L"Value"
 };
 
 const int agenttype_autoscalegraph_agenttypes[AGENTTYPE_AUTOSCALEGRAPH_AGENTCOUNT] =
@@ -42,21 +42,21 @@ bool agenttype_autoscalegraph_hastimer = false;
 list *agenttype_autoscalegraph_agents;
 
 double get_range_value(double value);
-double ReadValueFromString(char * string);
+double ReadValueFromString(wchar_t * string);
 
 #define AGENTTYPE_AUTOSCALEGRAPH_CHARTTYPECOUNT 2
 #define AGENTTYPE_AUTOSCALEGRAPH_CHARTTYPE_FILL 0
 #define AGENTTYPE_AUTOSCALEGRAPH_CHARTTYPE_LINE 1
-char *agenttype_autoscalegraph_charttypes[AGENTTYPE_AUTOSCALEGRAPH_CHARTTYPECOUNT] =
+wchar_t *agenttype_autoscalegraph_charttypes[AGENTTYPE_AUTOSCALEGRAPH_CHARTTYPECOUNT] =
 {
-	"FILLCHART",
-	"LINECHART",
+	L"FILLCHART",
+	L"LINECHART",
 };
 
-char *agenttype_autoscalegraph_friendlycharttypes[AGENTTYPE_AUTOSCALEGRAPH_CHARTTYPECOUNT] =
+wchar_t *agenttype_autoscalegraph_friendlycharttypes[AGENTTYPE_AUTOSCALEGRAPH_CHARTTYPECOUNT] =
 {
-	"Filled Chart",
-	"Line Chart",
+	L"Filled Chart",
+	L"Line Chart",
 };
 
 
@@ -70,8 +70,8 @@ int agenttype_autoscalegraph_startup()
 
 	//Register this type with the ControlMaster
 	agent_registertype(
-		"AutoScaleGraph",                          //Friendly name of agent type
-		"AutoScaleGraph",                          //Name of agent type
+		L"AutoScaleGraph",                          //Friendly name of agent type
+		L"AutoScaleGraph",                          //Name of agent type
 		CONTROL_FORMAT_IMAGE,               //Control type
 		true,
 		&agenttype_autoscalegraph_create,          
@@ -106,13 +106,13 @@ int agenttype_autoscalegraph_shutdown()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_autoscalegraph_create
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agenttype_autoscalegraph_create(agent *a, char *parameterstring)
+int agenttype_autoscalegraph_create(agent *a, wchar_t *parameterstring)
 {
 	//Get the chart type
 	int charttype = -1;
 	for (int  i = 0; i < AGENTTYPE_AUTOSCALEGRAPH_CHARTTYPECOUNT; i++)
 	{
-		if (!_stricmp(parameterstring, agenttype_autoscalegraph_charttypes[i])) charttype = i; 
+		if (!_wcsicmp(parameterstring, agenttype_autoscalegraph_charttypes[i])) charttype = i; 
 	}
 	if (charttype == -1) return 1;
 
@@ -126,8 +126,8 @@ int agenttype_autoscalegraph_create(agent *a, char *parameterstring)
 	details->chartcolor = style_get_text_color(STYLETYPE_TOOLBAR);
 
 	//Create a unique string to assign to this (just a number from a counter)
-	char identifierstring[64];
-	sprintf(identifierstring, "%ul", agenttype_autoscalegraph_counter);
+	wchar_t identifierstring[64];
+	swprintf(identifierstring, 64, L"%ul", agenttype_autoscalegraph_counter);
 	details->internal_identifier = new_string(identifierstring);
 
 	//Nullify all agents
@@ -186,27 +186,27 @@ int agenttype_autoscalegraph_destroy(agent *a)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_autoscalegraph_message
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agenttype_autoscalegraph_message(agent *a, int tokencount, char *tokens[])
+int agenttype_autoscalegraph_message(agent *a, int tokencount, wchar_t *tokens[])
 {
 	agenttype_autoscalegraph_details *details = (agenttype_autoscalegraph_details *) a->agentdetails;
-	if (!_stricmp("AutoScaleGraphType", tokens[5]))
+	if (!_wcsicmp(L"AutoScaleGraphType", tokens[5]))
 	{
 		int charttype = -1;
 		for (int  i = 0; i < AGENTTYPE_AUTOSCALEGRAPH_CHARTTYPECOUNT; i++)
 		{
-			if (!_stricmp(tokens[6], agenttype_autoscalegraph_charttypes[i])) charttype = i; 
+			if (!_wcsicmp(tokens[6], agenttype_autoscalegraph_charttypes[i])) charttype = i; 
 		}
 		if (charttype == -1) return 1;
 		details->charttype = charttype;
 		control_notify(a->controlptr, NOTIFY_NEEDUPDATE, NULL);
 		return 0;
 	}
-	else if (!_stricmp("CustomChartColor", tokens[5]) && config_set_bool(tokens[6],&(details->use_custom_color)))
+	else if (!_wcsicmp(L"CustomChartColor", tokens[5]) && config_set_bool(tokens[6],&(details->use_custom_color)))
 	{
 		control_notify(a->controlptr, NOTIFY_NEEDUPDATE, NULL);
 		return 0;
 	}
-	else if (!_stricmp("ChartColor",tokens[5])){
+	else if (!_wcsicmp(L"ChartColor",tokens[5])){
 		details->use_custom_color = true;
 		COLORREF colorval;
 		if((colorval = ReadColorFromString(tokens[6])) != -1){
@@ -215,12 +215,12 @@ int agenttype_autoscalegraph_message(agent *a, int tokencount, char *tokens[])
 		}
 		return 0;
 	}
-	else if(!_stricmp("AutoScale",tokens[5]) && config_set_bool(tokens[6],&(details->use_user_range)))
+	else if(!_wcsicmp(L"AutoScale",tokens[5]) && config_set_bool(tokens[6],&(details->use_user_range)))
 	{
 		control_notify(a->controlptr, NOTIFY_NEEDUPDATE, NULL);
 		return 0;
 	}
-	else if(!_stricmp("MaxRange",tokens[5]))
+	else if(!_wcsicmp(L"MaxRange",tokens[5]))
 	{
 		double temp = ReadValueFromString(tokens[6]);
 		if(temp <= 0) return 1;
@@ -251,7 +251,7 @@ void agenttype_autoscalegraph_notify(agent *a, int notifytype, void *messagedata
 	double *currentvalue;
 	double finalvalue;
 	COLORREF cr;
-	char color[8];
+	wchar_t color[8];
 	
 	switch(notifytype)
 	{
@@ -355,13 +355,13 @@ void agenttype_autoscalegraph_notify(agent *a, int notifytype, void *messagedata
 			//Write existance
 			config_write(config_get_control_setagent_c(a->controlptr, a->agentaction, a->agenttypeptr->agenttypename, agenttype_autoscalegraph_charttypes[details->charttype]));
 			if(details->use_user_range){
-				char range[20];
-				_snprintf(range,20,"%.0f",details->user_range);
-				config_write(config_getfull_control_setagentprop_c(a->controlptr,a->agentaction,"MaxRange",range));
+				wchar_t range[20];
+				swprintf(range,20,L"%.0f",details->user_range);
+				config_write(config_getfull_control_setagentprop_c(a->controlptr,a->agentaction,L"MaxRange",range));
 			}
 			if(details->use_custom_color){
-				sprintf(color,"#%06X",switch_rgb(details->chartcolor));
-				config_write(config_getfull_control_setagentprop_c(a->controlptr,a->agentaction,"ChartColor",color));
+				swprintf(color, 8, L"#%06X",switch_rgb(details->chartcolor));
+				config_write(config_getfull_control_setagentprop_c(a->controlptr,a->agentaction,L"ChartColor",color));
 			}
 			//Save all child agents, if necessary
 			for (int i = 0; i < AGENTTYPE_AUTOSCALEGRAPH_AGENTCOUNT; i++)
@@ -396,11 +396,11 @@ void *agenttype_autoscalegraph_getdata(agent *a, int datatype)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_autoscalegraph_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_autoscalegraph_menu_set(Menu *m, control *c, agent *a,  char *action, int controlformat)
+void agenttype_autoscalegraph_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
 	for (int i = 0; i < AGENTTYPE_AUTOSCALEGRAPH_CHARTTYPECOUNT; i++)
 	{
-		make_menuitem_cmd(m, agenttype_autoscalegraph_friendlycharttypes[i], config_getfull_control_setagent_c(c, action, "AutoScaleGraph", agenttype_autoscalegraph_charttypes[i]));
+		make_menuitem_cmd(m, agenttype_autoscalegraph_friendlycharttypes[i], config_getfull_control_setagent_c(c, action, L"AutoScaleGraph", agenttype_autoscalegraph_charttypes[i]));
 	}
 }
 
@@ -414,34 +414,34 @@ void agenttype_autoscalegraph_menu_context(Menu *m, agent *a)
 
 	for (int i = 0; i < AGENTTYPE_AUTOSCALEGRAPH_CHARTTYPECOUNT; i++)
 	{
-		make_menuitem_bol(m, agenttype_autoscalegraph_friendlycharttypes[i], config_getfull_control_setagentprop_c(a->controlptr, a->agentaction, "AutoScaleGraphType", agenttype_autoscalegraph_charttypes[i]), details->charttype == i);
+		make_menuitem_bol(m, agenttype_autoscalegraph_friendlycharttypes[i], config_getfull_control_setagentprop_c(a->controlptr, a->agentaction, L"AutoScaleGraphType", agenttype_autoscalegraph_charttypes[i]), details->charttype == i);
 	}
 	make_menuitem_nop(m, NULL);
 
-	char namedot[1000];
-	sprintf(namedot, "%s%s", a->agentaction, ".");
+	wchar_t namedot[1000];
+	swprintf(namedot, L"%s%s", a->agentaction, L".");
 
 	menu_controloptions(m, a->controlptr, AGENTTYPE_AUTOSCALEGRAPH_AGENTCOUNT, details->agents, namedot, agenttype_autoscalegraph_agentdescriptions, agenttype_autoscalegraph_agenttypes);
 
 	make_menuitem_nop(m,NULL);
-	submenu = make_menu("Auto Scale",a->controlptr);
+	submenu = make_menu(L"Auto Scale",a->controlptr);
 	bool temp = !details->use_user_range;
-	make_menuitem_bol(submenu,"Enable Auto Scale",config_getfull_control_setagentprop_b(a->controlptr,a->agentaction,"AutoScale",&temp),temp);
+	make_menuitem_bol(submenu,L"Enable Auto Scale",config_getfull_control_setagentprop_b(a->controlptr,a->agentaction,L"AutoScale",&temp),temp);
 	if(!temp){
-		char range[20];
-		_snprintf(range,20,"%.0f",details->user_range);
-		make_menuitem_str(submenu,"Max Range",config_getfull_control_setagentprop_s(a->controlptr,a->agentaction,"MaxRange"),range);
+		wchar_t range[20];
+		swprintf(range,20,L"%.0f",details->user_range);
+		make_menuitem_str(submenu,L"Max Range",config_getfull_control_setagentprop_s(a->controlptr,a->agentaction,L"MaxRange"),range);
 	}
-	make_submenu_item(m,"Auto Scale",submenu);
-	char color[8];
-	sprintf(color,"#%06X",switch_rgb(details->chartcolor));
+	make_submenu_item(m,L"Auto Scale",submenu);
+	wchar_t color[8];
+	swprintf(color, 8, L"#%06X",switch_rgb(details->chartcolor));
 	temp = !(details->use_custom_color);
-	make_menuitem_bol(m,"Custom Chart Color",config_getfull_control_setagentprop_b(a->controlptr,a->agentaction,"CustomChartColor",&temp),!temp);
+	make_menuitem_bol(m,L"Custom Chart Color",config_getfull_control_setagentprop_b(a->controlptr,a->agentaction,L"CustomChartColor",&temp),!temp);
 	if(!temp){
 		make_menuitem_str(
 			m,
-			"Chart Color",
-			config_getfull_control_setagentprop_s(a->controlptr,a->agentaction,"ChartColor"),
+			L"Chart Color",
+			config_getfull_control_setagentprop_s(a->controlptr,a->agentaction, L"ChartColor"),
 			color
 		);
 	}
@@ -489,19 +489,19 @@ double get_range_value(double value){
 
 /*=================================================*/
 
-double ReadValueFromString(char * string){
+double ReadValueFromString(wchar_t * string){
 	double val=0;
 	if(string == NULL) return -1.0;
-	char *s = _strlwr(string);
-	while(*s == ' ') s++;
-	char *p;
-	for(p=s;*p!='\0';p++){
-		if (isdigit(*p)) val = val * 10 + (*p) - '0';
-		else if(*p == 'k') { val = val * 1024; break;}
-		else if(*p == 'm') { val = val * 1024 * 1024; break;}
-		else if(*p == 'g') { val = val * 1024 * 1024 * 1024; break;}
-		else if(*p == 't') { val = val * 1024 * 1024 * 1024 * 1024; break;}
-		else if(*p == '.') break;
+	wchar_t *s = _wcslwr(string);
+	while(*s == L' ') s++;
+	wchar_t *p;
+	for(p=s;*p!=L'\0';p++){
+		if (isdigit(*p)) val = val * 10 + (*p) - L'0';
+		else if(*p == L'k') { val = val * 1024; break;}
+		else if(*p == L'm') { val = val * 1024 * 1024; break;}
+		else if(*p == L'g') { val = val * 1024 * 1024 * 1024; break;}
+		else if(*p == L't') { val = val * 1024 * 1024 * 1024 * 1024; break;}
+		else if(*p == L'.') break;
 		else return -1.0;
 	}
 	return val;

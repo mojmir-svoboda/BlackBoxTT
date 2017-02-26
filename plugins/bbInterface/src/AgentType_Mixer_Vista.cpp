@@ -19,8 +19,8 @@ int agenttype_mixer_startup_vista ()
 	CoInitialize(NULL);
 	//Register this type with the ControlMaster
 	agent_registertype(
-		"Mixer",                            //Friendly name of agent type
-		"MixerScale",                       //Name of agent type
+		L"Mixer",                            //Friendly name of agent type
+		L"MixerScale",                       //Name of agent type
 		CONTROL_FORMAT_SCALE|CONTROL_FORMAT_TEXT,               //Control format
 		true,
 		&agenttype_mixer_create_vista,
@@ -34,8 +34,8 @@ int agenttype_mixer_startup_vista ()
 		);
 
 	agent_registertype(
-		"Mixer",                            //Friendly name of agent type
-		"MixerBool",                        //Name of agent type
+		L"Mixer",                            //Friendly name of agent type
+		L"MixerBool",                        //Name of agent type
 		CONTROL_FORMAT_BOOL,                //Control format
 		true,
 		&agenttype_mixer_create_vista,
@@ -60,15 +60,15 @@ class CVolumeNotification;
 
 struct AgentType_Mixer_Vista
 {
-	AgentType_Mixer_Vista (char const * device)
+	AgentType_Mixer_Vista (wchar_t const * device)
 		: m_endpoint(0)
 		, m_agent(0)
 		, m_callback(0)
 		, m_value_double(0.0)
 		, m_value_bool(false)
 	{
-		size_t const n = strlen(device);
-		strncpy(m_device, device, n);
+		size_t const n = wcslen(device);
+		wcsncpy(m_device, device, n);
 		m_device[n] = 0;
 	}
 
@@ -82,16 +82,16 @@ struct AgentType_Mixer_Vista
 	bool GetMute () const;
 	void SetMute (bool m) const;
 
-	char m_device[1024];
+	wchar_t m_device[1024];
 	IAudioEndpointVolume * m_endpoint;
 	agent * m_agent;
 	CVolumeNotification * m_callback;
 	double m_value_double;
 	bool m_value_bool;
-	char m_value_text[32];
+	wchar_t m_value_text[32];
 };
 
-int agenttype_mixer_create_vista (agent * a, char * parameterstring)
+int agenttype_mixer_create_vista (agent * a, wchar_t * parameterstring)
 {
 	bool errorflag = false; //If there's an error
 
@@ -125,7 +125,7 @@ int agenttype_mixer_destroy_vista (agent * a)
 	return 0;
 }
 
-int agenttype_mixer_message_vista (agent *a, int tokencount, char *tokens[])
+int agenttype_mixer_message_vista (agent *a, int tokencount, wchar_t *tokens[])
 {
 	return 1;
 }
@@ -150,8 +150,8 @@ void agenttype_mixer_notify_vista (agent *a, int notifytype, void *messagedata)
 			}
 			case NOTIFY_SAVE_AGENT:
 			{
-				char temp[1024];
-				sprintf(temp, "%s", details->m_device);
+				wchar_t temp[1024];
+				swprintf(temp, 1024, L"%s", details->m_device);
 				config_write(config_get_control_setagent_c(a->controlptr, a->agentaction, a->agenttypeptr->agenttypename, temp));
 				break;
 			}
@@ -173,7 +173,7 @@ void * agenttype_mixer_getdata_vista (agent *a, int datatype)
 			case DATAFETCH_VALUE_TEXT:
 			{
 				int const intvalue = static_cast<int>(100.0 * details->m_value_double);
-				sprintf(details->m_value_text, "%d%%", intvalue);
+				swprintf(details->m_value_text, 32, L"%d%%", intvalue);
 				return details->m_value_text;
 			}
 			case DATAFETCH_VALUE_SCALE:
@@ -185,19 +185,19 @@ void * agenttype_mixer_getdata_vista (agent *a, int datatype)
 	return NULL;
 }
 
-void agenttype_mixer_menu_devices_vista (Menu *menu, control *c, char *action, char *agentname, int format);
-void agenttype_mixerscale_menu_set_vista (Menu *m, control *c, agent *a,  char *action, int controlformat)
+void agenttype_mixer_menu_devices_vista (Menu *menu, control *c, wchar_t *action, wchar_t *agentname, int format);
+void agenttype_mixerscale_menu_set_vista (Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
-	agenttype_mixer_menu_devices_vista(m, c, action, "MixerScale", CONTROL_FORMAT_SCALE);
+	agenttype_mixer_menu_devices_vista(m, c, action, L"MixerScale", CONTROL_FORMAT_SCALE);
 }
-void agenttype_mixerbool_menu_set_vista (Menu *m, control *c, agent *a,  char *action, int controlformat)
+void agenttype_mixerbool_menu_set_vista (Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
-	agenttype_mixer_menu_devices_vista(m, c, action, "MixerBool", CONTROL_FORMAT_BOOL);
+	agenttype_mixer_menu_devices_vista(m, c, action, L"MixerBool", CONTROL_FORMAT_BOOL);
 }
 
 void agenttype_mixer_menu_context_vista (Menu *m, agent *a)
 {
-	make_menuitem_nop(m, "No options available.");
+	make_menuitem_nop(m, L"No options available.");
 }
 
 void agenttype_mixer_notifytype_vista (int notifytype, void *messagedata)
@@ -294,10 +294,8 @@ bool AgentType_Mixer_Vista::Init ()
 	if (S_OK == CoCreateInstance(CLSID_MMDeviceEnumerator, NULL, CLSCTX_INPROC_SERVER, IID_IMMDeviceEnumerator, (LPVOID *)&deviceEnumerator))
 	{
 		// find device from config
-		wchar_t tmp[1024];
-		utf8_decode(m_device, tmp, 1024);
 		IMMDevice * device = 0;
-		if (S_OK == deviceEnumerator->GetDevice(tmp, &device))
+		if (S_OK == deviceEnumerator->GetDevice(m_device, &device))
 		{
 			IAudioEndpointVolume * endpointVolume = NULL;
 			if (S_OK == device->Activate(__uuidof(IAudioEndpointVolume), CLSCTX_INPROC_SERVER, NULL, (LPVOID *)&endpointVolume))
@@ -333,10 +331,10 @@ bool AgentType_Mixer_Vista::Init ()
 
 //@TODO: remove
 #define SAFE_RELEASE(punk)  if ((punk) != NULL)  { (punk)->Release(); (punk) = NULL; }
-extern const char * mixer_name_scale;
-extern const char * mixer_name_bool;
+extern const wchar_t * mixer_name_scale;
+extern const wchar_t * mixer_name_bool;
 
-void agenttype_mixer_menu_devices_vista (Menu *menu, control *c, char *action, char *agentname, int format)
+void agenttype_mixer_menu_devices_vista (Menu *menu, control *c, wchar_t *action, wchar_t *agentname, int format)
 {
 	IMMDeviceEnumerator * pEnumerator = NULL;
 	IMMDeviceCollection * pCollection = NULL;
@@ -358,9 +356,6 @@ void agenttype_mixer_menu_devices_vista (Menu *menu, control *c, char *action, c
 					if (S_OK != pEndpoint->GetId(&pwszID))
 						continue;
 
-					char id_tmp[1024];
-					utf8_encode(pwszID, id_tmp, 1024);
-
 					IPropertyStore * pProps = NULL;
 					if (S_OK == pEndpoint->OpenPropertyStore(STGM_READ, &pProps))
 					{
@@ -368,20 +363,13 @@ void agenttype_mixer_menu_devices_vista (Menu *menu, control *c, char *action, c
 						PropVariantInit(&varName);
 						if (S_OK == pProps->GetValue(PKEY_Device_FriendlyName, &varName))
 						{
-							char tmp[1024];
-							utf8_encode(varName.pwszVal, tmp, 1024);
-
-							const char * type = 0;
+							const wchar_t * type = 0;
 							if (format == CONTROL_FORMAT_SCALE)
 								type = mixer_name_scale;
 							else if (format == CONTROL_FORMAT_BOOL)
 								type = mixer_name_bool;
 
-							char text_item[256];
-							char text_params[256];
-							sprintf(text_item, "%s", tmp);
-							sprintf(text_params, "%s", id_tmp);
-							make_menuitem_cmd(menu, text_item, config_getfull_control_setagent_c(c, action, type, text_params));
+							make_menuitem_cmd(menu, varName.pwszVal, config_getfull_control_setagent_c(c, action, type, pwszID));
 
 							PropVariantClear(&varName);
 						}

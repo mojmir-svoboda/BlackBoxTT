@@ -21,17 +21,17 @@
 #include "ControlMaster.h"
 
 //Variables
-const char* agenttype_statictext_commons[] = {
-"OK",
-"Cancel",
-"Show Plugins",
-"Hide Plugins",
-"Play",
-"Pause",
-"Stop",
-"Next",
-"Previous",
-"Open"
+const wchar_t* agenttype_statictext_commons[] = {
+L"OK",
+L"Cancel",
+L"Show Plugins",
+L"Hide Plugins",
+L"Play",
+L"Pause",
+L"Stop",
+L"Next",
+L"Previous",
+L"Open"
 };
 
 #define array_count(ary) (sizeof(ary) / sizeof(ary[0]))
@@ -46,8 +46,8 @@ int agenttype_statictext_startup()
 {
 	//Register this type with the ControlMaster
 	agent_registertype(
-		"Static Text",                      //Friendly name of agent type
-		"StaticText",                       //Name of agent type
+		L"Static Text",                      //Friendly name of agent type
+		L"StaticText",                       //Name of agent type
 		CONTROL_FORMAT_TEXT,                //Control format
 		true,
 		&agenttype_statictext_create,           
@@ -76,7 +76,7 @@ int agenttype_statictext_shutdown()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //controltype_button_startup
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agenttype_statictext_create(agent *a, char *parameterstring)
+int agenttype_statictext_create(agent *a, wchar_t *parameterstring)
 {
 	//Find out details about the string
 	if (0 == * parameterstring)
@@ -162,22 +162,22 @@ void *agenttype_statictext_getdata(agent *a, int datatype)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_statictext_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_statictext_menu_set(Menu *m, control *c, agent *a,  char *action, int controlformat)
+void agenttype_statictext_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
-	const char *text = a
-		? ((agenttype_statictext_details *) a->agentdetails)->text : "";
+	const wchar_t *text = a
+		? ((agenttype_statictext_details *) a->agentdetails)->text : L"";
 
 	make_menuitem_str(
 		m,
-		"Entry:",
-		config_getfull_control_setagent_s(c, action, "StaticText"),
+		L"Entry:",
+		config_getfull_control_setagent_s(c, action, L"StaticText"),
 		text
 		);
 
-	make_menuitem_nop(m, "");
+	make_menuitem_nop(m, L"");
 	for (int i = 0; i < agenttype_statictext_commoncount; i++)
 	{
-		make_menuitem_bol(m, agenttype_statictext_commons[i], config_getfull_control_setagent_c(c, action, "StaticText", agenttype_statictext_commons[i]), 0 == strcmp(text, agenttype_statictext_commons[i]));
+		make_menuitem_bol(m, agenttype_statictext_commons[i], config_getfull_control_setagent_c(c, action, L"StaticText", agenttype_statictext_commons[i]), 0 == wcscmp(text, agenttype_statictext_commons[i]));
 	}
 }
 
@@ -186,7 +186,7 @@ void agenttype_statictext_menu_set(Menu *m, control *c, agent *a,  char *action,
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void agenttype_statictext_menu_context(Menu *m, agent *a)
 {
-	make_menuitem_nop(m, "No options available.");
+	make_menuitem_nop(m, L"No options available.");
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

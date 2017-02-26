@@ -21,36 +21,36 @@
 //Define all the appropriate commands
 struct agenttype_system_touple
 {
-	char *name;
+	wchar_t *name;
 	int msg;
 	int wparam;
 };
 
 agenttype_system_touple agenttype_system_touples[] = {
-	{"System Shutdown",         BB_SHUTDOWN,      0},
-	{"System Reboot",           BB_SHUTDOWN,      1},
-	{"System Logoff",           BB_SHUTDOWN,      2},
-	{"System Hibernate",        BB_SHUTDOWN,      3},
-	{"System Suspend",          BB_SHUTDOWN,      4},
-	{"System Lock",             BB_SHUTDOWN,      5},
-	{"Show Run Dialog",         BB_RUN,           0},
+	{L"System Shutdown",         BB_SHUTDOWN,      0},
+	{L"System Reboot",           BB_SHUTDOWN,      1},
+	{L"System Logoff",           BB_SHUTDOWN,      2},
+	{L"System Hibernate",        BB_SHUTDOWN,      3},
+	{L"System Suspend",          BB_SHUTDOWN,      4},
+	{L"System Lock",             BB_SHUTDOWN,      5},
+	{L"Show Run Dialog",         BB_RUN,           0},
 
-	{"Blackbox Quit",           BB_QUIT,          0},
-	{"Blackbox Restart",        BB_RESTART,       0},
-	{"Blackbox Reconfigure",    BB_RECONFIGURE,   0},
-	{"Blackbox Toggle Tray",    BB_TOGGLETRAY,    0},
-	{"Blackbox Toggle Plugins", BB_TOGGLEPLUGINS, 0},
+	{L"Blackbox Quit",           BB_QUIT,          0},
+	{L"Blackbox Restart",        BB_RESTART,       0},
+	{L"Blackbox Reconfigure",    BB_RECONFIGURE,   0},
+	{L"Blackbox Toggle Tray",    BB_TOGGLETRAY,    0},
+	{L"Blackbox Toggle Plugins", BB_TOGGLEPLUGINS, 0},
 
-	{"Blackbox Menu",           BB_MENU, 0},
+	{L"Blackbox Menu",           BB_MENU, 0},
 
-	{"Workspace Left",          BB_WORKSPACE,     BBWS_DESKLEFT},
-	{"Workspace Right",         BB_WORKSPACE,     BBWS_DESKRIGHT},
-	{"Workspace Move Left",     BB_WORKSPACE,     BBWS_MOVEWINDOWLEFT  },
-	{"Workspace Move Right",    BB_WORKSPACE,     BBWS_MOVEWINDOWRIGHT },
-	{"Workspace Gather",        BB_WORKSPACE,     BBWS_GATHERWINDOWS},
+	{L"Workspace Left",          BB_WORKSPACE,     BBWS_DESKLEFT},
+	{L"Workspace Right",         BB_WORKSPACE,     BBWS_DESKRIGHT},
+	{L"Workspace Move Left",     BB_WORKSPACE,     BBWS_MOVEWINDOWLEFT  },
+	{L"Workspace Move Right",    BB_WORKSPACE,     BBWS_MOVEWINDOWRIGHT },
+	{L"Workspace Gather",        BB_WORKSPACE,     BBWS_GATHERWINDOWS},
 
-	{"Previous Window",         BB_WORKSPACE,     BBWS_PREVWINDOW },
-	{"Next Window",             BB_WORKSPACE,     BBWS_NEXTWINDOW }
+	{L"Previous Window",         BB_WORKSPACE,     BBWS_PREVWINDOW },
+	{L"Next Window",             BB_WORKSPACE,     BBWS_NEXTWINDOW }
 
 };
 
@@ -66,8 +66,8 @@ int agenttype_system_startup()
 {
 	//Register this type with the ControlMaster
 	agent_registertype(
-		"System/Shell",                 //Friendly name of agent type
-		"System",                           //Name of agent type
+		L"System/Shell",                 //Friendly name of agent type
+		L"System",                           //Name of agent type
 		CONTROL_FORMAT_TRIGGER,             //Control type
 		true,
 		&agenttype_system_create,           
@@ -96,12 +96,12 @@ int agenttype_system_shutdown()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_system_create
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agenttype_system_create(agent *a, char *parameterstring)
+int agenttype_system_create(agent *a, wchar_t *parameterstring)
 {
 	//Figure out the command
 	int index;
 	for (index = 0; index < agenttype_system_touple_count; index++)
-		if (!_stricmp(agenttype_system_touples[index].name, parameterstring))
+		if (!_wcsicmp(agenttype_system_touples[index].name, parameterstring))
 			goto found;
 
 	return 1;
@@ -134,7 +134,7 @@ int agenttype_system_destroy(agent *a)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_system_message
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agenttype_system_message(agent *a, int tokencount, char *tokens[])
+int agenttype_system_message(agent *a, int tokencount, wchar_t *tokens[])
 {
 	return 1;
 }
@@ -176,7 +176,7 @@ void *agenttype_system_getdata(agent *a, int datatype)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_system_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_system_menu_set(Menu *m, control *c, agent *a,  char *action, int controlformat)
+void agenttype_system_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
 	int set = -1;
 	if (a)
@@ -188,7 +188,7 @@ void agenttype_system_menu_set(Menu *m, control *c, agent *a,  char *action, int
 	//List all options
 	for (int i = 0; i < agenttype_system_touple_count; i++)
 	{
-		make_menuitem_bol(m, agenttype_system_touples[i].name, config_getfull_control_setagent_c(c, action, "System", agenttype_system_touples[i].name), i == set);
+		make_menuitem_bol(m, agenttype_system_touples[i].name, config_getfull_control_setagent_c(c, action, L"System", agenttype_system_touples[i].name), i == set);
 	}
 }
 
@@ -197,7 +197,7 @@ void agenttype_system_menu_set(Menu *m, control *c, agent *a,  char *action, int
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void agenttype_system_menu_context(Menu *m, agent *a)
 {
-	make_menuitem_nop(m, "No options available.");
+	make_menuitem_nop(m, L"No options available.");
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

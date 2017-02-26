@@ -26,8 +26,8 @@ int agenttype_broam_startup()
 {
 	//Register this type with the ControlMaster
 	agent_registertype(
-		"BlackBox Bro@m",                   //Friendly name of agent type
-		"Bro@m",                            //Name of agent type
+		L"BlackBox Bro@m",                   //Friendly name of agent type
+		L"Bro@m",                            //Name of agent type
 		CONTROL_FORMAT_TRIGGER|CONTROL_FORMAT_DROP,  //Control type
 		true,
 		&agenttype_broam_create,            
@@ -45,8 +45,8 @@ int agenttype_broam_startup()
 	//We use this to generate friendly menus for BBI Controls
 	//Otherwise, it is exactly the same as Bro@m
 	agent_registertype(
-		"BBInterface Control",              //Friendly name of agent type
-		"BBInterfaceControl",               //Name of agent type
+		L"BBInterface Control",              //Friendly name of agent type
+		L"BBInterfaceControl",               //Name of agent type
 		CONTROL_FORMAT_TRIGGER|CONTROL_FORMAT_DROP,  //Control type
 		true,
 		&agenttype_broam_create,            
@@ -75,7 +75,7 @@ int agenttype_broam_shutdown()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_broam_create
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agenttype_broam_create(agent *a, char *parameterstring)
+int agenttype_broam_create(agent *a, wchar_t *parameterstring)
 {
 	if (0 == * parameterstring)
 		return 2; // no param, no agent
@@ -123,7 +123,7 @@ void agenttype_broam_notify(agent *a, int notifytype, void *messagedata)
 {
 	//Get the agent details
 	agenttype_broam_details *details = (agenttype_broam_details *) a->agentdetails;
-	char *buffer, *varptr, *endptr;
+	wchar_t *buffer, *varptr, *endptr;
 	bool gotdata;
 
 	switch(notifytype)
@@ -133,22 +133,22 @@ void agenttype_broam_notify(agent *a, int notifytype, void *messagedata)
 
 			//For now, just look for $BroadcastValue$ symbol
 			//This will be replaced by the controls broadcast value
-			varptr = strstr(details->command, "$BroadcastValue$");
+			varptr = wcsstr(details->command, L"$BroadcastValue$");
 			if (varptr != NULL)
 			{
 				//Build a stage for this new string
-				char *stage = new char[MAX_LINE_LENGTH];
+				wchar_t *stage = new wchar_t[MAX_LINE_LENGTH];
 
 				//Copy characters from the command to the stage
-				strncpy(stage, details->command, varptr - details->command);
-				stage[varptr - details->command] = '\0';
-				endptr = stage + strlen(stage);
+				wcsncpy(stage, details->command, varptr - details->command);
+				stage[varptr - details->command] = L'\0';
+				endptr = stage + wcslen(stage);
 
 				//Get the broadcast value from the agent
-				gotdata = control_getstringdata(a->controlptr, endptr, "BroadcastValue");
+				gotdata = control_getstringdata(a->controlptr, endptr, L"BroadcastValue");
 
 				//Add the rest of the string
-				strcat(stage, varptr + strlen("$BroadcastValue$"));				
+				wcscat(stage, varptr + wcslen(L"$BroadcastValue$"));				
 
 				//Copy the final to the buffer
 				buffer = new_string(stage);				
@@ -164,7 +164,7 @@ void agenttype_broam_notify(agent *a, int notifytype, void *messagedata)
 			// NOTE: To make broams local to modules, check if the message is a BBI broam,
 			// change the current module to the one the control the agent belongs to is in,
 			// process the message, then revert.
-			message_interpret(buffer,false,a->controlptr->moduleptr);
+			message_interpret(buffer, false, a->controlptr->moduleptr);
 
 			// NOTE: Is a->controlptr guaranteed to work even with agents that are not on top of the agent hierachy? (compound agents, for example)
 			// Not too sure on this change, so...
@@ -189,20 +189,20 @@ void *agenttype_broam_getdata(agent *a, int datatype)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_broam_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_broam_menu_set(Menu *m, control *c, agent *a,  char *action, int controlformat)
+void agenttype_broam_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
-	make_menuitem_str(m, "Entry:", config_getfull_control_setagent_s(c, action, "Bro@m"),
-		a ? ((agenttype_broam_details *) a->agentdetails)->command : "");
+	make_menuitem_str(m, L"Entry:", config_getfull_control_setagent_s(c, action, L"Bro@m"),
+		a ? ((agenttype_broam_details *) a->agentdetails)->command : L"");
 
-	make_menuitem_cmd(m, "@BBShowPlugins", config_getfull_control_setagent_c(c, action, "Bro@m", "@BBShowPlugins"));
-	make_menuitem_cmd(m, "@BBHidePlugins", config_getfull_control_setagent_c(c, action, "Bro@m", "@BBHidePlugins"));
-	make_menuitem_cmd(m, "@BBInterface Plugin About", config_getfull_control_setagent_c(c, action, "Bro@m", "@BBInterface Plugin About"));
+	make_menuitem_cmd(m, L"@BBShowPlugins", config_getfull_control_setagent_c(c, action, L"Bro@m", L"@BBShowPlugins"));
+	make_menuitem_cmd(m, L"@BBHidePlugins", config_getfull_control_setagent_c(c, action, L"Bro@m", L"@BBHidePlugins"));
+	make_menuitem_cmd(m, L"@BBInterface Plugin About", config_getfull_control_setagent_c(c, action, L"Bro@m", L"@BBInterface Plugin About"));
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_broam_bbicontrols_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_broam_bbicontrols_menu_set(Menu *m, control *c, agent *a,  char *action, int controlformat)
+void agenttype_broam_bbicontrols_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
 	//Declare variables
 	listnode *ln, *ln2;
@@ -210,28 +210,28 @@ void agenttype_broam_bbicontrols_menu_set(Menu *m, control *c, agent *a,  char *
 	int n;
 	const bool btrue = true;
 	const bool bfalse = false;
-	char broamcommand[1024];
+	wchar_t broamcommand[1024];
 
 	// NOTE: a better solution would be to have a boolean toggle for the controls...
 
-	sub = make_menu("Global",c);
+	sub = make_menu(L"Global",c);
 	n = 0;
 	dolist (ln2, globalmodule.controllist)
 	{
 		//Get the control
 		control *thiscontrol = (control *) ln2->value;
 
-		sub2 = make_menu("Visibility", thiscontrol);
-		strcpy(broamcommand, config_getfull_control_setwindowprop_b(thiscontrol, szWPisvisible, &btrue));
-		make_menuitem_cmd(sub2, "Visible", config_get_control_setagent_c(c, action, "BBInterfaceControl", broamcommand));
-		strcpy(broamcommand, config_getfull_control_setwindowprop_b(thiscontrol, szWPisvisible, &bfalse));
-		make_menuitem_cmd(sub2, "Invisible", config_get_control_setagent_c(c, action, "BBInterfaceControl", broamcommand));
+		sub2 = make_menu(L"Visibility", thiscontrol);
+		wcscpy(broamcommand, config_getfull_control_setwindowprop_b(thiscontrol, szWPisvisible, &btrue));
+		make_menuitem_cmd(sub2, L"Visible", config_get_control_setagent_c(c, action, L"BBInterfaceControl", broamcommand));
+		wcscpy(broamcommand, config_getfull_control_setwindowprop_b(thiscontrol, szWPisvisible, &bfalse));
+		make_menuitem_cmd(sub2, L"Invisible", config_get_control_setagent_c(c, action, L"BBInterfaceControl", broamcommand));
 
 		make_submenu_item(sub,thiscontrol->controlname,sub2);
 		++n;
 	}
-	if (n==0) make_menuitem_nop(sub,"(None.)");
-	make_submenu_item(m,"Global",sub);
+	if (n==0) make_menuitem_nop(sub,L"(None.)");
+	make_submenu_item(m,L"Global",sub);
 
 	dolist (ln, modulelist)
 	{       
@@ -243,16 +243,16 @@ void agenttype_broam_bbicontrols_menu_set(Menu *m, control *c, agent *a,  char *
 		{
 			//Get the control
 			control *thiscontrol = (control *) ln2->value;
-			sub2 = make_menu("Visibility", thiscontrol);
-			strcpy(broamcommand, config_getfull_control_setwindowprop_b(thiscontrol, szWPisvisible, &btrue));
-			make_menuitem_cmd(sub2, "Visible", config_get_control_setagent_c(c, action, "BBInterfaceControl", broamcommand));
-			strcpy(broamcommand, config_getfull_control_setwindowprop_b(thiscontrol, szWPisvisible, &bfalse));
-			make_menuitem_cmd(sub2, "Invisible", config_get_control_setagent_c(c, action, "BBInterfaceControl", broamcommand));
+			sub2 = make_menu(L"Visibility", thiscontrol);
+			wcscpy(broamcommand, config_getfull_control_setwindowprop_b(thiscontrol, szWPisvisible, &btrue));
+			make_menuitem_cmd(sub2, L"Visible", config_get_control_setagent_c(c, action, L"BBInterfaceControl", broamcommand));
+			wcscpy(broamcommand, config_getfull_control_setwindowprop_b(thiscontrol, szWPisvisible, &bfalse));
+			make_menuitem_cmd(sub2, L"Invisible", config_get_control_setagent_c(c, action, L"BBInterfaceControl", broamcommand));
 
 			make_submenu_item(sub,thiscontrol->controlname,sub2);
 			++n;
 		}
-		if (n==0) make_menuitem_nop(sub,"(None.)");
+		if (n==0) make_menuitem_nop(sub,L"(None.)");
 		make_submenu_item(m,mod->name,sub);
 	}
 
@@ -263,7 +263,7 @@ void agenttype_broam_bbicontrols_menu_set(Menu *m, control *c, agent *a,  char *
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void agenttype_broam_menu_context(Menu *m, agent *a)
 {
-	make_menuitem_nop(m, "No options available.");
+	make_menuitem_nop(m, L"No options available.");
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

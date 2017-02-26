@@ -36,7 +36,7 @@ HMODULE agenttype_diskspacemonitor_ntdllmodule;
 
 //Local primitives
 unsigned long agenttype_diskspacemonitor_counter;
-const char agenttype_diskspacemonitor_timerclass[] = "BBInterfaceAgenDiskSpaceMon";
+const wchar_t agenttype_diskspacemonitor_timerclass[] = L"BBInterfaceAgenDiskSpaceMon";
 
 //A list of this type of agent
 list *agenttype_diskspacemonitor_agents;
@@ -56,23 +56,23 @@ enum DISKSPACEMONITOR_TYPE
 };
 
 //Must match the enum ordering above! Must have DISKSPACEMONITOR_NUMTYPES entries
-const char *agenttype_diskspacemonitor_types[] =
+const wchar_t *agenttype_diskspacemonitor_types[] =
 {
-	"None", // Unused
-	"DiskFree",
-	"DiskFree(Pct.)",
-	"DiskUse",
-	"DiskUse(Pct.)"
+	L"None", // Unused
+	L"DiskFree",
+	L"DiskFree(Pct.)",
+	L"DiskUse",
+	L"DiskUse(Pct.)"
 };
 
 //Must match the enum ordering above! Must have DISKSPACEMONITOR_NUMTYPES entries
-const char *agenttype_diskspacemonitor_friendlytypes[] =
+const wchar_t *agenttype_diskspacemonitor_friendlytypes[] =
 {
-	"None", // Unused
-	"Disk Free",
-	"Disk Free(Percentage)",
-	"Disk Used",
-	"Disk Used(Percentage)"
+	L"None", // Unused
+	L"Disk Free",
+	L"Disk Free(Percentage)",
+	L"Disk Used",
+	L"Disk Used(Percentage)"
 };
 
 
@@ -92,7 +92,7 @@ int agenttype_diskspacemonitor_startup()
 	if (window_helper_register(agenttype_diskspacemonitor_timerclass, &agenttype_diskspacemonitor_event))
 	{
 		//Couldn't register the window
-		BBMessageBox(NULL, "failed on register class", "test", MB_OK);
+		BBMessageBox(NULL, L"failed on register class", "test", MB_OK);
 		return 1;
 	}
 	agenttype_diskspacemonitor_windowclassregistered = true;
@@ -102,15 +102,15 @@ int agenttype_diskspacemonitor_startup()
 	if (!agenttype_diskspacemonitor_window)
 	{
 		//Couldn't create the window
-		BBMessageBox(NULL, "failed on window", "test", MB_OK);
+		BBMessageBox(NULL, L"failed on window", "test", MB_OK);
 		return 1;
 	}
 
 	//If we got this far, we can successfully use this function
 	//Register this type with the AgentMaster
 	agent_registertype(
-		"DiskSpace Monitor",                   //Friendly name of agent type
-		"DiskSpaceMonitor",                    //Name of agent type
+		L"DiskSpace Monitor",                   //Friendly name of agent type
+		L"DiskSpaceMonitor",                    //Name of agent type
 		CONTROL_FORMAT_SCALE|CONTROL_FORMAT_TEXT,				//Control type
 		false,
 		&agenttype_diskspacemonitor_create,
@@ -151,7 +151,7 @@ int agenttype_diskspacemonitor_shutdown()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_diskspacemonitor_create
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agenttype_diskspacemonitor_create(agent *a, char *parameterstring)
+int agenttype_diskspacemonitor_create(agent *a, wchar_t *parameterstring)
 {
 
 
@@ -162,7 +162,7 @@ int agenttype_diskspacemonitor_create(agent *a, char *parameterstring)
 	int monitor_type = DISKSPACEMONITOR_TYPE_NONE;
 	for (int i = 1; i < DISKSPACEMONITOR_NUMTYPES; i++)
 	{
-		if (_stricmp(agenttype_diskspacemonitor_types[i], parameterstring) == 0)
+		if (_wcsicmp(agenttype_diskspacemonitor_types[i], parameterstring) == 0)
 		{
 			monitor_type = i;
 			break;
@@ -175,8 +175,8 @@ int agenttype_diskspacemonitor_create(agent *a, char *parameterstring)
 		//On an error
 		if (!plugin_suppresserrors)
 		{
-			char buffer[1000];
-			sprintf(buffer,	"There was an error setting the Disk Space Monitor agent:\n\nType \"%s\" is not a valid type.", parameterstring);
+			wchar_t buffer[1000];
+			swprintf(buffer,	1000, L"There was an error setting the Disk Space Monitor agent:\n\nType \"%s\" is not a valid type.", parameterstring);
 			BBMessageBox(NULL, buffer, szAppName, MB_OK|MB_SYSTEMMODAL);
 		}
 		return 1;
@@ -191,11 +191,11 @@ int agenttype_diskspacemonitor_create(agent *a, char *parameterstring)
 	details->value=-1.0;
 	details->previous_value = 0;
 	details->path=NULL;
-	strcpy(details->str_value,"");
+	wcscpy(details->str_value, L"");
 	
 	//Create a unique string to assign to this (just a number from a counter)
-	char identifierstring[64];
-	sprintf(identifierstring, "%ul", agenttype_diskspacemonitor_counter);
+	wchar_t identifierstring[64];
+	swprintf(identifierstring, 64, L"%ul", agenttype_diskspacemonitor_counter);
 	details->internal_identifier = new_string(identifierstring);
 
 	//Set the details
@@ -246,10 +246,10 @@ int agenttype_diskspacemonitor_destroy(agent *a)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_diskspacemonitor_message
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agenttype_diskspacemonitor_message(agent *a, int tokencount, char *tokens[])
+int agenttype_diskspacemonitor_message(agent *a, int tokencount, wchar_t *tokens[])
 {
 	agenttype_diskspacemonitor_details *details = (agenttype_diskspacemonitor_details *) a->agentdetails;
-	if (!strcmp("MonitoringPath",tokens[5]) && config_set_str(tokens[6],&details->path)){
+	if (!wcscmp(L"MonitoringPath",tokens[5]) && config_set_str(tokens[6],&details->path)){
 		details->value=-1.0;
 		agenttype_diskspacemonitor_updatevalue(details);
 		control_notify(a->controlptr,NOTIFY_NEEDUPDATE,NULL);
@@ -275,7 +275,7 @@ void agenttype_diskspacemonitor_notify(agent *a, int notifytype, void *messageda
 		case NOTIFY_SAVE_AGENT:
 			//Write existance
 			config_write(config_get_control_setagent_c(a->controlptr, a->agentaction, a->agenttypeptr->agenttypename, agenttype_diskspacemonitor_types[details->monitor_type]));
-			config_write(config_get_control_setagentprop_c(a->controlptr, a->agentaction, "MonitoringPath",details->path));
+			config_write(config_get_control_setagentprop_c(a->controlptr, a->agentaction, L"MonitoringPath",details->path));
 			break;
 	}
 }
@@ -303,12 +303,12 @@ void *agenttype_diskspacemonitor_getdata(agent *a, int datatype)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_diskspacemonitor_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_diskspacemonitor_menu_set(Menu *m, control *c, agent *a,  char *action, int controlformat)
+void agenttype_diskspacemonitor_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
 	//Add a menu item for every type
 	for (int i = 1; i < DISKSPACEMONITOR_NUMTYPES; i++)
 	{
-		make_menuitem_cmd(m, agenttype_diskspacemonitor_friendlytypes[i], config_getfull_control_setagent_c(c, action, "DiskSpaceMonitor", agenttype_diskspacemonitor_types[i]));
+		make_menuitem_cmd(m, agenttype_diskspacemonitor_friendlytypes[i], config_getfull_control_setagent_c(c, action, L"DiskSpaceMonitor", agenttype_diskspacemonitor_types[i]));
 	}
 }
 
@@ -318,7 +318,7 @@ void agenttype_diskspacemonitor_menu_set(Menu *m, control *c, agent *a,  char *a
 void agenttype_diskspacemonitor_menu_context(Menu *m, agent *a)
 {
 	agenttype_diskspacemonitor_details *details = (agenttype_diskspacemonitor_details *)a->agentdetails;
-	make_menuitem_str(m,"Monitoring  Path",config_getfull_control_setagentprop_s(a->controlptr,a->agentaction,"MonitoringPath"),details->path? details->path:"");
+	make_menuitem_str(m, L"Monitoring  Path",config_getfull_control_setagentprop_s(a->controlptr,a->agentaction, L"MonitoringPath"),details->path? details->path : L"");
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_diskspacemonitor_notifytype
@@ -400,7 +400,7 @@ void agenttype_diskspacemonitor_updatevalue(agenttype_diskspacemonitor_details *
 	if (d->value != -1) return;
 
 	static ULONGLONG diskfree,disktotal;	
-	char const *path= d->path?d->path:"C:\\";
+	wchar_t const *path= d->path ? d->path : L"C:\\";
 	GetDiskFreeSpaceEx(path,NULL,(ULARGE_INTEGER *)&disktotal,(ULARGE_INTEGER *)&diskfree);
 	//Otherwise, figure it out
 	switch(monitor_type)
@@ -413,7 +413,7 @@ void agenttype_diskspacemonitor_updatevalue(agenttype_diskspacemonitor_details *
 			d->value = diskfree/(double)disktotal;
 			if(d->value > 1)
 				d->value=1.0;
-			sprintf(d->str_value, "%d%%", ((int)100*d->value));
+			swprintf(d->str_value, 16, L"%d%%", ((int)100*d->value));
 			break;
 		case DISKSPACEMONITOR_TYPE_DISKUSEVAL:
 			d->value = (disktotal-diskfree)/(double)disktotal;
@@ -423,11 +423,11 @@ void agenttype_diskspacemonitor_updatevalue(agenttype_diskspacemonitor_details *
 			d->value = (disktotal-diskfree)/(double)disktotal;
 			if(d->value > 1)
 				d->value=1.0;
-			sprintf(d->str_value, "%d%%", ((int)100*d->value));
+			swprintf(d->str_value, 16, L"%d%%", ((int)100*d->value));
 			break;
 		default:
 			d->value=0.0;
-			strcpy(d->str_value,"Error"); //Should never happen
+			wcscpy(d->str_value, L"Error"); //Should never happen
 			break;
 	}
 

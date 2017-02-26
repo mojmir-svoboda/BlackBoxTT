@@ -24,11 +24,11 @@ const int agenttype_switchedstate_subagentcount = 3;
 #define AGENTTYPE_SWITCHEDSTATE_AGENT_BOOL 0
 #define AGENTTYPE_SWITCHEDSTATE_AGENT_WHENTRUE 1
 #define AGENTTYPE_SWITCHEDSTATE_AGENT_WHENFALSE 2
-char *agenttype_switchedstate_agentdescriptions[3] =
+wchar_t *agenttype_switchedstate_agentdescriptions[3] =
 {
-	"Value",
-	"ResultWhenTrue",
-	"ResultWhenFalse"
+	L"Value",
+	L"ResultWhenTrue",
+	L"ResultWhenFalse"
 };
 
 //The agent types arrays
@@ -44,11 +44,11 @@ const int agenttype_switchedstate_agenttypes[][AGENTTYPE_SWITCHEDSTATE_TYPECOUNT
     {CONTROL_FORMAT_BOOL, CONTROL_FORMAT_TRIGGER, CONTROL_FORMAT_TRIGGER}
 };
 
-const char *agenttype_switchedstate_typenames[AGENTTYPE_SWITCHEDSTATE_TYPECOUNT] =
+const wchar_t *agenttype_switchedstate_typenames[AGENTTYPE_SWITCHEDSTATE_TYPECOUNT] =
 {
-	"TEXT",
-	"IMAGE",
-	"TRIGGER"
+	L"TEXT",
+	L"IMAGE",
+	L"TRIGGER"
 };
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -58,8 +58,8 @@ int agenttype_switchedstate_startup()
 {
 	//Register this type with the ControlMaster
 	agent_registertype(
-		"Switched State Value",              //Friendly name of agent type
-		"SwitchedState",                    //Name of agent type
+		L"Switched State Value",              //Friendly name of agent type
+		L"SwitchedState",                    //Name of agent type
 		CONTROL_FORMAT_TEXT|CONTROL_FORMAT_TRIGGER|CONTROL_FORMAT_IMAGE,   //Control type
 		false,
 		&agenttype_switchedstate_create,            
@@ -88,7 +88,7 @@ int agenttype_switchedstate_shutdown()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_switchedstate_create
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agenttype_switchedstate_create(agent *a, char *parameterstring)
+int agenttype_switchedstate_create(agent *a, wchar_t *parameterstring)
 {
 	if (0 == * parameterstring)	return 2; // no param, no agent
 
@@ -96,7 +96,7 @@ int agenttype_switchedstate_create(agent *a, char *parameterstring)
 	int agenttype = -1;
 	for (int i = 0; i < AGENTTYPE_SWITCHEDSTATE_TYPECOUNT; i++)
 	{
-		if (_stricmp(parameterstring, agenttype_switchedstate_typenames[i]) == 0) agenttype = i;
+		if (_wcsicmp(parameterstring, agenttype_switchedstate_typenames[i]) == 0) agenttype = i;
 	}
 	if (agenttype == -1) return 1;
 
@@ -135,7 +135,7 @@ int agenttype_switchedstate_destroy(agent *a)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_switchedstate_message
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agenttype_switchedstate_message(agent *a, int tokencount, char *tokens[])
+int agenttype_switchedstate_message(agent *a, int tokencount, wchar_t *tokens[])
 {
 	//No errors
 	return 0;
@@ -214,20 +214,20 @@ void *agenttype_switchedstate_getdata(agent *a, int datatype)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_switchedstate_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_switchedstate_menu_set(Menu *m, control *c, agent *a,  char *action, int controlformat)
+void agenttype_switchedstate_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
-	char temp[32] = "";
+	wchar_t temp[32] = L"";
 	switch(controlformat)
 	{
-		case CONTROL_FORMAT_TEXT: strcpy(temp, agenttype_switchedstate_typenames[AGENTTYPE_SWITCHEDSTATE_TYPE_TEXT]); break;
-		case CONTROL_FORMAT_IMAGE: strcpy(temp, agenttype_switchedstate_typenames[AGENTTYPE_SWITCHEDSTATE_TYPE_IMAGE]); break;
-		case CONTROL_FORMAT_TRIGGER: strcpy(temp, agenttype_switchedstate_typenames[AGENTTYPE_SWITCHEDSTATE_TYPE_TRIGGER]); break;
+		case CONTROL_FORMAT_TEXT: wcscpy(temp, agenttype_switchedstate_typenames[AGENTTYPE_SWITCHEDSTATE_TYPE_TEXT]); break;
+		case CONTROL_FORMAT_IMAGE: wcscpy(temp, agenttype_switchedstate_typenames[AGENTTYPE_SWITCHEDSTATE_TYPE_IMAGE]); break;
+		case CONTROL_FORMAT_TRIGGER: wcscpy(temp, agenttype_switchedstate_typenames[AGENTTYPE_SWITCHEDSTATE_TYPE_TRIGGER]); break;
 		default: 
-			make_menuitem_nop(m, "Invalid type.");
+			make_menuitem_nop(m, L"Invalid type.");
 			break;
 	}
 
-	make_menuitem_cmd(m, "Set", config_getfull_control_setagent_c(c, action, "SwitchedState", temp));
+	make_menuitem_cmd(m, L"Set", config_getfull_control_setagent_c(c, action, L"SwitchedState", temp));
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -238,8 +238,8 @@ void agenttype_switchedstate_menu_context(Menu *m, agent *a)
 	//Get the agent details
 	agenttype_switchedstate_details *details = (agenttype_switchedstate_details *) a->agentdetails;
 
-	char namedot[1000];
-	sprintf(namedot, "%s%s", a->agentaction, ".");
+	wchar_t namedot[1000];
+	swprintf(namedot, 1000, L"%s%s", a->agentaction, L".");
 
 	menu_controloptions(m, a->controlptr, 3, details->agents, namedot, agenttype_switchedstate_agentdescriptions, agenttype_switchedstate_agenttypes[details->datatype]);
 }

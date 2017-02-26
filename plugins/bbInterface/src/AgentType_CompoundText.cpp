@@ -23,18 +23,18 @@
 //Local variables
 const int agenttype_compoundtext_subagentcount = AGENTTYPE_COMPOUNDTEXT_MAXAGENTS;
 
-char *agenttype_compoundtext_agentdescriptions[AGENTTYPE_COMPOUNDTEXT_MAXAGENTS] =
+wchar_t *agenttype_compoundtext_agentdescriptions[AGENTTYPE_COMPOUNDTEXT_MAXAGENTS] =
 {
-	"Text1",
-	"Text2",
-	"Text3",
-	"Text4",
-	"Text5",
-	"Text6",
-	"Text7",
-	"Text8",
-	"Text9",
-	"Text10"
+	L"Text1",
+	L"Text2",
+	L"Text3",
+	L"Text4",
+	L"Text5",
+	L"Text6",
+	L"Text7",
+	L"Text8",
+	L"Text9",
+	L"Text10"
 };
 
 const int agenttype_compoundtext_agenttypes[AGENTTYPE_COMPOUNDTEXT_MAXAGENTS] =
@@ -52,9 +52,9 @@ const int agenttype_compoundtext_agenttypes[AGENTTYPE_COMPOUNDTEXT_MAXAGENTS] =
 };
 
 //Variables
-const char* agenttype_compoundtext_commons[] = {
-	"Usage: $",
-	"CPU: $   MEM: $"
+const wchar_t * agenttype_compoundtext_commons[] = {
+	L"Usage: $",
+	L"CPU: $   MEM: $"
 };
 
 #define array_count(ary) (sizeof(ary) / sizeof(ary[0]))
@@ -67,8 +67,8 @@ int agenttype_compoundtext_startup()
 {
 	//Register this type with the ControlMaster
 	agent_registertype(
-		"Compound Text",                      //Friendly name of agent type
-		"CompoundText",                       //Name of agent type
+		L"Compound Text",                      //Friendly name of agent type
+		L"CompoundText",                       //Name of agent type
 		CONTROL_FORMAT_TEXT,                //Control format
 		true,
 		&agenttype_compoundtext_create,           
@@ -97,7 +97,7 @@ int agenttype_compoundtext_shutdown()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //controltype_button_startup
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agenttype_compoundtext_create(agent *a, char *parameterstring)
+int agenttype_compoundtext_create(agent *a, wchar_t *parameterstring)
 {
 	//Find out details about the string
 	if (0 == * parameterstring)
@@ -145,9 +145,9 @@ int agenttype_compoundtext_destroy(agent *a)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_compoundtext_message
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agenttype_compoundtext_message(agent *a, int tokencount, char *tokens[])
+int agenttype_compoundtext_message(agent *a, int tokencount, wchar_t *tokens[])
 {
-	if (!_stricmp("Formatting", tokens[5]))
+	if (!_wcsicmp(L"Formatting", tokens[5]))
 	{
 		agenttype_compoundtext_details *details = (agenttype_compoundtext_details *) a->agentdetails;
 		free_string(&details->text);
@@ -198,23 +198,23 @@ void *agenttype_compoundtext_getdata(agent *a, int datatype)
 
 		//Copy the characters of the text to the final output string
 		int charindex = 0;
-		char *currentoutput = details->finaltext;
+		wchar_t *currentoutput = details->finaltext;
 		int agentindex = 0;
-		while (details->text[charindex] != '\0')
+		while (details->text[charindex] != L'\0')
 		{
 			//If we hit a $
-			if (details->text[charindex] == '$')
+			if (details->text[charindex] == L'$')
 			{
 				//If we have an agent
 				if (agentindex < AGENTTYPE_COMPOUNDTEXT_MAXAGENTS && details->agents[agentindex] != NULL)
 				{
-					char *agenttext = (char *) agent_getdata(details->agents[agentindex], DATAFETCH_VALUE_TEXT);
-					strcpy(currentoutput, agenttext);
-					currentoutput += strlen(agenttext);
+					wchar_t *agenttext = (wchar_t *) agent_getdata(details->agents[agentindex], DATAFETCH_VALUE_TEXT);
+					wcscpy(currentoutput, agenttext);
+					currentoutput += wcslen(agenttext);
 				}
 				else
 				{
-					strcpy(currentoutput, "[?]");
+					wcscpy(currentoutput, L"[?]");
 					currentoutput += 3;
 				}
 				agentindex++;
@@ -229,7 +229,7 @@ void *agenttype_compoundtext_getdata(agent *a, int datatype)
 		}
 
 		//End the string
-		currentoutput[0] = '\0';
+		currentoutput[0] = L'\0';
 
 		return details->finaltext;
 	}
@@ -258,22 +258,22 @@ void *agenttype_compoundtext_getdata(agent *a, int datatype)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_compoundtext_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_compoundtext_menu_set(Menu *m, control *c, agent *a,  char *action, int controlformat)
+void agenttype_compoundtext_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
-	const char *text = a
-		? ((agenttype_compoundtext_details *) a->agentdetails)->text : "";
+	const wchar_t *text = a
+		? ((agenttype_compoundtext_details *) a->agentdetails)->text : L"";
 
 	make_menuitem_str(
 		m,
-		"Entry:",
-		config_getfull_control_setagent_s(c, action, "CompoundText"),
+		L"Entry:",
+		config_getfull_control_setagent_s(c, action, L"CompoundText"),
 		text
 		);
 
-	make_menuitem_nop(m, "");
+	make_menuitem_nop(m, L"");
 	for (int i = 0; i < agenttype_compoundtext_commoncount; i++)
 	{
-		make_menuitem_bol(m, agenttype_compoundtext_commons[i], config_getfull_control_setagent_c(c, action, "CompoundText", agenttype_compoundtext_commons[i]), 0 == strcmp(text, agenttype_compoundtext_commons[i]));
+		make_menuitem_bol(m, agenttype_compoundtext_commons[i], config_getfull_control_setagent_c(c, action, L"CompoundText", agenttype_compoundtext_commons[i]), 0 == wcscmp(text, agenttype_compoundtext_commons[i]));
 	}
 }
 
@@ -284,10 +284,10 @@ void agenttype_compoundtext_menu_context(Menu *m, agent *a)
 {
 	agenttype_compoundtext_details *details = (agenttype_compoundtext_details *) a->agentdetails;
 
-	make_menuitem_str(m, "Formatting", config_getfull_control_setagentprop_s(a->controlptr, a->agentaction, "Formatting"), details->text ? details->text : "");
+	make_menuitem_str(m, L"Formatting", config_getfull_control_setagentprop_s(a->controlptr, a->agentaction, L"Formatting"), details->text ? details->text : L"");
 
-	char namedot[1000];
-	sprintf(namedot, "%s%s", a->agentaction, ".");	
+	wchar_t namedot[1000];
+	swprintf(namedot, 1000, L"%s%s", a->agentaction, L".");	
 	menu_controloptions(m, a->controlptr, AGENTTYPE_COMPOUNDTEXT_MAXAGENTS, details->agents, namedot, agenttype_compoundtext_agentdescriptions, agenttype_compoundtext_agenttypes);
 }
 

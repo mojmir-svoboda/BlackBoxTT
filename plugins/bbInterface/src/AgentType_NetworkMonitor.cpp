@@ -36,9 +36,9 @@ bool agenttype_networkmonitor_hastimer = false;
 
 //Local primitives
 unsigned long agenttype_networkmonitor_counter;
-const char agenttype_networkmonitor_timerclass[] = "BBInterfaceAgentNetworkMon";
+const wchar_t agenttype_networkmonitor_timerclass[] = L"BBInterfaceAgentNetworkMon";
 
-void StrFormatByteSizeOrg(DWORD value,char c[]);
+void StrFormatByteSizeOrg (DWORD value, wchar_t * c, size_t n);
 
 //A list of this type of agent
 list *agenttype_networkmonitor_agents;
@@ -53,11 +53,11 @@ enum NETWORKMONITOR_TYPES
 	NETWORKMONITOR_TYPE_UPLOAD
 };
 
-const char *agenttype_networkmonitor_friendlytypes[] =
+const wchar_t *agenttype_networkmonitor_friendlytypes[] =
 {
-	"TOTAL",
-	"Download",
-	"Upload",
+	L"TOTAL",
+	L"Download",
+	L"Upload",
 };
 
 
@@ -81,33 +81,33 @@ enum NETWORKMONITOR_INTERFACES
 };
 
 //Must match the enum ordering above! Must have AGENTTYPE_NETWORKMONITOR_NUMINTERFACES entries
-const char *agenttype_networkmonitor_interface_numbers[] =
+const wchar_t *agenttype_networkmonitor_interface_numbers[] =
 {
-	"ALLInterfaces",
-	"Interface1",
-	"Interface2",
-	"Interface3",
-	"Interface4",
-	"Interface5",
-	"Interface6",
-	"Interface7",
-	"Interface8",
-	"Interface9"
+	L"ALLInterfaces",
+	L"Interface1",
+	L"Interface2",
+	L"Interface3",
+	L"Interface4",
+	L"Interface5",
+	L"Interface6",
+	L"Interface7",
+	L"Interface8",
+	L"Interface9"
 };
 
 //Must match the enum ordering above! Must have AGENTTYPE_NETWORKMONITOR_NUMINTERFACES entries
-const char *agenttype_networkmonitor_friendlyinterfaces[] =
+const wchar_t *agenttype_networkmonitor_friendlyinterfaces[] =
 {
-	"ALL Interfaces",
-	"Interface 1",
-	"Interface 2",
-	"Interface 3",
-	"Interface 4",
-	"Interface 5",
-	"Interface 6",
-	"Interface 7",
-	"Interface 8",
-	"Interface 9"
+	L"ALL Interfaces",
+	L"Interface 1",
+	L"Interface 2",
+	L"Interface 3",
+	L"Interface 4",
+	L"Interface 5",
+	L"Interface 6",
+	L"Interface 7",
+	L"Interface 8",
+	L"Interface 9"
 };
 
 
@@ -115,7 +115,7 @@ const char *agenttype_networkmonitor_friendlyinterfaces[] =
 double agenttype_networkmonitor_previous_values[AGENTTYPE_NETWORKMONITOR_NUMINTERFACES][AGENTTYPE_NETWORKMONITOR_NUMTYPES];
 double agenttype_networkmonitor_values[AGENTTYPE_NETWORKMONITOR_NUMINTERFACES][AGENTTYPE_NETWORKMONITOR_NUMTYPES];
 
-char agenttype_networkmonitor_textvalues[AGENTTYPE_NETWORKMONITOR_NUMINTERFACES][AGENTTYPE_NETWORKMONITOR_NUMTYPES][32];
+wchar_t agenttype_networkmonitor_textvalues[AGENTTYPE_NETWORKMONITOR_NUMINTERFACES][AGENTTYPE_NETWORKMONITOR_NUMTYPES][32];
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //controltype_button_startup
@@ -131,7 +131,7 @@ int agenttype_networkmonitor_startup()
 		{
 			agenttype_networkmonitor_previous_values[i][j] = -1.0;
 			agenttype_networkmonitor_values[i][j] = 0.0;
-			StrFormatByteSizeOrg(0,agenttype_networkmonitor_textvalues[i][j]);
+			StrFormatByteSizeOrg(0, agenttype_networkmonitor_textvalues[i][j], 32);
 		}
 	}
 
@@ -143,7 +143,7 @@ int agenttype_networkmonitor_startup()
 	if (window_helper_register(agenttype_networkmonitor_timerclass, &agenttype_networkmonitor_event))
 	{
 		//Couldn't register the window
-		BBMessageBox(NULL, "failed on register class", "test", MB_OK);
+		BBMessageBox(NULL, L"failed on register class", "test", MB_OK);
 		return 1;
 	}
 	agenttype_networkmonitor_windowclassregistered = true;
@@ -153,7 +153,7 @@ int agenttype_networkmonitor_startup()
 	if (!agenttype_networkmonitor_window)
 	{
 		//Couldn't create the window
-		BBMessageBox(NULL, "failed on window", "test", MB_OK);
+		BBMessageBox(NULL, L"failed on window", L"test", MB_OK);
 		return 1;
 	}
 
@@ -161,8 +161,8 @@ int agenttype_networkmonitor_startup()
 		//If we got this far, we can successfully use this function
 		//Register this type with the AgentMaster
 	agent_registertype(
-		"Network Monitor",                   //Friendly name of agent type
-		"NetworkMonitor",                    //Name of agent type
+		L"Network Monitor",                   //Friendly name of agent type
+		L"NetworkMonitor",                    //Name of agent type
 		CONTROL_FORMAT_DOUBLE|CONTROL_FORMAT_TEXT,				//Control type
 		false,
 		&agenttype_networkmonitor_create,
@@ -206,7 +206,7 @@ int agenttype_networkmonitor_shutdown()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_networkmonitor_create
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agenttype_networkmonitor_create(agent *a, char *parameterstring)
+int agenttype_networkmonitor_create(agent *a, wchar_t *parameterstring)
 {
 
 
@@ -217,7 +217,7 @@ int agenttype_networkmonitor_create(agent *a, char *parameterstring)
 	int monitor_interface_number = AGENTTYPE_NETWORKMONITOR_NUMINTERFACES;
 	for (int i = 0; i < AGENTTYPE_NETWORKMONITOR_NUMINTERFACES; i++)
 	{
-		if (_stricmp(agenttype_networkmonitor_interface_numbers[i], parameterstring) == 0)
+		if (_wcsicmp(agenttype_networkmonitor_interface_numbers[i], parameterstring) == 0)
 		{
 			monitor_interface_number = i;
 			break;
@@ -230,8 +230,8 @@ int agenttype_networkmonitor_create(agent *a, char *parameterstring)
 		//On an error
 		if (!plugin_suppresserrors)
 		{
-			char buffer[1000];
-			sprintf(buffer,	"There was an error setting the Network Monitor agent:\n\nType \"%s\" is not a valid type.", parameterstring);
+			wchar_t buffer[1000];
+			swprintf(buffer,	1000, L"There was an error setting the Network Monitor agent:\n\nType \"%s\" is not a valid type.", parameterstring);
 			BBMessageBox(NULL, buffer, szAppName, MB_OK|MB_SYSTEMMODAL);
 		}
 		return 1;
@@ -242,8 +242,8 @@ int agenttype_networkmonitor_create(agent *a, char *parameterstring)
 	details->monitor_interface_number = monitor_interface_number;
 
 	//Create a unique string to assign to this (just a number from a counter)
-	char identifierstring[64];
-	sprintf(identifierstring, "%ul", agenttype_networkmonitor_counter);
+	wchar_t identifierstring[64];
+	swprintf(identifierstring, 64, L"%ul", agenttype_networkmonitor_counter);
 	details->internal_identifier = new_string(identifierstring);
 	details->monitor_types = NETWORKMONITOR_TYPE_TOTAL;
 
@@ -293,11 +293,11 @@ int agenttype_networkmonitor_destroy(agent *a)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_networkmonitor_message
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agenttype_networkmonitor_message(agent *a, int tokencount, char *tokens[])
+int agenttype_networkmonitor_message(agent *a, int tokencount, wchar_t *tokens[])
 {
 	agenttype_networkmonitor_details *details = (agenttype_networkmonitor_details *) a->agentdetails;
 	          
-	if (!_stricmp("MonitorType", tokens[5]) && config_set_int(tokens[6],&details->monitor_types, 0,2)){
+	if (!_wcsicmp(L"MonitorType", tokens[5]) && config_set_int(tokens[6],&details->monitor_types, 0,2)){
 		control_notify(a->controlptr,NOTIFY_NEEDUPDATE,NULL);
 	}
 	//No errors
@@ -321,7 +321,7 @@ void agenttype_networkmonitor_notify(agent *a, int notifytype, void *messagedata
 		case NOTIFY_SAVE_AGENT:
 			//Write existance
 			config_write(config_get_control_setagent_c(a->controlptr, a->agentaction, a->agenttypeptr->agenttypename, agenttype_networkmonitor_interface_numbers[details->monitor_interface_number]));
-			config_write(config_get_control_setagentprop_i(a->controlptr,a->agentaction, "MonitorType",&details->monitor_types));
+			config_write(config_get_control_setagentprop_i(a->controlptr,a->agentaction, L"MonitorType",&details->monitor_types));
 			break;
 	}
 }
@@ -349,12 +349,12 @@ void *agenttype_networkmonitor_getdata(agent *a, int datatype)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_networkmonitor_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_networkmonitor_menu_set(Menu *m, control *c, agent *a,  char *action, int controlformat)
+void agenttype_networkmonitor_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
 	//Add a menu item for every type
 	for (int i = 0; i < AGENTTYPE_NETWORKMONITOR_NUMINTERFACES; i++)
 	{
-		make_menuitem_cmd(m, agenttype_networkmonitor_friendlyinterfaces[i], config_getfull_control_setagent_c(c, action, "NetworkMonitor", agenttype_networkmonitor_interface_numbers[i]));
+		make_menuitem_cmd(m, agenttype_networkmonitor_friendlyinterfaces[i], config_getfull_control_setagent_c(c, action, L"NetworkMonitor", agenttype_networkmonitor_interface_numbers[i]));
 	}
 }
 
@@ -366,7 +366,7 @@ void agenttype_networkmonitor_menu_context(Menu *m, agent *a)
 	agenttype_networkmonitor_details *details =  (agenttype_networkmonitor_details *)a->agentdetails;
 	for (int i = 0; i < AGENTTYPE_NETWORKMONITOR_NUMTYPES; i++)
 	{
-		make_menuitem_bol(m, agenttype_networkmonitor_friendlytypes[i], config_getfull_control_setagentprop_i(a->controlptr, a->agentaction, "MonitorType", &i),i==details->monitor_types);
+		make_menuitem_bol(m, agenttype_networkmonitor_friendlytypes[i], config_getfull_control_setagentprop_i(a->controlptr, a->agentaction, L"MonitorType", &i),i==details->monitor_types);
 	}
 	
 }
@@ -485,9 +485,9 @@ void agenttype_networkmonitor_updatevalue(int monitor_interface_number)
 		agenttype_networkmonitor_values[monitor_interface_number][NETWORKMONITOR_TYPE_DOWNLOAD] = (double)dwInVal;
 		agenttype_networkmonitor_values[monitor_interface_number][NETWORKMONITOR_TYPE_UPLOAD] = (double)dwOutVal;
 		agenttype_networkmonitor_values[monitor_interface_number][NETWORKMONITOR_TYPE_TOTAL] = (double)(dwInVal + dwOutVal);
-		StrFormatByteSizeOrg(dwInVal,agenttype_networkmonitor_textvalues[monitor_interface_number][NETWORKMONITOR_TYPE_DOWNLOAD]);
-		StrFormatByteSizeOrg(dwOutVal,agenttype_networkmonitor_textvalues[monitor_interface_number][NETWORKMONITOR_TYPE_UPLOAD]);
-		StrFormatByteSizeOrg(dwInVal+dwOutVal,agenttype_networkmonitor_textvalues[monitor_interface_number][NETWORKMONITOR_TYPE_TOTAL]);
+		StrFormatByteSizeOrg(dwInVal,agenttype_networkmonitor_textvalues[monitor_interface_number][NETWORKMONITOR_TYPE_DOWNLOAD], 32);
+		StrFormatByteSizeOrg(dwOutVal,agenttype_networkmonitor_textvalues[monitor_interface_number][NETWORKMONITOR_TYPE_UPLOAD], 32);
+		StrFormatByteSizeOrg(dwInVal+dwOutVal,agenttype_networkmonitor_textvalues[monitor_interface_number][NETWORKMONITOR_TYPE_TOTAL], 32);
 	}
 
 	//In all monitor type cases, copy the double value to the string value
@@ -495,11 +495,12 @@ void agenttype_networkmonitor_updatevalue(int monitor_interface_number)
 	return;
 }
 
-void StrFormatByteSizeOrg(DWORD value,char c[]){
-	if(value<1024)
-		sprintf(c,"%dBytes",value);
-	else if(value<1024*1024)
-		sprintf(c,"%.1fKB",value/1024.);
-	else if(value<1024*1024*1024)
-		sprintf(c,"%.1fMB",value/(1024*1024.));
+void StrFormatByteSizeOrg (DWORD value, wchar_t * c, size_t n)
+{
+	if (value < 1024)
+		swprintf(c, n, L"%dBytes",value);
+	else if (value < 1024*1024)
+		swprintf(c, n, L"%.1fKB",value/1024.);
+	else if (value < 1024*1024*1024)
+		swprintf(c, n, L"%.1fMB",value/(1024 * 1024.));
 }	

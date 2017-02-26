@@ -14,7 +14,7 @@
 //Define these structures
 struct agenttype_broam_details
 {
-	char *command;
+	wchar_t *command;
 	int minval;
 	int maxval;
 };
@@ -24,13 +24,13 @@ struct agenttype_broam_details
 int agenttype_broam_startup();
 int agenttype_broam_shutdown();
 
-int     agenttype_broam_create(agent *a, char *parameterstring);
+int     agenttype_broam_create(agent *a, wchar_t *parameterstring);
 int     agenttype_broam_destroy(agent *a);
-int     agenttype_broam_message(agent *a, int tokencount, char *tokens[]);
+int     agenttype_broam_message(agent *a, int tokencount, wchar_t *tokens[]);
 void    agenttype_broam_notify(agent *a, int notifytype, void *messagedata);
 void*   agenttype_broam_getdata(agent *a, int datatype);
-void    agenttype_broam_menu_set(Menu *m, control *c, agent *a,  char *action, int controlformat);
-void    agenttype_broam_bbicontrols_menu_set(Menu *m, control *c, agent *a,  char *action, int controlformat);
+void    agenttype_broam_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat);
+void    agenttype_broam_bbicontrols_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat);
 void    agenttype_broam_menu_context(Menu *m, agent *a);
 void    agenttype_broam_notifytype(int notifytype, void *messagedata);
 

@@ -15,7 +15,7 @@
 
 struct agenttype_networkmonitor_details
 {
-	char *internal_identifier;
+	wchar_t *internal_identifier;
 	int monitor_types;
 	int monitor_interface_number;
 };
@@ -27,12 +27,12 @@ struct agenttype_networkmonitor_details
 int agenttype_networkmonitor_startup();
 int agenttype_networkmonitor_shutdown();
 
-int     agenttype_networkmonitor_create(agent *a, char *parameterstring);
+int     agenttype_networkmonitor_create(agent *a, wchar_t *parameterstring);
 int     agenttype_networkmonitor_destroy(agent *a);
-int     agenttype_networkmonitor_message(agent *a, int tokencount, char *tokens[]);
+int     agenttype_networkmonitor_message(agent *a, int tokencount, wchar_t *tokens[]);
 void    agenttype_networkmonitor_notify(agent *a, int notifytype, void *messagedata);
 void*   agenttype_networkmonitor_getdata(agent *a, int datatype);
-void    agenttype_networkmonitor_menu_set(Menu *m, control *c, agent *a,  char *action, int controlformat);
+void    agenttype_networkmonitor_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat);
 void    agenttype_networkmonitor_menu_context(Menu *m, agent *a);
 void    agenttype_networkmonitor_notifytype(int notifytype, void *messagedata);
 

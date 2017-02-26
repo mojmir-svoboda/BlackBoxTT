@@ -29,8 +29,8 @@ int agenttype_run_startup()
 {
 	//Register this type with the ControlMaster
 	agent_registertype(
-		"Run/Open",                 //Friendly name of agent type
-		"Run",                      //Name of agent type
+		L"Run/Open",                 //Friendly name of agent type
+		L"Run",                      //Name of agent type
 		CONTROL_FORMAT_TRIGGER|CONTROL_FORMAT_DROP, //Control type
 		true,
 		&agenttype_run_create,          
@@ -60,7 +60,7 @@ int agenttype_run_shutdown()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_run_create
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agenttype_run_create(agent *a, char *parameterstring)
+int agenttype_run_create(agent *a, wchar_t *parameterstring)
 {
 	if (0 == * parameterstring)
 		return 2; // no param, no agent
@@ -73,10 +73,10 @@ int agenttype_run_create(agent *a, char *parameterstring)
 	details->workingdir = NULL;
 
 	//Copy the parameter string
-	if (!_stricmp(parameterstring, "*browse*"))
+	if (!_wcsicmp(parameterstring, L"*browse*"))
 	{
 		//Get the file
-		char *file = dialog_file(szFilterAll, "Select File", NULL, NULL, false);
+		wchar_t *file = dialog_file(szFilterAll, L"Select File", NULL, NULL, false);
 		if (file)
 		{
 			details->command = new_string(file);
@@ -118,16 +118,16 @@ int agenttype_run_destroy(agent *a)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_run_message
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agenttype_run_message(agent *a, int tokencount, char *tokens[])
+int agenttype_run_message(agent *a, int tokencount, wchar_t *tokens[])
 {
-	if (!_stricmp("Arguments", tokens[5]))
+	if (!_wcsicmp(L"Arguments", tokens[5]))
 	{
 		agenttype_run_details *details = (agenttype_run_details *) a->agentdetails;
 		free_string(&details->arguments);
 		if (*tokens[6]) details->arguments = new_string(tokens[6]);
 		return 0;
 	}
-	if (!_stricmp("WorkingDir", tokens[5]))
+	if (!_wcsicmp(L"WorkingDir", tokens[5]))
 	{
 		agenttype_run_details *details = (agenttype_run_details *) a->agentdetails;
 		free_string(&details->workingdir);
@@ -150,13 +150,14 @@ void agenttype_run_notify(agent *a, int notifytype, void *messagedata)
 	{
 		case NOTIFY_CHANGE:
 		{
-			const char *arguments = details->arguments;
+			const wchar_t *arguments = details->arguments;
 			if (a->format & CONTROL_FORMAT_DROP) // OnDrop
 			{
-				if (NULL == arguments) arguments = "$DroppedFile$";
+				if (NULL == arguments) arguments = L"$DroppedFile$";
 			}
-			char buffer[BBI_MAX_LINE_LENGTH];
-			if (arguments) arguments = message_preprocess(strcpy(buffer, arguments), a->controlptr->moduleptr);
+			wchar_t buffer[BBI_MAX_LINE_LENGTH];
+			if (arguments)
+				arguments = message_preprocess(wcscpy(buffer, arguments), a->controlptr->moduleptr);
 			shell_exec(details->command, arguments, details->workingdir);
 			break;
 		}
@@ -164,8 +165,8 @@ void agenttype_run_notify(agent *a, int notifytype, void *messagedata)
 			//Write existance
 			config_write(config_get_control_setagent_c(a->controlptr, a->agentaction, a->agenttypeptr->agenttypename, details->command));
 			//Write arguments
-			if (details->arguments) config_write(config_get_control_setagentprop_c(a->controlptr, a->agentaction, "Arguments", details->arguments));
-			if (details->workingdir) config_write(config_get_control_setagentprop_c(a->controlptr, a->agentaction, "WorkingDir", details->workingdir));
+			if (details->arguments) config_write(config_get_control_setagentprop_c(a->controlptr, a->agentaction, L"Arguments", details->arguments));
+			if (details->workingdir) config_write(config_get_control_setagentprop_c(a->controlptr, a->agentaction, L"WorkingDir", details->workingdir));
 			break;
 	}
 }
@@ -181,16 +182,16 @@ void *agenttype_run_getdata(agent *a, int datatype)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_run_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_run_menu_set(Menu *m, control *c, agent *a,  char *action, int controlformat)
+void agenttype_run_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
-	make_menuitem_str(m, "Entry:", config_getfull_control_setagent_s(c, action, "Run"),
-		a ? ((agenttype_run_details *) a->agentdetails)->command : "");
-	make_menuitem_cmd(m, "Browse...", config_getfull_control_setagent_c(c, action, "Run", "*browse*"));
+	make_menuitem_str(m, L"Entry:", config_getfull_control_setagent_s(c, action, L"Run"),
+		a ? ((agenttype_run_details *) a->agentdetails)->command : L"");
+	make_menuitem_cmd(m, L"Browse...", config_getfull_control_setagent_c(c, action, L"Run", L"*browse*"));
 
-	make_menuitem_nop(m, "");
-	make_menuitem_cmd(m, "Notepad", config_getfull_control_setagent_c(c, action, "Run", "notepad.exe"));
-	make_menuitem_cmd(m, "Calculator", config_getfull_control_setagent_c(c, action, "Run", "calc.exe"));
-	make_menuitem_cmd(m, "Command Prompt", config_getfull_control_setagent_c(c, action, "Run", "cmd.exe"));
+	make_menuitem_nop(m, L"");
+	make_menuitem_cmd(m, L"Notepad", config_getfull_control_setagent_c(c, action, L"Run", L"notepad.exe"));
+	make_menuitem_cmd(m, L"Calculator", config_getfull_control_setagent_c(c, action, L"Run", L"calc.exe"));
+	make_menuitem_cmd(m, L"Command Prompt", config_getfull_control_setagent_c(c, action, L"Run", L"cmd.exe"));
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -202,11 +203,11 @@ void agenttype_run_menu_context(Menu *m, agent *a)
 	agenttype_run_details *details = (agenttype_run_details *) a->agentdetails;
 
 	//Arguments
-	make_menuitem_str(m, "Arguments", config_getfull_control_setagentprop_s(a->controlptr, a->agentaction, "Arguments"),
-		details->arguments ? details->arguments : "");
+	make_menuitem_str(m, L"Arguments", config_getfull_control_setagentprop_s(a->controlptr, a->agentaction, L"Arguments"),
+		details->arguments ? details->arguments : L"");
 
-	make_menuitem_str(m, "Working Dir", config_getfull_control_setagentprop_s(a->controlptr, a->agentaction, "WorkingDir"),
-		details->workingdir ? details->workingdir : "");
+	make_menuitem_str(m, L"Working Dir", config_getfull_control_setagentprop_s(a->controlptr, a->agentaction, L"WorkingDir"),
+		details->workingdir ? details->workingdir : L"");
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
