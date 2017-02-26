@@ -131,7 +131,7 @@ namespace imgui {
 		codecvt_utf16_utf8(item->m_name.c_str(), item_text, 1024);
 		if (ImGui::Checkbox(item_text, &bbroam->m_checked))
 		{
-			bb::BlackBox::Instance().GetBroamServer().PostCommand(bbroam->m_broam.c_str());
+			bb::BlackBox::Instance().GetBroamServer().PostCommand(L"%s %s", bbroam->m_broam.c_str(), bbroam->m_checked ? L"true" : L"false");
 
 			m_gfxWindow->GetRoot()->SetDestroyTree();
 		}

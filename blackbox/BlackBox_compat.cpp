@@ -22,6 +22,7 @@ for more details.
 #include "BlackBox.h"
 #include "gfx/MenuWidget.h"
 #include "menu/MenuConfig.h"
+#include "gfx/utils_widgets.h"
 //===========================================================================
 // API: MakeNamedMenu
 // Purpose:         Create or refresh a bb::MenuConfig
@@ -39,7 +40,7 @@ std::shared_ptr<bb::MenuConfig> MakeNamedMenu (wchar_t const * headerText, wchar
 	m->m_widgetType = bb::MenuWidget::c_type;
 	m->m_id = id;
 	m->m_titlebar = headerText;
-	m->m_show = popup; // ?
+	m->m_show = true;
 	return m;
 }
 
@@ -93,22 +94,14 @@ void DelMenu (std::shared_ptr<bb::MenuConfig> pluginMenu)
 //===========================================================================
 // API: ShowMenu
 // Purpose: Finalizes creation or refresh for the menu and its submenus
-// IN: PluginMenu - pointer to the toplevel menu
+// IN: pluginMenu - pointer to the toplevel menu
 //===========================================================================
-
-void moveWidgetToPointerPos (bb::MenuWidget * w)
-{
-	POINT p;
-	if (::GetCursorPos(&p))
-	{
-		w->MoveWindow(p.x, p.y);
-	}
-}
 
 void ShowMenu (std::shared_ptr<bb::MenuConfig> pluginMenu)
 {
 	bb::BlackBox & bb = bb::BlackBox::Instance();
 
+	bool update = false;
 	bb::GuiWidget * w = bb.GetGfx().FindWidget(pluginMenu->m_id.c_str());
 	if (!w)
 	{
@@ -116,29 +109,62 @@ void ShowMenu (std::shared_ptr<bb::MenuConfig> pluginMenu)
 	}
 	else
 	{
-		Assert(0 && "todo");
-		//w->GetConfig().Clear();
+		update = true;
 	}
 
 	Assert(w && w->GetWidgetTypeName() == bb::MenuWidget::c_type);
 	bb::MenuWidget * menu = static_cast<bb::MenuWidget *>(w);
-	moveWidgetToPointerPos(menu);
-	menu->Show(true);
+	if (update)
+	{
+		//menu->GetConfig().clear();
+		//menu->GetConfig() = *pluginMenu;
+	}
 
-// 	if (NULL == PluginMenu)
+ 	moveWidgetToPointerPos(menu);
+ 	menu->Show(true);
+
+// 	if (NULL == pluginMenu)
 // 		return;
-// 	// dbg_printf("ShowMenu(%d) %x %s", PluginMenu->m_bPopup, PluginMenu, PluginMenu->m_pMenuItems->m_pszTitle);
+// 	// dbg_printf("ShowMenu(%d) %x %s", pluginMenu->m_bPopup, pluginMenu, pluginMenu->m_pMenuItems->m_pszTitle);
 // 
-// 	if (PluginMenu->m_bPopup) {
+// 	if (pluginMenu->m_bPopup) {
 // 		// just to signal e.g. BBSoundFX
 // #ifndef BBXMENU
 // 		PostMessage(BBhwnd, BB_MENU, BB_MENU_SIGNAL, 0);
 // #endif
-// 		PluginMenu->ShowMenu();
+// 		pluginMenu->ShowMenu();
 // 	} else {
-// 		PluginMenu->Redraw(1);
-// 		PluginMenu->decref();
+// 		pluginMenu->Redraw(1);
+// 		pluginMenu->decref();
 // 	}
+}
+
+void UpdateMenu (std::shared_ptr<bb::MenuConfig> pluginMenu)
+{
+	bb::BlackBox & bb = bb::BlackBox::Instance();
+
+	bool update = false;
+	bb::GuiWidget * w = bb.GetGfx().FindWidget(pluginMenu->m_id.c_str());
+	if (!w)
+	{
+		//w = bb.GetGfx().MkWidgetFromConfig(*pluginMenu);
+		//ShowMenu(pluginMenu);
+	}
+	else
+	{
+		update = true;
+		Assert(w && w->GetWidgetTypeName() == bb::MenuWidget::c_type);
+		bb::MenuWidget * menu = static_cast<bb::MenuWidget *>(w);
+		if (update)
+		{
+			menu->GetConfig().clear();
+			menu->GetConfig() = *pluginMenu;
+		}
+
+	}
+
+	//moveWidgetToPointerPos(menu);
+	//w->Show(true);
 }
 
 //===========================================================================
@@ -191,10 +217,10 @@ bb::MenuConfigItem * MakeMenuItemInt (std::shared_ptr<bb::MenuConfig> menu, wcha
 // API: MakeMenuItemString
 //===========================================================================
 
-bb::MenuConfigItem *MakeMenuItemString(std::shared_ptr<bb::MenuConfig>PluginMenu, wchar_t const * Title, wchar_t const * Cmd, wchar_t const * init_string)
+bb::MenuConfigItem *MakeMenuItemString(std::shared_ptr<bb::MenuConfig>pluginMenu, wchar_t const * Title, wchar_t const * Cmd, wchar_t const * init_string)
 {
 	return nullptr;
-// 	return helper_menu(PluginMenu, Title, MENU_ID_STRING,
+// 	return helper_menu(pluginMenu, Title, MENU_ID_STRING,
 // 		new StringItem(Cmd, init_string));
 }
 
@@ -215,18 +241,18 @@ bb::MenuConfigItem* MakeMenuNOP(std::shared_ptr<bb::MenuConfig> menu, wchar_t co
 // 		pItem = new SeparatorItem();
 // 	}
 // 	pItem->m_bNOP = true;
-// 	return PluginMenu->AddMenuItem(pItem);
+// 	return pluginMenu->AddMenuItem(pItem);
 }
 
 //===========================================================================
 // API: MakeMenuGrip
 //===========================================================================
 
-bb::MenuConfigItem* MakeMenuGrip(std::shared_ptr<bb::MenuConfig>PluginMenu, LPCSTR Title)
+bb::MenuConfigItem* MakeMenuGrip(std::shared_ptr<bb::MenuConfig>pluginMenu, LPCSTR Title)
 {
 	return nullptr;
 // 	if ( Settings_menusGripEnabled )
-// 		return PluginMenu->AddMenuItem(new MenuGrip(Title));
+// 		return pluginMenu->AddMenuItem(new MenuGrip(Title));
 // 	return 0;
 }
 

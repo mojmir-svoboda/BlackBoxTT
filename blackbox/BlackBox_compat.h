@@ -8,21 +8,21 @@
 /* creates a Menu or Submenu, Id must be unique, fshow indicates whether
 the menu should be shown (true) or redrawn (false) */
 BB_API std::shared_ptr<bb::MenuConfig> MakeNamedMenu (const wchar_t * HeaderText, const wchar_t * Id, bool fshow);
-BB_API bb::MenuConfigItem * MakeMenuGrip (std::shared_ptr<bb::MenuConfig> PluginMenu, const wchar_t * Title);
+BB_API bb::MenuConfigItem * MakeMenuGrip (std::shared_ptr<bb::MenuConfig> pluginMenu, const wchar_t * Title);
 
 /* inserts an item to execute a command or to set a boolean value */
-BB_API bb::MenuConfigItem * MakeMenuItem (std::shared_ptr<bb::MenuConfig> PluginMenu, const wchar_t * Title, const wchar_t * Cmd);
+BB_API bb::MenuConfigItem * MakeMenuItem (std::shared_ptr<bb::MenuConfig> pluginMenu, const wchar_t * Title, const wchar_t * Cmd);
 /* inserts an item to execute a command or to set a boolean value */
-BB_API bb::MenuConfigItem * MakeMenuItemBool (std::shared_ptr<bb::MenuConfig> PluginMenu, const wchar_t * Title, const wchar_t * Cmd, bool ShowIndicator);
+BB_API bb::MenuConfigItem * MakeMenuItemBool (std::shared_ptr<bb::MenuConfig> pluginMenu, const wchar_t * Title, const wchar_t * Cmd, bool ShowIndicator);
 
 /* inserts an inactive item, optionally with text. 'Title' may be NULL. */
-BB_API bb::MenuConfigItem * MakeMenuNOP (std::shared_ptr<bb::MenuConfig> PluginMenu, const wchar_t * Title);
+BB_API bb::MenuConfigItem * MakeMenuNOP (std::shared_ptr<bb::MenuConfig> pluginMenu, const wchar_t * Title);
 
 /* inserts an item to adjust a numeric value */
-BB_API bb::MenuConfigItem * MakeMenuItemInt (std::shared_ptr<bb::MenuConfig> PluginMenu, const wchar_t * Title, const wchar_t * Cmd, int val, int minval, int maxval);
+BB_API bb::MenuConfigItem * MakeMenuItemInt (std::shared_ptr<bb::MenuConfig> pluginMenu, const wchar_t * Title, const wchar_t * Cmd, int val, int minval, int maxval);
 
 /* inserts an item to edit a string value */
-BB_API bb::MenuConfigItem * MakeMenuItemString (std::shared_ptr<bb::MenuConfig> PluginMenu, const wchar_t * Title, const wchar_t * Cmd, const wchar_t * init_string);
+BB_API bb::MenuConfigItem * MakeMenuItemString (std::shared_ptr<bb::MenuConfig> pluginMenu, const wchar_t * Title, const wchar_t * Cmd, const wchar_t * init_string);
 
 /* inserts an item, which opens a submenu */
 BB_API bb::MenuConfigItem * MakeSubmenu (std::shared_ptr<bb::MenuConfig> ParentMenu, std::shared_ptr<bb::MenuConfig> ChildMenu, const wchar_t * Title);
@@ -36,7 +36,9 @@ BB_API bb::MenuConfigItem * MakeMenuItemPath (std::shared_ptr<bb::MenuConfig> Pa
 BB_API bb::MenuConfig * MakeContextMenu (const wchar_t * path, const void * pidl);
 
 /* shows the menu */
-BB_API void ShowMenu (std::shared_ptr<bb::MenuConfig> PluginMenu);
+BB_API void ShowMenu (std::shared_ptr<bb::MenuConfig> pluginMenu);
+/* updates the menu */
+BB_API void UpdateMenu (std::shared_ptr<bb::MenuConfig> pluginMenu);
 
 /* checks whether a menu with ID starting with 'IDString_start', still exists */
 BB_API bool MenuExists (const wchar_t * IDString_start);
@@ -75,4 +77,4 @@ BB_API void MenuOption (std::shared_ptr<bb::MenuConfig> pMenu, int flags, ...);
 
 /* obsolete: */
 BB_API std::shared_ptr<bb::MenuConfig> MakeMenu (const wchar_t * HeaderText);
-BB_API void DelMenu (std::shared_ptr<bb::MenuConfig> PluginMenu); /* does nothing */
+BB_API void DelMenu (std::shared_ptr<bb::MenuConfig> pluginMenu); /* does nothing */

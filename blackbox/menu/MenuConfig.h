@@ -90,7 +90,7 @@ namespace bb {
 	struct MenuConfigItemBroamBool : MenuConfigItem
 	{
 		bbstring m_broam;
-		bool m_checked{ false };
+		bool m_checked { false };
 		MenuConfigItemBroamBool (bbstring const & name, bbstring const & broam, bool chk) : MenuConfigItem(e_MenuItemBroamBool, name), m_broam(broam), m_checked(chk) { }
 	};
 	struct MenuConfigItemBroamInt : MenuConfigItem

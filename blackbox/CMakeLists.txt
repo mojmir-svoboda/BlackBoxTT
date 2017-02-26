@@ -87,6 +87,7 @@ set (blackbox_HEADERS
 	utils_vdm.h
 	GfxConfig.h
 	gfx/GuiWidget.h
+	gfx/utils_widgets.h
 	gfx/MenuWidget.h
 	gfx/IconId.h
 	gfx/GfxWindow.h
