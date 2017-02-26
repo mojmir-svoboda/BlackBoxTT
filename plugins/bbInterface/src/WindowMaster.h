@@ -21,7 +21,7 @@ struct window
 	
 	bool use_custom_font;
 	HFONT font;
-	char Fontname[128];
+	wchar_t Fontname[128];
 	int FontHeight;
 	int FontWeight;
 
@@ -59,7 +59,7 @@ struct ButtonStyleInfo
 	bool has_custom_style;
 	bool use_custom_font;
 	HFONT font;
-	char Fontname[128];
+	wchar_t Fontname[128];
 	int FontHeight;
 	int FontWeight;
 	int nosavevalue;
@@ -92,32 +92,32 @@ void window_save_control(control *c);
 void window_save();
 
 LRESULT CALLBACK window_event(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-int window_message(int tokencount, char *tokens[], bool from_core, module* caller);
-int window_message_setproperty(control *c, int tokencount, char *tokens[]);
+int window_message(int tokencount, wchar_t *tokens[], bool from_core, module* caller);
+int window_message_setproperty(control *c, int tokencount, wchar_t *tokens[]);
 void style_set_customvalue(StyleItem *styleptr, int style, int nosavevalue);
 void reconfigure_customvalue(control *c);
 
 void window_pluginsvisible(bool isvisible);
 void window_update(window *w, bool position, bool transparency, bool visibility, bool sticky);
 
-//int window_helper_register(const char *classname, LRESULT CALLBACK (*callbackfunc)(HWND, UINT, WPARAM, LPARAM));
-int window_helper_register(const char *classname, WNDPROC callbackfunc);
-int window_helper_unregister(const char *classname);
-HWND window_helper_create(const char *classname);
+//int window_helper_register(const wchar_t *classname, LRESULT CALLBACK (*callbackfunc)(HWND, UINT, WPARAM, LPARAM));
+int window_helper_register(const wchar_t *classname, WNDPROC callbackfunc);
+int window_helper_unregister(const wchar_t *classname);
+HWND window_helper_create(const wchar_t *classname);
 int window_helper_destroy(HWND hwnd);
 void window_make_child(window *w, window *pw);
 
 //Global variables
-extern char szWPx   [];
-extern char szWPy   [];
-extern char szWPwidth   [];
-extern char szWPheight  [];
-extern char szWPtransparency    [];
-extern char szWPisvisible   [];
-extern char szWPisontop [];
-extern char szWPissnappy    [];
-extern char szWPisslitted   [];
-extern char szWPistransparent   [];
-extern char szWPistoggledwithplugins    [];
-extern char szWPisonallworkspaces   [];
+extern wchar_t szWPx   [];
+extern wchar_t szWPy   [];
+extern wchar_t szWPwidth   [];
+extern wchar_t szWPheight  [];
+extern wchar_t szWPtransparency    [];
+extern wchar_t szWPisvisible   [];
+extern wchar_t szWPisontop [];
+extern wchar_t szWPissnappy    [];
+extern wchar_t szWPisslitted   [];
+extern wchar_t szWPistransparent   [];
+extern wchar_t szWPistoggledwithplugins    [];
+extern wchar_t szWPisonallworkspaces   [];
 

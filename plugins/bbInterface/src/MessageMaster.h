@@ -20,11 +20,11 @@
 
 int message_startup();
 int message_shutdown();
-void message_interpret(const char *message, bool from_core, module* caller);
+void message_interpret(const wchar_t *message, bool from_core, module* caller);
 
 extern HWND message_window;
-void shell_exec(const char *command, const char *arguments = NULL, const char *workingdir = NULL);
-char *message_preprocess(char *buffer, module* defmodule = currentmodule);
+void shell_exec(const wchar_t *command, const wchar_t *arguments = NULL, const wchar_t *workingdir = NULL);
+wchar_t *message_preprocess(wchar_t *buffer, module* defmodule = currentmodule);
 
 #endif
 /*=================================================*/

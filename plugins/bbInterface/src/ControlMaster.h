@@ -27,25 +27,25 @@ struct module;
 //Define these structures
 struct controltype
 {
-	char    controltypename[64];
+	wchar_t    controltypename[64];
 	bool    can_parentless;
 	bool    can_parent;
 	bool    can_child;
-	char    id;
+	wchar_t    id;
 	int     (*func_create)(control *c);
 	int     (*func_destroy)(control *c);
 	LRESULT (*func_event)(control *c, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void    (*func_notify)(control *c, int notifytype, void *messagedata);
-	int     (*func_message)(control *c, int tokencount, char *tokens[]);
+	int     (*func_message)(control *c, int tokencount, wchar_t *tokens[]);
 	void*   (*func_getdata)(control *c, int datatype);
-	bool    (*func_getstringvalue)(control *c, char *buffer, char *propertyname);
+	bool    (*func_getstringvalue)(control *c, wchar_t *buffer, wchar_t *propertyname);
 	void    (*func_menu_context)(Menu *m, control *c);
 	void    (*func_notifytype)(int notifytype, void *messagedata);
 };
 
 struct control
 {
-	char controlname[64];       //UNIQUE name of the control
+	wchar_t controlname[64];       //UNIQUE name of the control
 
 	controltype *controltypeptr;    //Pointer to the type of control
 	control *parentptr;         //Pointer to the parent control
@@ -82,16 +82,16 @@ int control_shutdown();
 
 extern module* currentmodule;
 
-int control_create(char *controlname, char *controltypename, char *controlparentname, bool include_parent, module* parentmodule);
+int control_create(wchar_t *controlname, wchar_t *controltypename, wchar_t *controlparentname, bool include_parent, module* parentmodule);
 int control_destroy(control *c, bool remove_from_list, bool save_last);
-int control_rename(control *c, char *newname);
-bool control_make_childof(control *c, const char *parentname);
+int control_rename(control *c, wchar_t *newname);
+bool control_make_childof(control *c, const wchar_t *parentname);
 bool control_make_parentless(control *c);
-control* control_get(const char *name, module* caller = currentmodule);
+control* control_get(const wchar_t *name, module* caller = currentmodule);
 
 
 LRESULT control_event(control *c, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-int control_message(int tokencount, char *tokens[], bool from_core, module* caller);
+int control_message(int tokencount, wchar_t *tokens[], bool from_core, module* caller);
 void control_notify(control *c, int notifytype, void *messagedata);
 
 void control_pluginsvisible(bool arevisible);
@@ -101,46 +101,46 @@ void control_menu_create(Menu *m, control *c, bool createchild);
 void control_menu_context(Menu *m, control *c);
 void control_menu_settings(Menu *m, control *c);
 
-bool control_getstringdata(control *c, char *buffer, char *propertyname);
+bool control_getstringdata(control *c, wchar_t *buffer, wchar_t *propertyname);
 
 void control_save();
 
 void control_checklast();
 
 void control_registertype(
-	char    *controltypename,
+	wchar_t    *controltypename,
 	bool    can_parentless,
 	bool    can_parent,
 	bool    can_child,
-	char    id,
+	wchar_t    id,
 	int     (*func_create)(control *c),
 	int     (*func_destroy)(control *c),
 	LRESULT (*func_event)(control *c, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam),
 	void    (*func_notify)(control *c, int notifytype, void *messagedata),
-	int     (*func_message)(control *c, int tokencount, char *tokens[]),
+	int     (*func_message)(control *c, int tokencount, wchar_t *tokens[]),
 	void*   (*func_getdata)(control *c, int datatype),
-	bool    (*func_getstringvalue)(control *c, char *buffer, char *propertyname),
+	bool    (*func_getstringvalue)(control *c, wchar_t *buffer, wchar_t *propertyname),
 	void    (*func_menu_context)(Menu *m, control *c),
 	void    (*func_notifytype)(int notifytype, void *messagedata)
 	);
 void control_unregistertype(controltype *ct);
 
 
-struct token_check { const char *key; size_t id; int args; };
-int token_check(struct token_check *t, int *curtok, int tokencount, char *tokens[]);
-int get_string_index (const char *key, const char **string_list);
-char *new_string(const char *);
-void free_string(char **s);
-char *extract_string(char *d, const char *s, int n);
-char* unquote(char *d, const char *s);
+struct token_check { const wchar_t *key; size_t id; int args; };
+int token_check(struct token_check *t, int *curtok, int tokencount, wchar_t *tokens[]);
+int get_string_index (const wchar_t *key, const wchar_t **string_list);
+wchar_t *new_string(const wchar_t *);
+void free_string(wchar_t **s);
+wchar_t *extract_string(wchar_t *d, const wchar_t *s, int n);
+wchar_t* unquote(wchar_t *d, const wchar_t *s);
 
 void variables_startup(void);
 void variables_shutdown(void);
 void variables_save(void);
-const char *variables_get(const char *key, const char *deflt, module* defmodule);
-void variables_set(bool is_static, const char *key, const char *val, module* defmodule = currentmodule);
-void variables_set(bool is_static, const char *key, int val, module* defmodule = currentmodule);
-char *get_dragged_file(char *buffer, WPARAM wParam);
+const wchar_t *variables_get(const wchar_t *key, const wchar_t *deflt, module* defmodule);
+void variables_set(bool is_static, const wchar_t *key, const wchar_t *val, module* defmodule = currentmodule);
+void variables_set(bool is_static, const wchar_t *key, int val, module* defmodule = currentmodule);
+wchar_t *get_dragged_file(wchar_t *buffer, WPARAM wParam);
 
 void controls_clickraise(void);
 void controls_updatetasks(void);

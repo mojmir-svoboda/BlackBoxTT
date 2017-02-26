@@ -41,10 +41,10 @@ int list_shutdown();
 list *list_create();
 int list_destroy(list *l);
 
-int list_add(list *l, const char *key, void *value, void** old_value);
-int list_remove(list *l, const char *key);
-void *list_lookup(list *l, const char *key);
-int list_rename(list *l, const char *key, const char *newkey);
+int list_add(list *l, const wchar_t *key, void *value, void** old_value);
+int list_remove(list *l, const wchar_t *key);
+void *list_lookup(list *l, const wchar_t *key);
+int list_rename(list *l, const wchar_t *key, const wchar_t *newkey);
 
 #define dolist(_ln, _plist) for (_ln = _plist->first; _ln; _ln = _ln->next)
 

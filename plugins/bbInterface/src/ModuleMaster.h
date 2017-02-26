@@ -9,18 +9,18 @@ struct list; struct listnode;
 struct module
 {
 	//Info fields - the first one is necessary.
-	char name[64];
-	char *author;
-	char *comments;
+	wchar_t name[64];
+	wchar_t *author;
+	wchar_t *comments;
 
-	char *filepath;       //path to the module file
+	wchar_t *filepath;       //path to the module file
 	bool enabled;
 
 	list *controllist; // list of controls associated with module
 	list *controllist_parentsonly; // list of controls associated with module
 	list *variables; // list of variables associated with module
 
-	char *actions[MODULE_ACTION_COUNT];
+	wchar_t *actions[MODULE_ACTION_COUNT];
 };
 
 extern module *currentmodule;
@@ -30,14 +30,14 @@ extern module globalmodule;
 int module_startup();
 int module_shutdown();
 
-module* module_create(char *filepath);
-module* module_create_new(char *filename);
+module* module_create(wchar_t *filepath);
+module* module_create_new(wchar_t *filename);
 int module_destroy(module *m, bool remove_from_list);
 int module_toggle(module *m);
-int module_toggle(char *modulename);
+int module_toggle(wchar_t *modulename);
 
-int module_message(int tokencount, char *tokens[], bool from_core, module* caller);
-bool module_state(char *modulename);
+int module_message(int tokencount, wchar_t *tokens[], bool from_core, module* caller);
+bool module_state(wchar_t *modulename);
 
 Menu* module_menu_modulelist();
 Menu* module_menu_editmodules();
@@ -45,7 +45,7 @@ Menu* module_menu_setactivemodule();
 
 void module_save_list();
 void module_save_all();
-module* module_get(char* key);
+module* module_get(wchar_t* key);
 
 
 extern list *modulelist;

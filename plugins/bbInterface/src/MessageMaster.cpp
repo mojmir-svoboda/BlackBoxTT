@@ -352,7 +352,7 @@ void get_property_by_name(char *targetstr, control *c, char *propname)
 	
 }
 
-char *message_preprocess(char *buffer, module* defmodule)
+wchar_t *message_preprocess(wchar_t *buffer, module* defmodule)
 {
 	char *start = buffer, *end = NULL;
 	while (NULL != (start = strchr(start, '$')) && NULL != (end = strchr(start+1, '$')))
@@ -489,13 +489,13 @@ void shell_exec(const char *command, const char *arguments, const char *workingd
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // strdup
-char *new_string(const char *s)
+wchar_t *new_string(const wchar_t *s)
 {
-	return s ? strcpy(new char[strlen(s)+1], s) : NULL;
+	return s ? wcscpy(new wchar_t[wcslen(s) + 1], s) : NULL;
 }
 
 // save strfree
-void free_string(char **s)
+void free_string(wchar_t **s)
 {
 	if (*s)
 	{

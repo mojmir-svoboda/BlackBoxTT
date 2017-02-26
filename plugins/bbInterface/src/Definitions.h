@@ -9,64 +9,64 @@
 #define BBInterface_Definitions_h
 
 //Plugin information
-extern const char szAppName       [];
-extern const char szVersion       [];
-extern const char szInfoVersion   [];
-extern const char szInfoAuthor    [];
-extern const char szInfoRelDate   [];
-extern const char szInfoLink      [];
-extern const char szInfoEmail     [];
+extern const wchar_t szAppName       [];
+extern const wchar_t szVersion       [];
+extern const wchar_t szInfoVersion   [];
+extern const wchar_t szInfoAuthor    [];
+extern const wchar_t szInfoRelDate   [];
+extern const wchar_t szInfoLink      [];
+extern const wchar_t szInfoEmail     [];
 
 //Local variables
-extern const char szPluginAbout   [];
-extern const char szPluginAboutLastControl    [];
-extern const char szPluginAboutQuickRef   [];
+extern const wchar_t szPluginAbout   [];
+extern const wchar_t szPluginAboutLastControl    [];
+extern const wchar_t szPluginAboutQuickRef   [];
 
 //Strings used frequently
 extern const int szBBroamLength;
-extern const char szBBroam            [];
-extern const char szBEntityControl    [];
-extern const char szBEntityAgent      [];
-extern const char szBEntityPlugin     [];
-extern const char szBEntityVarset     [];
-extern const char szBEntityWindow     [];
-extern const char szBEntityModule     [];
-extern const char szBActionCreate     [];
-extern const char szBActionCreateChild[];
-extern const char szBActionDelete     [];
-extern const char szBActionSetAgent   [];
-extern const char szBActionRemoveAgent[];
-extern const char szBActionSetAgentProperty   [];
-extern const char szBActionSetControlProperty [];
-extern const char szBActionSetWindowProperty  [];
-extern const char szBActionSetPluginProperty  [];
-extern const char szBActionSetModuleProperty  [];
+extern const wchar_t szBBroam            [];
+extern const wchar_t szBEntityControl    [];
+extern const wchar_t szBEntityAgent      [];
+extern const wchar_t szBEntityPlugin     [];
+extern const wchar_t szBEntityVarset     [];
+extern const wchar_t szBEntityWindow     [];
+extern const wchar_t szBEntityModule     [];
+extern const wchar_t szBActionCreate     [];
+extern const wchar_t szBActionCreateChild[];
+extern const wchar_t szBActionDelete     [];
+extern const wchar_t szBActionSetAgent   [];
+extern const wchar_t szBActionRemoveAgent[];
+extern const wchar_t szBActionSetAgentProperty   [];
+extern const wchar_t szBActionSetControlProperty [];
+extern const wchar_t szBActionSetWindowProperty  [];
+extern const wchar_t szBActionSetPluginProperty  [];
+extern const wchar_t szBActionSetModuleProperty  [];
 
 
-extern const char szBActionSetDefault			[];
-extern const char szBActionAssignToModule		[];
-extern const char szBActionDetachFromModule		[];
-extern const char szBActionOnLoad				[];
-extern const char szBActionOnUnload				[];
+extern const wchar_t szBActionSetDefault			[];
+extern const wchar_t szBActionAssignToModule		[];
+extern const wchar_t szBActionDetachFromModule		[];
+extern const wchar_t szBActionOnLoad				[];
+extern const wchar_t szBActionOnUnload				[];
 
-extern const char szBActionRename     [];
-extern const char szBActionLoad       [];
-extern const char szBActionEdit       [];
-extern const char szBActionToggle     [];
-extern const char szBActionSave       [];
-extern const char szBActionSaveAs     [];
-extern const char szBActionRevert     [];
-extern const char szBActionAbout      [];
+extern const wchar_t szBActionRename     [];
+extern const wchar_t szBActionLoad       [];
+extern const wchar_t szBActionEdit       [];
+extern const wchar_t szBActionToggle     [];
+extern const wchar_t szBActionSave       [];
+extern const wchar_t szBActionSaveAs     [];
+extern const wchar_t szBActionRevert     [];
+extern const wchar_t szBActionAbout      [];
 
-extern const char szTrue  [];
-extern const char szFalse [];
+extern const wchar_t szTrue  [];
+extern const wchar_t szFalse [];
 
-extern const char szFilterProgram [];
-extern const char szFilterScript  [];
-extern const char szFilterAll [];
+extern const wchar_t szFilterProgram [];
+extern const wchar_t szFilterScript  [];
+extern const wchar_t szFilterAll [];
 
 //Convenient arrays of strings
-extern const char *szBoolArray[2];
+extern const wchar_t *szBoolArray[2];
 
 
 //Constant data referrals

@@ -14,7 +14,7 @@
 //Define these structures
 struct agenttype_systeminfo_details
 {
-	char *internal_identifier;
+	wchar_t *internal_identifier;
 	int monitor_type;
 };
 
@@ -23,12 +23,12 @@ struct agenttype_systeminfo_details
 int agenttype_systeminfo_startup();
 int agenttype_systeminfo_shutdown();
 
-int     agenttype_systeminfo_create(agent *a, char *parameterstring);
+int     agenttype_systeminfo_create(agent *a, wchar_t *parameterstring);
 int     agenttype_systeminfo_destroy(agent *a);
-int     agenttype_systeminfo_message(agent *a, int tokencount, char *tokens[]);
+int     agenttype_systeminfo_message(agent *a, int tokencount, wchar_t *tokens[]);
 void    agenttype_systeminfo_notify(agent *a, int notifytype, void *messagedata);
 void*   agenttype_systeminfo_getdata(agent *a, int datatype);
-void    agenttype_systeminfo_menu_set(Menu *m, control *c, agent *a,  char *action, int controlformat);
+void    agenttype_systeminfo_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat);
 void    agenttype_systeminfo_menu_context(Menu *m, agent *a);
 void    agenttype_systeminfo_notifytype(int notifytype, void *messagedata);
 

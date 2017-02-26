@@ -130,7 +130,7 @@ int list_destroy(list *l)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //list_add
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int list_add(list *l, const char *key, void *value, void **old_value)
+int list_add(list *l, const wchar_t *key, void *value, void **old_value)
 {
 	if (old_value) *old_value = NULL;
 
@@ -177,7 +177,7 @@ int list_add(list *l, const char *key, void *value, void **old_value)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //list_remove
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int list_remove(list *l, const char *key)
+int list_remove(list *l, const wchar_t *key)
 {
 	//Hash table lookup
 	unsigned char hash_val = hash_func(key);
@@ -213,7 +213,7 @@ int list_remove(list *l, const char *key)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //list_lookup
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void *list_lookup(list *l, const char *key)
+void *list_lookup(list *l, const wchar_t *key)
 {
 	//Shortcut, the last found is cached for quick lookup
 	if (l->last_found && !strcmp(key, l->last_found->key))

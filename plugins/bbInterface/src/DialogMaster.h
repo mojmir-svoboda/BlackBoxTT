@@ -16,7 +16,7 @@
 //Define these functions internally
 int dialog_startup();
 int dialog_shutdown();
-char *dialog_file(const char *filter, const char *title, const char *defaultpath, const char *defaultextension, bool save);
+wchar_t *dialog_file(const wchar_t *filter, const wchar_t *title, const wchar_t *defaultpath, const wchar_t *defaultextension, bool save);
 
 #endif
 /*=================================================*/

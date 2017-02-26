@@ -26,34 +26,34 @@
 #include "ColorMaster.h"
 
 //Global variables
-char szWPx                      [] = "X";
-char szWPy                      [] = "Y";
-char szWPwidth                  [] = "Width";
-char szWPheight                 [] = "Height";
-char szWPtransparency           [] = "Transparency";
-char szWPworkspacenumber        [] = "WorkspaceNumber";
-char szWPisvisible              [] = "IsVisible";
-char szWPisontop                [] = "IsOnTop";
-char szWPissnappy               [] = "IsSnappy";
-char szWPisslitted              [] = "IsSlitted";
-char szWPistransparent          [] = "IsTransparent";
-char szWPistoggledwithplugins   [] = "IsToggledWithPlugins";
-char szWPisonallworkspaces      [] = "IsOnAllWorkspaces";
-char szWPisdetectfullscreen     [] = "DetectFullScreen";
-char szWPisbordered             [] = "Border";
-char szWPStyle                  [] = "Style";
-char szWPStyleWhenPressed       [] = "StyleWhenPressed";
-char szWPautohide               [] = "AutoHide";
-char szWPmakeinvisible          [] = "MakeInvisible";
-char szWPmakeinvisible_never    [] = "Never";
-char szWPmakeinvisible_bbblur   [] = "BBLoseFocus";
-char szWPmakeinvisible_winblur  [] = "WindowLoseFocus";
-char szWPfontname               [] = "FontName";
-char szWPfontname_pressed       [] = "PressedFontName";
-char szWPfontheight             [] = "FontSize";
-char szWPfontheight_pressed     [] = "PressedFontSize";
-char szWPfontweight             [] = "FontBold";
-char szWPfontweight_pressed     [] = "PressedFontBold";
+wchar_t szWPx                      [] = L"X";
+wchar_t szWPy                      [] = L"Y";
+wchar_t szWPwidth                  [] = L"Width";
+wchar_t szWPheight                 [] = L"Height";
+wchar_t szWPtransparency           [] = L"Transparency";
+wchar_t szWPworkspacenumber        [] = L"WorkspaceNumber";
+wchar_t szWPisvisible              [] = L"IsVisible";
+wchar_t szWPisontop                [] = L"IsOnTop";
+wchar_t szWPissnappy               [] = L"IsSnappy";
+wchar_t szWPisslitted              [] = L"IsSlitted";
+wchar_t szWPistransparent          [] = L"IsTransparent";
+wchar_t szWPistoggledwithplugins   [] = L"IsToggledWithPlugins";
+wchar_t szWPisonallworkspaces      [] = L"IsOnAllWorkspaces";
+wchar_t szWPisdetectfullscreen     [] = L"DetectFullScreen";
+wchar_t szWPisbordered             [] = L"Border";
+wchar_t szWPStyle                  [] = L"Style";
+wchar_t szWPStyleWhenPressed       [] = L"StyleWhenPressed";
+wchar_t szWPautohide               [] = L"AutoHide";
+wchar_t szWPmakeinvisible          [] = L"MakeInvisible";
+wchar_t szWPmakeinvisible_never    [] = L"Never";
+wchar_t szWPmakeinvisible_bbblur   [] = L"BBLoseFocus";
+wchar_t szWPmakeinvisible_winblur  [] = L"WindowLoseFocus";
+wchar_t szWPfontname               [] = L"FontName";
+wchar_t szWPfontname_pressed       [] = L"PressedFontName";
+wchar_t szWPfontheight             [] = L"FontSize";
+wchar_t szWPfontheight_pressed     [] = L"PressedFontSize";
+wchar_t szWPfontweight             [] = L"FontBold";
+wchar_t szWPfontweight_pressed     [] = L"PressedFontBold";
 
 
 //Local variables
