@@ -5,11 +5,10 @@ namespace bb {
 
 	CommandLine::CommandLine ()
 		: m_nostartup("n", "nostartup", "Do not run startup programs", false)
-		, m_notaskhook("t", "notaskhook", "Do not run task hook dll", false)
-		, m_notrayhook("y", "notrayhook", "Do not run tray hook dll", false)
+		, m_taskhook("t", "taskhook", "Run task hook dll (dll injection)", false)
+		, m_trayhook("y", "trayhook", "Run tray hook dll (dll injection)", false)
 		, m_configdir("d", "dir", "Specify directory with config files.", false, "", "directory")
 		, m_rcfile("r", "rcfile", "Specify config file.", false, "blackbox.rc", "rc config file")
-		//s_BlackboxConfig
 		, m_yamlfile("f", "yaml", "Specify config file.", false, "blackbox.yaml", "yaml config file")
 		, m_exec("e", "exec", "Send broadcast message to running WM", false, "@broam", "@broam")
 		, m_cmdLine(nullptr)
@@ -26,8 +25,8 @@ namespace bb {
 			{
 				m_cmdLine->setExceptionHandling(false);
 				m_cmdLine->add(m_nostartup);
-				m_cmdLine->add(m_notrayhook);
-				m_cmdLine->add(m_notaskhook);
+				m_cmdLine->add(m_trayhook);
+				m_cmdLine->add(m_taskhook);
 				m_cmdLine->add(m_configdir);
 				m_cmdLine->add(m_rcfile);
 				m_cmdLine->add(m_yamlfile);

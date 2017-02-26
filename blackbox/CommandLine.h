@@ -5,8 +5,8 @@ namespace bb {
 	struct CommandLine
 	{
 		TCLAP::SwitchArg m_nostartup;
-		TCLAP::SwitchArg m_notaskhook;
-		TCLAP::SwitchArg m_notrayhook;
+		TCLAP::SwitchArg m_taskhook;
+		TCLAP::SwitchArg m_trayhook;
 		TCLAP::ValueArg<std::string> m_configdir;
 		TCLAP::ValueArg<std::string> m_rcfile;
 		TCLAP::ValueArg<std::string> m_yamlfile;
@@ -18,8 +18,8 @@ namespace bb {
 		bool Done ();
 
 		bool NoStartup () { return m_nostartup.getValue(); }
-		bool NoTaskHook () { return m_notaskhook.getValue(); }
-		bool NoTrayHook () { return m_notrayhook.getValue(); }
+		bool NoTaskHook () { return !m_taskhook.getValue(); }
+		bool NoTrayHook () { return !m_trayhook.getValue(); }
 		std::string const & YamlFile () const { return m_yamlfile.getValue(); }
 		std::string const & ConfigDir () const { return m_configdir.getValue(); }
 	};
