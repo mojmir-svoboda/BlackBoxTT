@@ -28,7 +28,7 @@
 
 //Local variables
 HWND winamp_hwnd = NULL;
-const char agenttype_winamp_timerclass[] = "BBInterfaceAgentWinamp";
+const wchar_t agenttype_winamp_timerclass[] = L"BBInterfaceAgentWinamp";
 bool agenttype_winamp_windowclassregistered;
 LRESULT CALLBACK agenttype_winamp_event(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 VOID CALLBACK agenttype_winamp_timercall(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
@@ -39,12 +39,12 @@ list *agenttype_winamp_agents;
 //The pieces of data that might be fetched
 bool agenttype_winamp_isplaying = false;
 double agenttype_winamp_trackposition = 0.0;
-char agenttype_winamp_titlebuffer[1024] = "";
-char agenttype_winamp_timeelapsed[32] = "";
-char agenttype_winamp_timeremaining[32] = "";
-char agenttype_winamp_timetotal[32] = "";
-char *agenttype_winamp_currenttitle = agenttype_winamp_titlebuffer;
-char agenttype_winamp_bitrate[32] = "";
+wchar_t agenttype_winamp_titlebuffer[1024] = L"";
+wchar_t agenttype_winamp_timeelapsed[32] = L"";
+wchar_t agenttype_winamp_timeremaining[32] = L"";
+wchar_t agenttype_winamp_timetotal[32] = L"";
+wchar_t *agenttype_winamp_currenttitle = agenttype_winamp_titlebuffer;
+wchar_t agenttype_winamp_bitrate[32] = L"";
 
 //Function prototypes
 bool agenttype_winamp_getwinampwindow();
@@ -63,89 +63,89 @@ void agenttype_winamppoller_updatevalues();
 #define WINAMP_POLLINGTYPE_TIME_TOTAL 6
 #define WINAMP_POLLINGTYPE_BITRATE 7
 
-const char *agenttype_winamp_pollingnames[WINAMP_POLLINGTYPECOUNT] =
+const wchar_t *agenttype_winamp_pollingnames[WINAMP_POLLINGTYPECOUNT] =
 {
-	"None",
-	"IsPlaying",
-	"TrackPosition",
-	"TrackTitle",
-	"TimeElapsed",
-	"TimeRemaining",
-	"TimeTotal",
-	"Bitrate"
+	L"None",
+	L"IsPlaying",
+	L"TrackPosition",
+	L"TrackTitle",
+	L"TimeElapsed",
+	L"TimeRemaining",
+	L"TimeTotal",
+	L"Bitrate"
 };
 
-const char *agenttype_winamp_friendlynames[WINAMP_POLLINGTYPECOUNT] =
+const wchar_t *agenttype_winamp_friendlynames[WINAMP_POLLINGTYPECOUNT] =
 {
-	"None",
-	"Track Is Playing",
-	"Track Position",
-	"Track Title",
-	"Time Elapsed",
-	"Time Remaining",
-	"Time Total",
-	"Bitrate"
+	L"None",
+	L"Track Is Playing",
+	L"Track Position",
+	L"Track Title",
+	L"Time Elapsed",
+	L"Time Remaining",
+	L"Time Total",
+	L"Bitrate"
 };
 
 //Definitions
-struct { int code; const char *string; } winamp_actions[] =
+struct { int code; const wchar_t *string; } winamp_actions[] =
 {
-	{ 40044, "Previous track button"                          },
-	{ 40048, "Next track button"                              },
-	{ 40045, "Play button"                                    },
-	{ 40046, "Pause/Unpause button"                           },
-	{ 40047, "Stop button"                                    },
-	{ 40147, "Fadeout and stop"                               },
-	{ 40157, "Stop after current track"                       },
-	{ 40148, "Fast-forwardseconds"                            },
-	{ 40144, "Fast-rewindseconds"                             },
-	{ 40154, "Start of playlist"                              },
-	{ 40158, "Go to end of playlist "                         },
-	{ 40029, "Open file dialog"                               },
-	{ 40155, "Open URL dialog"                                },
-	{ 40188, "Open file info box"                             },
-	{ 40037, "Set time display mode to elapsed"               },
-	{ 40038, "Set time display mode to remaining"             },
-	{ 40012, "Toggle preferences screen"                      },
-	{ 40190, "Open visualization options"                     },
-	{ 40191, "Open visualization plug-in options"             },
-	{ 40192, "Execute current visualization plug-in"          },
-	{ 40041, "Toggle about box"                               },
-	{ 40189, "Toggle title Autoscrolling"                     },
-	{ 40019, "Toggle always on top"                           },
-	{ 40064, "Toggle Windowshade"                             },
-	{ 40266, "Toggle Playlist Windowshade"                    },
-	{ 40165, "Toggle doublesize mode"                         },
-	{ 40036, "Toggle EQ"                                      },
-	{ 40040, "Toggle playlist editor"                         },
-	{ 40258, "Toggle main window visible"                     },
-	{ 40298, "Toggle minibrowser"                             },
-	{ 40186, "Toggle easymove"                                },
-	{ 40058, "Raise volume by 1%"                             },
-	{ 40059, "Lower volume by 1%"                             },
-	{ 40022, "Toggle repeat"                                  },
-	{ 40023, "Toggle shuffle"                                 },
-	{ 40193, "Open jump to time dialog"                       },
-	{ 40194, "Open jump to file dialog"                       },
-	{ 40219, "Open skin selector"                             },
-	{ 40221, "Configure current visualization plug-in"        },
-	{ 40291, "Reload the current skin"                        },
-	{ 40001, "Close Winamp"                                   },
-	{ 40197, "Moves backtracks in playlist"                   },
-	{ 40320, "Show the edit bookmarks"                        },
-	{ 40321, "Adds current track as a bookmark"               },
-	{ 40323, "Play audio CD"                                  },
-	{ 40253, "Load a preset from EQ"                          },
-	{ 40254, "Save a preset to EQF"                           },
-	{ 40172, "Opens load presets dialog"                      },
-	{ 40173, "Opens auto-load presets dialog"                 },
-	{ 40174, "Load default preset"                            },
-	{ 40175, "Opens save preset dialog"                       },
-	{ 40176, "Opens auto-load save preset"                    },
-	{ 40178, "Opens delete preset dialog"                     },
-	{ 40180, "Opens delete an auto load preset dialog"        },
-	{ 40379, "Show media library"                             },
-	{ 40380, "Hide media library"                             }
+	{ 40044, L"Previous track button"                          },
+	{ 40048, L"Next track button"                              },
+	{ 40045, L"Play button"                                    },
+	{ 40046, L"Pause/Unpause button"                           },
+	{ 40047, L"Stop button"                                    },
+	{ 40147, L"Fadeout and stop"                               },
+	{ 40157, L"Stop after current track"                       },
+	{ 40148, L"Fast-forwardseconds"                            },
+	{ 40144, L"Fast-rewindseconds"                             },
+	{ 40154, L"Start of playlist"                              },
+	{ 40158, L"Go to end of playlist "                         },
+	{ 40029, L"Open file dialog"                               },
+	{ 40155, L"Open URL dialog"                                },
+	{ 40188, L"Open file info box"                             },
+	{ 40037, L"Set time display mode to elapsed"               },
+	{ 40038, L"Set time display mode to remaining"             },
+	{ 40012, L"Toggle preferences screen"                      },
+	{ 40190, L"Open visualization options"                     },
+	{ 40191, L"Open visualization plug-in options"             },
+	{ 40192, L"Execute current visualization plug-in"          },
+	{ 40041, L"Toggle about box"                               },
+	{ 40189, L"Toggle title Autoscrolling"                     },
+	{ 40019, L"Toggle always on top"                           },
+	{ 40064, L"Toggle Windowshade"                             },
+	{ 40266, L"Toggle Playlist Windowshade"                    },
+	{ 40165, L"Toggle doublesize mode"                         },
+	{ 40036, L"Toggle EQ"                                      },
+	{ 40040, L"Toggle playlist editor"                         },
+	{ 40258, L"Toggle main window visible"                     },
+	{ 40298, L"Toggle minibrowser"                             },
+	{ 40186, L"Toggle easymove"                                },
+	{ 40058, L"Raise volume by 1%"                             },
+	{ 40059, L"Lower volume by 1%"                             },
+	{ 40022, L"Toggle repeat"                                  },
+	{ 40023, L"Toggle shuffle"                                 },
+	{ 40193, L"Open jump to time dialog"                       },
+	{ 40194, L"Open jump to file dialog"                       },
+	{ 40219, L"Open skin selector"                             },
+	{ 40221, L"Configure current visualization plug-in"        },
+	{ 40291, L"Reload the current skin"                        },
+	{ 40001, L"Close Winamp"                                   },
+	{ 40197, L"Moves backtracks in playlist"                   },
+	{ 40320, L"Show the edit bookmarks"                        },
+	{ 40321, L"Adds current track as a bookmark"               },
+	{ 40323, L"Play audio CD"                                  },
+	{ 40253, L"Load a preset from EQ"                          },
+	{ 40254, L"Save a preset to EQF"                           },
+	{ 40172, L"Opens load presets dialog"                      },
+	{ 40173, L"Opens auto-load presets dialog"                 },
+	{ 40174, L"Load default preset"                            },
+	{ 40175, L"Opens save preset dialog"                       },
+	{ 40176, L"Opens auto-load save preset"                    },
+	{ 40178, L"Opens delete preset dialog"                     },
+	{ 40180, L"Opens delete an auto load preset dialog"        },
+	{ 40379, L"Show media library"                             },
+	{ 40380, L"Hide media library"                             }
 };
 
 const int winamp_actions_count = array_count(winamp_actions);
@@ -177,8 +177,8 @@ int agenttype_winamp_startup()
 
 	//Register this type with the ControlMaster
 	agent_registertype(
-		"Winamp",                           //Friendly name of agent type
-		"Winamp",                           //Name of agent type
+		L"Winamp",                           //Friendly name of agent type
+		L"Winamp",                           //Name of agent type
 		CONTROL_FORMAT_TRIGGER,             //Control format
 		true,
 		&agenttype_winamp_create,           
@@ -193,8 +193,8 @@ int agenttype_winamp_startup()
 
 	//Register this type with the ControlMaster
 	agent_registertype(
-		"Winamp",                           //Friendly name of agent type
-		"WinampScale",                      //Name of agent type
+		L"Winamp",                           //Friendly name of agent type
+		L"WinampScale",                      //Name of agent type
 		CONTROL_FORMAT_SCALE,               //Control format
 		true,
 		&agenttype_winamppoller_create,           
@@ -209,8 +209,8 @@ int agenttype_winamp_startup()
 
 	//Register this type with the ControlMaster
 	agent_registertype(
-		"Winamp",                           //Friendly name of agent type
-		"WinampBool",                       //Name of agent type
+		L"Winamp",                           //Friendly name of agent type
+		L"WinampBool",                       //Name of agent type
 		CONTROL_FORMAT_BOOL,                //Control format
 		false,
 		&agenttype_winamppoller_create,           
@@ -225,8 +225,8 @@ int agenttype_winamp_startup()
 
 	//Register this type with the ControlMaster
 	agent_registertype(
-		"Winamp",                           //Friendly name of agent type
-		"WinampText",                       //Name of agent type
+		L"Winamp",                           //Friendly name of agent type
+		L"WinampText",                       //Name of agent type
 		CONTROL_FORMAT_TEXT,                //Control format
 		true,
 		&agenttype_winamppoller_create,           
@@ -264,9 +264,9 @@ int agenttype_winamp_shutdown()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_winamp_create
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agenttype_winamp_create(agent *a, char *parameterstring)
+int agenttype_winamp_create(agent *a, wchar_t *parameterstring)
 {
-	int code = atoi(parameterstring);
+	int code = _wtoi(parameterstring);
 	if (code < 40001 || code > 40394) return 1;
 
 	//Create the details
@@ -284,17 +284,17 @@ int agenttype_winamp_create(agent *a, char *parameterstring)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_winamp_create
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agenttype_winamppoller_create(agent *a, char *parameterstring)
+int agenttype_winamppoller_create(agent *a, wchar_t *parameterstring)
 {
 	//Figure out what type of agent this is
 	int commandcode = 0;	
-	if (!_stricmp(a->agenttypeptr->agenttypename, "WinampScale") && !_stricmp(parameterstring, "TrackPosition")) commandcode = WINAMP_POLLINGTYPE_POSITION;
-	else if (!_stricmp(a->agenttypeptr->agenttypename, "WinampBool") && !_stricmp(parameterstring, "IsPlaying")) commandcode = WINAMP_POLLINGTYPE_ISPLAYING;
+	if (!_wcsicmp(a->agenttypeptr->agenttypename, L"WinampScale") && !_wcsicmp(parameterstring, L"TrackPosition")) commandcode = WINAMP_POLLINGTYPE_POSITION;
+	else if (!_wcsicmp(a->agenttypeptr->agenttypename, L"WinampBool") && !_wcsicmp(parameterstring, L"IsPlaying")) commandcode = WINAMP_POLLINGTYPE_ISPLAYING;
 	else
 	{
 		for (int i = WINAMP_POLLINGTYPE_LASTSCALE + 1; i < WINAMP_POLLINGTYPECOUNT; i++)
 		{
-			if (!_stricmp(a->agenttypeptr->agenttypename, "WinampText") && !_stricmp(parameterstring, agenttype_winamp_pollingnames[i])) commandcode = i;
+			if (!_wcsicmp(a->agenttypeptr->agenttypename, L"WinampText") && !_wcsicmp(parameterstring, agenttype_winamp_pollingnames[i])) commandcode = i;
 		}
 	}
 	if (commandcode == 0) return 1;
@@ -303,8 +303,8 @@ int agenttype_winamppoller_create(agent *a, char *parameterstring)
 	//If it is an invalid agent code, say so
 	if (commandcode == 0)
 	{
-		char tempstring[1000];
-		sprintf(tempstring, "There was an error setting the WinAmp agent:\n\nThe type %s %s is not a valid type.", a->agenttypeptr->agenttypename, parameterstring);
+		wchar_t tempstring[1000];
+		swprintf(tempstring, 1000, L"There was an error setting the WinAmp agent:\n\nThe type %s %s is not a valid type.", a->agenttypeptr->agenttypename, parameterstring);
 		if (!plugin_suppresserrors) BBMessageBox(NULL, tempstring, szAppName, MB_OK|MB_SYSTEMMODAL);
 		return 1;
 	}
@@ -317,8 +317,8 @@ int agenttype_winamppoller_create(agent *a, char *parameterstring)
 	bool first = (agenttype_winamp_agents->first == NULL ? true : false);
 
 	//Create a unique string to assign to this (just a number from a counter)
-	char identifierstring[64];
-	sprintf(identifierstring, "%ul", agenttype_winamp_counter);
+	wchar_t identifierstring[64];
+	swprintf(identifierstring, 64, L"%ul", agenttype_winamp_counter);
 	details->internal_identifier = new_string(identifierstring);
 
 	//Add this to our internal tracking list
@@ -475,7 +475,7 @@ void *agenttype_winamppoller_getdata(agent *a, int datatype)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_winamp_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_winamp_menu_set(Menu *m, control *c, agent *a,  char *action, int controlformat)
+void agenttype_winamp_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
 	int set = -1;
 	if (a)
@@ -486,34 +486,34 @@ void agenttype_winamp_menu_set(Menu *m, control *c, agent *a,  char *action, int
 
 	for (int i = 0; i < winamp_actions_count; i++)
 	{
-		make_menuitem_bol(m, winamp_actions[i].string, config_getfull_control_setagent_i(c, action, "Winamp", &winamp_actions[i].code), set == winamp_actions[i].code);
+		make_menuitem_bol(m, winamp_actions[i].string, config_getfull_control_setagent_i(c, action, L"Winamp", &winamp_actions[i].code), set == winamp_actions[i].code);
 	}
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_winamppoller_bool_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_winamppoller_bool_menu_set(Menu *m, control *c, agent *a,  char *action, int controlformat)
+void agenttype_winamppoller_bool_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
-	make_menuitem_cmd(m, "Track Is Playing", config_getfull_control_setagent_c(c, action, "WinampBool", "IsPlaying"));
+	make_menuitem_cmd(m, L"Track Is Playing", config_getfull_control_setagent_c(c, action, L"WinampBool", L"IsPlaying"));
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_winamppoller_scale_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_winamppoller_scale_menu_set(Menu *m, control *c, agent *a,  char *action, int controlformat)
+void agenttype_winamppoller_scale_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
-	make_menuitem_cmd(m, "Track Position", config_getfull_control_setagent_c(c, action, "WinampScale", "TrackPosition"));
+	make_menuitem_cmd(m, L"Track Position", config_getfull_control_setagent_c(c, action, L"WinampScale", L"TrackPosition"));
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_winamppoller_text_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_winamppoller_text_menu_set(Menu *m, control *c, agent *a,  char *action, int controlformat)
+void agenttype_winamppoller_text_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
 	for (int i = WINAMP_POLLINGTYPE_LASTSCALE + 1; i < WINAMP_POLLINGTYPECOUNT; i++)
 	{
-		make_menuitem_cmd(m, agenttype_winamp_friendlynames[i], config_getfull_control_setagent_c(c, action, "WinampText", agenttype_winamp_pollingnames[i]));
+		make_menuitem_cmd(m, agenttype_winamp_friendlynames[i], config_getfull_control_setagent_c(c, action, L"WinampText", agenttype_winamp_pollingnames[i]));
 	}
 }
 
@@ -523,7 +523,7 @@ void agenttype_winamppoller_text_menu_set(Menu *m, control *c, agent *a,  char *
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void agenttype_winamp_menu_context(Menu *m, agent *a)
 {
-	make_menuitem_nop(m, "No options available.");
+	make_menuitem_nop(m, L"No options available.");
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -549,7 +549,7 @@ bool agenttype_winamp_getwinampwindow()
 {
 	if (!winamp_hwnd || !IsWindow(winamp_hwnd))
 	{
-		winamp_hwnd = FindWindow("Winamp v1.x",NULL); 
+		winamp_hwnd = FindWindow(L"Winamp v1.x",NULL); 
 	}
 	return (winamp_hwnd == NULL ? false : true);
 }
@@ -630,10 +630,10 @@ void agenttype_winamppoller_updatevalues()
 					agenttype_winamp_trackposition = currentposition;
 
 					//Write text fields if necessary
-					if (needsupdate[WINAMP_POLLINGTYPE_TIME_ELAPSED]) sprintf(agenttype_winamp_timeelapsed, "%d:%02d", currentmilliseconds / 60000, (currentmilliseconds / 1000) % 60);
-					if (needsupdate[WINAMP_POLLINGTYPE_TIME_REMAINING]) sprintf(agenttype_winamp_timeremaining, "%d:%02d", (length_seconds - currentmilliseconds/1000)/60, (length_seconds - currentmilliseconds/1000) % 60);
-					if (needsupdate[WINAMP_POLLINGTYPE_TIME_TOTAL]) sprintf(agenttype_winamp_timetotal, "%d:%02d", (length_seconds / 60), (length_seconds % 60));
-					if (needsupdate[WINAMP_POLLINGTYPE_BITRATE]) sprintf(agenttype_winamp_bitrate, "%d", bitrate);
+					if (needsupdate[WINAMP_POLLINGTYPE_TIME_ELAPSED]) swprintf(agenttype_winamp_timeelapsed, 32, L"%d:%02d", currentmilliseconds / 60000, (currentmilliseconds / 1000) % 60);
+					if (needsupdate[WINAMP_POLLINGTYPE_TIME_REMAINING]) swprintf(agenttype_winamp_timeremaining, 32, L"%d:%02d", (length_seconds - currentmilliseconds/1000)/60, (length_seconds - currentmilliseconds/1000) % 60);
+					if (needsupdate[WINAMP_POLLINGTYPE_TIME_TOTAL]) swprintf(agenttype_winamp_timetotal, 32, L"%d:%02d", (length_seconds / 60), (length_seconds % 60));
+					if (needsupdate[WINAMP_POLLINGTYPE_BITRATE]) swprintf(agenttype_winamp_bitrate, 32, L"%d", bitrate);
 				}
 			}
 
@@ -645,8 +645,8 @@ void agenttype_winamppoller_updatevalues()
 				agenttype_winamp_currenttitle = agenttype_winamp_titlebuffer;
 
 				//Strip off the "Winamp" at the end
-				char *winamptitle = strstr(agenttype_winamp_titlebuffer, " - Winamp");
-				if (winamptitle != NULL) winamptitle[0] = '\0';
+				wchar_t *winamptitle = wcsstr(agenttype_winamp_titlebuffer, L" - Winamp");
+				if (winamptitle != NULL) winamptitle[0] = L'\0';
 
 				//See if there is a number number number dot space
 				int i;
@@ -668,12 +668,12 @@ void agenttype_winamppoller_updatevalues()
 			agenttype_winamp_isplaying = false;
 			agenttype_winamp_trackposition = 0.0;
 			agenttype_winamp_trackposition = 0.0;
-			strcpy(agenttype_winamp_titlebuffer, "");
+			wcscpy(agenttype_winamp_titlebuffer, L"");
 			agenttype_winamp_currenttitle = agenttype_winamp_titlebuffer;
-			sprintf(agenttype_winamp_timeelapsed, "");
-			sprintf(agenttype_winamp_timeremaining, "");
-			sprintf(agenttype_winamp_timetotal, "");
-			sprintf(agenttype_winamp_bitrate, "");
+			wsprintf(agenttype_winamp_timeelapsed, L"");
+			wsprintf(agenttype_winamp_timeremaining, L"");
+			wsprintf(agenttype_winamp_timetotal, L"");
+			wsprintf(agenttype_winamp_bitrate, L"");
 		}
 
 		//Go through every agent

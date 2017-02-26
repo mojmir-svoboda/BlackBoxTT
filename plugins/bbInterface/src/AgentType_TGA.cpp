@@ -23,7 +23,7 @@
 #include "Shellapi.h"
 
 //Local functions
-HBITMAP agenttype_tga_loadtga(const char *filename);
+HBITMAP agenttype_tga_loadtga(const wchar_t *filename);
 
 //Local structs
 #pragma pack(push, 1)
@@ -51,8 +51,8 @@ int agenttype_tga_startup()
 {
 	//Register this type with the ControlMaster
 	agent_registertype(
-		"TGA",                          //Friendly name of agent type
-		"TGA",                          //Name of agent type
+		L"TGA",                          //Friendly name of agent type
+		L"TGA",                          //Name of agent type
 		CONTROL_FORMAT_IMAGE,               //Control type
 		true,
 		&agenttype_tga_create,          
@@ -81,12 +81,12 @@ int agenttype_tga_shutdown()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_tga_create
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agenttype_tga_create(agent *a, char *parameterstring)
+int agenttype_tga_create(agent *a, wchar_t *parameterstring)
 {
 	//If the browse option is chosen
-	if (!_stricmp(parameterstring, "*browse*"))
+	if (!_wcsicmp(parameterstring, L"*browse*"))
 	{       
-		parameterstring = dialog_file("TGA Images\0*.tga\0", "Select TGA", config_path_plugin, ".tga", false);
+		parameterstring = dialog_file(L"TGA Images\0*.tga\0", L"Select TGA", config_path_plugin, L".tga", false);
 		if (!parameterstring)
 		{
 			//message_override = true;
@@ -94,10 +94,10 @@ int agenttype_tga_create(agent *a, char *parameterstring)
 		}
 
 		//If we have an absolute path, and only a relative path is necessary
-		int lenpath = strlen(config_path_plugin);
-		if (!_strnicmp(config_path_plugin, parameterstring, lenpath-1))
+		int lenpath = wcslen(config_path_plugin);
+		if (!_wcsnicmp(config_path_plugin, parameterstring, lenpath-1))
 		{
-			strcpy(parameterstring, &parameterstring[lenpath]);           
+			wcscpy(parameterstring, &parameterstring[lenpath]);           
 		}
 	}
 
@@ -106,9 +106,9 @@ int agenttype_tga_create(agent *a, char *parameterstring)
 	image = agenttype_tga_loadtga(parameterstring);
 	if (!image)
 	{
-		char *temp = new char[MAX_PATH*2];
-		strcpy(temp, config_path_plugin);
-		strcat(temp, parameterstring);
+		wchar_t *temp = new wchar_t[MAX_PATH*2];
+		wcscpy(temp, config_path_plugin);
+		wcscat(temp, parameterstring);
 		image = agenttype_tga_loadtga(temp);
 		delete[] temp;
 		if (!image)
@@ -207,10 +207,10 @@ void *agenttype_tga_getdata(agent *a, int datatype)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_tga_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_tga_menu_set(Menu *m, control *c, agent *a,  char *action, int controlformat)
+void agenttype_tga_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
-	make_menuitem_cmd(m, "Browse...", config_getfull_control_setagent_c(c, action, "TGA", "*browse*"));
-	make_menuitem_nop(m, "(Uncompressed 32bpp TGAs only!");
+	make_menuitem_cmd(m, L"Browse...", config_getfull_control_setagent_c(c, action, L"TGA", L"*browse*"));
+	make_menuitem_nop(m, L"(Uncompressed 32bpp TGAs only!");
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -218,7 +218,7 @@ void agenttype_tga_menu_set(Menu *m, control *c, agent *a,  char *action, int co
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void agenttype_tga_menu_context(Menu *m, agent *a)
 {
-	make_menuitem_nop(m, "No options available.");
+	make_menuitem_nop(m, L"No options available.");
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -232,7 +232,7 @@ void agenttype_tga_notifytype(int notifytype, void *messagedata)
 //##################################################
 //agenttype_tga_loadtga
 //##################################################
-HBITMAP agenttype_tga_loadtga(const char *filename)
+HBITMAP agenttype_tga_loadtga(const wchar_t *filename)
 {
 	//Variables
 	TGAHeader header;

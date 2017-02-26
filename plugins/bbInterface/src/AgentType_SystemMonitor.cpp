@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 #include "utils/core_load.h"
-#include <blackbox/worker.h>
+#include <bblib/bbstring.h>
 
 VOID CALLBACK agenttype_systemmonitor_timercall(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
 LRESULT CALLBACK agenttype_systemmonitor_event(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -30,7 +30,7 @@ struct SystemMonitor
 	long double m_agenttype_systemmonitor_last_system_time;
 	long double m_agenttype_systemmonitor_last_idle_time;
 	unsigned long m_agenttype_systemmonitor_counter;
-	std::string m_agenttype_systemmonitor_timerclass;
+	bbstring m_agenttype_systemmonitor_timerclass;
 
 	list * m_agenttype_systemmonitor_agents; //A list of this type of agent
 	bool m_agenttype_systemmonitor_hastimer;
@@ -42,7 +42,7 @@ struct SystemMonitor
 		, m_agenttype_systemmonitor_last_system_time(0.0)
 		, m_agenttype_systemmonitor_last_idle_time(0.0)
 		, m_agenttype_systemmonitor_counter(0)
-		, m_agenttype_systemmonitor_timerclass("BBInterfaceAgentSystemMon")
+		, m_agenttype_systemmonitor_timerclass(L"BBInterfaceAgentSystemMon")
 		, m_agenttype_systemmonitor_agents(nullptr)
 		, m_agenttype_systemmonitor_hastimer(false)
 	{ }
@@ -70,41 +70,41 @@ enum SYSTEMMONITOR_TYPE
 };
 
 //Must match the enum ordering above! Must have SYSTEMMONITOR_NUMTYPES entries
-const char *agenttype_systemmonitor_types[] =
+const wchar_t *agenttype_systemmonitor_types[] =
 {
-	"None", // Unused
-	"CPUUsage",
-	"PhysicalMemoryFree",
-	"PhysicalMemoryUsed",
-	"VirtualMemoryFree",
-	"VirtualMemoryUsed",
-	"PageFileFree",
-	"PageFileUsed",
-	"BatteryPower",
-	"CoreUsage"
+	L"None", // Unused
+	L"CPUUsage",
+	L"PhysicalMemoryFree",
+	L"PhysicalMemoryUsed",
+	L"VirtualMemoryFree",
+	L"VirtualMemoryUsed",
+	L"PageFileFree",
+	L"PageFileUsed",
+	L"BatteryPower",
+	L"CoreUsage"
 };
 
 //Must match the enum ordering above! Must have SYSTEMMONITOR_NUMTYPES entries
-const char *agenttype_systemmonitor_friendlytypes[] =
+const wchar_t *agenttype_systemmonitor_friendlytypes[] =
 {
-	"None", // Unused
-	"CPU Usage",
-	"Physical Memory Free",
-	"Physical Memory Used",
-	"Virtual Memory Free",
-	"Virtual Memory Used",
-	"Page File Free",
-	"Page File Used",
-	"Battery Power",
-	"Core Usages",
-	"Core Usage"
+	L"None", // Unused
+	L"CPU Usage",
+	L"Physical Memory Free",
+	L"Physical Memory Used",
+	L"Virtual Memory Free",
+	L"Virtual Memory Used",
+	L"Page File Free",
+	L"Page File Used",
+	L"Battery Power",
+	L"Core Usages",
+	L"Core Usage"
 };
 
 bool is2kxp = false;
 
 struct agenttype_systemmonitor_details
 {
-	char const * internal_identifier;
+	wchar_t const * internal_identifier;
 	SYSTEMMONITOR_TYPE monitor_type;
 	size_t monitor_index;
 	int m_int_arg;
@@ -175,8 +175,8 @@ int agenttype_systemmonitor_startup ()
 		//If we got this far, we can successfully use this function
 		//Register this type with the AgentMaster
 		agent_registertype(
-			"System Monitor",                   //Friendly name of agent type
-			"SystemMonitor",                    //Name of agent type
+			L"System Monitor",                   //Friendly name of agent type
+			L"SystemMonitor",                    //Name of agent type
 			CONTROL_FORMAT_SCALE | CONTROL_FORMAT_TEXT,				//Control type
 			false,
 			&agenttype_systemmonitor_create,
@@ -209,7 +209,7 @@ bool SystemMonitor::Init ()
 	if (window_helper_register(m_agenttype_systemmonitor_timerclass.c_str(), &agenttype_systemmonitor_event))
 	{
 		//Couldn't register the window
-		BBMessageBox(NULL, "failed on register class", "test", MB_OK);
+		BBMessageBox(NULL, L"failed on register class", "test", MB_OK);
 		return false;
 	}
 	m_agenttype_systemmonitor_windowclassregistered = true;
@@ -219,7 +219,7 @@ bool SystemMonitor::Init ()
 	if (!m_agenttype_systemmonitor_window)
 	{
 		//Couldn't create the window
-		BBMessageBox(NULL, "failed on window", "test", MB_OK);
+		BBMessageBox(NULL, L"failed on window", "test", MB_OK);
 		return false;
 	}
 
@@ -227,7 +227,7 @@ bool SystemMonitor::Init ()
 	if (is2kxp)
 	{
 		m_agenttype_systemmonitor_ntdllmodule = NULL;
-		m_agenttype_systemmonitor_ntdllmodule = LoadLibrary("ntdll.dll");
+		m_agenttype_systemmonitor_ntdllmodule = LoadLibrary(L"ntdll.dll");
 
 		//Check to make sure it loaded properly
 		if (m_agenttype_systemmonitor_ntdllmodule == NULL)
@@ -235,7 +235,7 @@ bool SystemMonitor::Init ()
 			//We couldn't load the NTDLL library
 			//Return immediately
 			return false;
-			BBMessageBox(NULL, "failed on ntdll", "test", MB_OK);
+			BBMessageBox(NULL, L"failed on ntdll", L"test", MB_OK);
 		}
 
 		//Get the NtQuerySystemInformation function
@@ -247,7 +247,7 @@ bool SystemMonitor::Init ()
 		{
 			//Error - couldn't get the function call
 			FreeLibrary(m_agenttype_systemmonitor_ntdllmodule);
-			BBMessageBox(NULL, "failed on get proc address", "test", MB_OK);
+			BBMessageBox(NULL, L"failed on get proc address", L"test", MB_OK);
 			return false;
 		}
 
@@ -261,7 +261,7 @@ bool SystemMonitor::Init ()
 		if (m_agenttype_systemmonitor_number_processors < 1 || m_agenttype_systemmonitor_number_processors > 64)
 		{
 			FreeLibrary(m_agenttype_systemmonitor_ntdllmodule);
-			BBMessageBox(NULL, "failed on number of processors", "test", MB_OK);
+			BBMessageBox(NULL, L"failed on number of processors", "test", MB_OK);
 			return false;
 		}
 	}
@@ -308,15 +308,15 @@ int agenttype_systemmonitor_shutdown()
 	return 0;
 }
 
-SYSTEMMONITOR_TYPE findMonitorType (char const * str)
+SYSTEMMONITOR_TYPE findMonitorType (wchar_t const * str)
 {
 	//Find the monitor type
 	int monitor_type = SYSTEMMONITOR_TYPE_NONE;
 	for (int i = 1; i < SYSTEMMONITOR_NUMTYPES; i++)
 	{
-		std::string const t = agenttype_systemmonitor_types[i]; // hm, inefficient
-		std::size_t found = std::string(str).find(t);
-		if (found != std::string::npos)
+		bbstring const t = agenttype_systemmonitor_types[i]; // hm, inefficient
+		std::size_t found = bbstring(str).find(t);
+		if (found != bbstring::npos)
 		{
 			monitor_type = i;
 			break;
@@ -328,12 +328,12 @@ SYSTEMMONITOR_TYPE findMonitorType (char const * str)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_systemmonitor_create
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agenttype_systemmonitor_create (agent * a, char * parameterstring)
+int agenttype_systemmonitor_create (agent * a, wchar_t * parameterstring)
 {
 	if (0 == * parameterstring)
 		return 2; // no param, no agent
 
-	std::string arg(parameterstring);
+	bbstring arg(parameterstring);
 	SYSTEMMONITOR_TYPE const monitor_type = findMonitorType(parameterstring);
 
 	//If we didn't find a correct monitor type
@@ -342,8 +342,8 @@ int agenttype_systemmonitor_create (agent * a, char * parameterstring)
 		//On an error
 		if (!plugin_suppresserrors)
 		{
-			char buffer[1024];
-			_snprintf_s(buffer, 1024, "There was an error setting the System Monitor agent:\n\nType \"%s\" is not a valid type.", parameterstring);
+			wchar_t buffer[1024];
+			swprintf(buffer, 1024, L"There was an error setting the System Monitor agent:\n\nType \"%s\" is not a valid type.", parameterstring);
 			BBMessageBox(NULL, buffer, szAppName, MB_OK|MB_SYSTEMMODAL);
 		}
 		return 1;
@@ -356,13 +356,13 @@ int agenttype_systemmonitor_create (agent * a, char * parameterstring)
 	if (monitor_type == SYSTEMMONITOR_TYPE_COREUSAGE)
 	{
 		//parse for core number
-		std::string core_arg = arg.substr(strlen(agenttype_systemmonitor_types[SYSTEMMONITOR_TYPE_COREUSAGE]));
-		details->m_int_arg = atoi(core_arg.c_str()); //@TODO: err handling
+		bbstring core_arg = arg.substr(wcslen(agenttype_systemmonitor_types[SYSTEMMONITOR_TYPE_COREUSAGE]));
+		details->m_int_arg = _wtoi(core_arg.c_str()); //@TODO: err handling
 	}
 
 	//Create a unique string to assign to this (just a number from a counter)
-	char identifierstring[64];
-	sprintf(identifierstring, "%ul", g_sysMon->m_agenttype_systemmonitor_counter);
+	wchar_t identifierstring[64];
+	swprintf(identifierstring, 64, L"%ul", g_sysMon->m_agenttype_systemmonitor_counter);
 	details->internal_identifier = new_string(identifierstring);
 
 	//Set the details
@@ -426,9 +426,9 @@ void agenttype_systemmonitor_notify (agent * a, int notifytype, void * messageda
 		case NOTIFY_SAVE_AGENT:
 		{
 			//Write existance
-			std::string type(agenttype_systemmonitor_types[details->monitor_type]);
+			bbstring type(agenttype_systemmonitor_types[details->monitor_type]);
 			if (details->monitor_type == SYSTEMMONITOR_TYPE_COREUSAGE)
-				type += std::to_string(details->m_int_arg);
+				type += std::to_wstring(details->m_int_arg);
 			config_write(config_get_control_setagent_c(a->controlptr, a->agentaction, a->agenttypeptr->agenttypename, type.c_str()));
 			break;
 		}
@@ -456,23 +456,23 @@ void * agenttype_systemmonitor_getdata (agent * a, int datatype)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_systemmonitor_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_systemmonitor_menu_set (Menu * m, control * c, agent * a,  char * action, int controlformat)
+void agenttype_systemmonitor_menu_set (Menu * m, control * c, agent * a,  wchar_t * action, int controlformat)
 {
 	//Add a menu item for every type (except none and core usage)
 	for (int i = 1; i < SYSTEMMONITOR_TYPE_COREUSAGE; i++)
 	{
-		make_menuitem_cmd(m, agenttype_systemmonitor_friendlytypes[i], config_getfull_control_setagent_c(c, action, "SystemMonitor", agenttype_systemmonitor_types[i]));
+		make_menuitem_cmd(m, agenttype_systemmonitor_friendlytypes[i], config_getfull_control_setagent_c(c, action, L"SystemMonitor", agenttype_systemmonitor_types[i]));
 	}
 
 	//make menu for cores
 	for (size_t i = 0, ie = g_sysMon->m_coreLoad.GetCoreCount(); i < ie; ++i)
 	{
-		std::string friendly(agenttype_systemmonitor_friendlytypes[SYSTEMMONITOR_TYPE_COREUSAGE]);
-		friendly += std::to_string(i);
-		std::string type(agenttype_systemmonitor_types[SYSTEMMONITOR_TYPE_COREUSAGE]);
-		type += std::to_string(i);
+		bbstring friendly(agenttype_systemmonitor_friendlytypes[SYSTEMMONITOR_TYPE_COREUSAGE]);
+		friendly += std::to_wstring(i);
+		bbstring type(agenttype_systemmonitor_types[SYSTEMMONITOR_TYPE_COREUSAGE]);
+		type += std::to_wstring(i);
 
-		make_menuitem_cmd(m, friendly.c_str(), config_getfull_control_setagent_c(c, action, "SystemMonitor", type.c_str()));
+		make_menuitem_cmd(m, friendly.c_str(), config_getfull_control_setagent_c(c, action, L"SystemMonitor", type.c_str()));
 	}
 }
 
@@ -481,7 +481,7 @@ void agenttype_systemmonitor_menu_set (Menu * m, control * c, agent * a,  char *
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void agenttype_systemmonitor_menu_context (Menu * m, agent * a)
 {
-	make_menuitem_nop(m, "No options available.");
+	make_menuitem_nop(m, L"No options available.");
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_systemmonitor_notifytype
@@ -603,9 +603,9 @@ void update_cpu_usage (agenttype_systemmonitor_details const * details)
 		DWORD dwType;
 		DWORD dwCpuUsage;
 
-		RegOpenKeyEx(HKEY_DYN_DATA, "PerfStats\\StatData", 0, KEY_QUERY_VALUE, &hkey);
+		RegOpenKeyEx(HKEY_DYN_DATA, L"PerfStats\\StatData", 0, KEY_QUERY_VALUE, &hkey);
 		dwDataSize = sizeof(dwCpuUsage);
-		RegQueryValueEx(hkey, "KERNEL\\CPUUsage", NULL, &dwType, (LPBYTE)&dwCpuUsage, &dwDataSize);
+		RegQueryValueEx(hkey, L"KERNEL\\CPUUsage", NULL, &dwType, (LPBYTE)&dwCpuUsage, &dwDataSize);
 		RegCloseKey(hkey);
 
 		g_monitors[monitor_index].m_value = ((double)dwCpuUsage) / 100;
