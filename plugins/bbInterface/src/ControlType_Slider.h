@@ -55,9 +55,9 @@ int controltype_slider_create(control *c);
 int controltype_slider_destroy(control *c);
 LRESULT controltype_slider_event(control *c, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 void controltype_slider_notify(control *c, int notifytype, void *messagedata);
-int controltype_slider_message(control *c, int tokencount, char *tokens[]);
+int controltype_slider_message(control *c, int tokencount, wchar_t *tokens[]);
 void *controltype_slider_getdata(control *c, int datatype);
-bool controltype_slider_getstringdata(control *c, char *buffer, char *propertyname);
+bool controltype_slider_getstringdata(control *c, wchar_t *buffer, wchar_t *propertyname);
 void controltype_slider_menu_context(Menu *m, control *c);
 void controltype_slider_notifytype(int notifytype, void *messagedata);
 

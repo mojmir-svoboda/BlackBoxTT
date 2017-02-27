@@ -517,9 +517,9 @@ static int config_load2(char *filename, module* caller)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //plugin_message
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int plugin_message(int tokencount, char *tokens[], bool from_core, module* caller)
+int plugin_message(int tokencount, wchar_t *tokens[], bool from_core, module* caller)
 {
-	char *filename;
+	wchar_t *filename;
 
 	if (tokencount == 3 && !_stricmp(tokens[2], szBActionSave))
 	{

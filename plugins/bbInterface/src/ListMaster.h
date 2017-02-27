@@ -17,7 +17,7 @@ struct listnode;
 //Define these structures
 struct listnode
 {
-	char key[96];
+	wchar_t key[96];
 	void *value;
 
 	listnode *next;

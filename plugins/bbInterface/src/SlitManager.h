@@ -18,7 +18,7 @@ typedef struct PluginInfo
 	HWND hwnd;
 	WNDPROC wp;
 	HMODULE hMO;
-	char module_name[96];
+	wchar_t module_name[96];
 
 	// the window sizes
 	int width;
@@ -36,8 +36,8 @@ typedef struct ModuleInfo
 {
 	struct ModuleInfo *next;
 	HMODULE hMO;
-	char file_name[MAX_PATH];
-	char module_name[96];
+	wchar_t file_name[MAX_PATH];
+	wchar_t module_name[96];
 	int (*endPlugin)(HINSTANCE hMainInstance);
 	LPCSTR (*pluginInfo)(int);
 
@@ -46,12 +46,12 @@ typedef struct ModuleInfo
 
 //=============================================================================
 // SlitManager functions
-ModuleInfo *loadPlugin(ModuleInfo **, HWND hSlit, const char *module_name);
-bool unloadPlugin(ModuleInfo **, const char *module_name);
+ModuleInfo *loadPlugin(ModuleInfo **, HWND hSlit, const wchar_t *module_name);
+bool unloadPlugin(ModuleInfo **, const wchar_t *module_name);
 int SlitWndProc(control *c, HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-bool plugin_getset_show_state(PluginInfo *PI, char *module_name, int state);
-bool plugin_setpos(PluginInfo *PI, char *module_name, int x, int y);
-void aboutPlugins(ModuleInfo *m, const char *);
+bool plugin_getset_show_state(PluginInfo *PI, wchar_t *module_name, int state);
+bool plugin_setpos(PluginInfo *PI, wchar_t *module_name, int x, int y);
+void aboutPlugins(ModuleInfo *m, const wchar_t *);
 
 //=============================================================================
 #endif

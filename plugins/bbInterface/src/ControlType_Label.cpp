@@ -40,11 +40,11 @@ const int controltype_frame_data_maximumwidth = 1024;
 
 const int FRAME_TITLEBAR_HEIGHT = 20;
 
-const char *label_haligns[] = {"Center", "Left", "Right", NULL};
-const char *label_valigns[] = {"Center", "Top", "Bottom", "TopWrap", NULL};
+const wchar_t *label_haligns[] = {L"Center", L"Left", L"Right", NULL};
+const wchar_t *label_valigns[] = {L"Center", L"Top", L"Bottom", L"TopWrap", NULL};
 
 //Agents
-char *controltype_label_agentnames[] = {"Caption", "Image", "RightMouseUp", "OnDrop"};
+wchar_t *controltype_label_agentnames[] = {L"Caption", L"Image", L"RightMouseUp", L"OnDrop"};
 int controltype_label_agenttypes[] = {CONTROL_FORMAT_TEXT, CONTROL_FORMAT_IMAGE, CONTROL_FORMAT_TRIGGER, CONTROL_FORMAT_DROP};
 
 //Indexes
@@ -56,8 +56,8 @@ enum CONTROLTYPE_LABEL_AGENT {
 };
 const int CONTROLTYPE_LABEL_AGENT_COUNT = 4;
 
-const char szBActionPlugin [] = "ExternalPlugin";
-const char szBActionPluginSetProperty [] = "SetProperty";
+const wchar_t szBActionPlugin [] = L"ExternalPlugin";
+const wchar_t szBActionPluginSetProperty [] = L"SetProperty";
 
 //Local functions
 void controltype_label_updatesettings(controltype_label_details *details);
@@ -72,7 +72,7 @@ int controltype_label_startup()
 {
 	//Register this type with the ControlMaster
 	control_registertype(
-		"Frame",                            //Name of control type
+		L"Frame",                            //Name of control type
 		true,                               //Can be parentless
 		true,                               //Can parent
 		true,                               //Can child
@@ -90,7 +90,7 @@ int controltype_label_startup()
 
 	//Register this type with the ControlMaster
 	control_registertype(
-		"Label",                            //Name of control type
+		L"Label",                            //Name of control type
 		true,                               //Can be parentless
 		false,                              //Can parent
 		true,                               //Can child
@@ -199,8 +199,8 @@ LRESULT controltype_label_event(control *c, HWND hwnd, UINT msg, WPARAM wParam, 
 	{
 		case WM_DROPFILES:
 		{
-			char buffer[MAX_PATH];
-			variables_set(false, "DroppedFile", get_dragged_file(buffer, wParam));
+			wchar_t buffer[MAX_PATH];
+			variables_set(false, L"DroppedFile", get_dragged_file(buffer, wParam));
 			agent_notify(details->agents[CONTROLTYPE_LABEL_AGENT_ONDROP], NOTIFY_CHANGE, NULL);
 			break;
 		}
@@ -328,7 +328,7 @@ void controltype_label_notify(control *c, int notifytype, void *messagedata)
 			//Update the caption first
 			if (details->agents[CONTROLTYPE_LABEL_AGENT_CAPTION])
 			{
-				details->caption = (char *) agent_getdata(details->agents[CONTROLTYPE_LABEL_AGENT_CAPTION], DATAFETCH_VALUE_TEXT);
+				details->caption = (wchar_t *) agent_getdata(details->agents[CONTROLTYPE_LABEL_AGENT_CAPTION], DATAFETCH_VALUE_TEXT);
 			}
 			else
 			{
@@ -341,12 +341,12 @@ void controltype_label_notify(control *c, int notifytype, void *messagedata)
 
 		case NOTIFY_SAVE_CONTROL:
 			//Save all local values
-			config_write(config_get_control_setcontrolprop_c(c, "HAlign", label_haligns[details->halign]));
-			config_write(config_get_control_setcontrolprop_c(c, "VAlign", label_valigns[details->valign]));
+			config_write(config_get_control_setcontrolprop_c(c, L"HAlign", label_haligns[details->halign]));
+			config_write(config_get_control_setcontrolprop_c(c, L"VAlign", label_valigns[details->valign]));
 			if (details->is_frame)
 			{
-				config_write(config_get_control_setcontrolprop_b(c, "HasTitleBar", &details->has_titlebar));
-				config_write(config_get_control_setcontrolprop_b(c, "IsLocked", &details->is_locked));
+				config_write(config_get_control_setcontrolprop_b(c, L"HasTitleBar", &details->has_titlebar));
+				config_write(config_get_control_setcontrolprop_b(c, L"IsLocked", &details->is_locked));
 			}
 
 			for (i = 0; i < CONTROLTYPE_LABEL_AGENT_COUNT; i++)
@@ -365,7 +365,7 @@ void controltype_label_notify(control *c, int notifytype, void *messagedata)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //controltype_label_message
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int controltype_label_message(control *c, int tokencount, char *tokens[])
+int controltype_label_message(control *c, int tokencount, wchar_t *tokens[])
 {
 	// token strings
 
@@ -385,30 +385,30 @@ int controltype_label_message(control *c, int tokencount, char *tokens[])
 		T_PLUGINABOUT
 	};
 
-	extern char szWPStyle [];
+	extern wchar_t szWPStyle [];
 
 	static struct token_check controltype_label_property_tokens[] =
 	{
 		{ szWPStyle,            T_STYLE         , 1 },
-		{ "VAlign",             T_VALIGN        , 1 },
-		{ "HAlign",             T_HALIGN        , 1 },
-		{ "HasTitleBar",        T_HASTITLE      , 1 },
-		{ "IsLocked",           T_LOCKPOS       , 1 },
+		{ L"VAlign",             T_VALIGN        , 1 },
+		{ L"HAlign",             T_HALIGN        , 1 },
+		{ L"HasTitleBar",        T_HASTITLE      , 1 },
+		{ L"IsLocked",           T_LOCKPOS       , 1 },
 		{ NULL }
 	};
 
 	static struct token_check controltype_label_plugin_property_tokens[] =
 	{
-		{ "IsVisible",          T_PLUGINSHOW    , 1 },
-		{ "Position",           T_PLUGINSETPOS  , 2 },
+		{ L"IsVisible",          T_PLUGINSHOW    , 1 },
+		{ L"Position",           T_PLUGINSETPOS  , 2 },
 		{ NULL }
 	};
 
 	static struct token_check controltype_label_plugin_tokens[] =
 	{
-		{ "Load",               T_PLUGINLOAD    , 1 },
-		{ "Unload",             T_PLUGINUNLOAD  , 1 },
-		{ "About",              T_PLUGINABOUT   , 0 },
+		{ L"Load",               T_PLUGINLOAD    , 1 },
+		{ L"Unload",             T_PLUGINUNLOAD  , 1 },
+		{ L"About",              T_PLUGINABOUT   , 0 },
 		{ szBActionPluginSetProperty, (size_t)controltype_label_plugin_property_tokens  , 2 },
 		{ NULL }
 	};
@@ -480,11 +480,11 @@ int controltype_label_message(control *c, int tokencount, char *tokens[])
 		case T_PLUGINLOAD:
 		if (details->is_frame)
 		{
-			char *plugin_name = tokens[curtok];
-			if (0 == strcmp(plugin_name, "*browse*"))
+			wchar_t *plugin_name = tokens[curtok];
+			if (0 == wcscmp(plugin_name, L"*browse*"))
 			{
 				// "open file" dialog
-				plugin_name = dialog_file("Plugins\0*.dll\0", "Add Plugin" , NULL, ".dll", false);
+				plugin_name = dialog_file(L"Plugins\0*.dll\0", L"Add Plugin" , NULL, L".dll", false);
 				if (NULL == plugin_name)
 				{
 					//message_override = true;
@@ -494,7 +494,7 @@ int controltype_label_message(control *c, int tokencount, char *tokens[])
 			ModuleInfo * m = loadPlugin(&details->module_info, c->windowptr->hwnd, plugin_name);
 			if (m)
 			{
-				variables_set(false, "LastPlugin", m->module_name);
+				variables_set(false, L"LastPlugin", m->module_name);
 				return 0;
 			}
 		}
@@ -628,31 +628,31 @@ void controltype_label_menu_context(Menu *m, control *c)
 	controltype_label_details *details = (controltype_label_details *) c->controldetails;
 
 	//Show the menu
-	menu_controloptions(m, c, CONTROLTYPE_LABEL_AGENT_COUNT, details->agents, "", controltype_label_agentnames, controltype_label_agenttypes);
+	menu_controloptions(m, c, CONTROLTYPE_LABEL_AGENT_COUNT, details->agents, L"", controltype_label_agentnames, controltype_label_agenttypes);
 
-	make_menuitem_nop(m, "");
+	make_menuitem_nop(m, L"");
 
-	submenu = make_menu("Text Settings", c);
-	make_menuitem_bol(submenu, "Left", config_getfull_control_setcontrolprop_c(c, "HAlign", "Left"), details->halign == 1);
-	make_menuitem_bol(submenu, "Center", config_getfull_control_setcontrolprop_c(c, "HAlign", "Center"), details->halign == 0);
-	make_menuitem_bol(submenu, "Right", config_getfull_control_setcontrolprop_c(c, "HAlign", "Right"), details->halign == 2);
+	submenu = make_menu(L"Text Settings", c);
+	make_menuitem_bol(submenu, L"Left", config_getfull_control_setcontrolprop_c(c, L"HAlign", L"Left"), details->halign == 1);
+	make_menuitem_bol(submenu, L"Center", config_getfull_control_setcontrolprop_c(c, L"HAlign", L"Center"), details->halign == 0);
+	make_menuitem_bol(submenu, L"Right", config_getfull_control_setcontrolprop_c(c, L"HAlign", L"Right"), details->halign == 2);
 
-	make_menuitem_nop(submenu, "");
+	make_menuitem_nop(submenu, L"");
 
-	make_menuitem_bol(submenu, "Top, Word Wrapped", config_getfull_control_setcontrolprop_c(c, "VAlign", "TopWrap"), details->valign == 3);
-	make_menuitem_bol(submenu, "Top", config_getfull_control_setcontrolprop_c(c, "VAlign", "Top"), details->valign == 1);
-	make_menuitem_bol(submenu, "Center", config_getfull_control_setcontrolprop_c(c, "VAlign", "Center"), details->valign == 0);
-	make_menuitem_bol(submenu, "Bottom", config_getfull_control_setcontrolprop_c(c, "VAlign", "Bottom"), details->valign == 2);
+	make_menuitem_bol(submenu, L"Top, Word Wrapped", config_getfull_control_setcontrolprop_c(c, L"VAlign", L"TopWrap"), details->valign == 3);
+	make_menuitem_bol(submenu, L"Top", config_getfull_control_setcontrolprop_c(c, L"VAlign", L"Top"), details->valign == 1);
+	make_menuitem_bol(submenu, L"Center", config_getfull_control_setcontrolprop_c(c, L"VAlign", L"Center"), details->valign == 0);
+	make_menuitem_bol(submenu, L"Bottom", config_getfull_control_setcontrolprop_c(c, L"VAlign", L"Bottom"), details->valign == 2);
 
-	make_submenu_item(m, "Text Settings", submenu);
+	make_submenu_item(m, L"Text Settings", submenu);
 
 	if (details->is_frame)
 	{
 		bool temp;
 		temp = !details->has_titlebar;
-		make_menuitem_bol(m, "Has Title Bar", config_getfull_control_setcontrolprop_b(c, "HasTitleBar", &temp), false == temp);
+		make_menuitem_bol(m, L"Has Title Bar", config_getfull_control_setcontrolprop_b(c, L"HasTitleBar", &temp), false == temp);
 		temp = !details->is_locked;
-		make_menuitem_bol(m, "Lock Children", config_getfull_control_setcontrolprop_b(c, "IsLocked", &temp), false == temp);
+		make_menuitem_bol(m, L"Lock Children", config_getfull_control_setcontrolprop_b(c, L"IsLocked", &temp), false == temp);
 		make_menuitem_nop(m, NULL);
 		controltype_frame_insertpluginmenu(c, m);
 	}
@@ -692,25 +692,25 @@ void controltype_label_notifytype(int notifytype, void *messagedata)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // plugin stuff
 
-extern char *config_masterbroam;
+extern wchar_t *config_masterbroam;
 
-char *config_get_control_plugin_s(control *c, const char *key)
-{   sprintf(config_masterbroam, "%s %s %s %s %s", szBBroam, szBEntityControl, szBActionPlugin, c->controlname, key); return config_masterbroam;  }
-char *config_get_control_plugin_c(control *c, const char *key, const char * plug)
-{   sprintf(config_masterbroam, "%s %s %s %s %s \"%s\"", szBBroam, szBEntityControl, szBActionPlugin, c->controlname, key, plug); return config_masterbroam;  }
-char *config_get_control_plugin_prop_b(control *c, const char * plug, const char *key, bool val)
-{   sprintf(config_masterbroam, "%s %s %s %s %s %s %s %s", szBBroam, szBEntityControl, szBActionPlugin, c->controlname, szBActionPluginSetProperty, plug, key, szBoolArray[val]); return config_masterbroam;  }
-char *config_get_control_plugin_prop_ii(control *c, const char * plug, const char *key, int x, int y)
-{   sprintf(config_masterbroam, "%s %s %s %s %s %s %s %d %d", szBBroam, szBEntityControl, szBActionPlugin, c->controlname, szBActionPluginSetProperty, plug, key, x, y); return config_masterbroam;  }
+wchar_t *config_get_control_plugin_s(control *c, const wchar_t *key)
+{   wprintf(config_masterbroam, "%s %s %s %s %s", szBBroam, szBEntityControl, szBActionPlugin, c->controlname, key); return config_masterbroam;  }
+wchar_t *config_get_control_plugin_c(control *c, const wchar_t *key, const wchar_t * plug)
+{   wprintf(config_masterbroam, "%s %s %s %s %s \"%s\"", szBBroam, szBEntityControl, szBActionPlugin, c->controlname, key, plug); return config_masterbroam;  }
+wchar_t *config_get_control_plugin_prop_b(control *c, const wchar_t * plug, const wchar_t *key, bool val)
+{   wprintf(config_masterbroam, "%s %s %s %s %s %s %s %s", szBBroam, szBEntityControl, szBActionPlugin, c->controlname, szBActionPluginSetProperty, plug, key, szBoolArray[val]); return config_masterbroam;  }
+wchar_t *config_get_control_plugin_prop_ii(control *c, const wchar_t * plug, const wchar_t *key, int x, int y)
+{   wprintf(config_masterbroam, "%s %s %s %s %s %s %s %d %d", szBBroam, szBEntityControl, szBActionPlugin, c->controlname, szBActionPluginSetProperty, plug, key, x, y); return config_masterbroam;  }
 
-char *config_getfull_control_plugin_s(control *c, const char *key)
-{   sprintf(config_masterbroam, "%s %s %s %s:%s %s", szBBroam, szBEntityControl, szBActionPlugin, c->moduleptr->name, c->controlname, key); return config_masterbroam;  }
-char *config_getfull_control_plugin_c(control *c, const char *key, const char * plug)
-{   sprintf(config_masterbroam, "%s %s %s %s:%s %s \"%s\"", szBBroam, szBEntityControl, szBActionPlugin, c->moduleptr->name, c->controlname, key, plug); return config_masterbroam;  }
-char *config_getfull_control_plugin_prop_b(control *c, const char * plug, const char *key, bool val)
-{   sprintf(config_masterbroam, "%s %s %s %s:%s %s %s %s %s", szBBroam, szBEntityControl, szBActionPlugin, c->moduleptr->name, c->controlname, szBActionPluginSetProperty, plug, key, szBoolArray[val]); return config_masterbroam;  }
-char *config_getfull_control_plugin_prop_ii(control *c, const char * plug, const char *key, int x, int y)
-{   sprintf(config_masterbroam, "%s %s %s %s:%s %s %s %s %d %d", szBBroam, szBEntityControl, szBActionPlugin, c->moduleptr->name, c->controlname, szBActionPluginSetProperty, plug, key, x, y); return config_masterbroam;  }
+wchar_t *config_getfull_control_plugin_s(control *c, const wchar_t *key)
+{   wprintf(config_masterbroam, "%s %s %s %s:%s %s", szBBroam, szBEntityControl, szBActionPlugin, c->moduleptr->name, c->controlname, key); return config_masterbroam;  }
+wchar_t *config_getfull_control_plugin_c(control *c, const wchar_t *key, const wchar_t * plug)
+{   wprintf(config_masterbroam, "%s %s %s %s:%s %s \"%s\"", szBBroam, szBEntityControl, szBActionPlugin, c->moduleptr->name, c->controlname, key, plug); return config_masterbroam;  }
+wchar_t *config_getfull_control_plugin_prop_b(control *c, const wchar_t * plug, const wchar_t *key, bool val)
+{   wprintf(config_masterbroam, "%s %s %s %s:%s %s %s %s %s", szBBroam, szBEntityControl, szBActionPlugin, c->moduleptr->name, c->controlname, szBActionPluginSetProperty, plug, key, szBoolArray[val]); return config_masterbroam;  }
+wchar_t *config_getfull_control_plugin_prop_ii(control *c, const wchar_t * plug, const wchar_t *key, int x, int y)
+{   wprintf(config_masterbroam, "%s %s %s %s:%s %s %s %s %d %d", szBBroam, szBEntityControl, szBActionPlugin, c->moduleptr->name, c->controlname, szBActionPluginSetProperty, plug, key, x, y); return config_masterbroam;  }
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -718,36 +718,36 @@ char *config_getfull_control_plugin_prop_ii(control *c, const char * plug, const
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void controltype_frame_insertpluginmenu(control *c, Menu *m)
 {
-	const char menu_title[] = "Plugins";
+	const wchar_t menu_title[] = L"Plugins";
 	Menu *sub = make_menu(menu_title, c);
 
 	controltype_label_details *details = (controltype_label_details *) c->controldetails;
-	make_menuitem_cmd(sub, "Load Plugin...", config_getfull_control_plugin_c(c, "Load", "*browse*"));
-	static const char *submenu_titles[] = { "Unload Plugin", "Visibility" };
+	make_menuitem_cmd(sub, L"Load Plugin...", config_getfull_control_plugin_c(c, L"Load", L"*browse*"));
+	static const wchar_t *submenu_titles[] = { L"Unload Plugin", L"Visibility" };
 	for (int n = 0; n < 2; n++)
 	{
 		Menu *sub2 = make_menu(submenu_titles[n], c);
 		ModuleInfo *mi = details->module_info;
-		if (NULL == mi) make_menuitem_nop(sub2, "No plugins loaded");
+		if (NULL == mi) make_menuitem_nop(sub2, L"No plugins loaded");
 		for (;mi; mi=mi->next)
 		{
 			if (0 == n)
 			{
 				make_menuitem_bol(sub2, mi->module_name,
-					config_getfull_control_plugin_c(c, "Unload", mi->module_name), false);
+					config_getfull_control_plugin_c(c, L"Unload", mi->module_name), false);
 			}
 			else
 			if (1 == n)
 			{
 				bool temp = !plugin_getset_show_state(details->plugin_info, mi->module_name, 3);
 				make_menuitem_bol(sub2, mi->module_name,
-					config_getfull_control_plugin_prop_b(c, mi->module_name, "IsVisible", temp), !temp);
+					config_getfull_control_plugin_prop_b(c, mi->module_name, L"IsVisible", temp), !temp);
 			}
 		}
 		make_submenu_item(sub, submenu_titles[n], sub2);
 	}
 	if (details->module_info)
-		make_menuitem_cmd(sub, "About Plugins", config_getfull_control_plugin_s(c, "About"));
+		make_menuitem_cmd(sub, L"About Plugins", config_getfull_control_plugin_s(c, L"About"));
 
 	make_submenu_item(m, menu_title, sub);
 }
@@ -762,17 +762,17 @@ void controltype_frame_saveplugins(control *c)
 	ModuleInfo *m = details->module_info;
 	if (NULL == m) return;
 
-	config_printf("!---- %s::ExternalPlugins ----", c->controlname);
+	config_printf(L"!---- %s::ExternalPlugins ----", c->controlname);
 	for (;m; m=m->next)
 	{
-		config_write(config_get_control_plugin_c(c, "Load", m->file_name));
+		config_write(config_get_control_plugin_c(c, L"Load", m->file_name));
 		bool temp = plugin_getset_show_state(details->plugin_info, m->module_name, 3);
-		config_write(config_get_control_plugin_prop_b(c, m->module_name, "IsVisible", temp));
+		config_write(config_get_control_plugin_prop_b(c, m->module_name, L"IsVisible", temp));
 		PluginInfo *p = details->plugin_info;
 		for (;p; p=p->next)
 		{
 			if (p->hMO == m->hMO)
-			config_write(config_get_control_plugin_prop_ii(c, p->module_name, "Position", p->xpos, p->ypos));
+			config_write(config_get_control_plugin_prop_ii(c, p->module_name, L"Position", p->xpos, p->ypos));
 		}
 	}
 }

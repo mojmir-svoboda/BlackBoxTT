@@ -18,7 +18,7 @@
 void plugin_startup();
 void plugin_shutdown(bool save);
 void plugin_reconfigure(bool force);
-int plugin_message(int tokencount, char *tokens[], bool from_core, module* caller);
+int plugin_message(int tokencount, wchar_t *tokens[], bool from_core, module* caller);
 Menu *plugin_menu_settings(void);
 void plugin_save();
 
@@ -37,7 +37,7 @@ extern bool plugin_click_raise;
 //extern bool plugin_backup_script;
 //extern bool plugin_enableshadows;  
 extern bool plugin_save_modules_on_unload;
-extern char *plugin_desktop_drop_command;
+extern wchar_t *plugin_desktop_drop_command;
 
 extern bool plugin_snapwindows;
 extern int plugin_snap_dist;

@@ -49,7 +49,7 @@ enum CONTROLTYPE_SLIDER_AGENT {
 };
 const int CONTROLTYPE_SLIDER_AGENTCOUNT = 4;
 
-char *controltype_slider_agentnames[] = {"Value", "OnChange", "OnGrab", "OnRelease"};
+wchar_t *controltype_slider_agentnames[] = {L"Value", L"OnChange", L"OnGrab", L"OnRelease"};
 int controltype_slider_agenttypes[] = {CONTROL_FORMAT_SCALE, CONTROL_FORMAT_TRIGGER, CONTROL_FORMAT_TRIGGER, CONTROL_FORMAT_TRIGGER};
 
 
@@ -60,7 +60,7 @@ int controltype_slider_startup()
 {
 	//Register this type with the ControlMaster
 	control_registertype(
-		"Slider",                           //Name of control type
+		L"Slider",                           //Name of control type
 		true,                               //Can be parentless
 		false,                              //Can parent
 		true,                               //Can child
@@ -302,12 +302,12 @@ void controltype_slider_notify(control *c, int notifytype, void *messagedata)
 
 		case NOTIFY_SAVE_CONTROL:
 			//Save the details of this particular slider
-			config_write(config_get_control_setcontrolprop_d(c, "Value", &details->value));
-			config_write(config_get_control_setcontrolprop_b(c, "Vertical", &details->vertical));
-			config_write(config_get_control_setcontrolprop_b(c, "Reversed", &details->reversed));
-			config_write(config_get_control_setcontrolprop_i(c, "Appearance", &details->appearance));
-			config_write(config_get_control_setcontrolprop_i(c, "BroadcastValueMinimum", &details->broadcast_value_minimum));
-			config_write(config_get_control_setcontrolprop_i(c, "BroadcastValueMaximum", &details->broadcast_value_maximum));
+			config_write(config_get_control_setcontrolprop_d(c, L"Value", &details->value));
+			config_write(config_get_control_setcontrolprop_b(c, L"Vertical", &details->vertical));
+			config_write(config_get_control_setcontrolprop_b(c, L"Reversed", &details->reversed));
+			config_write(config_get_control_setcontrolprop_i(c, L"Appearance", &details->appearance));
+			config_write(config_get_control_setcontrolprop_i(c, L"BroadcastValueMinimum", &details->broadcast_value_minimum));
+			config_write(config_get_control_setcontrolprop_i(c, L"BroadcastValueMaximum", &details->broadcast_value_maximum));
 
 			//Save the agent details
 			for (int i = 0; i < CONTROLTYPE_SLIDER_AGENTCOUNT; i++)	agent_notify(details->agents[i], NOTIFY_SAVE_AGENT, NULL);
@@ -319,22 +319,22 @@ void controltype_slider_notify(control *c, int notifytype, void *messagedata)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //controltype_slider_message
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int controltype_slider_message(control *c, int tokencount, char *tokens[])
+int controltype_slider_message(control *c, int tokencount, wchar_t *tokens[])
 {
 	//Get the details
 	controltype_slider_details *details = (controltype_slider_details *) c->controldetails;
 
 	//If it's set control property
-	if (tokencount == 6 && !_stricmp(tokens[2], szBActionSetControlProperty))
+	if (tokencount == 6 && !_wcsicmp(tokens[2], szBActionSetControlProperty))
 	{
 		//Check all settable values
 		if (
-			   (!_stricmp(tokens[4], "Value") && config_set_double_expr(tokens[5], &details->value, 0.0, 1.0))
-			|| (!_stricmp(tokens[4], "Reversed") && config_set_bool(tokens[5], &details->reversed))
-			|| (!_stricmp(tokens[4], "Vertical") && config_set_bool(tokens[5], &details->vertical))
-			|| (!_stricmp(tokens[4], "Appearance") && config_set_int(tokens[5], &details->appearance, 0, 2))
-			|| (!_stricmp(tokens[4], "BroadcastValueMinimum") && config_set_int(tokens[5], &details->broadcast_value_minimum, -32767, 32767))
-			|| (!_stricmp(tokens[4], "BroadcastValueMaximum") && config_set_int(tokens[5], &details->broadcast_value_maximum, -32767, 32767))
+			   (!_wcsicmp(tokens[4], L"Value") && config_set_double_expr(tokens[5], &details->value, 0.0, 1.0))
+			|| (!_wcsicmp(tokens[4], L"Reversed") && config_set_bool(tokens[5], &details->reversed))
+			|| (!_wcsicmp(tokens[4], L"Vertical") && config_set_bool(tokens[5], &details->vertical))
+			|| (!_wcsicmp(tokens[4], L"Appearance") && config_set_int(tokens[5], &details->appearance, 0, 2))
+			|| (!_wcsicmp(tokens[4], L"BroadcastValueMinimum") && config_set_int(tokens[5], &details->broadcast_value_minimum, -32767, 32767))
+			|| (!_wcsicmp(tokens[4], L"BroadcastValueMaximum") && config_set_int(tokens[5], &details->broadcast_value_maximum, -32767, 32767))
 			)
 		{
 			details->track_needsupdate = true;
@@ -386,22 +386,22 @@ void *controltype_slider_getdata(control *c, int datatype)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //controltype_slider_getstringdata
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-bool controltype_slider_getstringdata(control *c, char *buffer, char *propertyname)
+bool controltype_slider_getstringdata(control *c, wchar_t *buffer, wchar_t *propertyname)
 {
 	controltype_slider_details *details = (controltype_slider_details *) c->controldetails;
-	if (!_stricmp(propertyname,"Value"))
+	if (!_wcsicmp(propertyname,L"Value"))
 	{
-		sprintf(buffer, "%lf", details->value);
+		wprintf(buffer, L"%lf", details->value);
 		return true;
 	}
 	//Broadcast value is a special text value that ALL controls should be able to broadcast
 	//It contains a certain "value" that can be associated with a control.  Various things
 	//such as broams can reference it.
 	//For sliders, this value is the adjusted value using the min and max.
-	else if (!_stricmp(propertyname,"BroadcastValue"))
+	else if (!_wcsicmp(propertyname,L"BroadcastValue"))
 	{
 		long broadcastvalue = (long) (details->value * (((long) details->broadcast_value_maximum) - ((long) details->broadcast_value_minimum)) + details->broadcast_value_minimum);
-		sprintf(buffer, "%d", broadcastvalue);
+		wprintf(buffer, L"%d", broadcastvalue);
 	}
 
 	//No data to return - return false
@@ -421,32 +421,30 @@ void controltype_slider_menu_context(Menu *m, control *c)
 	controltype_slider_details *details = (controltype_slider_details *) c->controldetails;
 
 	//Show the menu
-	menu_controloptions(m, c, CONTROLTYPE_SLIDER_AGENTCOUNT, details->agents, "", controltype_slider_agentnames, controltype_slider_agenttypes);
+	menu_controloptions(m, c, CONTROLTYPE_SLIDER_AGENTCOUNT, details->agents, L"", controltype_slider_agentnames, controltype_slider_agenttypes);
 
-	make_menuitem_nop(m, "");
+	make_menuitem_nop(m, L"");
 
-	temp = !details->reversed; make_menuitem_bol(m, "Values Reversed", config_getfull_control_setcontrolprop_b(c, "Reversed", &temp), !temp);
+	temp = !details->reversed; make_menuitem_bol(m, L"Values Reversed", config_getfull_control_setcontrolprop_b(c, L"Reversed", &temp), !temp);
 
-	make_menuitem_nop(m, "");
+	make_menuitem_nop(m, L"");
 
-	make_menuitem_int(m, "Broadcast Value Minimum", config_getfull_control_setcontrolprop_s(c, "BroadcastValueMinimum"), details->broadcast_value_minimum, -32767, 32767);
-	make_menuitem_int(m, "Broadcast Value Maximum", config_getfull_control_setcontrolprop_s(c, "BroadcastValueMaximum"), details->broadcast_value_maximum, -32767, 32767);	
+	make_menuitem_int(m, L"Broadcast Value Minimum", config_getfull_control_setcontrolprop_s(c, L"BroadcastValueMinimum"), details->broadcast_value_minimum, -32767, 32767);
+	make_menuitem_int(m, L"Broadcast Value Maximum", config_getfull_control_setcontrolprop_s(c, L"BroadcastValueMaximum"), details->broadcast_value_maximum, -32767, 32767);	
 
-	make_menuitem_nop(m, "");
+	make_menuitem_nop(m, L"");
 
-	submenu1 = make_menu("Appearance", c);
-	temp = false; make_menuitem_bol(submenu1, "Horizontal", config_getfull_control_setcontrolprop_b(c, "Vertical", &temp), !details->vertical);
-	temp = true; make_menuitem_bol(submenu1, "Vertical", config_getfull_control_setcontrolprop_b(c, "Vertical", &temp), details->vertical);
+	submenu1 = make_menu(L"Appearance", c);
+	temp = false; make_menuitem_bol(submenu1, L"Horizontal", config_getfull_control_setcontrolprop_b(c, L"Vertical", &temp), !details->vertical);
+	temp = true; make_menuitem_bol(submenu1, L"Vertical", config_getfull_control_setcontrolprop_b(c, L"Vertical", &temp), details->vertical);
 	
-	make_menuitem_nop(submenu1, "");
+	make_menuitem_nop(submenu1, L"");
 
-	make_menuitem_bol(submenu1, "Fill Bar", config_getfull_control_setcontrolprop_i(c, "Appearance", &slider_appearance_fillbar), details->appearance == slider_appearance_fillbar);
-	make_menuitem_bol(submenu1, "Scroll Bar", config_getfull_control_setcontrolprop_i(c, "Appearance", &slider_appearance_scrollbar), details->appearance == slider_appearance_scrollbar);
-	make_menuitem_bol(submenu1, "Track and Knob", config_getfull_control_setcontrolprop_i(c, "Appearance", &slider_appearance_trackknob), details->appearance == slider_appearance_trackknob);
+	make_menuitem_bol(submenu1, L"Fill Bar", config_getfull_control_setcontrolprop_i(c, L"Appearance", &slider_appearance_fillbar), details->appearance == slider_appearance_fillbar);
+	make_menuitem_bol(submenu1, L"Scroll Bar", config_getfull_control_setcontrolprop_i(c, L"Appearance", &slider_appearance_scrollbar), details->appearance == slider_appearance_scrollbar);
+	make_menuitem_bol(submenu1, L"Track and Knob", config_getfull_control_setcontrolprop_i(c, L"Appearance", &slider_appearance_trackknob), details->appearance == slider_appearance_trackknob);
 	
-	make_submenu_item(m, "Appearance", submenu1);
-
-	
+	make_submenu_item(m, L"Appearance", submenu1);
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

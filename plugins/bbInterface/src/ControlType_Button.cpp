@@ -54,13 +54,13 @@ enum CONTROLTYPE_TWOSTATEBUTTON_AGENT {
 };
 const int CONTROLTYPE_TWOSTATEBUTTON_AGENTCOUNT = 7;
 
-char *controltype_button_agentnames[] = {"Caption", "Image", "ImageWhenPressed", "MouseDown", "MouseUp", "LeftMouseDown", "LeftMouseUp","RightMouseDown", "RightMouseUp","MiddleMouseDown", "MiddleMouseUp","OnDrop" };
+wchar_t *controltype_button_agentnames[] = {L"Caption", L"Image", L"ImageWhenPressed", L"MouseDown", L"MouseUp", L"LeftMouseDown", L"LeftMouseUp",L"RightMouseDown", L"RightMouseUp",L"MiddleMouseDown", L"MiddleMouseUp",L"OnDrop" };
 int controltype_button_agenttypes[] = {CONTROL_FORMAT_TEXT, CONTROL_FORMAT_IMAGE, CONTROL_FORMAT_IMAGE, CONTROL_FORMAT_TRIGGER, CONTROL_FORMAT_TRIGGER,CONTROL_FORMAT_TRIGGER, CONTROL_FORMAT_TRIGGER,CONTROL_FORMAT_TRIGGER, CONTROL_FORMAT_TRIGGER,CONTROL_FORMAT_TRIGGER, CONTROL_FORMAT_TRIGGER, CONTROL_FORMAT_DROP };
-char *controltype_switchbutton_agentnames[] = {"Caption", "Image", "ImageWhenPressed", "Value", "Pressed", "Unpressed", "OnDrop" };
+wchar_t *controltype_switchbutton_agentnames[] = {L"Caption", L"Image", L"ImageWhenPressed", L"Value", L"Pressed", L"Unpressed", L"OnDrop" };
 int controltype_switchbutton_agenttypes[] = {CONTROL_FORMAT_TEXT, CONTROL_FORMAT_IMAGE, CONTROL_FORMAT_IMAGE, CONTROL_FORMAT_BOOL, CONTROL_FORMAT_TRIGGER, CONTROL_FORMAT_TRIGGER, CONTROL_FORMAT_TRIGGER, CONTROL_FORMAT_DROP};
 
-const char *button_haligns[] = {"Center", "Left", "Right", NULL};
-const char *button_valigns[] = {"Center", "Top", "Bottom", "TopWrap", NULL};
+const wchar_t *button_haligns[] = {L"Center", L"Left", L"Right", NULL};
+const wchar_t *button_valigns[] = {L"Center", L"Top", L"Bottom", L"TopWrap", NULL};
 
 // Local functions
 void controltype_button_updatesettings(controltype_button_details *details);
@@ -71,7 +71,7 @@ int controltype_button_startup()
 {
 	//Register this type with the ControlMaster
 	control_registertype(
-		"Button",                           //Name of control type
+		L"Button",                           //Name of control type
 		true,                               //Can be parentless
 		false,                              //Can parent
 		true,                               //Can child
@@ -89,7 +89,7 @@ int controltype_button_startup()
 
 		//Register this type with the ControlMaster
 	control_registertype(
-		"SwitchButton",                     //Name of control type
+		L"SwitchButton",                     //Name of control type
 		true,                               //Can be parentless
 		false,                              //Can parent
 		true,                               //Can child
@@ -196,8 +196,8 @@ LRESULT controltype_button_event(control *c, HWND hwnd, UINT msg, WPARAM wParam,
 	{
 		case WM_DROPFILES:
 		{
-			char buffer[MAX_PATH];
-			variables_set(false, "DroppedFile", get_dragged_file(buffer, wParam));
+			wchar_t buffer[MAX_PATH];
+			variables_set(false, L"DroppedFile", get_dragged_file(buffer, wParam));
 			agent_notify(details->agents[ (details->is_twostate ? CONTROLTYPE_TWOSTATEBUTTON_AGENT_ONDROP : CONTROLTYPE_BUTTON_AGENT_ONDROP)], NOTIFY_CHANGE, NULL);
 			break;
 		}
@@ -459,7 +459,7 @@ void controltype_button_notify(control *c, int notifytype, void *messagedata)
 			//Update the caption first
 			if (details->agents[CONTROLTYPE_BUTTON_CAPTION])
 			{
-				details->caption = (char *) agent_getdata(details->agents[CONTROLTYPE_BUTTON_CAPTION], DATAFETCH_VALUE_TEXT);
+				details->caption = (wchar_t *) agent_getdata(details->agents[CONTROLTYPE_BUTTON_CAPTION], DATAFETCH_VALUE_TEXT);
 			}
 			else
 			{
@@ -484,13 +484,13 @@ void controltype_button_notify(control *c, int notifytype, void *messagedata)
 
 		case NOTIFY_SAVE_CONTROL:
 			//Save all local values
-			config_write(config_get_control_setcontrolprop_c(c, "HAlign", button_haligns[details->halign]));
-			config_write(config_get_control_setcontrolprop_c(c, "VAlign", button_valigns[details->valign]));
+			config_write(config_get_control_setcontrolprop_c(c, L"HAlign", button_haligns[details->halign]));
+			config_write(config_get_control_setcontrolprop_c(c, L"VAlign", button_valigns[details->valign]));
 			int i;
 			for (i = 0; i < CONTROLTYPE_BUTTON_AGENTCOUNT; i++)
 				agent_notify(details->agents[i], NOTIFY_SAVE_AGENT, NULL);
 			if (details->is_twostate)
-				config_write(config_get_control_setcontrolprop_b(c, "Pressed", &details->is_on));
+				config_write(config_get_control_setcontrolprop_b(c, L"Pressed", &details->is_on));
 			break;
 
 		case NOTIFY_DRAGACCEPT:
@@ -503,21 +503,21 @@ void controltype_button_notify(control *c, int notifytype, void *messagedata)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //controltype_button_message
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int controltype_button_message(control *c, int tokencount, char *tokens[])
+int controltype_button_message(control *c, int tokencount, wchar_t *tokens[])
 {
 	//Get the details
 	controltype_button_details *details = (controltype_button_details *) c->controldetails;
 
 	//If it's set control property
-	if (tokencount == 6 && !_stricmp(tokens[2], szBActionSetControlProperty))
+	if (tokencount == 6 && !_wcsicmp(tokens[2], szBActionSetControlProperty))
 	{
 		//Only pressed, only for two state buttons
-		if (details->is_twostate && !_stricmp(tokens[4], "Pressed") && config_set_bool(tokens[5], &details->is_on))
+		if (details->is_twostate && !_wcsicmp(tokens[4], L"Pressed") && config_set_bool(tokens[5], &details->is_on))
 		{
 			style_draw_invalidate(c);
 			return 0;
 		}
-		else if (!strcmp(tokens[4],"VAlign"))
+		else if (!wcscmp(tokens[4],L"VAlign"))
 		{
 			int i;
 			if (-1 != (i = get_string_index(tokens[5], button_valigns)))
@@ -528,7 +528,7 @@ int controltype_button_message(control *c, int tokencount, char *tokens[])
 				return 0;
 			}
 		}
-		else if (!strcmp(tokens[4],"HAlign"))
+		else if (!wcscmp(tokens[4],L"HAlign"))
 		{
 			int i;
 			if (-1 != (i = get_string_index(tokens[5], button_haligns)))
@@ -589,27 +589,27 @@ void *controltype_button_getdata(control *c, int datatype)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //controltype_button_getstringdata
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-bool controltype_button_getstringdata(control *c, char *buffer, char *propertyname)
+bool controltype_button_getstringdata(control *c, wchar_t *buffer, wchar_t *propertyname)
 {
 	controltype_button_details *details = (controltype_button_details *) c->controldetails;
-	if (details->is_twostate && !_stricmp(propertyname,"Pressed"))
+	if (details->is_twostate && !_wcsicmp(propertyname,L"Pressed"))
 	{
-		strcpy(buffer, (details->is_on ? "1" : "0"));
+		wcscpy(buffer, (details->is_on ? L"1" : L"0"));
 		return true;
 	}
-	else if (!_stricmp(propertyname, "Caption"))
+	else if (!_wcsicmp(propertyname, L"Caption"))
 	{
-		strcpy(buffer, details->caption);
+		wcscpy(buffer, details->caption);
 	}
 	//Broadcast value is a special text value that ALL controls should be able to broadcast
 	//It contains a certain "value" that can be associated with a control.  Various things
 	//such as broams can reference it.
 	//For sliders, this value is the adjusted value using the min and max.
-	else if (!_stricmp(propertyname,"BroadcastValue"))
+	else if (!_wcsicmp(propertyname,L"BroadcastValue"))
 	{
 		if (details->is_twostate)
 		{
-			sprintf(buffer, "%d", details->is_on);
+			wprintf(buffer, L"%d", details->is_on);
 		}
 	}
 
@@ -626,19 +626,19 @@ void controltype_button_menu_context(Menu *m, control *c)
 	controltype_button_details *details = (controltype_button_details *) c->controldetails;
 
 	//Show the menu
-	menu_controloptions(m, c, CONTROLTYPE_BUTTON_AGENTCOUNT, details->agents, "", controltype_button_agentnames, controltype_button_agenttypes);
+	menu_controloptions(m, c, CONTROLTYPE_BUTTON_AGENTCOUNT, details->agents, L"", controltype_button_agentnames, controltype_button_agenttypes);
 
-	make_menuitem_nop(m, "");
-	Menu *submenu = make_menu("Text Settings", c);
-	make_menuitem_bol(submenu, "Left", config_getfull_control_setcontrolprop_c(c, "HAlign", "Left"), details->halign == 1);
-	make_menuitem_bol(submenu, "Center", config_getfull_control_setcontrolprop_c(c, "HAlign", "Center"), details->halign == 0);
-	make_menuitem_bol(submenu, "Right", config_getfull_control_setcontrolprop_c(c, "HAlign", "Right"), details->halign == 2);
-	make_menuitem_nop(submenu, "");
-	make_menuitem_bol(submenu, "Top, Word Wrapped", config_getfull_control_setcontrolprop_c(c, "VAlign", "TopWrap"), details->valign == 3);
-	make_menuitem_bol(submenu, "Top", config_getfull_control_setcontrolprop_c(c, "VAlign", "Top"), details->valign == 1);
-	make_menuitem_bol(submenu, "Center", config_getfull_control_setcontrolprop_c(c, "VAlign", "Center"), details->valign == 0);
-	make_menuitem_bol(submenu, "Bottom", config_getfull_control_setcontrolprop_c(c, "VAlign", "Bottom"), details->valign == 2);
-	make_submenu_item(m, "Text Settings", submenu);
+	make_menuitem_nop(m, L"");
+	Menu *submenu = make_menu(L"Text Settings", c);
+	make_menuitem_bol(submenu, L"Left", config_getfull_control_setcontrolprop_c(c, L"HAlign", L"Left"), details->halign == 1);
+	make_menuitem_bol(submenu, L"Center", config_getfull_control_setcontrolprop_c(c, L"HAlign", L"Center"), details->halign == 0);
+	make_menuitem_bol(submenu, L"Right", config_getfull_control_setcontrolprop_c(c, L"HAlign", L"Right"), details->halign == 2);
+	make_menuitem_nop(submenu, L"");
+	make_menuitem_bol(submenu, L"Top, Word Wrapped", config_getfull_control_setcontrolprop_c(c, L"VAlign", L"TopWrap"), details->valign == 3);
+	make_menuitem_bol(submenu, L"Top", config_getfull_control_setcontrolprop_c(c, L"VAlign", L"Top"), details->valign == 1);
+	make_menuitem_bol(submenu, L"Center", config_getfull_control_setcontrolprop_c(c, L"VAlign", L"Center"), details->valign == 0);
+	make_menuitem_bol(submenu, L"Bottom", config_getfull_control_setcontrolprop_c(c, L"VAlign", L"Bottom"), details->valign == 2);
+	make_submenu_item(m, L"Text Settings", submenu);
 
 }
 
@@ -651,19 +651,19 @@ void controltype_switchbutton_menu_context(Menu *m, control *c)
 	controltype_button_details *details = (controltype_button_details *) c->controldetails;
 
 	//Show the menu
-	menu_controloptions(m, c, CONTROLTYPE_TWOSTATEBUTTON_AGENTCOUNT, details->agents, "", controltype_switchbutton_agentnames, controltype_switchbutton_agenttypes);
+	menu_controloptions(m, c, CONTROLTYPE_TWOSTATEBUTTON_AGENTCOUNT, details->agents, L"", controltype_switchbutton_agentnames, controltype_switchbutton_agenttypes);
 
-	make_menuitem_nop(m, "");
-	Menu* submenu = make_menu("Text Settings", c);
-	make_menuitem_bol(submenu, "Left", config_getfull_control_setcontrolprop_c(c, "HAlign", "Left"), details->halign == 1);
-	make_menuitem_bol(submenu, "Center", config_getfull_control_setcontrolprop_c(c, "HAlign", "Center"), details->halign == 0);
-	make_menuitem_bol(submenu, "Right", config_getfull_control_setcontrolprop_c(c, "HAlign", "Right"), details->halign == 2);
-	make_menuitem_nop(submenu, "");
-	make_menuitem_bol(submenu, "Top, Word Wrapped", config_getfull_control_setcontrolprop_c(c, "VAlign", "TopWrap"), details->valign == 3);
-	make_menuitem_bol(submenu, "Top", config_getfull_control_setcontrolprop_c(c, "VAlign", "Top"), details->valign == 1);
-	make_menuitem_bol(submenu, "Center", config_getfull_control_setcontrolprop_c(c, "VAlign", "Center"), details->valign == 0);
-	make_menuitem_bol(submenu, "Bottom", config_getfull_control_setcontrolprop_c(c, "VAlign", "Bottom"), details->valign == 2);
-	make_submenu_item(m, "Text Settings", submenu);
+	make_menuitem_nop(m, L"");
+	Menu* submenu = make_menu(L"Text Settings", c);
+	make_menuitem_bol(submenu, L"Left", config_getfull_control_setcontrolprop_c(c, L"HAlign", L"Left"), details->halign == 1);
+	make_menuitem_bol(submenu, L"Center", config_getfull_control_setcontrolprop_c(c, L"HAlign", L"Center"), details->halign == 0);
+	make_menuitem_bol(submenu, L"Right", config_getfull_control_setcontrolprop_c(c, L"HAlign", L"Right"), details->halign == 2);
+	make_menuitem_nop(submenu, L"");
+	make_menuitem_bol(submenu, L"Top, Word Wrapped", config_getfull_control_setcontrolprop_c(c, L"VAlign", L"TopWrap"), details->valign == 3);
+	make_menuitem_bol(submenu, L"Top", config_getfull_control_setcontrolprop_c(c, L"VAlign", L"Top"), details->valign == 1);
+	make_menuitem_bol(submenu, L"Center", config_getfull_control_setcontrolprop_c(c, L"VAlign", L"Center"), details->valign == 0);
+	make_menuitem_bol(submenu, L"Bottom", config_getfull_control_setcontrolprop_c(c, L"VAlign", L"Bottom"), details->valign == 2);
+	make_submenu_item(m, L"Text Settings", submenu);
 
 }
 

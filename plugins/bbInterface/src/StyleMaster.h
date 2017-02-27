@@ -26,11 +26,11 @@
 #define STYLETYPE_NONE 8
 #define STYLETYPE_DEFAULT 9
 
-extern const char * szStyleNames[];
-extern const char * szStyleProperties[];
-extern const char * szPressedStyleNames[];
-extern const char * szPressedStyleProperties[];
-extern const char * szBevelTypes[];
+extern const wchar_t * szStyleNames[];
+extern const wchar_t * szStyleProperties[];
+extern const wchar_t * szPressedStyleNames[];
+extern const wchar_t * szPressedStyleProperties[];
+extern const wchar_t * szBevelTypes[];
 
 const short int STYLE_PROPERTY_COUNT = 10;
 const short int STYLE_COLOR_PROPERTY_COUNT = 3;
@@ -72,8 +72,8 @@ void style_draw_invalidate(control *c);
 
 void style_draw_box(RECT &rect, HDC &buffer, int styletype, bool is_bordered);
 void style_draw_box(RECT &rect, HDC &buffer, StyleItem* styleptr, bool is_bordered);
-void style_draw_text(RECT &rect, HDC &buffer, StyleItem* styleptr, char *text, UINT settings, HFONT font);
-void style_draw_text(RECT &rect, HDC &buffer, int style, char *text, UINT settings, HFONT font);
+void style_draw_text(RECT &rect, HDC &buffer, StyleItem* styleptr, wchar_t *text, UINT settings, HFONT font);
+void style_draw_text(RECT &rect, HDC &buffer, int style, wchar_t *text, UINT settings, HFONT font);
 COLORREF style_make_shadowcolor(StyleItem* style);
 void style_draw_image_alpha(HDC &buffer, int x, int y, int width, int height, HANDLE &image);
 

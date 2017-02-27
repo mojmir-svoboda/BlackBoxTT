@@ -13,14 +13,14 @@
 #include "Definitions.h"
 
 //Define these variables
-char *dialog_filename;
+wchar_t *dialog_filename;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //dialog_startup
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 int dialog_startup()
 {
-	dialog_filename = new char[MAX_PATH];
+	dialog_filename = new wchar_t[MAX_PATH];
 	return 0;
 }
 
@@ -36,7 +36,7 @@ int dialog_shutdown()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //dialog_openfile
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-char *dialog_file(const char *filter, const char *title, const char *defaultpath, const char *defaultextension, bool save)
+wchar_t *dialog_file(const wchar_t *filter, const wchar_t *title, const wchar_t *defaultpath, const wchar_t *defaultextension, bool save)
 {
 	OPENFILENAME ofn;       // common dialog box structure
 

@@ -16,7 +16,7 @@
 struct controltype_label_details
 {
 	agent *agents[4];
-	char *caption;
+	wchar_t *caption;
 
 	int valign;
 	int halign;
@@ -38,9 +38,9 @@ int controltype_label_create(control *c);
 int controltype_label_destroy(control *c);
 LRESULT controltype_label_event(control *c, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 void controltype_label_notify(control *c, int notifytype, void *messagedata);
-int controltype_label_message(control *c, int tokencount, char *tokens[]);
+int controltype_label_message(control *c, int tokencount, wchar_t *tokens[]);
 void *controltype_label_getdata(control *c, int datatype);
-bool controltype_label_getstringdata(control *c, char *buffer, char *propertyname);
+bool controltype_label_getstringdata(control *c, wchar_t *buffer, wchar_t *propertyname);
 void controltype_label_menu_context(Menu *m, control *c);
 void controltype_label_notifytype(int notifytype, void *messagedata);
 
