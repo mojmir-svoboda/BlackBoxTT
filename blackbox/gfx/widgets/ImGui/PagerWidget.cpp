@@ -78,7 +78,9 @@ namespace imgui {
 		codecvt_utf16_utf8(wg->m_currentVertexId, curr_ws_u8, TaskInfo::e_wspaceLenMax);
 		char id_u8[128];
 		codecvt_utf16_utf8(GetId().c_str(), id_u8, 128);
-		_snprintf(title, 256, "%s (%s)###%s", curr_ws_u8, cluster_id.c_str(), id_u8);
+		char cluster_u8[128];
+		codecvt_utf16_utf8(cluster_id.c_str(), cluster_u8, 128);
+		_snprintf(title, 256, "%s (%s)###%s", curr_ws_u8, cluster_u8, id_u8);
 
 		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiSetCond_Always);
 
