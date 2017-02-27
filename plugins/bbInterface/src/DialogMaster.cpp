@@ -29,7 +29,8 @@ int dialog_startup()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 int dialog_shutdown()
 {
-	delete dialog_filename;
+	delete[] dialog_filename;
+	dialog_filename = nullptr;
 	return 0;
 }
 
