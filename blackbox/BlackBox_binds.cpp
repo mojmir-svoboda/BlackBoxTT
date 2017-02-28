@@ -28,8 +28,38 @@ namespace bb {
 		m_gfx->MkWidgetFromId(widget_id.c_str());
 	}
 
-	void BlackBox::ShowMenu (bbstring const & widget_name)
+	void BlackBox::MoveOrDestroyOnToggle (bool is_new, bb::GuiWidget * w)
 	{
+		POINT p;
+		if (::GetCursorPos(&p))
+		{
+			RECT r;
+			::GetWindowRect(w->m_gfxWindow->m_hwnd, &r);
+			if (::PtInRect(&r, p))
+			{
+				if (!is_new)
+					m_gfx->DestroyWindow(w->GetId().c_str());
+			}
+			else
+			{
+				w->MoveWindow(p.x, p.y);
+				m_tasks.Focus(w->m_gfxWindow->m_hwnd);
+				w->Show(true);
+			}
+		}
+	}
+
+	void BlackBox::ToggleMenu (std::shared_ptr<bb::MenuConfig> menu_cfg)
+	{
+		bool new_menu = false;
+		GuiWidget * w = m_gfx->FindWidget(menu_cfg->m_id.c_str());
+		if (!w)
+		{
+			w = m_gfx->MkWidgetFromConfig(*menu_cfg);
+			new_menu = true;
+		}
+
+		MoveOrDestroyOnToggle(new_menu, w);
 	}
 
 	void BlackBox::ToggleMenu (bbstring const & widget_name)

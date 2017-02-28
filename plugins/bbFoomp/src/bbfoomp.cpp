@@ -249,7 +249,7 @@ void show_foomp_menu ()
 	if (scMenu)
 		DelMenu(scMenu);
 
-	scMenu = MakeMenu(L"bbFoomp");
+	scMenu = MakeNamedMenu(L"bbFoomp", L"bbFoompMenu", true);
 
 	{
  		//	<<	BEGIN	-- Controls Submenu

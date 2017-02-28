@@ -32,7 +32,7 @@ s7_pointer bind_LoadPlugin (s7_scheme * sc, s7_pointer args)
 		getBlackBoxInstanceRW()->LoadPlugin(name);
 		return s7_nil(sc);
 	}
-	return s7_wrong_type_arg_error(sc, "ShowMenu", 1, s7_car(args), "utf8 string");
+	return s7_wrong_type_arg_error(sc, "LoadPlugin", 1, s7_car(args), "utf8 string");
 }
 s7_pointer bind_UnloadPlugin (s7_scheme * sc, s7_pointer args)
 {
@@ -43,7 +43,7 @@ s7_pointer bind_UnloadPlugin (s7_scheme * sc, s7_pointer args)
 		getBlackBoxInstanceRW()->UnloadPlugin(name);
 		return s7_nil(sc);
 	}
-	return s7_wrong_type_arg_error(sc, "ShowMenu", 1, s7_car(args), "utf8 string");
+	return s7_wrong_type_arg_error(sc, "UnloadPlugin", 1, s7_car(args), "utf8 string");
 }
 s7_pointer bind_IsPluginLoaded (s7_scheme * sc, s7_pointer args)
 {
@@ -83,19 +83,6 @@ s7_pointer bind_CreateWidgetFromId (s7_scheme * sc, s7_pointer args)
 		return s7_nil(sc);
 	}
 	return s7_wrong_type_arg_error(sc, "CreateWidgetFromId", 1, s7_car(args), "utf8 string id in config section [Widgets]");
-}
-
-
-s7_pointer bind_ShowMenu (s7_scheme * sc, s7_pointer args)
-{
-	if (s7_is_string(s7_car(args)))
-	{
-		char const * widget_name = s7_string(s7_car(args));
-		bbstring name = toString(widget_name);
-		getBlackBoxInstanceRW()->ShowMenu(name);
-		return s7_nil(sc);
-	}
-	return s7_wrong_type_arg_error(sc, "ShowMenu", 1, s7_car(args), "utf8 string");
 }
 
 s7_pointer bind_ToggleMenu (s7_scheme * sc, s7_pointer args)
@@ -190,7 +177,6 @@ namespace bb {
 
 		s7_define_function(m_scheme, "SetQuit", bind_SetQuit, 1, 0, false, "(SetQuit int) Quits with code int");
 		s7_define_function(m_scheme, "SaveConfig", bind_SaveConfig, 0, 0, false, "(SaveConfig) Saves main bbTT config");
-		s7_define_function(m_scheme, "ShowMenu", bind_ShowMenu, 1, 0, false, "(ShowMenu widget_name) Show/Hide menu with name widget_name");
 		s7_define_function(m_scheme, "LoadPlugin", bind_LoadPlugin, 1, 0, false, "(LoadPlugin plugin_id) Load plugin with id from config section [Plugins]");
 		s7_define_function(m_scheme, "UnloadPlugin", bind_UnloadPlugin, 1, 0, false, "(UnloadPlugin plugin_id) Unload plugin with id from config section [Plugins]");
 		s7_define_function(m_scheme, "IsPluginLoaded", bind_IsPluginLoaded, 1, 0, false, "(IsPluginLoaded plugin_id) returns true if plugin is loaded");

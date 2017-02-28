@@ -91,6 +91,7 @@ void DelMenu (std::shared_ptr<bb::MenuConfig> pluginMenu)
 	}
 }
 
+
 //===========================================================================
 // API: ShowMenu
 // Purpose: Finalizes creation or refresh for the menu and its submenus
@@ -100,71 +101,25 @@ void DelMenu (std::shared_ptr<bb::MenuConfig> pluginMenu)
 void ShowMenu (std::shared_ptr<bb::MenuConfig> pluginMenu)
 {
 	bb::BlackBox & bb = bb::BlackBox::Instance();
-
-	bool update = false;
-	bb::GuiWidget * w = bb.GetGfx().FindWidget(pluginMenu->m_id.c_str());
-	if (!w)
-	{
-		w = bb.GetGfx().MkWidgetFromConfig(*pluginMenu);
-	}
-	else
-	{
-		update = true;
-	}
-
-	Assert(w && w->GetWidgetTypeName() == bb::MenuWidget::c_type);
-	bb::MenuWidget * menu = static_cast<bb::MenuWidget *>(w);
-	if (update)
-	{
-		//menu->GetConfig().clear();
-		//menu->GetConfig() = *pluginMenu;
-	}
-
- 	moveWidgetToPointerPos(menu);
- 	menu->Show(true);
-
-// 	if (NULL == pluginMenu)
-// 		return;
-// 	// dbg_printf("ShowMenu(%d) %x %s", pluginMenu->m_bPopup, pluginMenu, pluginMenu->m_pMenuItems->m_pszTitle);
-// 
-// 	if (pluginMenu->m_bPopup) {
-// 		// just to signal e.g. BBSoundFX
-// #ifndef BBXMENU
-// 		PostMessage(BBhwnd, BB_MENU, BB_MENU_SIGNAL, 0);
-// #endif
-// 		pluginMenu->ShowMenu();
-// 	} else {
-// 		pluginMenu->Redraw(1);
-// 		pluginMenu->decref();
-// 	}
+	bb.ToggleMenu(pluginMenu);
 }
 
 void UpdateMenu (std::shared_ptr<bb::MenuConfig> pluginMenu)
 {
 	bb::BlackBox & bb = bb::BlackBox::Instance();
 
-	bool update = false;
 	bb::GuiWidget * w = bb.GetGfx().FindWidget(pluginMenu->m_id.c_str());
 	if (!w)
 	{
-		//w = bb.GetGfx().MkWidgetFromConfig(*pluginMenu);
-		//ShowMenu(pluginMenu);
+		// do not update non existing menu
 	}
 	else
 	{
-		update = true;
 		Assert(w && w->GetWidgetTypeName() == bb::MenuWidget::c_type);
 		bb::MenuWidget * menu = static_cast<bb::MenuWidget *>(w);
-		if (update)
-		{
-			menu->GetConfig().clear();
-			menu->GetConfig() = *pluginMenu;
-		}
-
+		menu->GetConfig().clear();
+		menu->GetConfig() = *pluginMenu;
 	}
-
-	//moveWidgetToPointerPos(menu);
-	//w->Show(true);
 }
 
 //===========================================================================
