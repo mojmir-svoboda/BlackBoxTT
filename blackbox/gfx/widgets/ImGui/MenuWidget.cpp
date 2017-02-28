@@ -147,11 +147,13 @@ namespace imgui {
 		char response[4096];
 		bb::BlackBox::Instance().GetScheme().Eval(item_val, response, 4096);
 
-		// @TODO: parse response!!!
+		// @TODO: parse response... is there a better way to do this?
+		bool chk = strstr(response, "#t") != 0;
+
 		char item_text[1024];
 		codecvt_utf16_utf8(item->m_name.c_str(), item_text, 1024);
 
-		bool state = false;
+		bool state = chk;
 		if (ImGui::Checkbox(item_text, &state))
 		{
 			if (state)
