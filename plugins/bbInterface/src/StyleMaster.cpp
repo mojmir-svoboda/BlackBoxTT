@@ -1,5 +1,6 @@
 #include <blackbox/plugin/bb.h>
-# include "../../BBPLugin/BBPlugin.h"
+#include <blackbox/BlackBox_compat.h>
+#include <bblibcompat/StyleStruct.h>
 #ifdef _MSC_VER
 # pragma comment(lib, "msimg32.lib")
 #endif
@@ -8,38 +9,38 @@
 #include "PluginMaster.h"
 #include "ControlMaster.h"
 
-const char * szStyleNames[STYLE_COUNT + 1] = {"Toolbar", "Inset", "Flat", "Sunken", "Label", "Clock", "Button", "PressedButton", "None", NULL};
+const wchar_t * szStyleNames[STYLE_COUNT + 1] = {L"Toolbar", L"Inset", L"Flat", L"Sunken", L"Label", L"Clock", L"Button", L"PressedButton", L"None", NULL};
 // do a full changeable style property listing, with the property types in a separate list
-const char * szStyleProperties[STYLE_PROPERTY_COUNT + 1] = 
+const wchar_t * szStyleProperties[STYLE_PROPERTY_COUNT + 1] = 
 {
-		"Color",
-		"ColorTo",
-		"TextColor",
-		"Bevel",
-		"BevelPosition",
-		"BorderWidth",
-		"BorderColor",
-		"ShadowColor",
-		"ShadowPosX",
-		"ShadowPosY",
+		L"Color",
+		L"ColorTo",
+		L"TextColor",
+		L"Bevel",
+		L"BevelPosition",
+		L"BorderWidth",
+		L"BorderColor",
+		L"ShadowColor",
+		L"ShadowPosX",
+		L"ShadowPosY",
 		NULL
 };
-const char * szBevelTypes[STYLE_BEVEL_TYPE_COUNT + 1] = {"Flat", "Raised", "Sunken", NULL};
+const wchar_t * szBevelTypes[STYLE_BEVEL_TYPE_COUNT + 1] = {L"Flat", L"Raised", L"Sunken", NULL};
 
 // use only button
-const char * szPressedStyleNames[PRESSED_STYLE_COUNT + 1] = {"Toolbar", "Inset", "Flat", "Sunken", "Label", "Clock", "Button", "PressedButton" , "None", "Default", NULL};
-const char * szPressedStyleProperties[STYLE_PROPERTY_COUNT + 1] = 
+const wchar_t * szPressedStyleNames[PRESSED_STYLE_COUNT + 1] = {L"Toolbar", L"Inset", L"Flat", L"Sunken", L"Label", L"Clock", L"Button", L"PressedButton" , L"None", L"Default", NULL};
+const wchar_t * szPressedStyleProperties[STYLE_PROPERTY_COUNT + 1] = 
 {
-		"PressedColor", 
-		"PressedColorTo", 
-		"PressedTextColor", 
-		"PressedBevel", 
-		"PressedBevelPosition",
-		"PressedBorderWidth",
-		"PressedBorderColor",
-		"PressedShadowColor", 
-		"PressedShadowPosX",
-		"PressedShadowPosY",
+		L"PressedColor", 
+		L"PressedColorTo", 
+		L"PressedTextColor", 
+		L"PressedBevel", 
+		L"PressedBevelPosition",
+		L"PressedBorderWidth",
+		L"PressedBorderColor",
+		L"PressedShadowColor", 
+		L"PressedShadowPosX",
+		L"PressedShadowPosY",
 		NULL
 };
 
@@ -70,6 +71,7 @@ COLORREF    style_color_border;
 
 
 #define TRANSCOLOUR  RGB(255,0,255)
+#define VALID_TEXTCOLOR 8
 
 //Fonts
 HFONT       style_font;
@@ -165,7 +167,7 @@ int style_startup()
         style_font = CreateStyleFont(T);
 	        
 	*(FARPROC*)&pSetLayeredWindowAttributes
-		= GetProcAddress(GetModuleHandle("USER32"), "SetLayeredWindowAttributes");
+		= GetProcAddress(GetModuleHandle(L"USER32"), "SetLayeredWindowAttributes");
 	// --------------------
 
 	style_bevel_width   = *(int*)GetSettingPtr(SN_BEVELWIDTH);
@@ -371,12 +373,12 @@ void style_draw_text(RECT &rect, HDC &buffer, StyleItem* styleptr, char *text, U
 	SetBkMode(buffer, TRANSPARENT);
 
 	//Parse it for newline characters
-	char temp[BBI_MAX_LINE_LENGTH], *p = temp, c;
+	wchar_t temp[BBI_MAX_LINE_LENGTH], *p = temp, c;
 	do
 	{
 		c = *p = *text++;
-		if (c == '\\' && *text == 'n')
-			*p++ = '\r', *p = '\n', text++;
+		if (c == L'\\' && *text == L'n')
+			*p++ = L'\r', *p = L'\n', text++;
 		p++;
 	} while (c);
 

@@ -9,6 +9,7 @@
 //Multiple definition prevention
 #ifndef BBInterface_SlitManager_h
 #define BBInterface_SlitManager_h
+#include <blackbox/plugin/plugin.h>
 
 typedef struct PluginInfo
 {
@@ -38,8 +39,8 @@ typedef struct ModuleInfo
 	HMODULE hMO;
 	wchar_t file_name[MAX_PATH];
 	wchar_t module_name[96];
-	int (*endPlugin)(HINSTANCE hMainInstance);
-	LPCSTR (*pluginInfo)(int);
+	endPlugin_t endPlugin;
+	pluginInfoW_t pluginInfo;
 
 } ModuleInfo;
 

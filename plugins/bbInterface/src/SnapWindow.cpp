@@ -286,7 +286,7 @@ HMONITOR get_monitor(HWND hw)
 {
 	if (NULL == pMonitorFromWindow)
 	{
-		HMODULE hDll = GetModuleHandle("USER32");
+		HMODULE hDll = GetModuleHandle(L"USER32");
 		*(FARPROC*)&pMonitorFromWindow = GetProcAddress(hDll, "MonitorFromWindow" );
 		*(FARPROC*)&pGetMonitorInfoA   = GetProcAddress(hDll, "GetMonitorInfoA"   );
 		if (NULL == pMonitorFromWindow)

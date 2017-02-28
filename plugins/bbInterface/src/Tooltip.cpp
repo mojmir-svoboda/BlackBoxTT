@@ -20,7 +20,7 @@ bool tooltip_enabled = true;
 
 
 static void
-notice(const char* message)
+notice(const wchar_t* message)
 {
 	if (!plugin_suppresserrors)
 		BBMessageBox(NULL, message, szAppName, MB_OK | MB_SYSTEMMODAL);
@@ -47,7 +47,7 @@ tooltip_startup(void)
 	                            NULL );
 
 	if (tooltip_window == NULL) {
-		notice("Failed to create tooltip");
+		notice(L"Failed to create tooltip");
 		return !0;
 	}
 
@@ -84,7 +84,7 @@ tooltip_add(HWND hwnd)
 	ti.lpszText = LPSTR_TEXTCALLBACK;
 
 	if (!SendMessage(tooltip_window, TTM_ADDTOOL, 0, (LPARAM)&ti)) {
-		notice("Failed to add a control into tooltip");
+		notice(L"Failed to add a control into tooltip");
 		return !0;
 	}
 
@@ -119,10 +119,10 @@ tooltip_update(NMTTDISPINFO* di, control* c)
 
 	if (di->hdr.hwndFrom == tooltip_window) {
 		if (di->hdr.code == TTN_GETDISPINFO) {
-			char buf[225];
+			wchar_t buf[225];
 			window* w = c->windowptr;
-			sprintf(buf,"%s:%s [%d,%d] @ (%d,%d)",c->moduleptr->name,c->controlname, w->width, w->height, w->x, w->y);
-			strncpy( di->szText, buf,
+			swprintf(buf, 225, L"%s:%s [%d,%d] @ (%d,%d)",c->moduleptr->name,c->controlname, w->width, w->height, w->x, w->y);
+			wcsncpy( di->szText, buf,
 			         NUMBER_OF(di->szText) );
 			di->szText[NUMBER_OF(di->szText) - 1] = '\0';
 		}

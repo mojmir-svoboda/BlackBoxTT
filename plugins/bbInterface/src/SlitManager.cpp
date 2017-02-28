@@ -8,6 +8,7 @@
 
 // Global Include
 #include <blackbox/plugin/bb.h>
+#include <bblibcompat/winutils.h>
 
 #include "ControlType_Label.h"
 #include "SlitManager.h"
@@ -16,11 +17,11 @@
 
 //=============================================================================
 
-void dbg_window (HWND window, char *msg)
+void dbg_window (HWND window, wchar_t *msg)
 {
-	char buffer[256];
+	wchar_t buffer[256];
 	GetClassName(window, buffer, 256);
-	dbg_printf("%s %s", msg, buffer);
+	dbg_printf(L"%s %s", msg, buffer);
 }
 
 #undef dolist
@@ -191,43 +192,50 @@ found:
 }
 
 //=============================================================================
-int plugin_get_displayname(const char *src, char *buff)
+int plugin_get_displayname(const wchar_t *src, wchar_t *buff)
 {
-	const char *s = src;
-	const char *e = s + strlen(s);
+	const wchar_t *s = src;
+	const wchar_t *e = s + wcslen(s);
 	int len = 0;
 	// start after the last slash
-	while (e>s && e[-1]!= '\\' && e[-1]!= '/') e--, len++;
-	strcpy(buff, e);
+	while (e>s && e[-1]!= L'\\' && e[-1]!= L'/')
+		e--, len++;
+	wcscpy(buff, e);
 
 	// cut off ".dll", if present
-	while (len) if (buff[--len]== '.') { buff[len] = 0; break; }
+	while (len)
+		if (buff[--len]== '.')
+		{ 
+			buff[len] = 0;
+			break;
+		}
 	return len;
 }
 
 //=============================================================================
-void get_unique_modulename(PluginInfo *PI, HMODULE hMO, char *buffer)
+void get_unique_modulename(PluginInfo *PI, HMODULE hMO, wchar_t *buffer, size_t buff_sz)
 {
-	char temp[200]; *buffer = 0;
-	char module_name[200];
+	wchar_t temp[200] = { 0 };
+	*buffer = 0;
+	wchar_t module_name[200];
 	GetModuleFileName(hMO, module_name, sizeof module_name);
 	int len = plugin_get_displayname(module_name, temp);
 
 	PluginInfo *p; int n = 1;
 	dolist (p, PI)
 	{
-		if (0 == _memicmp(temp, p->module_name, len)
-			&& (0 == p->module_name[len] || '.' == p->module_name[len]))
+		if (0 == _wcsicmp(temp, p->module_name)
+			&& (0 == p->module_name[len] || L'.' == p->module_name[len]))
 		{
 			if (1 == n)
-				sprintf(p->module_name, "%s.%d", temp, n);
+				swprintf(p->module_name, 96, L"%s.%d", temp, n);
 			n++;
 		}
 	}
 	if (1 == n)
-		strcpy(buffer, temp);
+		wcscpy(buffer, temp);
 	else
-		sprintf(buffer, "%s.%d", temp, n);
+		swprintf(buffer, buff_sz, L"%s.%d", temp, n);
 
 	//dbg_printf("loaded: <%s> <%s>", temp, buffer);
 }
@@ -251,9 +259,9 @@ int SlitWndProc(control *c, HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				p->hMO = (HMODULE)GetClassLongPtr(p->hwnd, -16 /*GCL_HMODULE*/);
 
 				if (wParam >= 0x400)
-					strcpy(p->module_name, (const char *)wParam);
+					wcscpy(p->module_name, (const wchar_t *)wParam);
 				else
-					get_unique_modulename(*pp, p->hMO, p->module_name);
+					get_unique_modulename(*pp, p->hMO, p->module_name, 96);
 
 				//dbg_printf("module: %x %s",  p->hMO, p->module_name);
 
@@ -307,7 +315,7 @@ int SlitWndProc(control *c, HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 //============================================================================
 // load/unloadPlugins
 
-ModuleInfo * m_loadPlugin(HWND hSlit, const char *file_name)
+ModuleInfo * m_loadPlugin(HWND hSlit, const wchar_t *file_name)
 {
 	const char *errormsg = NULL;
 
@@ -355,7 +363,7 @@ ModuleInfo * m_loadPlugin(HWND hSlit, const char *file_name)
 					m->hMO = hMO;
 					m->endPlugin = endPlugin;
 					*(FARPROC*)&m->pluginInfo = GetProcAddress(hMO, "pluginInfo");
-					strcpy(m->file_name, file_name);
+					wcscpy(m->file_name, file_name);
 					plugin_get_displayname(file_name, m->module_name);
 					return m;
 				}
@@ -370,8 +378,8 @@ ModuleInfo * m_loadPlugin(HWND hSlit, const char *file_name)
 		FreeLibrary(hMO);
 	}
 
-	char message[MAX_PATH + 512];
-	sprintf (message, "%s\n%s", file_name, errormsg);
+	wchar_t message[MAX_PATH + 512];
+	swprintf (message, MAX_PATH + 512, L"%s\n%s", file_name, errormsg);
 	MBoxErrorValue(message);
 	return NULL;
 }
@@ -384,12 +392,12 @@ void m_unloadPlugin(ModuleInfo *m)
 }
 
 //============================================================================
-const char * check_relative_path(const char *filename)
+const wchar_t * check_relative_path(const wchar_t *filename)
 {
 	// get relative path to blackbox process
-	char bb_path[MAX_PATH];
+	wchar_t bb_path[MAX_PATH];
 	GetBlackboxPath(bb_path, MAX_PATH);
-	int len = strlen(bb_path);
+	int len = wcslen(bb_path);
 
 	if (0 == _memicmp(bb_path, filename, len))
 		return filename + len;
@@ -397,7 +405,7 @@ const char * check_relative_path(const char *filename)
 }
 
 //============================================================================
-ModuleInfo *loadPlugin(ModuleInfo **pm, HWND hSlit, const char *file_name)
+ModuleInfo *loadPlugin(ModuleInfo **pm, HWND hSlit, const wchar_t *file_name)
 {
 	ModuleInfo *m = m_loadPlugin(hSlit, check_relative_path(file_name));
 	if (m)
@@ -409,12 +417,12 @@ ModuleInfo *loadPlugin(ModuleInfo **pm, HWND hSlit, const char *file_name)
 }
 
 //============================================================================
-bool unloadPlugin(ModuleInfo **pm, const char *module_name)
+bool unloadPlugin(ModuleInfo **pm, const wchar_t *module_name)
 {
 	ModuleInfo *m; bool result = false;
 	for (; NULL != (m = *pm);)
 	{
-		if (NULL == module_name || 0 == _stricmp(module_name, m->module_name))
+		if (NULL == module_name || 0 == _wcsicmp(module_name, m->module_name))
 		{
 			m_unloadPlugin(m);
 			*pm = m->next;
@@ -431,25 +439,21 @@ bool unloadPlugin(ModuleInfo **pm, const char *module_name)
 
 //=============================================================================
 
-void aboutPlugins(ModuleInfo *m0, const char *ctrl)
+void aboutPlugins(ModuleInfo *m0, const wchar_t *ctrl)
 {
-	char buff[5000]; LPCSTR (*pluginInfo)(int);
-	int x = 0; ModuleInfo *m;
+	wchar_t buff[5000];
+	int x = 0;
+	ModuleInfo *m;
 	for (m = m0; m; m= m->next)
 	{
-		pluginInfo = m->pluginInfo;
-		x += pluginInfo
-			? sprintf(buff+x, "%s %s by %s (%s)\t\n",
-				pluginInfo(PLUGIN_NAME),
-				pluginInfo(PLUGIN_VERSION),
-				pluginInfo(PLUGIN_AUTHOR),
-				pluginInfo(PLUGIN_RELEASE)
-				)
-			: sprintf(buff+x, "%s\t\n", m->file_name)
+		x += m->pluginInfo
+			? swprintf(buff+x, 5000-x, L"%s %s by %s (%s)\t\n", m->pluginInfo(PLUGIN_NAME), m->pluginInfo(PLUGIN_VERSION), m->pluginInfo(PLUGIN_AUTHOR), m->pluginInfo(PLUGIN_RELEASE))
+			: swprintf(buff+x, 5000-x, L"%s\t\n", m->file_name)
 			;
 	}
-	char caption[256];
-	sprintf(caption, "%s - About Plugins", ctrl);
+
+	wchar_t caption[256];
+	swprintf(caption, 256, L"%s - About Plugins", ctrl);
 	MessageBox(NULL, buff, caption, MB_OK|MB_SYSTEMMODAL);
 }
 
