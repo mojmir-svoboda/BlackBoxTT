@@ -5,7 +5,7 @@ Copyright © 2004-2009 grischka
 Copyright © 2015-2016 mojmir
 ========================================================================== */
 #include "utils_recover.h"
-#include <platform_win.h>
+#include <common.h>
 #include <Psapi.h>
 #include <TlHelp32.h>
 
@@ -98,7 +98,7 @@ static BOOL CALLBACK recoverWindowEnumProc (HWND hwnd, LPARAM lParam)
 			size_t const idx = params->m_size++;
 			params->m_data[idx].m_hwnd = hwnd;
 			params->m_data[idx].m_visible = FALSE != ::IsWindowVisible(hwnd);
-			wcsncpy(params->m_data[idx].m_caption, windowtext, 512);
+			wcslcpy(params->m_data[idx].m_caption, windowtext, 512);
 		}
 		else
 			return FALSE;

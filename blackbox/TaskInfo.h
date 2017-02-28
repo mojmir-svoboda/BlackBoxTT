@@ -1,6 +1,5 @@
 #pragma once
-#include <platform_win.h>
-#include <bbstring.h>
+#include <common.h>
 #include "TaskConfig.h"
 #include "gfx/IconId.h"
 
@@ -27,12 +26,12 @@ namespace bb {
 
 		void SetWorkSpace (wchar_t const * s)
 		{
-			wcsncpy(m_wspace, s, e_wspaceLenMax);
+			wcslcpy(m_wspace, s, e_wspaceLenMax);
 		}
 
 		void SetCaption (wchar_t const * s)
 		{
-			wcsncpy(m_caption, s, e_captionLenMax);
+			wcslcpy(m_caption, s, e_captionLenMax);
 		}
 
 		bool IsTaskManIgnored () const

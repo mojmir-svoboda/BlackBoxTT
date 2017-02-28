@@ -25,6 +25,7 @@ set(bblib_HEADERS
   SpinLock.h
   unicode.h
   utils_file.h
+	wcslcpy.h
 	${bblib_trace_HEADERS}
 )
 

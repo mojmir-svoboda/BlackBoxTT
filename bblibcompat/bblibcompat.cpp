@@ -1,6 +1,7 @@
 #include "bblibcompat.h"
 #include <crazyrc/crazyrc.h>
 #include <bblib/utils_paths.h>
+#include <bblib/wcslcpy.h>
 #include "utils_string.h"
 #include <Shlwapi.h>
 #include <shellapi.h>
@@ -750,8 +751,7 @@ skip:
 			if (n_results < buff_count)
 			{
 				size_t const tok_sz = std::distance(token_begin, s);
-				wcsncpy(buffs[n_results], token_begin, tok_sz);
-				buffs[n_results][tok_sz] = 0;
+				wcslcpy(buffs[n_results], token_begin, tok_sz + 1);
 				++n_results;
 			}
 
@@ -760,7 +760,7 @@ skip:
 
 			if (n_results == buff_count)
 			{
-				wcsncpy(rest_of_string, s, rest_of_string_size);
+				wcslcpy(rest_of_string, s, rest_of_string_size + 1);
 				break;
 			}
 

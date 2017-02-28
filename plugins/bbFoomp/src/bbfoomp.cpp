@@ -343,7 +343,7 @@ void show_foomp_menu ()
 void handleBroamMsg (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	wchar_t temp[MAX_LINE_LENGTH];
-	wcsncpy(temp, (LPCWSTR)lParam, MAX_LINE_LENGTH);
+	wcslcpy(temp, (LPCWSTR)lParam, MAX_LINE_LENGTH);
 
 	// Global bro@ms...
 	if (!getSettings().FooDockedToSlit)

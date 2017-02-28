@@ -78,8 +78,7 @@ namespace bb {
 						{
 							size_t const ln = curr.length();
 							wchar_t * tmp = (wchar_t *)alloca((ln + 1) * sizeof(wchar_t));
-							wcsncpy(tmp, curr.c_str(), ln);
-							tmp[ln] = 0;
+							wcslcpy(tmp, curr.c_str(), ln + 1);
 							int a = 255 * ws.m_notif.m_counter / ws.m_notif.m_counterMax;
 							drawText(hDC, tmp, rc, RGB(a, a, a), RGB(1, 1, 1));
 							SelectObject(hDC, hOldFont);

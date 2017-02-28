@@ -305,8 +305,7 @@ namespace bb {
 		if (n > 0 && n < e_broamMsgLenMax)
 		{
 			wchar_t * msg = new wchar_t[n + 1];
-			msg[n] = 0;
-			wcsncpy(msg, buff, n + 1);
+			wcslcpy(msg, buff, n + 1);
 			PostMessage(m_BBHwnd, BB_POSTSTRING, 0, (LPARAM)msg);
 			return true;
 		}
