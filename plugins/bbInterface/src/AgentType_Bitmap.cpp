@@ -313,7 +313,7 @@ void *agenttype_bitmap_getdata(agent *a, int datatype)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_bitmap_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_bitmap_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
+void agenttype_bitmap_menu_set(std::shared_ptr<bb::MenuConfig> m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
 	make_menuitem_cmd(m, L"Browse...", config_getfull_control_setagent_c(c, action, L"Bitmap", L"*browse*"));
 }
@@ -321,7 +321,7 @@ void agenttype_bitmap_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_icon_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_icon_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
+void agenttype_icon_menu_set(std::shared_ptr<bb::MenuConfig> m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
 	make_menuitem_cmd(m, L"Browse...", config_getfull_control_setagent_c(c, action, L"Icon", L"*browse*"));
 }
@@ -329,7 +329,7 @@ void agenttype_icon_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, in
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_bitmap_menu_context
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_bitmap_menu_context(Menu *m, agent *a)
+void agenttype_bitmap_menu_context(std::shared_ptr<bb::MenuConfig> m, agent *a)
 {
 	//Get the agent details
 	agenttype_bitmap_details *details = (agenttype_bitmap_details *) a->agentdetails;	
@@ -349,7 +349,7 @@ void agenttype_bitmap_menu_context(Menu *m, agent *a)
                                           config_getfull_control_setagentprop_s(a->controlptr, a->agentaction, L"Scale"),
                                           details->scale, 1, 500);
 	}
-	Menu *submenu = make_menu(L"Image Alignment", a->controlptr);
+	std::shared_ptr<bb::MenuConfig> submenu = make_menu(L"Image Alignment", a->controlptr);
 	make_menuitem_bol(submenu, L"Left", config_getfull_control_setagentprop_c(a->controlptr, a->agentaction, L"HAlign", L"Left"), details->halign == 1);
 	make_menuitem_bol(submenu, L"Center", config_getfull_control_setagentprop_c(a->controlptr, a->agentaction, L"HAlign", L"Center"), details->halign == 0);
 	make_menuitem_bol(submenu, L"Right", config_getfull_control_setagentprop_c(a->controlptr, a->agentaction, L"HAlign", L"Right"), details->halign == 2);

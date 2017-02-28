@@ -349,7 +349,7 @@ void *agenttype_networkmonitor_getdata(agent *a, int datatype)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_networkmonitor_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_networkmonitor_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
+void agenttype_networkmonitor_menu_set(std::shared_ptr<bb::MenuConfig> m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
 	//Add a menu item for every type
 	for (int i = 0; i < AGENTTYPE_NETWORKMONITOR_NUMINTERFACES; i++)
@@ -361,7 +361,7 @@ void agenttype_networkmonitor_menu_set(Menu *m, control *c, agent *a,  wchar_t *
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_networkmonitor_menu_context
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_networkmonitor_menu_context(Menu *m, agent *a)
+void agenttype_networkmonitor_menu_context(std::shared_ptr<bb::MenuConfig> m, agent *a)
 {
 	agenttype_networkmonitor_details *details =  (agenttype_networkmonitor_details *)a->agentdetails;
 	for (int i = 0; i < AGENTTYPE_NETWORKMONITOR_NUMTYPES; i++)

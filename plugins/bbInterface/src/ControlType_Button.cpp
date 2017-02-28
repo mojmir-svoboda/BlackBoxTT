@@ -620,7 +620,7 @@ bool controltype_button_getstringdata(control *c, wchar_t *buffer, wchar_t *prop
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //controltype_button_menu_context
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void controltype_button_menu_context(Menu *m, control *c)
+void controltype_button_menu_context(std::shared_ptr<bb::MenuConfig> m, control *c)
 {
 	//Get the details
 	controltype_button_details *details = (controltype_button_details *) c->controldetails;
@@ -629,7 +629,7 @@ void controltype_button_menu_context(Menu *m, control *c)
 	menu_controloptions(m, c, CONTROLTYPE_BUTTON_AGENTCOUNT, details->agents, L"", controltype_button_agentnames, controltype_button_agenttypes);
 
 	make_menuitem_nop(m, L"");
-	Menu *submenu = make_menu(L"Text Settings", c);
+	std::shared_ptr<bb::MenuConfig> submenu = make_menu(L"Text Settings", c);
 	make_menuitem_bol(submenu, L"Left", config_getfull_control_setcontrolprop_c(c, L"HAlign", L"Left"), details->halign == 1);
 	make_menuitem_bol(submenu, L"Center", config_getfull_control_setcontrolprop_c(c, L"HAlign", L"Center"), details->halign == 0);
 	make_menuitem_bol(submenu, L"Right", config_getfull_control_setcontrolprop_c(c, L"HAlign", L"Right"), details->halign == 2);
@@ -645,7 +645,7 @@ void controltype_button_menu_context(Menu *m, control *c)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //controltype_switchbutton_menu_context
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void controltype_switchbutton_menu_context(Menu *m, control *c)
+void controltype_switchbutton_menu_context(std::shared_ptr<bb::MenuConfig> m, control *c)
 {
 	//Get the details
 	controltype_button_details *details = (controltype_button_details *) c->controldetails;
@@ -654,7 +654,7 @@ void controltype_switchbutton_menu_context(Menu *m, control *c)
 	menu_controloptions(m, c, CONTROLTYPE_TWOSTATEBUTTON_AGENTCOUNT, details->agents, L"", controltype_switchbutton_agentnames, controltype_switchbutton_agenttypes);
 
 	make_menuitem_nop(m, L"");
-	Menu* submenu = make_menu(L"Text Settings", c);
+	std::shared_ptr<bb::MenuConfig>  submenu = make_menu(L"Text Settings", c);
 	make_menuitem_bol(submenu, L"Left", config_getfull_control_setcontrolprop_c(c, L"HAlign", L"Left"), details->halign == 1);
 	make_menuitem_bol(submenu, L"Center", config_getfull_control_setcontrolprop_c(c, L"HAlign", L"Center"), details->halign == 0);
 	make_menuitem_bol(submenu, L"Right", config_getfull_control_setcontrolprop_c(c, L"HAlign", L"Right"), details->halign == 2);

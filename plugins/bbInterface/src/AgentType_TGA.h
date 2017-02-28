@@ -30,11 +30,11 @@ int     agenttype_tga_destroy(agent *a);
 int     agenttype_tga_message(agent *a, int tokencount, wchar_t *tokens[]);
 void    agenttype_tga_notify(agent *a, int notifytype, void *messagedata);
 void*   agenttype_tga_getdata(agent *a, int datatype);
-void    agenttype_tga_menu_set(Menu *m, control *c, agent *a, wchar_t *action, int controlformat);
-void    agenttype_tga_menu_context(Menu *m, agent *a);
+void    agenttype_tga_menu_set(std::shared_ptr<bb::MenuConfig> m, control *c, agent *a, wchar_t *action, int controlformat);
+void    agenttype_tga_menu_context(std::shared_ptr<bb::MenuConfig> m, agent *a);
 void    agenttype_tga_notifytype(int notifytype, void *messagedata);
 
-void    agenttype_icon_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat);
+void    agenttype_icon_menu_set(std::shared_ptr<bb::MenuConfig> m, control *c, agent *a,  wchar_t *action, int controlformat);
 int     agenttype_icon_create(agent *a, wchar_t *parameterstring);
 
 #endif

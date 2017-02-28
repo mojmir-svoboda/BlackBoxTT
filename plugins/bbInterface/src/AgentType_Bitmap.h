@@ -35,11 +35,11 @@ int     agenttype_bitmap_destroy(agent *a);
 int     agenttype_bitmap_message(agent *a, int tokencount, wchar_t *tokens[]);
 void    agenttype_bitmap_notify(agent *a, int notifytype, void *messagedata);
 void*   agenttype_bitmap_getdata(agent *a, int datatype);
-void    agenttype_bitmap_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat);
-void    agenttype_bitmap_menu_context(Menu *m, agent *a);
+void    agenttype_bitmap_menu_set(std::shared_ptr<bb::MenuConfig> m, control *c, agent *a,  wchar_t *action, int controlformat);
+void    agenttype_bitmap_menu_context(std::shared_ptr<bb::MenuConfig> m, agent *a);
 void    agenttype_bitmap_notifytype(int notifytype, void *messagedata);
 
-void    agenttype_icon_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat);
+void    agenttype_icon_menu_set(std::shared_ptr<bb::MenuConfig> m, control *c, agent *a,  wchar_t *action, int controlformat);
 int     agenttype_icon_create(agent *a, wchar_t *parameterstring);
 
 #endif

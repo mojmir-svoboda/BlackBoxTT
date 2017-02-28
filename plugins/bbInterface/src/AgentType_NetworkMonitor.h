@@ -32,8 +32,8 @@ int     agenttype_networkmonitor_destroy(agent *a);
 int     agenttype_networkmonitor_message(agent *a, int tokencount, wchar_t *tokens[]);
 void    agenttype_networkmonitor_notify(agent *a, int notifytype, void *messagedata);
 void*   agenttype_networkmonitor_getdata(agent *a, int datatype);
-void    agenttype_networkmonitor_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat);
-void    agenttype_networkmonitor_menu_context(Menu *m, agent *a);
+void    agenttype_networkmonitor_menu_set(std::shared_ptr<bb::MenuConfig> m, control *c, agent *a,  wchar_t *action, int controlformat);
+void    agenttype_networkmonitor_menu_context(std::shared_ptr<bb::MenuConfig> m, agent *a);
 void    agenttype_networkmonitor_notifytype(int notifytype, void *messagedata);
 
 #endif

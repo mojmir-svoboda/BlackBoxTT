@@ -53,7 +53,7 @@ int agenttype_mixer_shutdown ()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_mixer_create
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agenttype_mixer_create (agent * a, char * parameterstring)
+int agenttype_mixer_create (agent * a, wchar_t * parameterstring)
 {
 	if (is_vista())
 		return agenttype_mixer_create_vista(a, parameterstring);
@@ -107,21 +107,21 @@ void * agenttype_mixer_getdata (agent *a, int datatype)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_mixerscale_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_mixerscale_menu_set(Menu *m, control *c, agent *a,  char *action, int controlformat)
+void agenttype_mixerscale_menu_set(std::shared_ptr<bb::MenuConfig> m, control *c, agent *a,  char *action, int controlformat)
 {
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_mixerbool_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_mixerbool_menu_set(Menu *m, control *c, agent *a,  char *action, int controlformat)
+void agenttype_mixerbool_menu_set(std::shared_ptr<bb::MenuConfig> m, control *c, agent *a,  char *action, int controlformat)
 {
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_mixer_menu_context
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_mixer_menu_context(Menu *m, agent *a)
+void agenttype_mixer_menu_context(std::shared_ptr<bb::MenuConfig> m, agent *a)
 {
 }
 

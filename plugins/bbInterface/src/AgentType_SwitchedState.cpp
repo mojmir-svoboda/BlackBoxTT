@@ -214,7 +214,7 @@ void *agenttype_switchedstate_getdata(agent *a, int datatype)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_switchedstate_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_switchedstate_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
+void agenttype_switchedstate_menu_set(std::shared_ptr<bb::MenuConfig> m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
 	wchar_t temp[32] = L"";
 	switch(controlformat)
@@ -233,7 +233,7 @@ void agenttype_switchedstate_menu_set(Menu *m, control *c, agent *a,  wchar_t *a
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_switchedstate_menu_context
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_switchedstate_menu_context(Menu *m, agent *a)
+void agenttype_switchedstate_menu_context(std::shared_ptr<bb::MenuConfig> m, agent *a)
 {
 	//Get the agent details
 	agenttype_switchedstate_details *details = (agenttype_switchedstate_details *) a->agentdetails;

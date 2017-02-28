@@ -5,7 +5,7 @@
 ===================================================*/
 // Global Include
 #include <blackbox/plugin/bb.h>
-#include "bbPlugin.h"
+#include <blackbox/BlackBox_compat.h>
 
 //Define the ALPHA SOFTWARE flag
 //This will cause an annoying message box to pop up and confirm
@@ -657,9 +657,9 @@ void plugin_save()
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Menu *plugin_menu_settings(void)
+std::shared_ptr<bb::MenuConfig> plugin_menu_settings(void)
 {
-	Menu *m = make_menu("Global Options");
+	std::shared_ptr<bb::MenuConfig> m = make_menu(L"Global Options");
 	bool tmp;
 	for (struct plugin_properties *p = plugin_properties; p->key; p++)
 		switch (p->type)

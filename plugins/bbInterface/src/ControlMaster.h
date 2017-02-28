@@ -39,7 +39,7 @@ struct controltype
 	int     (*func_message)(control *c, int tokencount, wchar_t *tokens[]);
 	void*   (*func_getdata)(control *c, int datatype);
 	bool    (*func_getstringvalue)(control *c, wchar_t *buffer, wchar_t *propertyname);
-	void    (*func_menu_context)(Menu *m, control *c);
+	void    (*func_menu_context)(std::shared_ptr<bb::MenuConfig> m, control *c);
 	void    (*func_notifytype)(int notifytype, void *messagedata);
 };
 
@@ -97,9 +97,9 @@ void control_notify(control *c, int notifytype, void *messagedata);
 void control_pluginsvisible(bool arevisible);
 void control_invalidate(void);
 
-void control_menu_create(Menu *m, control *c, bool createchild);
-void control_menu_context(Menu *m, control *c);
-void control_menu_settings(Menu *m, control *c);
+void control_menu_create(std::shared_ptr<bb::MenuConfig> m, control *c, bool createchild);
+void control_menu_context(std::shared_ptr<bb::MenuConfig> m, control *c);
+void control_menu_settings(std::shared_ptr<bb::MenuConfig> m, control *c);
 
 bool control_getstringdata(control *c, wchar_t *buffer, wchar_t *propertyname);
 
@@ -120,7 +120,7 @@ void control_registertype(
 	int     (*func_message)(control *c, int tokencount, wchar_t *tokens[]),
 	void*   (*func_getdata)(control *c, int datatype),
 	bool    (*func_getstringvalue)(control *c, wchar_t *buffer, wchar_t *propertyname),
-	void    (*func_menu_context)(Menu *m, control *c),
+	void    (*func_menu_context)(std::shared_ptr<bb::MenuConfig> m, control *c),
 	void    (*func_notifytype)(int notifytype, void *messagedata)
 	);
 void control_unregistertype(controltype *ct);

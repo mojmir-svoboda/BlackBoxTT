@@ -162,7 +162,7 @@ void *agenttype_statictext_getdata(agent *a, int datatype)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_statictext_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_statictext_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
+void agenttype_statictext_menu_set(std::shared_ptr<bb::MenuConfig> m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
 	const wchar_t *text = a
 		? ((agenttype_statictext_details *) a->agentdetails)->text : L"";
@@ -184,7 +184,7 @@ void agenttype_statictext_menu_set(Menu *m, control *c, agent *a,  wchar_t *acti
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_statictext_menu_context
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_statictext_menu_context(Menu *m, agent *a)
+void agenttype_statictext_menu_context(std::shared_ptr<bb::MenuConfig> m, agent *a)
 {
 	make_menuitem_nop(m, L"No options available.");
 }

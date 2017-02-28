@@ -411,10 +411,10 @@ bool controltype_slider_getstringdata(control *c, wchar_t *buffer, wchar_t *prop
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //controltype_slider_menu_context
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void controltype_slider_menu_context(Menu *m, control *c)
+void controltype_slider_menu_context(std::shared_ptr<bb::MenuConfig> m, control *c)
 {
 	//Variables
-	Menu *submenu1;
+	std::shared_ptr<bb::MenuConfig> submenu1;
 	bool temp;
 
 	//Get the details

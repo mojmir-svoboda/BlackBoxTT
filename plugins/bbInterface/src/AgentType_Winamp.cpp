@@ -475,7 +475,7 @@ void *agenttype_winamppoller_getdata(agent *a, int datatype)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_winamp_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_winamp_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
+void agenttype_winamp_menu_set(std::shared_ptr<bb::MenuConfig> m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
 	int set = -1;
 	if (a)
@@ -493,7 +493,7 @@ void agenttype_winamp_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_winamppoller_bool_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_winamppoller_bool_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
+void agenttype_winamppoller_bool_menu_set(std::shared_ptr<bb::MenuConfig> m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
 	make_menuitem_cmd(m, L"Track Is Playing", config_getfull_control_setagent_c(c, action, L"WinampBool", L"IsPlaying"));
 }
@@ -501,7 +501,7 @@ void agenttype_winamppoller_bool_menu_set(Menu *m, control *c, agent *a,  wchar_
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_winamppoller_scale_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_winamppoller_scale_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
+void agenttype_winamppoller_scale_menu_set(std::shared_ptr<bb::MenuConfig> m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
 	make_menuitem_cmd(m, L"Track Position", config_getfull_control_setagent_c(c, action, L"WinampScale", L"TrackPosition"));
 }
@@ -509,7 +509,7 @@ void agenttype_winamppoller_scale_menu_set(Menu *m, control *c, agent *a,  wchar
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_winamppoller_text_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_winamppoller_text_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
+void agenttype_winamppoller_text_menu_set(std::shared_ptr<bb::MenuConfig> m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
 	for (int i = WINAMP_POLLINGTYPE_LASTSCALE + 1; i < WINAMP_POLLINGTYPECOUNT; i++)
 	{
@@ -521,7 +521,7 @@ void agenttype_winamppoller_text_menu_set(Menu *m, control *c, agent *a,  wchar_
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_winamp_menu_context
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_winamp_menu_context(Menu *m, agent *a)
+void agenttype_winamp_menu_context(std::shared_ptr<bb::MenuConfig> m, agent *a)
 {
 	make_menuitem_nop(m, L"No options available.");
 }

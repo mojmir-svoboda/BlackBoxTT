@@ -40,8 +40,8 @@ void controltype_button_notify(control *c, int notifytype, void *messagedata);
 int controltype_button_message(control *c, int tokencount, wchar_t *tokens[]);
 void *controltype_button_getdata(control *c, int datatype);
 bool controltype_button_getstringdata(control *c, wchar_t *buffer, wchar_t *propertyname);
-void controltype_button_menu_context(Menu *m, control *c);
-void controltype_switchbutton_menu_context(Menu *m, control *c);
+void controltype_button_menu_context(std::shared_ptr<bb::MenuConfig> m, control *c);
+void controltype_switchbutton_menu_context(std::shared_ptr<bb::MenuConfig> m, control *c);
 void controltype_button_notifytype(int notifytype, void *messagedata);
 #endif
 /*=================================================*/

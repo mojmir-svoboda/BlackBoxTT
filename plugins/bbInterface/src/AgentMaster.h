@@ -1,6 +1,7 @@
 #pragma once
+#include <blackbox/BlackBox_compat.h>
 
-struct module; class Menu; struct agent; struct control;
+struct module; struct agent; struct control;
 
 struct agenttype
 {
@@ -13,8 +14,8 @@ struct agenttype
 	int     (*func_message) (agent *a, int tokencount, wchar_t *tokens[]);
 	void    (*func_notify) (agent *a, int notifytype, void *messagedata);
 	void *  (*func_getdata) (agent *a, int datatype);
-	void    (*func_menu_set) (Menu *m, control *c, agent *a, wchar_t *action, int controlformat);
-	void    (*func_menu_context) (Menu *m, agent *a);
+	void    (*func_menu_set) (std::shared_ptr<bb::MenuConfig> m, control *c, agent *a, wchar_t *action, int controlformat);
+	void    (*func_menu_context) (std::shared_ptr<bb::MenuConfig> m, agent *a);
 	void    (*func_notifytype) (int notifytype, void *messagedata);
 };
 
@@ -44,8 +45,8 @@ int agent_message (int tokencount, wchar_t *tokens[], bool from_core, module* ca
 int agent_message (agent *a, int tokencount, wchar_t *tokens[]);
 int agent_controlmessage (control *c, int tokencount, wchar_t *tokens[], int agentcount, agent *agents[], wchar_t *agentnames[], int agenttypes[]);
 
-void agent_menu_set (Menu *m, control *c, agent *a, int controlformat, wchar_t *action);
-void agent_menu_context (Menu *m, control *c, agent *a);
+void agent_menu_set (std::shared_ptr<bb::MenuConfig> m, control *c, agent *a, int controlformat, wchar_t *action);
+void agent_menu_context (std::shared_ptr<bb::MenuConfig> m, control *c, agent *a);
 
 void agent_registertype(
 	wchar_t *  agenttypenamefriendly,
@@ -57,8 +58,8 @@ void agent_registertype(
 	int     (*func_message) (agent *a, int tokencount, wchar_t *tokens[]),
 	void    (*func_notify) (agent *a, int notifytype, void *messagedata),
 	void *  (*func_getdata) (agent *a, int datatype),
-	void    (*func_menu_set) (Menu *m, control *c, agent *a, wchar_t *action, int controlformat),
-	void    (*func_menu_context) (Menu *m, agent *a),
+	void    (*func_menu_set) (std::shared_ptr<bb::MenuConfig> m, control *c, agent *a, wchar_t *action, int controlformat),
+	void    (*func_menu_context) (std::shared_ptr<bb::MenuConfig> m, agent *a),
 	void    (*func_notifytype) (int notifytype, void *messagedata)
 	);
 

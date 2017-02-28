@@ -185,17 +185,17 @@ void * agenttype_mixer_getdata_vista (agent *a, int datatype)
 	return NULL;
 }
 
-void agenttype_mixer_menu_devices_vista (Menu *menu, control *c, wchar_t *action, wchar_t *agentname, int format);
-void agenttype_mixerscale_menu_set_vista (Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
+void agenttype_mixer_menu_devices_vista (std::shared_ptr<bb::MenuConfig> menu, control *c, wchar_t *action, wchar_t *agentname, int format);
+void agenttype_mixerscale_menu_set_vista (std::shared_ptr<bb::MenuConfig> m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
 	agenttype_mixer_menu_devices_vista(m, c, action, L"MixerScale", CONTROL_FORMAT_SCALE);
 }
-void agenttype_mixerbool_menu_set_vista (Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
+void agenttype_mixerbool_menu_set_vista (std::shared_ptr<bb::MenuConfig> m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
 	agenttype_mixer_menu_devices_vista(m, c, action, L"MixerBool", CONTROL_FORMAT_BOOL);
 }
 
-void agenttype_mixer_menu_context_vista (Menu *m, agent *a)
+void agenttype_mixer_menu_context_vista (std::shared_ptr<bb::MenuConfig> m, agent *a)
 {
 	make_menuitem_nop(m, L"No options available.");
 }
@@ -334,7 +334,7 @@ bool AgentType_Mixer_Vista::Init ()
 extern const wchar_t * mixer_name_scale;
 extern const wchar_t * mixer_name_bool;
 
-void agenttype_mixer_menu_devices_vista (Menu *menu, control *c, wchar_t *action, wchar_t *agentname, int format)
+void agenttype_mixer_menu_devices_vista (std::shared_ptr<bb::MenuConfig> menu, control *c, wchar_t *action, wchar_t *agentname, int format)
 {
 	IMMDeviceEnumerator * pEnumerator = NULL;
 	IMMDeviceCollection * pCollection = NULL;

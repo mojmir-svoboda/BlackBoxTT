@@ -207,7 +207,7 @@ void *agenttype_tga_getdata(agent *a, int datatype)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_tga_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_tga_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
+void agenttype_tga_menu_set(std::shared_ptr<bb::MenuConfig> m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
 	make_menuitem_cmd(m, L"Browse...", config_getfull_control_setagent_c(c, action, L"TGA", L"*browse*"));
 	make_menuitem_nop(m, L"(Uncompressed 32bpp TGAs only!");
@@ -216,7 +216,7 @@ void agenttype_tga_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_tga_menu_context
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_tga_menu_context(Menu *m, agent *a)
+void agenttype_tga_menu_context(std::shared_ptr<bb::MenuConfig> m, agent *a)
 {
 	make_menuitem_nop(m, L"No options available.");
 }

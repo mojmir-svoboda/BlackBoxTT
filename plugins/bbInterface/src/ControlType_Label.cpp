@@ -62,7 +62,7 @@ const wchar_t szBActionPluginSetProperty [] = L"SetProperty";
 //Local functions
 void controltype_label_updatesettings(controltype_label_details *details);
 int controltype_labelframe_create(control *c, bool isframe);
-void controltype_frame_insertpluginmenu(control *c, Menu *m);
+void controltype_frame_insertpluginmenu(control *c, std::shared_ptr<bb::MenuConfig> m);
 void controltype_frame_saveplugins(control *c);
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -619,10 +619,10 @@ void *controltype_frame_getdata(control *c, int datatype)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //controltype_label_menu_context
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void controltype_label_menu_context(Menu *m, control *c)
+void controltype_label_menu_context(std::shared_ptr<bb::MenuConfig> m, control *c)
 {
 	//Variables
-	Menu *submenu;
+	std::shared_ptr<bb::MenuConfig> submenu;
 
 	//Get the details
 	controltype_label_details *details = (controltype_label_details *) c->controldetails;
@@ -716,17 +716,17 @@ wchar_t *config_getfull_control_plugin_prop_ii(control *c, const wchar_t * plug,
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //controltype_frame_insertpluginmenu
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void controltype_frame_insertpluginmenu(control *c, Menu *m)
+void controltype_frame_insertpluginmenu(control *c, std::shared_ptr<bb::MenuConfig> m)
 {
 	const wchar_t menu_title[] = L"Plugins";
-	Menu *sub = make_menu(menu_title, c);
+	std::shared_ptr<bb::MenuConfig> sub = make_menu(menu_title, c);
 
 	controltype_label_details *details = (controltype_label_details *) c->controldetails;
 	make_menuitem_cmd(sub, L"Load Plugin...", config_getfull_control_plugin_c(c, L"Load", L"*browse*"));
 	static const wchar_t *submenu_titles[] = { L"Unload Plugin", L"Visibility" };
 	for (int n = 0; n < 2; n++)
 	{
-		Menu *sub2 = make_menu(submenu_titles[n], c);
+		std::shared_ptr<bb::MenuConfig> sub2 = make_menu(submenu_titles[n], c);
 		ModuleInfo *mi = details->module_info;
 		if (NULL == mi) make_menuitem_nop(sub2, L"No plugins loaded");
 		for (;mi; mi=mi->next)

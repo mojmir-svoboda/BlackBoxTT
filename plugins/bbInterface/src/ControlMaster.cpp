@@ -31,13 +31,13 @@ int controlcount = 0;
 list *variables_temp = NULL;
 
 //Locally defined functions
-int control_message_create(int tokencount, char *tokens[], bool ischild, module* parentmodule);
-int control_message_delete(control *c, int tokencount, char *tokens[]);
+int control_message_create(int tokencount, wchar_t *tokens[], bool ischild, module* parentmodule);
+int control_message_delete(control *c, int tokencount, wchar_t *tokens[]);
 
 void control_save_control(control *c, struct renamed_control **);
 void control_child_add(control *c_parent, control *c_child);
 void control_child_remove(control *c_child);
-bool control_is_valid_name(char *name);
+bool control_is_valid_name(wchar_t *name);
 //control* control_get(const char *name);
 
 // These were unused?
@@ -45,15 +45,15 @@ bool control_is_valid_name(char *name);
 //control *control_pop();
 
 //Constant variables
-const char *control_lastcontrol[] =
+const wchar_t *control_lastcontrol[] =
 {
-"@BBInterface Control Create Button LastControl",
-"@BBInterface Control SetWindowProperty LastControl X 10",
-"@BBInterface Control SetWindowProperty LastControl Y 10",
-"@BBInterface Control SetWindowProperty LastControl Width 180",
-"@BBInterface Control SetWindowProperty LastControl Height 50",
-"@BBInterface Control SetAgent LastControl Caption StaticText \"About This Control\"",
-"@BBInterface Control SetAgent LastControl MouseUp Bro@m \"@BBInterface Plugin About LastControl\"",
+L"@BBInterface Control Create Button LastControl",
+L"@BBInterface Control SetWindowProperty LastControl X 10",
+L"@BBInterface Control SetWindowProperty LastControl Y 10",
+L"@BBInterface Control SetWindowProperty LastControl Width 180",
+L"@BBInterface Control SetWindowProperty LastControl Height 50",
+L"@BBInterface Control SetAgent LastControl Caption StaticText \"About This Control\"",
+L"@BBInterface Control SetAgent LastControl MouseUp Bro@m \"@BBInterface Plugin About LastControl\"",
 NULL
 };
 
@@ -97,7 +97,7 @@ int control_shutdown()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //control_create
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int control_create(char *controlname, char *controltypename, char *controlparentname, bool include_parent, module* parentmodule)
+int control_create(wchar_t *controlname, wchar_t *controltypename, wchar_t *controlparentname, bool include_parent, module* parentmodule)
 {
 /*	char buffer[1000];
 	sprintf(buffer,"control_create\nControl: %s\nParent: %s\nDefault module: %s",name,parentmodule->name);
@@ -107,8 +107,8 @@ int control_create(char *controlname, char *controltypename, char *controlparent
 	control *controlpointer;
 	control *controlpointer_parent = NULL;
 
-	//Check name lenght
-	if (strlen(controlname) >= 64)
+	//Check name length
+	if (wcslen(controlname) >= 64)
 	{
 		return 1;
 	}
@@ -134,7 +134,7 @@ int control_create(char *controlname, char *controltypename, char *controlparent
 	controlpointer->firstchild = NULL;
 	controlpointer->lastchild = NULL;
 	controlpointer->mychildnode = NULL;
-	strcpy(controlpointer->controlname, controlname);
+	wcscpy(controlpointer->controlname, controlname);
 
 	//Identify & set the controltype
 	controlpointer->controltypeptr = (controltype *) list_lookup(controltypelist, controltypename);
@@ -173,9 +173,9 @@ int control_create(char *controlname, char *controltypename, char *controlparent
 		return 1;
 	}
 
-	char buffer[200];
-	sprintf(buffer,"%s:%s",parentmodule->name,controlname);
-	variables_set(false, "LastControl", buffer);
+	wchar_t buffer[200];
+	swprintf(buffer,200,L"%s:%s",parentmodule->name,controlname);
+	variables_set(false, L"LastControl", buffer);
 
 	//No errors
 	return 0;
@@ -233,7 +233,7 @@ int control_destroy(control *c, bool remove_from_list, bool save_last)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //control_event
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int control_rename(control *c, char *newname)
+int control_rename(control *c, wchar_t *newname)
 {
 	//Check the name to make sure it is valid
 	if (!control_is_valid_name(newname)) return 1;
@@ -247,7 +247,7 @@ int control_rename(control *c, char *newname)
 	}
 
 	//Change the name
-	strcpy(c->controlname, newname);
+	wcscpy(c->controlname, newname);
 
 	return 0;
 }
@@ -263,7 +263,7 @@ LRESULT control_event(control *c, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPa
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //control_set_pluginproperty
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int control_set_pluginproperty(control *c, int tokencount, char *tokens[], module* caller)
+int control_set_pluginproperty(control *c, int tokencount, wchar_t *tokens[], module* caller)
 {
 	for (int i = 4; i < tokencount; i++)
 		tokens[i-1] = tokens[i];
@@ -273,16 +273,16 @@ int control_set_pluginproperty(control *c, int tokencount, char *tokens[], modul
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //control_message_saveas
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int control_saveas_control(control *c, int tokencount, char **tokens)
+int control_saveas_control(control *c, int tokencount, wchar_t **tokens)
 {
 	if (5 != tokencount) return 1;
 
-	char *filename = tokens[4];
+	wchar_t *filename = tokens[4];
 
 	//If the browse option is chosen
-	if (!_stricmp(filename, "*browse*"))
+	if (!_wcsicmp(filename, L"*browse*"))
 	{       
-		filename = dialog_file(szFilterScript, "Save This Control As", ".rc", config_path_plugin, true);
+		filename = dialog_file(szFilterScript, L"Save This Control As", L".rc", config_path_plugin, true);
 		if (!filename)
 		{
 			//message_override = true;
@@ -290,7 +290,7 @@ int control_saveas_control(control *c, int tokencount, char **tokens)
 		}
 	}
 
-	config_file_out = config_open(filename, "wt");
+	config_file_out = config_open(filename, L"wt");
 	if (NULL == config_file_out) return 1;
 
 	control_save_control(c, NULL);
@@ -305,7 +305,7 @@ struct renamed_control
 {
 	struct renamed_control *next;
 	control *c;
-	char old_name[80];
+	wchar_t old_name[80];
 };
 
 int control_clone(control *c)
@@ -322,7 +322,7 @@ int control_clone(control *c)
 	fclose(config_file_out);
 	while (RC)
 	{
-		strcpy(RC->c->controlname, RC->old_name);
+		wcscpy(RC->c->controlname, RC->old_name);
 		struct renamed_control *RC2 = RC->next;
 		delete RC; RC = RC2;
 	}
@@ -334,11 +334,11 @@ int control_clone(control *c)
 	return 0;
 }
 
-bool lookup_renamed_controls(struct renamed_control *RC, char *new_name)
+bool lookup_renamed_controls(struct renamed_control *RC, wchar_t *new_name)
 {
 	while (RC)
 	{
-		if (0 == _stricmp(new_name, RC->c->controlname))
+		if (0 == _wcsicmp(new_name, RC->c->controlname))
 			break;
 		RC = RC->next;
 	}
@@ -347,17 +347,18 @@ bool lookup_renamed_controls(struct renamed_control *RC, char *new_name)
 
 void replace_name(control *c, struct renamed_control ** p_renamed_list)
 {
-	char new_name[80];
-	strcpy(new_name, c->controlname);
-	char *e;
-	for (e = strchr(new_name, 0); e > new_name && e[-1] >= '0' && e[-1]<='9'; e--);
-	int number = *e ? 1 + atoi(e) : 1;
-	do sprintf(e, "%d", number++);
+	wchar_t new_name[80];
+	wcscpy(new_name, c->controlname);
+	wchar_t *e;
+	for (e = wcschr(new_name, 0); e > new_name && e[-1] >= L'0' && e[-1]<=L'9'; e--)
+		;
+	int number = *e ? 1 + _wtoi(e) : 1;
+	do swprintf(e, 80,L"%d", number++);
 	while (list_lookup(c->moduleptr->controllist, new_name) || lookup_renamed_controls(*p_renamed_list, new_name));
 
 	struct renamed_control *p_renamed_node = new struct renamed_control;
-	strcpy(p_renamed_node->old_name, c->controlname);
-	strcpy(c->controlname, new_name);
+	wcscpy(p_renamed_node->old_name, c->controlname);
+	wcscpy(c->controlname, new_name);
 	p_renamed_node->c = c;
 
 	p_renamed_node->next = *p_renamed_list;
@@ -380,7 +381,7 @@ bool control_can_be_assigned_to(control *c, module* m)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //control_assign_to_module
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int control_assign_to_module(control* c, const char* modulename)
+int control_assign_to_module(control* c, const wchar_t* modulename)
 {
 	module* m = (module *) list_lookup(modulelist, modulename);
 	if (!m) return 1;
@@ -452,7 +453,7 @@ int control_detach_from_module(control* c)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //control_message
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int control_message(int tokencount, char *tokens[], bool from_core, module* caller)
+int control_message(int tokencount, wchar_t *tokens[], bool from_core, module* caller)
 {
 /*	//DEBUG STUFF
 	char buffer[1000];
@@ -468,7 +469,7 @@ int control_message(int tokencount, char *tokens[], bool from_core, module* call
 	if (tokencount < 4) return 1;
 	
 	//The create scenario, we don't need to find a control
-	if (!_stricmp(tokens[2], szBActionCreate))
+	if (!_wcsicmp(tokens[2], szBActionCreate))
 		return control_message_create(tokencount, tokens, false, caller);
 	
 	//Find the control
@@ -476,39 +477,39 @@ int control_message(int tokencount, char *tokens[], bool from_core, module* call
 	if (!c) return 1;
 
 	//Create child only if allowed
-	if (!_stricmp(tokens[2], szBActionCreateChild))
+	if (!_wcsicmp(tokens[2], szBActionCreateChild))
 		return control_message_create(tokencount, tokens, c->controltypeptr->can_parent, c->moduleptr);
 
 	// "Delete"
-	if (!_stricmp(tokens[2], szBActionDelete))
+	if (!_wcsicmp(tokens[2], szBActionDelete))
 		return control_message_delete(c, tokencount, tokens);
 
 	// "Save This Control As..."
-	if (!_stricmp(tokens[2], szBActionSaveAs))
+	if (!_wcsicmp(tokens[2], szBActionSaveAs))
 		return control_saveas_control(c, tokencount, tokens);
 
 	// "Clone"
-	if (!_stricmp(tokens[2], "Clone"))
+	if (!_wcsicmp(tokens[2], L"Clone"))
 		return control_clone(c);
 
 	int result;
 
 	// "Set Window Property"
-	if (!_stricmp(tokens[2], szBActionSetWindowProperty))
+	if (!_wcsicmp(tokens[2], szBActionSetWindowProperty))
 		result = window_message_setproperty(c, tokencount, tokens);
 	else
 	//If it's rename, try to rename it
-	if (tokencount == 5 && !_stricmp(tokens[2], szBActionRename))
+	if (tokencount == 5 && !_wcsicmp(tokens[2], szBActionRename))
 		result = control_rename(c, tokens[4]);
 	else
-	if (tokencount == 5 && !_stricmp(tokens[2], szBActionAssignToModule))
+	if (tokencount == 5 && !_wcsicmp(tokens[2], szBActionAssignToModule))
 		result = control_assign_to_module(c, tokens[4]);
 	else
-	if (!_stricmp(tokens[2], szBActionDetachFromModule))
+	if (!_wcsicmp(tokens[2], szBActionDetachFromModule))
 		result = control_detach_from_module(c);
 	else
 	//If it's a plugin property message, reroute it to the plugin_message handler
-	if (!_stricmp(tokens[2], szBActionSetPluginProperty))
+	if (!_wcsicmp(tokens[2], szBActionSetPluginProperty))
 		result = control_set_pluginproperty(c, tokencount, tokens, caller);
 	else
 	//Pass it up to the control, since we can't handle it here
@@ -641,7 +642,7 @@ void control_invalidate(void)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //control_menu_create
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void control_menu_create(Menu *m, control *c, bool createchild)
+void control_menu_create(std::shared_ptr<bb::MenuConfig> m, control *c, bool createchild)
 {
 	//Create the list
 	listnode *ln;
@@ -670,41 +671,42 @@ bool is_descendant (control *c, control *parent)
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void control_menu_settings(Menu *m, control *c)
+void control_menu_settings(std::shared_ptr<bb::MenuConfig> m, control *c)
 {
 	//Variables
-	listnode *ln, *ln2; int n; Menu *sub, *sub2; const bool btrue = true;
-	const char *sub_title;
+	listnode *ln, *ln2; int n; std::shared_ptr<bb::MenuConfig> sub, sub2; const bool btrue = true;
+	const wchar_t *sub_title;
 
-	make_menuitem_cmd(m, "Clone This Control", config_getfull_control_clone(c));
-	make_menuitem_cmd(m, "Save This Control As...", config_getfull_control_saveas(c, "*Browse*"));
+	make_menuitem_cmd(m, L"Clone This Control", config_getfull_control_clone(c));
+	make_menuitem_cmd(m, L"Save This Control As...", config_getfull_control_saveas(c, L"*Browse*"));
 
-	n = 0; sub = make_menu("Parent Control", c);
+	n = 0; sub = make_menu(L"Parent Control", c);
 
 	// ------- change child status of controls --------
 	if (c->controltypeptr->can_parentless && c->parentptr)
 	{
-		sub_title = "Detach From";
-		++n, make_menuitem_bol(sub, c->parentptr->controlname, config_getfull_control_setwindowprop_s(c, "Detach"), true);
+		sub_title = L"Detach From";
+		++n, make_menuitem_bol(sub, c->parentptr->controlname, config_getfull_control_setwindowprop_s(c, L"Detach"), true);
 	}
 	else
 	{
-		sub_title = "Attach To";
+		sub_title = L"Attach To";
 		if (c->controltypeptr->can_child && NULL == c->parentptr && false == c->windowptr->is_slitted)
 		{
-			sub2 = make_menu("Global", c);
+			sub2 = make_menu(L"Global", c);
 			n = 0;
 			dolist (ln2, globalmodule.controllist)
 			{
 				control *pspec = (control *) ln2->value;
 				if (pspec->controltypeptr->can_parent && !is_descendant(pspec, c))
 				{
-					char buffer[110]; sprintf(buffer, "AttachTo %s:%s", pspec->moduleptr->name, pspec->controlname);
+					wchar_t buffer[110];
+					swprintf(buffer, 110, L"AttachTo %s:%s", pspec->moduleptr->name, pspec->controlname);
 					++n, make_menuitem_cmd(sub2, pspec->controlname, config_getfull_control_setwindowprop_s(c, buffer));
 				}
 			}
-			if (0 == n) make_menuitem_nop(sub2, "Not Available");
-			make_submenu_item(sub, "Global", sub2);
+			if (0 == n) make_menuitem_nop(sub2, L"Not Available");
+			make_submenu_item(sub, L"Global", sub2);
 			// add the rest of the modules as well
 			dolist (ln,modulelist)
 			{
@@ -719,11 +721,12 @@ void control_menu_settings(Menu *m, control *c)
 						control *pspec = (control *) ln2->value;
 						if (pspec->controltypeptr->can_parent && !is_descendant(pspec, c))
 						{
-							char buffer[110]; sprintf(buffer, "AttachTo %s:%s", pspec->moduleptr->name, pspec->controlname);
+							wchar_t buffer[110];
+							swprintf(buffer, 110, L"AttachTo %s:%s", pspec->moduleptr->name, pspec->controlname);
 							++n, make_menuitem_cmd(sub2, pspec->controlname, config_getfull_control_setwindowprop_s(c, buffer));
 						}
 					}
-					if (0 == n) make_menuitem_nop(sub2, "Not Available");
+					if (0 == n) make_menuitem_nop(sub2, L"Not Available");
 					make_submenu_item(sub, mod->name, sub2);
 				}
 			}
@@ -735,12 +738,12 @@ void control_menu_settings(Menu *m, control *c)
 	if (!c->parentptr)
 		if (c->moduleptr != &globalmodule)
 		{	
-			sub = make_menu("Detach From", c);
+			sub = make_menu(L"Detach From", c);
 			make_menuitem_cmd(sub, c->moduleptr->name, config_getfull_control_detachfrommodule(c));
-			make_submenu_item(m, "Detach From Module", sub);
+			make_submenu_item(m, L"Detach From Module", sub);
 		} else
 		{
-			n = 0; sub = make_menu("Assign To", c);
+			n = 0; sub = make_menu(L"Assign To", c);
 			dolist (ln, modulelist)
 			{
 				module* m = (module*) ln->value;
@@ -749,14 +752,14 @@ void control_menu_settings(Menu *m, control *c)
 					++n; make_menuitem_cmd(sub, m->name, config_getfull_control_assigntomodule(c, m));
 				}
 			}
-			if (0 == n) make_menuitem_nop(sub, "Not Available");
-			make_submenu_item(m, "Assign To Module", sub);
+			if (0 == n) make_menuitem_nop(sub, L"Not Available");
+			make_submenu_item(m, L"Assign To Module", sub);
 		}
 
 	// ------- recover hidden controls --------
-	sub = make_menu(sub_title = "Unhide Control", c);
+	sub = make_menu(sub_title = L"Unhide Control", c);
 
-	sub2 = make_menu("Global", c);
+	sub2 = make_menu(L"Global", c);
 	n = 0;
 	dolist (ln2, globalmodule.controllist)
 	{
@@ -764,8 +767,8 @@ void control_menu_settings(Menu *m, control *c)
 		if (false == cspec->windowptr->is_visible)
 			++n, make_menuitem_cmd(sub2, cspec->controlname, config_getfull_control_setwindowprop_b(cspec, szWPisvisible, &btrue));
 	}
-	if (0 == n) make_menuitem_nop(sub2, "None Hidden");
-	make_submenu_item(sub, "Global", sub2);
+	if (0 == n) make_menuitem_nop(sub2, L"None Hidden");
+	make_submenu_item(sub, L"Global", sub2);
 	dolist (ln, modulelist)
 	{
 		module *mod = (module *) ln->value;
@@ -779,7 +782,7 @@ void control_menu_settings(Menu *m, control *c)
 				if (false == cspec->windowptr->is_visible)
 					++n, make_menuitem_cmd(sub2, cspec->controlname, config_getfull_control_setwindowprop_b(cspec, szWPisvisible, &btrue));
 			}
-			if (0 == n) make_menuitem_nop(sub2, "None Hidden");
+			if (0 == n) make_menuitem_nop(sub2, L"None Hidden");
 			make_submenu_item(sub, mod->name, sub2);
 		}
 	}
@@ -788,11 +791,11 @@ void control_menu_settings(Menu *m, control *c)
 	// -------
 
 	make_menuitem_nop(m, NULL);
-	make_menuitem_cmd(m, "Delete This Control", config_getfull_control_delete(c));
+	make_menuitem_cmd(m, L"Delete This Control", config_getfull_control_delete(c));
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-bool control_make_childof(control *c, const char *parentname)
+bool control_make_childof(control *c, const wchar_t *parentname)
 {
 	control *pc = control_get(parentname);
 	if (NULL == pc
@@ -827,7 +830,7 @@ bool control_make_parentless(control *c)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //control_menu_context
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void control_menu_context(Menu *m, control *c)
+void control_menu_context(std::shared_ptr<bb::MenuConfig> m, control *c)
 {   
 	//Type-specific menu
 	(c->controltypeptr->func_menu_context)(m, c);
@@ -870,12 +873,12 @@ void control_save_control(control *c, struct renamed_control ** p_renamed_list)
 	//Save the control's existance
 	if (c->parentptr)
 	{
-		config_printf("!---- %s::%s ----", c->parentptr->controlname, c->controlname);
+		config_printf(L"!---- %s::%s ----", c->parentptr->controlname, c->controlname);
 		config_write(config_get_control_create_child_named(c->parentptr, c->controltypeptr, c));
 	}
 	else
 	{
-		config_printf("!---- %s ----", c->controlname);
+		config_printf(L"!---- %s ----", c->controlname);
 		config_write(config_get_control_create_named(c->controltypeptr, c));
 	}
 
@@ -906,7 +909,7 @@ void control_checklast()
 	if (controlcount > 0 || plugin_zerocontrolsallowed) return;
 
 	//If this is the last control, create a new one!
-	for (const char ** p = control_lastcontrol; *p; p++)
+	for (const wchar_t ** p = control_lastcontrol; *p; p++)
 		message_interpret(*p, false, &globalmodule);
 }
 
@@ -914,7 +917,7 @@ void control_checklast()
 //control_registertype
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void control_registertype(
-	char    *controltypename,
+	wchar_t    *controltypename,
 	bool    can_parentless,
 	bool    can_parent,
 	bool    can_child,
@@ -923,20 +926,20 @@ void control_registertype(
 	int     (*func_destroy)(control *c),
 	LRESULT (*func_event)(control *c, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam),
 	void    (*func_notify)(control *c, int notifytype, void *messagedata),
-	int     (*func_message)(control *c, int tokencount, char *tokens[]),
+	int     (*func_message)(control *c, int tokencount, wchar_t *tokens[]),
 	void*   (*func_getdata)(control *c, int datatype),
-	bool    (*func_getstringvalue)(control *c, char *buffer, char *propertyname),
-	void    (*func_menu_context)(Menu *m, control *c),
+	bool    (*func_getstringvalue)(control *c, wchar_t *buffer, wchar_t *propertyname),
+	void    (*func_menu_context)(std::shared_ptr<bb::MenuConfig> m, control *c),
 	void    (*func_notifytype)(int notifytype, void *messagedata)
 	)
 {
 	//Error conditions
-	if (strlen(controltypename) >= 64) return;
+	if (wcslen(controltypename) >= 64) return;
 
 	controltype *controltypepointer;
 	controltypepointer = new controltype;
 
-	strcpy(controltypepointer->controltypename, controltypename);
+	wcscpy(controltypepointer->controltypename, controltypename);
 	
 	controltypepointer->can_parentless = can_parentless;
 	controltypepointer->can_parent = can_parent;
@@ -969,7 +972,7 @@ void control_unregistertype(controltype *ct)
 //##################################################
 //control_message_create
 //##################################################
-int control_message_create(int tokencount, char *tokens[], bool ischild, module* defaultmodule)
+int control_message_create(int tokencount, wchar_t *tokens[], bool ischild, module* defaultmodule)
 {
 	//Variables
 	int index_newname, index_targettype;
@@ -981,8 +984,8 @@ int control_message_create(int tokencount, char *tokens[], bool ischild, module*
 	{   index_newname = 4; index_targettype = 3; }
 
 	//Determine target module and controltype
-	char* mname = new_string(tokens[index_targettype]); //module name
-	char* tname = strchr(mname,':'); //type name
+	wchar_t* mname = new_string(tokens[index_targettype]); //module name
+	wchar_t* tname = wcschr(mname, L':'); //type name
 	module* parentmodule;
 	if (tname)
 	{
@@ -1002,17 +1005,17 @@ int control_message_create(int tokencount, char *tokens[], bool ischild, module*
 	{
 		//Find a new unique name for the new control
 		//This is dirty - possible better solution later!
-		char tempname[64];
+		wchar_t tempname[64];
 		int number = 1;
 		do
 		{
-			sprintf(tempname, "%s%d", tname, number);
+			swprintf(tempname, 64, L"%s%d", tname, number);
 			number++;
 
 		} while (list_lookup(parentmodule->controllist, tempname));
 		
 		//Create the control, return the result
-		if (!ischild && 0 == control_create(tempname, tname, "", false, parentmodule))
+		if (!ischild && 0 == control_create(tempname, tname, L"", false, parentmodule))
 			return 0;
 		else
 		if (ischild && 0 == control_create(tempname, tname, tokens[3], true, parentmodule))
@@ -1026,7 +1029,7 @@ int control_message_create(int tokencount, char *tokens[], bool ischild, module*
 			return 1;
 
 		//Create the control, return the result
-		if (!ischild && 0 == control_create(tokens[4], tname, "", false, parentmodule))
+		if (!ischild && 0 == control_create(tokens[4], tname, L"", false, parentmodule))
 			return 0;
 		else
 		if (ischild && 0 == control_create(tokens[5], tname, tokens[3], true, parentmodule))
@@ -1038,9 +1041,9 @@ int control_message_create(int tokencount, char *tokens[], bool ischild, module*
 //##################################################
 //control_message_delete
 //##################################################
-int control_message_delete(control *c, int tokencount, char *tokens[])
+int control_message_delete(control *c, int tokencount, wchar_t *tokens[])
 {
-	if (tokencount == 4 && !strcmp(tokens[2], "Delete"))
+	if (tokencount == 4 && !wcscmp(tokens[2], L"Delete"))
 	{
 		control_destroy(c, true, true);
 		return 0;       
@@ -1115,11 +1118,11 @@ bool control_is_valid_name(char *name)
 //control_get
 // Returns controls with the fully qualified name "Module:Control" or NULL if not found.
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-control* control_get(const char *name, module* deflt)
+control* control_get(const wchar_t *name, module* deflt)
 {
-	char mname[512];
-	strncpy(mname, name, 512);
-	char* cname = strchr(mname,':');
+	wchar_t mname[512];
+	wcsncpy(mname, name, 512);
+	wchar_t* cname = wcschr(mname, L':');
 	module* m;
 	if (cname)
 	{
@@ -1139,7 +1142,7 @@ control* control_get(const char *name, module* deflt)
 //##################################################
 //control_getstringdata
 //##################################################
-bool control_getstringdata(control *c, char *buffer, char *propertyname)
+bool control_getstringdata(control *c, wchar_t *buffer, wchar_t *propertyname)
 {
 	if (c == NULL) return NULL;
 	return c->controltypeptr->func_getstringvalue(c, buffer, propertyname);
@@ -1162,7 +1165,7 @@ void variables_shutdown(void)
 	if (variables_temp)
 	{
 		listnode *ln;
-		dolist (ln, variables_temp) free_string((char **)&ln->value);
+		dolist (ln, variables_temp) free_string((wchar_t **)&ln->value);
 		list_destroy(variables_temp);
 		variables_temp = NULL;
 	}
@@ -1176,7 +1179,7 @@ void variables_shutdown(void)
 void variables_save(void)
 {
 	if (!globalmodule.variables->first) return;
-	config_printf("!---- Global variables ----");
+	config_printf(L"!---- Global variables ----");
 	listnode *ln;
 	dolist(ln,globalmodule.variables)
 		config_write(config_get_variable_set_static(ln));
@@ -1184,13 +1187,13 @@ void variables_save(void)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //variables_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void variables_set(bool is_static, const char *key, const char *val, module* defmodule)
+void variables_set(bool is_static, const wchar_t *key, const wchar_t *val, module* defmodule)
 {
-	char *old_val;
+	wchar_t *old_val;
 	if (is_static)
 	{
-		char* mname = new_string(key);
-		char* vname = strrchr(mname,':');
+		wchar_t* mname = new_string(key);
+		wchar_t* vname = wcsrchr(mname,':');
 		module* m;
 		if (vname)
 		{
@@ -1211,16 +1214,16 @@ void variables_set(bool is_static, const char *key, const char *val, module* def
 	}
 	else
 	{
-		const char *p = strrchr(key,':');
+		const wchar_t *p = wcsrchr(key, L':');
 		list_add(variables_temp, p ? p+1 : key, new_string(val), (void**)&old_val);
 		free_string(&old_val);
 	}
 }
 
-void variables_set(bool is_static, const char *key, int val, module* defmodule)
+void variables_set(bool is_static, const wchar_t *key, int val, module* defmodule)
 {
-	char buffer[20];
-	sprintf(buffer, "%d", val);
+	wchar_t buffer[20];
+	swprintf(buffer, 20, L"%d", val);
 	variables_set(is_static, key, buffer, defmodule);
 }
 /*
@@ -1240,10 +1243,10 @@ void variables_set_local(module *m, const char *key, int val)
 }
 
 */
-const char *variables_get(const char *key, const char *deflt, module* defmodule)
+const wchar_t *variables_get(const wchar_t *key, const wchar_t *deflt, module* defmodule)
 {
-	char* mname = new_string(key);
-	char* vname = strrchr(mname,':');
+	wchar_t* mname = new_string(key);
+	wchar_t* vname = wcsrchr(mname, L':');
 	module* m;
 	if (vname)
 	{
@@ -1257,10 +1260,10 @@ const char *variables_get(const char *key, const char *deflt, module* defmodule)
 		vname = mname;
 		m = defmodule;
 	}
-	char* s = (char*) list_lookup(m->variables,vname);
+	wchar_t* s = (wchar_t*) list_lookup(m->variables,vname);
 	if (s) return s;
 
-	s = (char*) list_lookup(variables_temp, vname);
+	s = (wchar_t*) list_lookup(variables_temp, vname);
 	if (s) return s;
 	
 	return deflt;

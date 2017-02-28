@@ -1,4 +1,5 @@
 #pragma once
+#include <blackbox/BlackBox_compat.h>
 
 struct list; struct listnode;
 
@@ -39,9 +40,9 @@ int module_toggle(wchar_t *modulename);
 int module_message(int tokencount, wchar_t *tokens[], bool from_core, module* caller);
 bool module_state(wchar_t *modulename);
 
-Menu* module_menu_modulelist();
-Menu* module_menu_editmodules();
-Menu* module_menu_setactivemodule();
+std::shared_ptr<bb::MenuConfig>  module_menu_modulelist();
+std::shared_ptr<bb::MenuConfig>  module_menu_editmodules();
+std::shared_ptr<bb::MenuConfig>  module_menu_setactivemodule();
 
 void module_save_list();
 void module_save_all();

@@ -396,7 +396,7 @@ void *agenttype_autoscalegraph_getdata(agent *a, int datatype)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_autoscalegraph_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_autoscalegraph_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
+void agenttype_autoscalegraph_menu_set(std::shared_ptr<bb::MenuConfig> m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
 	for (int i = 0; i < AGENTTYPE_AUTOSCALEGRAPH_CHARTTYPECOUNT; i++)
 	{
@@ -407,9 +407,9 @@ void agenttype_autoscalegraph_menu_set(Menu *m, control *c, agent *a,  wchar_t *
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_autoscalegraph_menu_context
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_autoscalegraph_menu_context(Menu *m, agent *a)
+void agenttype_autoscalegraph_menu_context(std::shared_ptr<bb::MenuConfig> m, agent *a)
 {
-	Menu *submenu;
+	std::shared_ptr<bb::MenuConfig> submenu;
 	agenttype_autoscalegraph_details *details = (agenttype_autoscalegraph_details *) a->agentdetails;
 
 	for (int i = 0; i < AGENTTYPE_AUTOSCALEGRAPH_CHARTTYPECOUNT; i++)
@@ -419,7 +419,7 @@ void agenttype_autoscalegraph_menu_context(Menu *m, agent *a)
 	make_menuitem_nop(m, NULL);
 
 	wchar_t namedot[1000];
-	swprintf(namedot, L"%s%s", a->agentaction, L".");
+	swprintf(namedot, 1000, L"%s%s", a->agentaction, L".");
 
 	menu_controloptions(m, a->controlptr, AGENTTYPE_AUTOSCALEGRAPH_AGENTCOUNT, details->agents, namedot, agenttype_autoscalegraph_agentdescriptions, agenttype_autoscalegraph_agenttypes);
 

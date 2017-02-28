@@ -10,7 +10,7 @@ int     agenttype_mixer_destroy (agent *a);
 int     agenttype_mixer_message (agent *a, int tokencount, char *tokens[]);
 void    agenttype_mixer_notify (agent *a, int notifytype, void *messagedata);
 void*   agenttype_mixer_getdata (agent *a, int datatype);
-void    agenttype_mixer_menu_context (Menu *m, agent *a);
+void    agenttype_mixer_menu_context (std::shared_ptr<bb::MenuConfig> m, agent *a);
 void    agenttype_mixer_notifytype (int notifytype, void *messagedata);
 
 

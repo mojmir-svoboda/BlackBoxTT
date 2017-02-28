@@ -1,4 +1,5 @@
 #pragma once
+#include <blackbox/BlackBox_compat.h>
 
 struct module; class Menu; struct agent; struct control; struct window; struct StyleItem;
 
@@ -86,7 +87,7 @@ int window_shutdown();
 int window_create(control *c);
 int window_destroy(window **pw);
 
-void window_menu_context(Menu *m, control *c);
+void window_menu_context(std::shared_ptr<bb::MenuConfig> m, control *c);
 
 void window_save_control(control *c);
 void window_save();

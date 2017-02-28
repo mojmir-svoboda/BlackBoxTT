@@ -258,7 +258,7 @@ void *agenttype_compoundtext_getdata(agent *a, int datatype)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_compoundtext_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_compoundtext_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
+void agenttype_compoundtext_menu_set(std::shared_ptr<bb::MenuConfig> m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
 	const wchar_t *text = a
 		? ((agenttype_compoundtext_details *) a->agentdetails)->text : L"";
@@ -280,7 +280,7 @@ void agenttype_compoundtext_menu_set(Menu *m, control *c, agent *a,  wchar_t *ac
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_compoundtext_menu_context
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_compoundtext_menu_context(Menu *m, agent *a)
+void agenttype_compoundtext_menu_context(std::shared_ptr<bb::MenuConfig> m, agent *a)
 {
 	agenttype_compoundtext_details *details = (agenttype_compoundtext_details *) a->agentdetails;
 

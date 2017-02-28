@@ -6,9 +6,10 @@
 
 // Global Include
 #include <blackbox/plugin/bb.h>
+#include <bblibcompat/StyleStruct.h>
 #include <shellapi.h>
 #include <stdlib.h>
-#include "BB.h"
+//#include "BB.h"
 #include "Workspaces.h"
 
 //Parent Include
@@ -90,7 +91,7 @@ int window_startup()
 
 	if (!RegisterClass(&wc)) 
 	{
-		if (!plugin_suppresserrors) BBMessageBox(0, "Error registering window class", szVersion, MB_OK | MB_ICONERROR | MB_TOPMOST);
+		if (!plugin_suppresserrors) BBMessageBox(0, L"Error registering window class", szVersion, MB_OK | MB_ICONERROR | MB_TOPMOST);
 		return 1;
 	}
 
@@ -138,7 +139,7 @@ int window_create(control *c)
 	w->has_custom_style = false;
 	w->font = NULL;
 	w->use_custom_font = false;
-	strncpy(w->Fontname, "", sizeof(w->Fontname) / sizeof(w->Fontname));
+	wcsncpy(w->Fontname, L"", sizeof(w->Fontname) / sizeof(w->Fontname));
 	w->FontHeight = 0;
 	w->FontWeight = FW_NORMAL;
 	w->nosavevalue = 0;
@@ -165,7 +166,7 @@ int window_create(control *c)
 		w->bstyleptr->has_custom_style = false;
 		w->bstyleptr->use_custom_font = false;
 		w->bstyleptr->font = NULL;
-		strcpy(w->bstyleptr->Fontname,"");
+		wcscpy(w->bstyleptr->Fontname, L"");
 		w->bstyleptr->FontHeight = 0;
 		w->bstyleptr->FontWeight = FW_NORMAL;
 		w->bstyleptr->nosavevalue = 0;
@@ -232,7 +233,7 @@ int window_create(control *c)
 	if (NULL == hwnd)
 	{                          
 		if (!plugin_suppresserrors)
-			BBMessageBox(0, "Error creating window", szVersion, MB_OK | MB_ICONERROR | MB_TOPMOST);
+			BBMessageBox(0, L"Error creating window", szVersion, MB_OK | MB_ICONERROR | MB_TOPMOST);
 
 		delete w;
 		c->windowptr = NULL;
@@ -298,10 +299,10 @@ int window_destroy(window **pw)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //window_menu_context
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void window_menu_context(Menu *m, control *c)
+void window_menu_context(std::shared_ptr<bb::MenuConfig> m, control *c)
 {
 	window *w = c->windowptr;
-	Menu *submenu, *custommenu, *advancedmenu;
+	std::shared_ptr<bb::MenuConfig> submenu, custommenu, advancedmenu;
 	int i; bool temp;
 
 	// NOTE: Comment out in proper version for now.
@@ -314,10 +315,10 @@ void window_menu_context(Menu *m, control *c)
 	*/
 	
 	//Style options
-	submenu = make_menu("Style", c);
+	submenu = make_menu(L"Style", c);
 	for (i = 0; i < STYLE_COUNT; ++i)
-		make_menuitem_bol(submenu, szStyleNames[i], config_getfull_control_setwindowprop_c(c, "Style", szStyleNames[i]), (!w->has_custom_style) && (w->style == i) ); //None of these are possible if a custom style is used. Subject to change with the rest of the implementation.
-	custommenu = make_menu("Custom", c );
+		make_menuitem_bol(submenu, szStyleNames[i], config_getfull_control_setwindowprop_c(c, L"Style", szStyleNames[i]), (!w->has_custom_style) && (w->style == i) ); //None of these are possible if a custom style is used. Subject to change with the rest of the implementation.
+	custommenu = make_menu(L"Custom", c );
 	for (i = 0; i < STYLE_COLOR_PROPERTY_COUNT; ++i)
 	{
 		if((w->nosavevalue&(1<<i))==0)
@@ -335,8 +336,8 @@ void window_menu_context(Menu *m, control *c)
 					colorval = w->has_custom_style ? w->styleptr->TextColor : style_get_copy(w->style).TextColor; 
 					break;
 			}
-			char color[8];
-			sprintf(color,"#%06X",switch_rgb(colorval)); //the bits need to be switched around here
+			wchar_t color[8];
+			swprintf(color, 8, L"#%06X",switch_rgb(colorval)); //the bits need to be switched around here
 			make_menuitem_str(
 				custommenu,
 				szStyleProperties[i],
@@ -347,7 +348,7 @@ void window_menu_context(Menu *m, control *c)
 	}
 
 	// Add the bevel setting menus as well.
-	Menu* bevelmenu = make_menu("Bevel Style", c);
+	std::shared_ptr<bb::MenuConfig>  bevelmenu = make_menu(L"Bevel Style", c);
 	int beveltype = w->has_custom_style ? w->styleptr->bevelstyle : style_get_copy(w->style).bevelstyle;
 	if((w->nosavevalue&(1<<STYLE_BEVELTYPE_INDEX))==0){
 		for (i=0; i<STYLE_BEVEL_TYPE_COUNT; ++i)
@@ -355,31 +356,31 @@ void window_menu_context(Menu *m, control *c)
 			bool temp = (beveltype == i);
 			make_menuitem_bol(bevelmenu,szBevelTypes[i],config_getfull_control_setwindowprop_c(c,szStyleProperties[STYLE_BEVELTYPE_INDEX],szBevelTypes[i]),temp);
 		}
-		make_submenu_item(custommenu,"Bevel Style",bevelmenu);
+		make_submenu_item(custommenu, L"Bevel Style",bevelmenu);
 	}
 	if (beveltype != 0 && (w->nosavevalue&(1<<STYLE_BEVELPOS_INDEX))==0)
 		make_menuitem_int(
 			custommenu,
-			"Bevel Position",
+			L"Bevel Position",
 			config_getfull_control_setwindowprop_s(c, szStyleProperties[STYLE_BEVELPOS_INDEX]),
 			w->has_custom_style ? w->styleptr->bevelposition : style_get_copy(w->style).bevelposition,
 			1,
 			2);
 //Border Options -------------------------------------------------------
-	Menu *bordermenu = make_menu("Border",c);
+	std::shared_ptr<bb::MenuConfig> bordermenu = make_menu(L"Border",c);
 	
 	temp = !(w->has_custom_style ?
 			w->styleptr->bordered : style_get_copy(w->style).bordered);
-	make_menuitem_bol(bordermenu,"default",config_getfull_control_setwindowprop_c(c,"DefaultBorder","True"),temp);
+	make_menuitem_bol(bordermenu,L"default",config_getfull_control_setwindowprop_c(c,L"DefaultBorder",L"True"),temp);
 
-	Menu *bordercustommenu = make_menu("Custom",c);
+	std::shared_ptr<bb::MenuConfig> bordercustommenu = make_menu(L"Custom",c);
 
 	if((w->nosavevalue&(1<<STYLE_BORDERWIDTH_INDEX))==0){
 		int borderwidth = w->has_custom_style ? 
 			(w->styleptr->bordered ? w->styleptr->borderWidth : *((int *)GetSettingPtr(SN_BORDERWIDTH))) :
 			(style_get_copy(w->style).bordered ? style_get_copy(w->style).borderWidth : *((int *)GetSettingPtr(SN_BORDERWIDTH))); 
 		make_menuitem_int(
-			bordercustommenu,"Border Width",
+			bordercustommenu,L"Border Width",
 			config_getfull_control_setwindowprop_s(c, szStyleProperties[STYLE_BORDERWIDTH_INDEX]),
 			borderwidth,0,50);
 	}
@@ -387,66 +388,66 @@ void window_menu_context(Menu *m, control *c)
 		int colorval = w->has_custom_style ? 
 			(w->styleptr->bordered ? w->styleptr->borderColor : *((COLORREF *)GetSettingPtr(SN_BORDERCOLOR))) :
 			(style_get_copy(w->style).bordered ? style_get_copy(w->style).borderColor : *((COLORREF *)GetSettingPtr(SN_BORDERCOLOR))); 
-		char color[8];
-		sprintf(color,"#%06X",switch_rgb(colorval));
+		wchar_t color[8];
+		swprintf(color, 8, L"#%06X",switch_rgb(colorval));
 		make_menuitem_str(
 			bordercustommenu,
-			"Border Color",
+			L"Border Color",
 			config_getfull_control_setwindowprop_s(c,szStyleProperties[STYLE_BORDERCOLOR_INDEX]),
 			color
 		);
 	}
-	make_submenu_item(bordermenu,"Custom",bordercustommenu);
-	make_submenu_item(custommenu,"Border",bordermenu);
+	make_submenu_item(bordermenu,L"Custom",bordercustommenu);
+	make_submenu_item(custommenu,L"Border",bordermenu);
 
 //Shadow Options -------------------------------------------------------
-	Menu *shadowmenu = make_menu("Text Shadow",c);
+	std::shared_ptr<bb::MenuConfig> shadowmenu = make_menu(L"Text Shadow",c);
 	
-	Menu *shadowcolormenu = make_menu("Shadow Color",c);
+	std::shared_ptr<bb::MenuConfig> shadowcolormenu = make_menu(L"Shadow Color",c);
 	if((w->nosavevalue&(1<<STYLE_SHADOWCOLOR_INDEX))==0){
 		
 		temp =	((w->has_custom_style ? w->styleptr->validated  : style_get_copy(w->style).validated) & VALID_SHADOWCOLOR) == 0;
-		make_menuitem_bol(shadowcolormenu,"disable",config_getfull_control_setwindowprop_c(c,szStyleProperties[STYLE_SHADOWCOLOR_INDEX],"Disable"),temp);
+		make_menuitem_bol(shadowcolormenu, L"disable",config_getfull_control_setwindowprop_c(c,szStyleProperties[STYLE_SHADOWCOLOR_INDEX],L"Disable"),temp);
  
 		int colorval = w->has_custom_style ? w->styleptr->ShadowColor : style_get_copy(w->style).ShadowColor;
 		temp = !temp && (colorval == CLR_INVALID); 
-		make_menuitem_bol(shadowcolormenu,"auto",config_getfull_control_setwindowprop_c(c,szStyleProperties[STYLE_SHADOWCOLOR_INDEX],"Auto"),temp);
-		char color[8];
-		sprintf(color,"#%06X",switch_rgb(colorval));
+		make_menuitem_bol(shadowcolormenu, L"auto",config_getfull_control_setwindowprop_c(c,szStyleProperties[STYLE_SHADOWCOLOR_INDEX],L"Auto"),temp);
+		wchar_t color[8];
+		swprintf(color, 8, L"#%06X",switch_rgb(colorval));
 		make_menuitem_str(
 			shadowcolormenu,
-			"Custom Shadow Color",
+			L"Custom Shadow Color",
 			config_getfull_control_setwindowprop_s(c,szStyleProperties[STYLE_SHADOWCOLOR_INDEX]),
 			color
 		);
-		make_submenu_item(shadowmenu,"Shadow Color",shadowcolormenu);
+		make_submenu_item(shadowmenu, L"Shadow Color",shadowcolormenu);
 	}	
 		
 	if((w->nosavevalue&(1<<STYLE_SHADOWPOSX_INDEX))==0){
 		make_menuitem_int(
-			shadowmenu,"Position X",
+			shadowmenu,L"Position X",
 			config_getfull_control_setwindowprop_s(c, szStyleProperties[STYLE_SHADOWPOSX_INDEX]),
 			w->has_custom_style ? w->styleptr->ShadowX : style_get_copy(w->style).ShadowX,
 			-100,100);
 	}	
 	if((w->nosavevalue&(1<<STYLE_SHADOWPOSY_INDEX))==0){
 		make_menuitem_int(
-			shadowmenu, "Position Y",
+			shadowmenu, L"Position Y",
 			config_getfull_control_setwindowprop_s(c, szStyleProperties[STYLE_SHADOWPOSY_INDEX]),
 			w->has_custom_style ? w->styleptr->ShadowY : style_get_copy(w->style).ShadowY,
 			-100, 100);
 	}
-	make_submenu_item(custommenu,"Text Shadow",shadowmenu);
+	make_submenu_item(custommenu,L"Text Shadow",shadowmenu);
 	
 // Slider Options ---------------------------------------------------------
 	if(w->is_slider){
 
 	//Slider Bar Style Menu------------------------------------------------
-		Menu *sliderbarmenu = make_menu("Bar Style",c);
+		std::shared_ptr<bb::MenuConfig> sliderbarmenu = make_menu(L"Bar Style",c);
 		for (i = 0; i < STYLE_COUNT - 1 ; ++i) // exclude "None"
-			make_menuitem_bol(sliderbarmenu, szStyleNames[i], config_getfull_control_setwindowprop_c(c, "SliderBarStyle", szStyleNames[i]), (!w->sstyleptr->has_custom_style) && (w->sstyleptr->style == i) ); 
-		Menu *sliderbarcustommenu = make_menu("Custom",c);
-		char color[8];
+			make_menuitem_bol(sliderbarmenu, szStyleNames[i], config_getfull_control_setwindowprop_c(c, L"SliderBarStyle", szStyleNames[i]), (!w->sstyleptr->has_custom_style) && (w->sstyleptr->style == i) ); 
+		std::shared_ptr<bb::MenuConfig> sliderbarcustommenu = make_menu(L"Custom",c);
+		wchar_t color[8];
 		int colorval;
 		for ( i = 0; i < 2; i++){ // Don't show TextColor menu
 			if(i == 0){
@@ -454,38 +455,38 @@ void window_menu_context(Menu *m, control *c)
 			}else{
 				colorval = w->sstyleptr->has_custom_style ? w->sstyleptr->styleptr->ColorTo : style_get_copy(w->sstyleptr->style).ColorTo;
 			}
-			sprintf(color,"#%06X", switch_rgb(colorval)); 
+			swprintf(color, 8, L"#%06X", switch_rgb(colorval)); 
 			make_menuitem_str(
 				sliderbarcustommenu,
 				szStyleProperties[i],
-				config_getfull_control_setwindowprop_s(c, (i == 0)?"SliderBarColor":"SliderBarColorTo"),
+				config_getfull_control_setwindowprop_s(c, (i == 0) ? L"SliderBarColor" : L"SliderBarColorTo"),
 				color);
 		}
 		
-		Menu* sliderbarbevelmenu = make_menu("Bevel Style", c);
+		std::shared_ptr<bb::MenuConfig>  sliderbarbevelmenu = make_menu(L"Bevel Style", c);
 		int beveltype = w->sstyleptr->has_custom_style ? w->sstyleptr->styleptr->bevelstyle : style_get_copy(w->sstyleptr->style).bevelstyle;
 		for (i=0; i<STYLE_BEVEL_TYPE_COUNT; ++i)
-			make_menuitem_bol(sliderbarbevelmenu,szBevelTypes[i],config_getfull_control_setwindowprop_c(c,"SliderBarBevel",szBevelTypes[i]),(beveltype == i));
-		make_submenu_item(sliderbarcustommenu,"Bevel Style",sliderbarbevelmenu);
+			make_menuitem_bol(sliderbarbevelmenu,szBevelTypes[i],config_getfull_control_setwindowprop_c(c,L"SliderBarBevel",szBevelTypes[i]),(beveltype == i));
+		make_submenu_item(sliderbarcustommenu,L"Bevel Style",sliderbarbevelmenu);
 		
 		if (beveltype != 0)
 			make_menuitem_int(
-				sliderbarcustommenu, "Bevel Position",
-				config_getfull_control_setwindowprop_s(c, "SliderBarBevelPosition"),
+				sliderbarcustommenu, L"Bevel Position",
+				config_getfull_control_setwindowprop_s(c, L"SliderBarBevelPosition"),
 				w->sstyleptr->has_custom_style ? w->sstyleptr->styleptr->bevelposition : style_get_copy(w->sstyleptr->style).bevelposition,
 				1, 2);
 
-		make_submenu_item(sliderbarmenu,"Custom",sliderbarcustommenu);
+		make_submenu_item(sliderbarmenu,L"Custom",sliderbarcustommenu);
 		
 	//Slider Inner Style Menu----------------------------------------------
-		Menu *sliderinnermenu = make_menu("Slider Inner Style",c);
+		std::shared_ptr<bb::MenuConfig> sliderinnermenu = make_menu(L"Slider Inner Style",c);
 		bool temp = !w->sstyleptr->draw_inner;
-		make_menuitem_bol(sliderinnermenu,"Draw Inner Frame",config_getfull_control_setwindowprop_b(c,"DrawSliderInner",&temp),!temp);
+		make_menuitem_bol(sliderinnermenu,L"Draw Inner Frame",config_getfull_control_setwindowprop_b(c,L"DrawSliderInner",&temp),!temp);
 		if(!temp){
 			for (i = 0; i < STYLE_COUNT - 1; ++i)
-				make_menuitem_bol(sliderinnermenu, szStyleNames[i], config_getfull_control_setwindowprop_c(c, "SliderInnerStyle", szStyleNames[i]), (!w->sstyleptr->in_has_custom_style) && (w->sstyleptr->in_style == i) ); 
-			Menu *sliderinnercustommenu = make_menu("Custom",c);
-			char color[8];
+				make_menuitem_bol(sliderinnermenu, szStyleNames[i], config_getfull_control_setwindowprop_c(c, L"SliderInnerStyle", szStyleNames[i]), (!w->sstyleptr->in_has_custom_style) && (w->sstyleptr->in_style == i) ); 
+			std::shared_ptr<bb::MenuConfig> sliderinnercustommenu = make_menu(L"Custom",c);
+			wchar_t color[8];
 			int colorval;
 			for ( i = 0; i < 2; i++){
 				if(i == 0){
@@ -493,89 +494,89 @@ void window_menu_context(Menu *m, control *c)
 				}else{
 					colorval = w->sstyleptr->in_has_custom_style ? w->sstyleptr->in_styleptr->ColorTo : style_get_copy(w->sstyleptr->in_style).ColorTo;
 				}
-				sprintf(color,"#%06X", switch_rgb(colorval)); 
+				swprintf(color, 8,L"#%06X", switch_rgb(colorval)); 
 				make_menuitem_str(
 					sliderinnercustommenu,
 					szStyleProperties[i],
-					config_getfull_control_setwindowprop_s(c, (i == 0)?"SliderInnerColor":"SliderInnerColorTo"),
+					config_getfull_control_setwindowprop_s(c, (i == 0)? L"SliderInnerColor" : L"SliderInnerColorTo"),
 					color);
 			}
 		
-			Menu* sliderinnerbevelmenu = make_menu("Bevel Style", c);
+			std::shared_ptr<bb::MenuConfig>  sliderinnerbevelmenu = make_menu(L"Bevel Style", c);
 			int beveltype = w->sstyleptr->in_has_custom_style ? w->sstyleptr->in_styleptr->bevelstyle : style_get_copy(w->sstyleptr->in_style).bevelstyle;
 			for (i=0; i<STYLE_BEVEL_TYPE_COUNT; ++i)
-				make_menuitem_bol(sliderinnerbevelmenu,szBevelTypes[i],config_getfull_control_setwindowprop_c(c,"SliderInnerBevel",szBevelTypes[i]),(beveltype == i));
-			make_submenu_item(sliderinnercustommenu,"Bevel Style",sliderinnerbevelmenu);
+				make_menuitem_bol(sliderinnerbevelmenu,szBevelTypes[i],config_getfull_control_setwindowprop_c(c,L"SliderInnerBevel",szBevelTypes[i]),(beveltype == i));
+			make_submenu_item(sliderinnercustommenu,L"Bevel Style",sliderinnerbevelmenu);
 		
 			if (beveltype != 0)
 				make_menuitem_int(
-					sliderinnercustommenu, "Bevel Position",
-					config_getfull_control_setwindowprop_s(c, "SliderInnerBevelPosition"),
+					sliderinnercustommenu, L"Bevel Position",
+					config_getfull_control_setwindowprop_s(c, L"SliderInnerBevelPosition"),
 					w->sstyleptr->in_has_custom_style ? w->sstyleptr->in_styleptr->bevelposition : style_get_copy(w->sstyleptr->in_style).bevelposition,
 					1, 2);
 
-			make_submenu_item(sliderinnermenu,"Custom",sliderinnercustommenu);
+			make_submenu_item(sliderinnermenu,L"Custom",sliderinnercustommenu);
 		}
 
 		make_menuitem_nop(custommenu,NULL);
-		make_submenu_item(custommenu,"Bar Style",sliderbarmenu);
-		make_submenu_item(custommenu,"Inner Style",sliderinnermenu);
+		make_submenu_item(custommenu,L"Bar Style",sliderbarmenu);
+		make_submenu_item(custommenu,L"Inner Style",sliderinnermenu);
 	}
 // End Slider Options ------------------------------------------------------
 
 
 // Advanced Options --------------------------------------------------------
-	advancedmenu = make_menu("Advanced Option",c);
-	Menu* advancedmenu2 = make_menu("Base Style",c);
+	advancedmenu = make_menu(L"Advanced Option",c);
+	std::shared_ptr<bb::MenuConfig>  advancedmenu2 = make_menu(L"Base Style",c);
 	for (i = 0; i < STYLE_COUNT; ++i)
-		make_menuitem_bol(advancedmenu2, szStyleNames[i], config_getfull_control_setwindowprop_c(c, "BaseStyle", szStyleNames[i]), (w->style == i) ); 
-	Menu* advancedmenu3 = make_menu("Use Style Default Value",c);
+		make_menuitem_bol(advancedmenu2, szStyleNames[i], config_getfull_control_setwindowprop_c(c, L"BaseStyle", szStyleNames[i]), (w->style == i) ); 
+	std::shared_ptr<bb::MenuConfig>  advancedmenu3 = make_menu(L"Use Style Default Value",c);
 	
 	for (i = 0; i < STYLE_PROPERTY_COUNT; ++i){
 		temp = ((w->nosavevalue & (1<<i))!=0); 
-		make_menuitem_bol(advancedmenu3,szStyleProperties[i],config_getfull_control_setwindowprop_c(c,temp?"UseCustomValue":"UseStyleDefault",szStyleProperties[i]),temp);
+		make_menuitem_bol(advancedmenu3,szStyleProperties[i],config_getfull_control_setwindowprop_c(c,temp?L"UseCustomValue":L"UseStyleDefault",szStyleProperties[i]),temp);
 	}
 	
-	make_submenu_item(advancedmenu,"Base Style",advancedmenu2);
-	make_submenu_item(advancedmenu,"Use Style Default Value",advancedmenu3);
+	make_submenu_item(advancedmenu,L"Base Style",advancedmenu2);
+	make_submenu_item(advancedmenu,L"Use Style Default Value",advancedmenu3);
 	make_menuitem_nop(custommenu,NULL);
-	make_submenu_item(custommenu,"Advanced",advancedmenu);
+	make_submenu_item(custommenu,L"Advanced",advancedmenu);
 	
 	
-	make_submenu_item(submenu, "Custom", custommenu);
-	make_submenu_item(m, "Style", submenu);
+	make_submenu_item(submenu, L"Custom", custommenu);
+	make_submenu_item(m, L"Style", submenu);
 
 // End Style Options -------------------------------------------------------
 
 
 // Font Setting Menu -------------------------------------------------------
 	if(!w->is_slider){  // Slider does not use font
-		Menu* fonttopmenu = make_menu("Font",c);
+		std::shared_ptr<bb::MenuConfig>  fonttopmenu = make_menu(L"Font",c);
 		temp = !w->use_custom_font;
-		make_menuitem_bol(fonttopmenu,"Use Custom Font",config_getfull_control_setwindowprop_b(c,"UseCustomFont",&temp),!temp);
+		make_menuitem_bol(fonttopmenu,L"Use Custom Font",config_getfull_control_setwindowprop_b(c,L"UseCustomFont",&temp),!temp);
 		if(w->use_custom_font){
-			char fontname[128];
+			wchar_t fontname[128];
 			LOGFONT lf;
 			GetObject(style_font,sizeof(lf),&lf);
-			strcpy(fontname,lf.lfFaceName);
-			if(strlen(w->Fontname)>0){
-				strcpy(fontname,w->Fontname);
+			wcscpy(fontname,lf.lfFaceName);
+			if(wcslen(w->Fontname)>0){
+				wcscpy(fontname,w->Fontname);
 			}
 	
-			Menu* fontmenu = make_menu("Font Name", c);
-			std::list<std::string>::iterator it = fontList.begin();
-			const char *font;
+			std::shared_ptr<bb::MenuConfig>  fontmenu = make_menu(L"Font Name", c);
+			std::list<bbstring>::iterator it = fontList.begin();
+			const wchar_t *font;
 			while(it != fontList.end())
 			{
 				font = it->c_str();
-				make_menuitem_bol(fontmenu,font,config_getfull_control_setwindowprop_c(c,szWPfontname,font),(strcmp(font,fontname)==0));
+				make_menuitem_bol(fontmenu,font,config_getfull_control_setwindowprop_c(c,szWPfontname,font),(wcscmp(font,fontname)==0));
 				it++;
 			}
-			make_submenu_item(fonttopmenu,"Font",fontmenu);
+			make_submenu_item(fonttopmenu,L"Font",fontmenu);
 		
 			make_menuitem_int(
 				fonttopmenu,
-				"Font Size",
+				L"Font Size",
 				config_getfull_control_setwindowprop_s(c,szWPfontheight),
 				w->FontHeight,
 				1,
@@ -584,12 +585,12 @@ void window_menu_context(Menu *m, control *c)
 			temp = !(w->FontWeight==FW_BOLD);
 			make_menuitem_bol(
 				fonttopmenu,
-				"Font Bold",
+				L"Font Bold",
 				config_getfull_control_setwindowprop_b(c, szWPfontweight, &temp), 
 				!temp 
 			);
 		}	
-		make_submenu_item(m,"Font",fonttopmenu);
+		make_submenu_item(m,L"Font",fonttopmenu);
 	}
 
 	
@@ -599,17 +600,17 @@ void window_menu_context(Menu *m, control *c)
 // Pressed Button Style Menu -----------------------------------------------
 	if(w->is_button){
 		int stylenum = (w->bstyleptr->style==STYLETYPE_DEFAULT)?get_pressedstyle_index(w->style):w->bstyleptr->style;
-		Menu *buttonsubmenu, *buttoncustommenu, *advancedbuttonmenu; 
+		std::shared_ptr<bb::MenuConfig> buttonsubmenu, buttoncustommenu, advancedbuttonmenu; 
 	
 		//Style options
-		buttonsubmenu = make_menu("StyleWhenPressed", c);
+		buttonsubmenu = make_menu(L"StyleWhenPressed", c);
 	
 		//First , Default Style
 		make_menuitem_bol(buttonsubmenu, szPressedStyleNames[STYLETYPE_DEFAULT], config_getfull_control_setwindowprop_c(c, szWPStyleWhenPressed, szPressedStyleNames[STYLETYPE_DEFAULT]), (!w->bstyleptr->has_custom_style) && (w->bstyleptr->style == STYLETYPE_DEFAULT) ); 
 		for (i = 0; i < PRESSED_STYLE_COUNT - 1 ; ++i)
 			make_menuitem_bol(buttonsubmenu, szPressedStyleNames[i], config_getfull_control_setwindowprop_c(c, szWPStyleWhenPressed, szPressedStyleNames[i]), (!w->bstyleptr->has_custom_style) && (w->bstyleptr->style == i) ); 
 
-		buttoncustommenu = make_menu("Custom", c );
+		buttoncustommenu = make_menu(L"Custom", c );
 		for (i = 0; i < STYLE_COLOR_PROPERTY_COUNT; ++i)
 		{
 			if((w->bstyleptr->nosavevalue&(1<<i))==0)
@@ -634,8 +635,8 @@ void window_menu_context(Menu *m, control *c)
 						break;
 ;
 				}
-				char color[8];
-				sprintf(color,"#%06X",switch_rgb(colorval)); //the bits need to be switched around here
+				wchar_t color[8];
+				swprintf(color, 8, L"#%06X",switch_rgb(colorval)); //the bits need to be switched around here
 				
 				make_menuitem_str(
 					buttoncustommenu,
@@ -647,7 +648,7 @@ void window_menu_context(Menu *m, control *c)
 		}
 	
 		// Add the bevel setting menus as well.
-		Menu* buttonbevelmenu = make_menu("Bevel Style", c);
+		std::shared_ptr<bb::MenuConfig>  buttonbevelmenu = make_menu(L"Bevel Style", c);
 		int beveltype = w->bstyleptr->has_custom_style ? w->bstyleptr->styleptr->bevelstyle : style_get_copy(stylenum).bevelstyle;
 		if((w->bstyleptr->nosavevalue&(1<<STYLE_BEVELTYPE_INDEX))==0){
 			for (int i=0; i<STYLE_BEVEL_TYPE_COUNT; ++i)
@@ -655,12 +656,12 @@ void window_menu_context(Menu *m, control *c)
 				bool temp = (beveltype == i);
 				make_menuitem_bol(buttonbevelmenu,szBevelTypes[i],config_getfull_control_setwindowprop_c(c,szPressedStyleProperties[STYLE_BEVELTYPE_INDEX],szBevelTypes[i]),temp);
 			}
-			make_submenu_item(buttoncustommenu,"Bevel Style",buttonbevelmenu);
+			make_submenu_item(buttoncustommenu,L"Bevel Style",buttonbevelmenu);
 		}
 		if (beveltype != 0 && (w->bstyleptr->nosavevalue&(1<<STYLE_BEVELPOS_INDEX))==0)
 			make_menuitem_int(
 				buttoncustommenu,
-				"Bevel Position",
+				L"Bevel Position",
 				config_getfull_control_setwindowprop_s(c, szPressedStyleProperties[STYLE_BEVELPOS_INDEX]),
 				w->bstyleptr->has_custom_style ? w->bstyleptr->styleptr->bevelposition : style_get_copy(stylenum).bevelposition,
 				1,
@@ -668,13 +669,13 @@ void window_menu_context(Menu *m, control *c)
 
 
 //Border Options (Pressed)------------------------------------------------
-		Menu *bordermenu = make_menu("Border",c);
+		std::shared_ptr<bb::MenuConfig> bordermenu = make_menu(L"Border",c);
 	
 		temp = !(w->bstyleptr->has_custom_style ?
 				w->bstyleptr->styleptr->bordered : style_get_copy(stylenum).bordered);
-		make_menuitem_bol(bordermenu,"default",config_getfull_control_setwindowprop_c(c,"DefaultBorderPressed","True"),temp);
+		make_menuitem_bol(bordermenu,L"default",config_getfull_control_setwindowprop_c(c,L"DefaultBorderPressed",L"True"),temp);
 	
-		Menu *bordercustommenu = make_menu("Custom",c);
+		std::shared_ptr<bb::MenuConfig> bordercustommenu = make_menu(L"Custom",c);
 	
 		if((w->bstyleptr->nosavevalue&(1<<STYLE_BORDERWIDTH_INDEX))==0){
 			int borderwidth = 
@@ -690,7 +691,7 @@ void window_menu_context(Menu *m, control *c)
 							*((int *)GetSettingPtr(SN_BORDERWIDTH))
 						); 
 			make_menuitem_int(
-				bordercustommenu,"Border Width",
+				bordercustommenu,L"Border Width",
 				config_getfull_control_setwindowprop_s(c, szPressedStyleProperties[STYLE_BORDERWIDTH_INDEX]),
 				borderwidth,0,50);
 		}
@@ -707,110 +708,110 @@ void window_menu_context(Menu *m, control *c)
 						 	style_get_copy(stylenum).borderColor : 
 							*((COLORREF *)GetSettingPtr(SN_BORDERCOLOR))
 						); 
-			char color[8];
-			sprintf(color,"#%06X",switch_rgb(colorval));
+			wchar_t color[8];
+			swprintf(color, 8, L"#%06X",switch_rgb(colorval));
 			make_menuitem_str(
 				bordercustommenu,
-				"Border Color",
+				L"Border Color",
 				config_getfull_control_setwindowprop_s(c,szPressedStyleProperties[STYLE_BORDERCOLOR_INDEX]),
 				color
 			);
 		}
-		make_submenu_item(bordermenu,"Custom",bordercustommenu);
-		make_submenu_item(buttoncustommenu,"Border",bordermenu);
+		make_submenu_item(bordermenu,L"Custom",bordercustommenu);
+		make_submenu_item(buttoncustommenu,L"Border",bordermenu);
 
 //Shadow Options (Pressed)-----------------------------------------
-		Menu *shadowmenu = make_menu("Text Shadow",c);
-		Menu *shadowcolormenu = make_menu("Shadow Color",c);
+		std::shared_ptr<bb::MenuConfig> shadowmenu = make_menu(L"Text Shadow",c);
+		std::shared_ptr<bb::MenuConfig> shadowcolormenu = make_menu(L"Shadow Color",c);
 		if((w->bstyleptr->nosavevalue&(1<<STYLE_SHADOWCOLOR_INDEX))==0){
 			
 			temp =	((w->bstyleptr->has_custom_style ? w->bstyleptr->styleptr->validated  : style_get_copy(stylenum).validated) & VALID_SHADOWCOLOR) == 0;
-			make_menuitem_bol(shadowcolormenu,"disable",config_getfull_control_setwindowprop_c(c,szPressedStyleProperties[STYLE_SHADOWCOLOR_INDEX],"Disable"),temp);
+			make_menuitem_bol(shadowcolormenu,L"disable",config_getfull_control_setwindowprop_c(c,szPressedStyleProperties[STYLE_SHADOWCOLOR_INDEX],L"Disable"),temp);
  
 			int colorval = w->bstyleptr->has_custom_style ? w->bstyleptr->styleptr->ShadowColor : style_get_copy(stylenum).ShadowColor;
 			temp = !temp && (colorval == CLR_INVALID); 
-			make_menuitem_bol(shadowcolormenu,"auto",config_getfull_control_setwindowprop_c(c,szPressedStyleProperties[STYLE_SHADOWCOLOR_INDEX],"Auto"),temp);
-			char color[8];
-			sprintf(color,"#%06X",switch_rgb(colorval));
+			make_menuitem_bol(shadowcolormenu,L"auto",config_getfull_control_setwindowprop_c(c,szPressedStyleProperties[STYLE_SHADOWCOLOR_INDEX],L"Auto"),temp);
+			wchar_t color[8];
+			swprintf(color, 8, L"#%06X",switch_rgb(colorval));
 			make_menuitem_str(
 				shadowcolormenu,
-				"Custom Shadow Color",
+				L"Custom Shadow Color",
 				config_getfull_control_setwindowprop_s(c,szPressedStyleProperties[STYLE_SHADOWCOLOR_INDEX]),
 				color
 			);
-			make_submenu_item(shadowmenu,"Shadow Color",shadowcolormenu);
+			make_submenu_item(shadowmenu,L"Shadow Color",shadowcolormenu);
 		}	
 			
 		if((w->bstyleptr->nosavevalue&(1<<STYLE_SHADOWPOSX_INDEX))==0){
 			make_menuitem_int(
-				shadowmenu,"Position X",
+				shadowmenu,L"Position X",
 				config_getfull_control_setwindowprop_s(c, szPressedStyleProperties[STYLE_SHADOWPOSX_INDEX]),
 				w->bstyleptr->has_custom_style ? w->bstyleptr->styleptr->ShadowX : style_get_copy(stylenum).ShadowX,
 				-100,100);
 		}	
 		if((w->bstyleptr->nosavevalue&(1<<STYLE_SHADOWPOSY_INDEX))==0){
 			make_menuitem_int(
-				shadowmenu, "Position Y",
+				shadowmenu, L"Position Y",
 				config_getfull_control_setwindowprop_s(c, szPressedStyleProperties[STYLE_SHADOWPOSY_INDEX]),
 				w->bstyleptr->has_custom_style ? w->bstyleptr->styleptr->ShadowY : style_get_copy(stylenum).ShadowY,
 				-100, 100);
 		}
-		make_submenu_item(buttoncustommenu,"Text Shadow",shadowmenu);
+		make_submenu_item(buttoncustommenu,L"Text Shadow",shadowmenu);
 	
 
 		
 	
 		// Advanced Option (Pressed Button)
-		advancedbuttonmenu = make_menu("Advanced Option",c);
-		Menu* advancedbuttonmenu2 = make_menu("Base Style",c);
+		advancedbuttonmenu = make_menu(L"Advanced Option",c);
+		std::shared_ptr<bb::MenuConfig>  advancedbuttonmenu2 = make_menu(L"Base Style",c);
 		
-		make_menuitem_bol(advancedbuttonmenu2, szPressedStyleNames[STYLETYPE_DEFAULT], config_getfull_control_setwindowprop_c(c, "BaseStyle(Pressed)", szPressedStyleNames[STYLETYPE_DEFAULT]), (w->bstyleptr->style == STYLETYPE_DEFAULT) ); 
+		make_menuitem_bol(advancedbuttonmenu2, szPressedStyleNames[STYLETYPE_DEFAULT], config_getfull_control_setwindowprop_c(c, L"BaseStyle(Pressed)", szPressedStyleNames[STYLETYPE_DEFAULT]), (w->bstyleptr->style == STYLETYPE_DEFAULT) ); 
 		for (i = 0; i < PRESSED_STYLE_COUNT - 1 ; ++i)
-			make_menuitem_bol(advancedbuttonmenu2, szPressedStyleNames[i], config_getfull_control_setwindowprop_c(c, "BaseStyle(Pressed)", szPressedStyleNames[i]), (w->bstyleptr->style == i) ); 
+			make_menuitem_bol(advancedbuttonmenu2, szPressedStyleNames[i], config_getfull_control_setwindowprop_c(c, L"BaseStyle(Pressed)", szPressedStyleNames[i]), (w->bstyleptr->style == i) ); 
 		
-		Menu* advancedbuttonmenu3 = make_menu("Use Style Default Value",c);
+		std::shared_ptr<bb::MenuConfig>  advancedbuttonmenu3 = make_menu(L"Use Style Default Value",c);
 		
 		for (i = 0; i < STYLE_PROPERTY_COUNT; ++i){
 			temp = ((w->bstyleptr->nosavevalue & (1<<i))!=0); 
-			make_menuitem_bol(advancedbuttonmenu3,szStyleProperties[i],config_getfull_control_setwindowprop_c(c,temp?"UseCustomValue(Pressed)":"UseStyleDefault(Pressed)",szStyleProperties[i]),temp);
+			make_menuitem_bol(advancedbuttonmenu3,szStyleProperties[i],config_getfull_control_setwindowprop_c(c,temp?L"UseCustomValue(Pressed)":L"UseStyleDefault(Pressed)",szStyleProperties[i]),temp);
 		}
 	
-		make_submenu_item(advancedbuttonmenu,"Base Style",advancedbuttonmenu2);
-		make_submenu_item(advancedbuttonmenu,"Use Style Default Value",advancedbuttonmenu3);
+		make_submenu_item(advancedbuttonmenu,L"Base Style",advancedbuttonmenu2);
+		make_submenu_item(advancedbuttonmenu,L"Use Style Default Value",advancedbuttonmenu3);
 		make_menuitem_nop(buttoncustommenu,NULL);
-		make_submenu_item(buttoncustommenu,"Advanced",advancedbuttonmenu);
+		make_submenu_item(buttoncustommenu,L"Advanced",advancedbuttonmenu);
 			
-		make_submenu_item(buttonsubmenu, "Custom", buttoncustommenu);
-		make_submenu_item(m, "StyleWhenPressed", buttonsubmenu);
+		make_submenu_item(buttonsubmenu, L"Custom", buttoncustommenu);
+		make_submenu_item(m, L"StyleWhenPressed", buttonsubmenu);
 
-		Menu* pressedfonttopmenu = make_menu("FontWhenPressed",c);
+		std::shared_ptr<bb::MenuConfig>  pressedfonttopmenu = make_menu(L"FontWhenPressed",c);
 		
 		temp = !w->bstyleptr->use_custom_font;
-		make_menuitem_bol(pressedfonttopmenu,"Use Custom Font",config_getfull_control_setwindowprop_b(c,"UseCustomFontWhenPressed",&temp),!temp);
+		make_menuitem_bol(pressedfonttopmenu,L"Use Custom Font",config_getfull_control_setwindowprop_b(c,L"UseCustomFontWhenPressed",&temp),!temp);
 		if(w->bstyleptr->use_custom_font){
 		
-			char fontname[128];
+			wchar_t fontname[128];
 			LOGFONT lf;
 			GetObject(style_font,sizeof(lf),&lf);
-			strcpy(fontname,lf.lfFaceName);
-			if(strlen(w->bstyleptr->Fontname)>0){
-				strcpy(fontname,w->bstyleptr->Fontname);
+			wcscpy(fontname,lf.lfFaceName);
+			if(wcslen(w->bstyleptr->Fontname)>0){
+				wcscpy(fontname,w->bstyleptr->Fontname);
 			}
-			Menu* buttonfontmenu = make_menu("Font Name", c);
-			std::list<std::string>::iterator it = fontList.begin();
-			const char *font;
+			std::shared_ptr<bb::MenuConfig>  buttonfontmenu = make_menu(L"Font Name", c);
+			std::list<bbstring>::iterator it = fontList.begin();
+			const wchar_t *font;
 			while(it != fontList.end())
 			{
 				font = it->c_str();
-				make_menuitem_bol(buttonfontmenu,font,config_getfull_control_setwindowprop_c(c,szWPfontname_pressed,font),(strcmp(font,fontname)==0));
+				make_menuitem_bol(buttonfontmenu,font,config_getfull_control_setwindowprop_c(c,szWPfontname_pressed,font),(wcscmp(font,fontname)==0));
 				it++;
 				
 			}
-			make_submenu_item(pressedfonttopmenu,"Font",buttonfontmenu);
+			make_submenu_item(pressedfonttopmenu,L"Font",buttonfontmenu);
 		
 			make_menuitem_int(
 				pressedfonttopmenu,
-				"Font Size",
+				L"Font Size",
 				config_getfull_control_setwindowprop_s(c,szWPfontheight_pressed),
 				w->bstyleptr->FontHeight,
 				1,
@@ -819,12 +820,12 @@ void window_menu_context(Menu *m, control *c)
 			temp = !(w->bstyleptr->FontWeight==FW_BOLD);
 			make_menuitem_bol(
 				pressedfonttopmenu,
-				"Font Bold",
+				L"Font Bold",
 				config_getfull_control_setwindowprop_b(c, szWPfontweight_pressed, &temp), 
 				!temp 
 			);
 		}
-		make_submenu_item(m,"FontWhenPressed",pressedfonttopmenu);
+		make_submenu_item(m,L"FontWhenPressed",pressedfonttopmenu);
 		make_menuitem_nop(m,NULL);
 	
 	}
@@ -832,33 +833,33 @@ void window_menu_context(Menu *m, control *c)
 	//---------------end button pressed option
 	
 	temp = !w->is_bordered;
-	make_menuitem_bol(m, "Border", config_getfull_control_setwindowprop_b(c, szWPisbordered, &temp), !temp);
+	make_menuitem_bol(m, L"Border", config_getfull_control_setwindowprop_b(c, szWPisbordered, &temp), !temp);
 
-	temp = !w->is_visible; make_menuitem_bol(m, "Visible", config_getfull_control_setwindowprop_b(c, szWPisvisible, &temp), !temp);
+	temp = !w->is_visible; make_menuitem_bol(m, L"Visible", config_getfull_control_setwindowprop_b(c, szWPisvisible, &temp), !temp);
 
 	if (!c->parentptr && plugin_hwnd_slit)
 	{
 		temp = !w->useslit;
-		make_menuitem_bol(m, "In Slit", config_getfull_control_setwindowprop_b(c, szWPisslitted, &temp), !temp);
+		make_menuitem_bol(m, L"In Slit", config_getfull_control_setwindowprop_b(c, szWPisslitted, &temp), !temp);
 	}
 
 	if (!c->parentptr && (!w->useslit || NULL == plugin_hwnd_slit))
 	{
 		//Do the "Make Invisible" property
 		make_menuitem_nop(m, NULL);
-		submenu = make_menu("Make Invisible", c);
-		temp = (w->makeinvisible == MAKEINVISIBLE_NEVER); make_menuitem_bol(submenu, "Never", config_getfull_control_setwindowprop_c(c, szWPmakeinvisible, szWPmakeinvisible_never), temp);
-		temp = (w->makeinvisible == MAKEINVISIBLE_WINLOSEFOCUS); make_menuitem_bol(submenu, "When control loses focus", config_getfull_control_setwindowprop_c(c, szWPmakeinvisible, szWPmakeinvisible_winblur), temp);
-		temp = (w->makeinvisible == MAKEINVISIBLE_BBLOSEFOCUS); make_menuitem_bol(submenu, "When BlackBox loses focus", config_getfull_control_setwindowprop_c(c, szWPmakeinvisible, szWPmakeinvisible_bbblur), temp);
-		make_submenu_item(m, "Make Invisible", submenu);
+		submenu = make_menu(L"Make Invisible", c);
+		temp = (w->makeinvisible == MAKEINVISIBLE_NEVER); make_menuitem_bol(submenu, L"Never", config_getfull_control_setwindowprop_c(c, szWPmakeinvisible, szWPmakeinvisible_never), temp);
+		temp = (w->makeinvisible == MAKEINVISIBLE_WINLOSEFOCUS); make_menuitem_bol(submenu, L"When control loses focus", config_getfull_control_setwindowprop_c(c, szWPmakeinvisible, szWPmakeinvisible_winblur), temp);
+		temp = (w->makeinvisible == MAKEINVISIBLE_BBLOSEFOCUS); make_menuitem_bol(submenu, L"When BlackBox loses focus", config_getfull_control_setwindowprop_c(c, szWPmakeinvisible, szWPmakeinvisible_bbblur), temp);
+		make_submenu_item(m, L"Make Invisible", submenu);
 
 
 		make_menuitem_nop(m, NULL);
-		temp = !w->autohide; make_menuitem_bol(m, "AutoHide", config_getfull_control_setwindowprop_b(c, szWPautohide, &temp), !temp);
-		temp = !w->is_ontop; make_menuitem_bol(m, "Always On Top", config_getfull_control_setwindowprop_b(c, szWPisontop, &temp), !temp);
-		temp = !w->is_detectfullscreen; make_menuitem_bol(m, "Detect Fullscreen App", config_getfull_control_setwindowprop_b(c, szWPisdetectfullscreen, &temp), !temp);
-		temp = !w->is_toggledwithplugins; make_menuitem_bol(m, "Toggle With Plugins", config_getfull_control_setwindowprop_b(c, szWPistoggledwithplugins, &temp), !temp);
-		temp = !w->is_onallworkspaces; make_menuitem_bol(m, "On All Workspaces", config_getfull_control_setwindowprop_b(c, szWPisonallworkspaces, &temp), !temp);
+		temp = !w->autohide; make_menuitem_bol(m, L"AutoHide", config_getfull_control_setwindowprop_b(c, szWPautohide, &temp), !temp);
+		temp = !w->is_ontop; make_menuitem_bol(m, L"Always On Top", config_getfull_control_setwindowprop_b(c, szWPisontop, &temp), !temp);
+		temp = !w->is_detectfullscreen; make_menuitem_bol(m, L"Detect Fullscreen App", config_getfull_control_setwindowprop_b(c, szWPisdetectfullscreen, &temp), !temp);
+		temp = !w->is_toggledwithplugins; make_menuitem_bol(m, L"Toggle With Plugins", config_getfull_control_setwindowprop_b(c, szWPistoggledwithplugins, &temp), !temp);
+		temp = !w->is_onallworkspaces; make_menuitem_bol(m, L"On All Workspaces", config_getfull_control_setwindowprop_b(c, szWPisonallworkspaces, &temp), !temp);
 
 		if(!w->is_onallworkspaces){
 			DesktopInfo di;
@@ -869,8 +870,8 @@ void window_menu_context(Menu *m, control *c)
 		if (plugin_using_modern_os)
 		{
 			make_menuitem_nop(m, NULL);
-			temp = !w->is_transparent; make_menuitem_bol(m, "Transparent", config_getfull_control_setwindowprop_b(c, szWPistransparent, &temp), !temp);
-			make_menuitem_int(m, "Transparency", config_getfull_control_setwindowprop_s(c, szWPtransparency), w->transparency, 0, 100);
+			temp = !w->is_transparent; make_menuitem_bol(m, L"Transparent", config_getfull_control_setwindowprop_b(c, szWPistransparent, &temp), !temp);
+			make_menuitem_int(m, L"Transparency", config_getfull_control_setwindowprop_s(c, szWPtransparency), w->transparency, 0, 100);
 		}
 	}
 }
@@ -904,8 +905,8 @@ void window_save_control(control *c)
 				case STYLE_COLORTO_INDEX: colorval = w->styleptr->ColorTo; break;
 				case STYLE_TEXTCOLOR_INDEX: colorval = w->styleptr->TextColor; break;
 			}
-			char color[8];
-			sprintf(color,"#%06X",switch_rgb(colorval)); //the bits need to be switched around here
+			wchar_t color[8];
+			swprintf(color, 8, L"#%06X",switch_rgb(colorval)); //the bits need to be switched around here
 			if(((w->nosavevalue & (1<<i)) == 0)) // Don't save flag check
 				config_write(config_get_control_setwindowprop_c(c, szStyleProperties[i], color));
 		}
@@ -922,20 +923,20 @@ void window_save_control(control *c)
 				
 			}
 			if((w->nosavevalue & (1<<STYLE_BORDERCOLOR_INDEX)) == 0){
-				char color[8];
-				sprintf(color,"#%06X",switch_rgb(w->styleptr->borderColor)); 
+				wchar_t color[8];
+				swprintf(color, 8, L"#%06X",switch_rgb(w->styleptr->borderColor)); 
 				config_write(config_get_control_setwindowprop_c(c, szStyleProperties[STYLE_BORDERCOLOR_INDEX], color));
 			}
 		}
 
 		if((w->nosavevalue & (1<<STYLE_SHADOWCOLOR_INDEX)) == 0){
 			if((w->styleptr->validated & VALID_SHADOWCOLOR) == 0)
-				config_write(config_get_control_setwindowprop_c(c, szStyleProperties[STYLE_SHADOWCOLOR_INDEX],"Disable"));
+				config_write(config_get_control_setwindowprop_c(c, szStyleProperties[STYLE_SHADOWCOLOR_INDEX],L"Disable"));
 			else if(w->styleptr->ShadowColor == CLR_INVALID)
-				config_write(config_get_control_setwindowprop_c(c, szStyleProperties[STYLE_SHADOWCOLOR_INDEX],"Auto"));
+				config_write(config_get_control_setwindowprop_c(c, szStyleProperties[STYLE_SHADOWCOLOR_INDEX],L"Auto"));
 			else{
-				char color[8];
-				sprintf(color,"#%06X",switch_rgb(w->styleptr->ShadowColor)); 
+				wchar_t color[8];
+				swprintf(color, 8, L"#%06X",switch_rgb(w->styleptr->ShadowColor)); 
 				config_write(config_get_control_setwindowprop_c(c, szStyleProperties[STYLE_SHADOWCOLOR_INDEX], color));
 			}
 		}
@@ -951,35 +952,35 @@ void window_save_control(control *c)
 // slider only config settings ---------------------------------------------
 		if (w->is_slider)
 		{
-			config_write(config_get_control_setwindowprop_c(c, "SliderBarStyle", szStyleNames[w->sstyleptr->style])); 
+			config_write(config_get_control_setwindowprop_c(c, L"SliderBarStyle", szStyleNames[w->sstyleptr->style])); 
 			if (w->sstyleptr->has_custom_style){
 				for (int i = 0; i < STYLE_COLOR_PROPERTY_COUNT - 1; ++i) 
 				{
 					int colorval = (i==0)?w->sstyleptr->styleptr->Color: w->sstyleptr->styleptr->ColorTo;
-					char color[8];
-					sprintf(color,"#%06X",switch_rgb(colorval)); 
-					config_write(config_get_control_setwindowprop_c(c, (i==0)?"SliderBarColor":"SliderBarColorTo", color));
+					wchar_t color[8];
+					swprintf(color, 8, L"#%06X",switch_rgb(colorval)); 
+					config_write(config_get_control_setwindowprop_c(c, (i==0)?L"SliderBarColor":L"SliderBarColorTo", color));
 				}
 				int bevelstyle = w->sstyleptr->styleptr->bevelstyle;
-				config_write(config_get_control_setwindowprop_c(c,"SliderBarBevel",szBevelTypes[bevelstyle]));
+				config_write(config_get_control_setwindowprop_c(c,L"SliderBarBevel",szBevelTypes[bevelstyle]));
 				if((bevelstyle != 0))
-					config_write(config_get_control_setwindowprop_i(c,"SliderBarBevelPosition",&w->sstyleptr->styleptr->bevelposition));
+					config_write(config_get_control_setwindowprop_i(c,L"SliderBarBevelPosition",&w->sstyleptr->styleptr->bevelposition));
 			}
-			config_write(config_get_control_setwindowprop_b(c, "DrawSliderInner", &w->sstyleptr->draw_inner));
+			config_write(config_get_control_setwindowprop_b(c, L"DrawSliderInner", &w->sstyleptr->draw_inner));
 			if(w->sstyleptr->draw_inner){
-				config_write(config_get_control_setwindowprop_c(c, "SliderInnerStyle", szStyleNames[w->sstyleptr->in_style])); 
+				config_write(config_get_control_setwindowprop_c(c, L"SliderInnerStyle", szStyleNames[w->sstyleptr->in_style])); 
 				if (w->sstyleptr->in_has_custom_style){
 					for (int i = 0; i < STYLE_COLOR_PROPERTY_COUNT - 1; ++i) 
 					{
 						int colorval = (i==0)?w->sstyleptr->in_styleptr->Color: w->sstyleptr->in_styleptr->ColorTo;
-						char color[8];
-						sprintf(color,"#%06X",switch_rgb(colorval)); 
-						config_write(config_get_control_setwindowprop_c(c, (i==0)?"SliderInnerColor":"SliderInnerColorTo", color));
+						wchar_t color[8];
+						swprintf(color, 8, L"#%06X",switch_rgb(colorval)); 
+						config_write(config_get_control_setwindowprop_c(c, (i==0)?L"SliderInnerColor":L"SliderInnerColorTo", color));
 					}
 					int bevelstyle = w->sstyleptr->in_styleptr->bevelstyle;
-					config_write(config_get_control_setwindowprop_c(c,"SliderInnerBevel",szBevelTypes[bevelstyle]));
+					config_write(config_get_control_setwindowprop_c(c,L"SliderInnerBevel",szBevelTypes[bevelstyle]));
 					if((bevelstyle != 0))
-						config_write(config_get_control_setwindowprop_i(c,"SliderInnerBevelPosition",&w->sstyleptr->in_styleptr->bevelposition));
+						config_write(config_get_control_setwindowprop_i(c,L"SliderInnerBevelPosition",&w->sstyleptr->in_styleptr->bevelposition));
 				}
 			
 
@@ -987,13 +988,13 @@ void window_save_control(control *c)
 		}
 	}	
 	if(w->use_custom_font){	
-		char fontname[128];
-		if(strlen(w->Fontname)){
-			strcpy(fontname,w->Fontname);
+		wchar_t fontname[128];
+		if(wcslen(w->Fontname)){
+			wcscpy(fontname,w->Fontname);
 		}else{
 			LOGFONT lf;
 			::GetObject(style_font,sizeof(lf),&lf);
-			strcpy(fontname,lf.lfFaceName);
+			wcscpy(fontname,lf.lfFaceName);
 		}
 		config_write(config_get_control_setwindowprop_c(c,szWPfontname,fontname));
 		config_write(config_get_control_setwindowprop_i(c,szWPfontheight,&w->FontHeight));
@@ -1003,7 +1004,7 @@ void window_save_control(control *c)
 	}
 	for(int j=w->nosavevalue , i=0; j > 0  ; i++ , j>>=1 ){
 		if(j&1){
-			config_write(config_get_control_setwindowprop_c(c,"UseStyleDefault",szStyleProperties[i]));
+			config_write(config_get_control_setwindowprop_c(c,L"UseStyleDefault",szStyleProperties[i]));
 		}
 	}
 	
@@ -1024,8 +1025,8 @@ void window_save_control(control *c)
 					case STYLE_COLORTO_INDEX: colorval = w->bstyleptr->styleptr->ColorTo; break;
 					case STYLE_TEXTCOLOR_INDEX: colorval = w->bstyleptr->styleptr->TextColor; break;
 				}
-				char color[8];
-				sprintf(color,"#%06X",switch_rgb(colorval)); //the bits need to be switched around here
+				wchar_t color[8];
+				swprintf(color, 8, L"#%06X",switch_rgb(colorval)); //the bits need to be switched around here
 				if(((w->bstyleptr->nosavevalue & (1<<i)) == 0)) // Don't save flag check
 					config_write(config_get_control_setwindowprop_c(c, szPressedStyleProperties[i], color));
 			}
@@ -1039,8 +1040,8 @@ void window_save_control(control *c)
 					config_write(config_get_control_setwindowprop_i(c,szPressedStyleProperties[STYLE_BORDERWIDTH_INDEX],&val));
 				}
 				if((w->bstyleptr->nosavevalue & (1<<STYLE_BORDERCOLOR_INDEX)) == 0){
-					char color[8];
-					sprintf(color,"#%06X",switch_rgb(w->bstyleptr->styleptr->borderColor)); 
+					wchar_t color[8];
+					swprintf(color, 8, L"#%06X",switch_rgb(w->bstyleptr->styleptr->borderColor)); 
 					config_write(config_get_control_setwindowprop_c(c, szPressedStyleProperties[STYLE_BORDERCOLOR_INDEX], color));
 				}
 			}
@@ -1049,12 +1050,12 @@ void window_save_control(control *c)
 
 			if((w->bstyleptr->nosavevalue & (1<<STYLE_SHADOWCOLOR_INDEX)) == 0){
 				if((w->bstyleptr->styleptr->validated & VALID_SHADOWCOLOR) == 0)
-					config_write(config_get_control_setwindowprop_c(c, szPressedStyleProperties[STYLE_SHADOWCOLOR_INDEX],"Disable"));
+					config_write(config_get_control_setwindowprop_c(c, szPressedStyleProperties[STYLE_SHADOWCOLOR_INDEX],L"Disable"));
 				else if(w->bstyleptr->styleptr->ShadowColor == CLR_INVALID)
-					config_write(config_get_control_setwindowprop_c(c, szPressedStyleProperties[STYLE_SHADOWCOLOR_INDEX],"Auto"));
+					config_write(config_get_control_setwindowprop_c(c, szPressedStyleProperties[STYLE_SHADOWCOLOR_INDEX],L"Auto"));
 				else{
-					char color[8];
-					sprintf(color,"#%06X",switch_rgb(w->bstyleptr->styleptr->ShadowColor)); 
+					wchar_t color[8];
+					swprintf(color, 8, L"#%06X",switch_rgb(w->bstyleptr->styleptr->ShadowColor)); 
 					config_write(config_get_control_setwindowprop_c(c, szPressedStyleProperties[STYLE_SHADOWCOLOR_INDEX], color));
 				}
 			}
@@ -1070,13 +1071,13 @@ void window_save_control(control *c)
 		}
 		if (w->bstyleptr->use_custom_font){
 		
-			char fontname[128];
-			if(strlen(w->bstyleptr->Fontname)){
-				strcpy(fontname,w->bstyleptr->Fontname);
+			wchar_t fontname[128];
+			if(wcslen(w->bstyleptr->Fontname)){
+				wcscpy(fontname,w->bstyleptr->Fontname);
 			}else{
 				LOGFONT lf;
 				::GetObject(style_font,sizeof(lf),&lf);
-				strcpy(fontname,lf.lfFaceName);
+				wcscpy(fontname, lf.lfFaceName);
 			}
 			config_write(config_get_control_setwindowprop_c(c,szWPfontname_pressed,fontname));
 			config_write(config_get_control_setwindowprop_i(c,szWPfontheight_pressed,&w->bstyleptr->FontHeight));
@@ -1086,7 +1087,7 @@ void window_save_control(control *c)
 		}
 		for(int j=w->bstyleptr->nosavevalue , i=0; j > 0  ; i++ , j>>=1 ){
 			if(j&1){
-				config_write(config_get_control_setwindowprop_c(c,"UseStyleDefault",szStyleProperties[i]));
+				config_write(config_get_control_setwindowprop_c(c,L"UseStyleDefault",szStyleProperties[i]));
 			}
 		}
 	}
@@ -1104,7 +1105,7 @@ void window_save_control(control *c)
 		config_write(config_get_control_setwindowprop_b(c, szWPistransparent, &w->is_transparent));
 		config_write(config_get_control_setwindowprop_i(c, szWPtransparency, &w->transparency));
 
-		char *makeinvisiblestring;
+		wchar_t *makeinvisiblestring;
 		switch (w->makeinvisible)
 		{
 			case MAKEINVISIBLE_BBLOSEFOCUS: makeinvisiblestring = szWPmakeinvisible_bbblur; break;
@@ -1425,7 +1426,7 @@ LRESULT CALLBACK window_event(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //window_message
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int window_message(int tokencount, char *tokens[], bool from_core, module* caller)
+int window_message(int tokencount, wchar_t *tokens[], bool from_core, module* caller)
 {
 	//No errors
 	return 0;
@@ -1434,7 +1435,7 @@ int window_message(int tokencount, char *tokens[], bool from_core, module* calle
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //window_message_setproperty
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int window_message_setproperty(control *c, int tokencount, char *tokens[])
+int window_message_setproperty(control *c, int tokencount, wchar_t *tokens[])
 {
 	//Variables
 	bool needs_slitupdate = false;
@@ -1451,7 +1452,7 @@ int window_message_setproperty(control *c, int tokencount, char *tokens[])
 
 	if (tokencount == 5)
 	{
-		if (!_stricmp(tokens[4], "Detach") && control_make_parentless(c))
+		if (!_wcsicmp(tokens[4], L"Detach") && control_make_parentless(c))
 		{
 			window_make_child(w, NULL);
 			needs_posupdate = needs_transupdate = needs_visupdate = needs_stickyupdate = true;
@@ -1465,22 +1466,22 @@ int window_message_setproperty(control *c, int tokencount, char *tokens[])
 		errors = 1;
 	else
 	//Figure out which property to set, and what to do once it's set
-	if (!_stricmp(tokens[4], szWPx) && config_set_int_expr(tokens[5], &w->x))
+	if (!_wcsicmp(tokens[4], szWPx) && config_set_int_expr(tokens[5], &w->x))
 		{ needs_posupdate = true; }
 	else
-	if (!_stricmp(tokens[4], szWPy) && config_set_int_expr(tokens[5], &w->y))
+	if (!_wcsicmp(tokens[4], szWPy) && config_set_int_expr(tokens[5], &w->y))
 		{ needs_posupdate = true; }
 	else
-	if (!_stricmp(tokens[4], szWPwidth) && config_set_int_expr(tokens[5], &w->width))
+	if (!_wcsicmp(tokens[4], szWPwidth) && config_set_int_expr(tokens[5], &w->width))
 		{ style_draw_invalidate(c); needs_posupdate = true; }
 	else
-	if (!_stricmp(tokens[4], szWPheight) && config_set_int_expr(tokens[5], &w->height))
+	if (!_wcsicmp(tokens[4], szWPheight) && config_set_int_expr(tokens[5], &w->height))
 		{ style_draw_invalidate(c); needs_posupdate = true; }
 	else
-	if (!_stricmp(tokens[4], szWPisbordered) && config_set_bool(tokens[5], &w->is_bordered))
+	if (!_wcsicmp(tokens[4], szWPisbordered) && config_set_bool(tokens[5], &w->is_bordered))
 		{ style_draw_invalidate(c); }
 	else
-	if (!_stricmp(tokens[4], szWPStyle) && -1 != (i = get_string_index(tokens[5], szStyleNames)))
+	if (!_wcsicmp(tokens[4], szWPStyle) && -1 != (i = get_string_index(tokens[5], szStyleNames)))
 	{
 		if(w->has_custom_style) { 
 			delete w->styleptr; 
@@ -1492,7 +1493,7 @@ int window_message_setproperty(control *c, int tokencount, char *tokens[])
 		w->style = i; style_draw_invalidate(c); needs_transupdate = true;
 	}
 	else
-	if (!_stricmp(tokens[4], "BaseStyle") && -1 != (i = get_string_index(tokens[5], szStyleNames)))
+	if (!_wcsicmp(tokens[4], L"BaseStyle") && -1 != (i = get_string_index(tokens[5], szStyleNames)))
 	{
 		if(!w->has_custom_style){
 			w->has_custom_style = true;
@@ -1507,7 +1508,7 @@ int window_message_setproperty(control *c, int tokencount, char *tokens[])
 		needs_transupdate = true;
 	}
 	else
-	if (!_stricmp(tokens[4], "UseCustomValue") && -1 != (i = get_string_index(tokens[5],szStyleProperties)))
+	if (!_wcsicmp(tokens[4], L"UseCustomValue") && -1 != (i = get_string_index(tokens[5],szStyleProperties)))
 	{
 		w->nosavevalue &= ~(1<<i);
 		if(!w->has_custom_style){
@@ -1521,7 +1522,7 @@ int window_message_setproperty(control *c, int tokencount, char *tokens[])
 		needs_transupdate = true;
 	}
 	else
-	if (!_stricmp(tokens[4], "UseStyleDefault") && -1 != (i = get_string_index(tokens[5],szStyleProperties)))
+	if (!_wcsicmp(tokens[4], L"UseStyleDefault") && -1 != (i = get_string_index(tokens[5],szStyleProperties)))
 	{
 		w->nosavevalue |= (1<<i);
 		if(!w->has_custom_style){
@@ -1581,7 +1582,7 @@ int window_message_setproperty(control *c, int tokencount, char *tokens[])
 		needs_transupdate = true;
 	}
 	else
-	if (!_stricmp(tokens[4],"UseCustomFont") && config_set_bool(tokens[5], &w->use_custom_font))
+	if (!_wcsicmp(tokens[4],L"UseCustomFont") && config_set_bool(tokens[5], &w->use_custom_font))
 	{
 		if(!w->use_custom_font){
 			DeleteObject(w->font);
@@ -1592,23 +1593,23 @@ int window_message_setproperty(control *c, int tokencount, char *tokens[])
 		needs_fontupdate = true;
 	}
 	else
-	if (!_stricmp(tokens[4],szWPfontname))
+	if (!_wcsicmp(tokens[4],szWPfontname))
 	{
 		w->use_custom_font = true;
-		strcpy(w->Fontname,tokens[5]);
+		wcscpy(w->Fontname,tokens[5]);
 		style_draw_invalidate(c); needs_transupdate = true; 
 		needs_fontupdate = true;
 	}
 	else
-	if (!_stricmp(tokens[4],szWPfontheight))
+	if (!_wcsicmp(tokens[4],szWPfontheight))
 	{
 		w->use_custom_font = true;
-		w->FontHeight=atoi(tokens[5]);
+		w->FontHeight=_wtoi(tokens[5]);
 		style_draw_invalidate(c); needs_transupdate = true; 
 		needs_fontupdate = true;
 	}
 	else
-	if(!_stricmp(tokens[4],szWPfontweight))
+	if(!_wcsicmp(tokens[4],szWPfontweight))
 	{
 		w->use_custom_font = true;
 		bool temp;
@@ -1633,10 +1634,10 @@ int window_message_setproperty(control *c, int tokencount, char *tokens[])
 		if ( (i==STYLE_BEVELPOS_INDEX) && !config_set_int(tokens[5], &(w->styleptr->bevelposition), 1, 2)) errors = 1;
 		if (i== STYLE_SHADOWCOLOR_INDEX){
 			//Shadow color
-			if(!_stricmp(tokens[5],"Auto")){
+			if(!_wcsicmp(tokens[5],L"Auto")){
 				colorval = CLR_INVALID;
 			}
-			else if(!_stricmp(tokens[5],"Disable")){
+			else if(!_wcsicmp(tokens[5],L"Disable")){
 				shadow_set = false;
 			}
 			else if((colorval = ReadColorFromString(tokens[5]))==-1)
@@ -1700,10 +1701,10 @@ int window_message_setproperty(control *c, int tokencount, char *tokens[])
 					}
 					break;
 				case STYLE_SHADOWPOSX_INDEX:
-					w->styleptr->ShadowX = (char)shadowpos;
+					w->styleptr->ShadowX = (wchar_t)shadowpos;
 					break;
 				case STYLE_SHADOWPOSY_INDEX:
-					w->styleptr->ShadowY = (char)shadowpos;
+					w->styleptr->ShadowY = (wchar_t)shadowpos;
 					break;
 
 			}
@@ -1712,7 +1713,7 @@ int window_message_setproperty(control *c, int tokencount, char *tokens[])
 		}
 	}
 	else
-	if (!_stricmp(tokens[4], "DefaultBorder")){
+	if (!_wcsicmp(tokens[4], L"DefaultBorder")){
 		StyleItem *tmpstyle;
 		tmpstyle = new StyleItem;
 		*tmpstyle = style_get_copy(w->style);
@@ -1734,15 +1735,15 @@ int window_message_setproperty(control *c, int tokencount, char *tokens[])
 		needs_transupdate = true;
 	}
 	else
-	if (!_stricmp(tokens[4], szWPisvisible) && config_set_bool(tokens[5], &w->is_visible))
+	if (!_wcsicmp(tokens[4], szWPisvisible) && config_set_bool(tokens[5], &w->is_visible))
 		{ needs_visupdate = true; }
 	else
 	if (!c->parentptr)
 	{
-		if (!_stricmp(tokens[4], szWPtransparency) && config_set_int(tokens[5], &w->transparency, 0, 100))
+		if (!_wcsicmp(tokens[4], szWPtransparency) && config_set_int(tokens[5], &w->transparency, 0, 100))
 			{ needs_transupdate = true; }
 		else
-		if (!_stricmp(tokens[4], szWPisonallworkspaces) && config_set_bool(tokens[5], &w->is_onallworkspaces))
+		if (!_wcsicmp(tokens[4], szWPisonallworkspaces) && config_set_bool(tokens[5], &w->is_onallworkspaces))
 			{
 				needs_stickyupdate = true;
 				DesktopInfo di;
@@ -1750,7 +1751,7 @@ int window_message_setproperty(control *c, int tokencount, char *tokens[])
 				w->workspacenumber = di.number ;
 			}
 		else
-		if (!_stricmp(tokens[4], szWPworkspacenumber))
+		if (!_wcsicmp(tokens[4], szWPworkspacenumber))
 			{
 				DesktopInfo di;
 				getWorkspaces().GetDesktopInfo(di);
@@ -1760,38 +1761,38 @@ int window_message_setproperty(control *c, int tokencount, char *tokens[])
 
 			}
 		else
-		if (!_stricmp(tokens[4], szWPisdetectfullscreen) && config_set_bool(tokens[5], &w->is_detectfullscreen))
+		if (!_wcsicmp(tokens[4], szWPisdetectfullscreen) && config_set_bool(tokens[5], &w->is_detectfullscreen))
 			{ 
 				needs_posupdate = true; 
 			}
 		else
-		if (!_stricmp(tokens[4], szWPisontop) && config_set_bool(tokens[5], &w->is_ontop))
+		if (!_wcsicmp(tokens[4], szWPisontop) && config_set_bool(tokens[5], &w->is_ontop))
 			{ 
 				needs_posupdate = true; 
 			}
 		else
-		if (!_stricmp(tokens[4], szWPisslitted) && config_set_bool(tokens[5], &w->useslit))
+		if (!_wcsicmp(tokens[4], szWPisslitted) && config_set_bool(tokens[5], &w->useslit))
 			{ needs_slitupdate = true; }
 		else
-		if (!_stricmp(tokens[4], szWPistoggledwithplugins) && config_set_bool(tokens[5], &w->is_toggledwithplugins))
+		if (!_wcsicmp(tokens[4], szWPistoggledwithplugins) && config_set_bool(tokens[5], &w->is_toggledwithplugins))
 			{ needs_visupdate = true; }
 		else
-		if (!_stricmp(tokens[4], szWPistransparent) && config_set_bool(tokens[5], &w->is_transparent))
+		if (!_wcsicmp(tokens[4], szWPistransparent) && config_set_bool(tokens[5], &w->is_transparent))
 			{ needs_transupdate = true; }
 		else
-		if (!_stricmp(tokens[4], szWPautohide) && config_set_bool(tokens[5], &w->autohide))
+		if (!_wcsicmp(tokens[4], szWPautohide) && config_set_bool(tokens[5], &w->autohide))
 			{ needs_posupdate = needs_transupdate = true; w->is_autohidden = window_test_autohide(w, NULL); }
 		else
-		if (!_stricmp(tokens[4], "AttachTo") && control_make_childof(c, tokens[5]))
+		if (!_wcsicmp(tokens[4], L"AttachTo") && control_make_childof(c, tokens[5]))
 		{
 			window_make_child(w, c->parentptr->windowptr);
 			needs_posupdate = needs_transupdate = needs_visupdate = needs_stickyupdate = true;
 		}
 		else
-		if (!_stricmp(tokens[4], szWPmakeinvisible))
+		if (!_wcsicmp(tokens[4], szWPmakeinvisible))
 		{			
-			if (!_stricmp(tokens[5], szWPmakeinvisible_winblur)) w->makeinvisible = MAKEINVISIBLE_WINLOSEFOCUS;
-			else if (!_stricmp(tokens[5], szWPmakeinvisible_bbblur)) w->makeinvisible = MAKEINVISIBLE_BBLOSEFOCUS;
+			if (!_wcsicmp(tokens[5], szWPmakeinvisible_winblur)) w->makeinvisible = MAKEINVISIBLE_WINLOSEFOCUS;
+			else if (!_wcsicmp(tokens[5], szWPmakeinvisible_bbblur)) w->makeinvisible = MAKEINVISIBLE_BBLOSEFOCUS;
 			else w->makeinvisible = MAKEINVISIBLE_NEVER;
 		}
 		else
@@ -1803,7 +1804,7 @@ int window_message_setproperty(control *c, int tokencount, char *tokens[])
 	// Slider Option Settings
 	if (errors && w->is_slider){
 		errors = 0;
-		if (!_stricmp(tokens[4], "SliderBarStyle") && -1 != (i = get_string_index(tokens[5], szStyleNames)))
+		if (!_wcsicmp(tokens[4], L"SliderBarStyle") && -1 != (i = get_string_index(tokens[5], szStyleNames)))
 		{
 			if (!w->has_custom_style) {
 				w->has_custom_style = true; w->styleptr = new StyleItem; *w->styleptr = style_get_copy(w->style);
@@ -1818,7 +1819,7 @@ int window_message_setproperty(control *c, int tokencount, char *tokens[])
 			w->sstyleptr->style = i; style_draw_invalidate(c); needs_transupdate = true;
 		}
 		else
-		if (!strncmp(tokens[4],"SliderBar",9)  && -1 != (i = get_string_index(&tokens[4][9], szStyleProperties)) )
+		if (!wcsncmp(tokens[4],L"SliderBar",9)  && -1 != (i = get_string_index(&tokens[4][9], szStyleProperties)) )
 		{
 			if (!w->has_custom_style) {
 				w->has_custom_style = true; w->styleptr = new StyleItem; *w->styleptr = style_get_copy(w->style);
@@ -1848,7 +1849,7 @@ int window_message_setproperty(control *c, int tokencount, char *tokens[])
 			}
 		}
 		else
-		if (!_stricmp(tokens[4],"DrawSliderInner") && config_set_bool(tokens[5], &(w->sstyleptr->draw_inner))){
+		if (!_wcsicmp(tokens[4],L"DrawSliderInner") && config_set_bool(tokens[5], &(w->sstyleptr->draw_inner))){
 			if(w->sstyleptr->draw_inner && !w->has_custom_style) {
 				w->has_custom_style = true;
 				w->styleptr = new StyleItem; 
@@ -1857,7 +1858,7 @@ int window_message_setproperty(control *c, int tokencount, char *tokens[])
 			style_draw_invalidate(c); needs_transupdate = true;
 		}
 		else
-		if (!_stricmp(tokens[4], "SliderInnerStyle") && -1 != (i = get_string_index(tokens[5], szStyleNames)))
+		if (!_wcsicmp(tokens[4], L"SliderInnerStyle") && -1 != (i = get_string_index(tokens[5], szStyleNames)))
 		{
 			w->sstyleptr->draw_inner = true;
 			if (!w->has_custom_style) {
@@ -1872,7 +1873,7 @@ int window_message_setproperty(control *c, int tokencount, char *tokens[])
 		}
 
 		else
-		if (!strncmp(tokens[4],"SliderInner",11)  && -1 != (i = get_string_index(&tokens[4][11], szStyleProperties)) )
+		if (!wcsncmp(tokens[4],L"SliderInner",11)  && -1 != (i = get_string_index(&tokens[4][11], szStyleProperties)) )
 		{
 			w->sstyleptr->draw_inner = true;
 			if (!w->has_custom_style) {
@@ -1910,7 +1911,7 @@ int window_message_setproperty(control *c, int tokencount, char *tokens[])
 	if (errors && w->is_button){
 		errors = 0;
 		int stylenum = (w->bstyleptr->style==STYLETYPE_DEFAULT)?get_pressedstyle_index(w->style):w->bstyleptr->style;
-		if (!_stricmp(tokens[4], szWPStyleWhenPressed) && -1 != (i = get_string_index(tokens[5], szPressedStyleNames)))
+		if (!_wcsicmp(tokens[4], szWPStyleWhenPressed) && -1 != (i = get_string_index(tokens[5], szPressedStyleNames)))
 		{
 			if(w->bstyleptr->has_custom_style) { 
 				delete w->bstyleptr->styleptr; 
@@ -1921,7 +1922,7 @@ int window_message_setproperty(control *c, int tokencount, char *tokens[])
 			w->bstyleptr->style = i; style_draw_invalidate(c); needs_transupdate = true;
 		}
 		else
-		if (!_stricmp(tokens[4],"UseCustomFontWhenPressed") && config_set_bool(tokens[5], &w->bstyleptr->use_custom_font))
+		if (!_wcsicmp(tokens[4],L"UseCustomFontWhenPressed") && config_set_bool(tokens[5], &w->bstyleptr->use_custom_font))
 		{
 			if(w->bstyleptr->use_custom_font){
 				style_draw_invalidate(c);
@@ -1939,23 +1940,23 @@ int window_message_setproperty(control *c, int tokencount, char *tokens[])
 			}
 		}
 		else
-		if (!_stricmp(tokens[4],szWPfontname_pressed))
+		if (!_wcsicmp(tokens[4],szWPfontname_pressed))
 		{
 			w->bstyleptr->use_custom_font = true;
-			strcpy(w->bstyleptr->Fontname,tokens[5]);
+			wcscpy(w->bstyleptr->Fontname,tokens[5]);
 			style_draw_invalidate(c); needs_transupdate = true; 
 			needs_pressedfontupdate = true;
 		}
 		else
-		if (!_stricmp(tokens[4],szWPfontheight_pressed))
+		if (!_wcsicmp(tokens[4],szWPfontheight_pressed))
 		{
 			w->bstyleptr->use_custom_font = true;
-			w->bstyleptr->FontHeight=atoi(tokens[5]);
+			w->bstyleptr->FontHeight=_wtoi(tokens[5]);
 			style_draw_invalidate(c); needs_transupdate = true; 
 			needs_pressedfontupdate = true;
 		}
 		else
-		if(!_stricmp(tokens[4],szWPfontweight_pressed))
+		if(!_wcsicmp(tokens[4],szWPfontweight_pressed))
 		{
 			w->bstyleptr->use_custom_font = true;
 			bool temp;
@@ -1983,8 +1984,8 @@ int window_message_setproperty(control *c, int tokencount, char *tokens[])
 			if ( (i==STYLE_BORDERCOLOR_INDEX) && -1 == ( colorval = ReadColorFromString(tokens[5])) ) errors = 1;
 			if (i== STYLE_SHADOWCOLOR_INDEX){
 				//Shadow color
-				if(!_stricmp(tokens[5],"Auto"))	colorval = CLR_INVALID;
-				else if(!_stricmp(tokens[5],"Disable"))	shadow_set = false;
+				if(!_wcsicmp(tokens[5],L"Auto"))	colorval = CLR_INVALID;
+				else if(!_wcsicmp(tokens[5],L"Disable"))	shadow_set = false;
 				else if((colorval = ReadColorFromString(tokens[5]))==-1) errors = 1;
 			}
 			if ( (i==STYLE_SHADOWPOSX_INDEX || i==STYLE_SHADOWPOSY_INDEX) && !config_set_int(tokens[5],&shadowpos,-100,100)) errors = 1;
@@ -2041,10 +2042,10 @@ int window_message_setproperty(control *c, int tokencount, char *tokens[])
 						}
 						break;
 					case STYLE_SHADOWPOSX_INDEX:
-						w->bstyleptr->styleptr->ShadowX = (char)shadowpos;
+						w->bstyleptr->styleptr->ShadowX = (wchar_t)shadowpos;
 						break;
 					case STYLE_SHADOWPOSY_INDEX:
-						w->bstyleptr->styleptr->ShadowY = (char)shadowpos;
+						w->bstyleptr->styleptr->ShadowY = (wchar_t)shadowpos;
 						break;
 				}
 	
@@ -2052,7 +2053,7 @@ int window_message_setproperty(control *c, int tokencount, char *tokens[])
 			}
 		}
 		else
-		if (!_stricmp(tokens[4], "BaseStyle(Pressed)") && -1 != (i = get_string_index(tokens[5], szPressedStyleNames)))
+		if (!_wcsicmp(tokens[4], L"BaseStyle(Pressed)") && -1 != (i = get_string_index(tokens[5], szPressedStyleNames)))
 		{
 			if(!w->bstyleptr->has_custom_style){
 				w->bstyleptr->has_custom_style = true;
@@ -2065,7 +2066,7 @@ int window_message_setproperty(control *c, int tokencount, char *tokens[])
 			needs_transupdate = true;
 		}
 		else
-		if (!_stricmp(tokens[4], "UseCustomValue(Pressed)") && -1 != (i = get_string_index(tokens[5],szStyleProperties)))
+		if (!_wcsicmp(tokens[4], L"UseCustomValue(Pressed)") && -1 != (i = get_string_index(tokens[5],szStyleProperties)))
 		{
 			w->bstyleptr->nosavevalue &= ~(1<<i);
 			if(!w->bstyleptr->has_custom_style){
@@ -2075,7 +2076,7 @@ int window_message_setproperty(control *c, int tokencount, char *tokens[])
 			}
 		}
 		else
-		if (!_stricmp(tokens[4], "UseStyleDefault(Pressed)") && -1 != (i = get_string_index(tokens[5],szStyleProperties)))
+		if (!_wcsicmp(tokens[4], L"UseStyleDefault(Pressed)") && -1 != (i = get_string_index(tokens[5],szStyleProperties)))
 		{
 			w->bstyleptr->nosavevalue |= (1<<i);
 			if(!w->bstyleptr->has_custom_style){
@@ -2141,7 +2142,7 @@ int window_message_setproperty(control *c, int tokencount, char *tokens[])
 			needs_transupdate = true;
 		}
 		else
-		if (!_stricmp(tokens[4], "DefaultBorderPressed")){
+		if (!_wcsicmp(tokens[4], L"DefaultBorderPressed")){
 			StyleItem *tmpstyle;
 			tmpstyle = new StyleItem;
 			*tmpstyle = style_get_copy(stylenum);
@@ -2174,8 +2175,8 @@ int window_message_setproperty(control *c, int tokencount, char *tokens[])
 		}
 	        LOGFONT lf;
 		::GetObject(style_font,sizeof(lf),&lf);
-	        if(strlen(w->Fontname)){
-	                strcpy(lf.lfFaceName, w->Fontname);
+	        if(wcslen(w->Fontname)){
+	                wcscpy(lf.lfFaceName, w->Fontname);
 	        }
 		if(w->FontHeight >0){
 		        lf.lfHeight=w->FontHeight;
@@ -2193,8 +2194,8 @@ int window_message_setproperty(control *c, int tokencount, char *tokens[])
 		}
 	        LOGFONT lf;
 		::GetObject(style_font,sizeof(lf),&lf);
-	        if(strlen(w->bstyleptr->Fontname)){
-	                strcpy(lf.lfFaceName, w->bstyleptr->Fontname);
+	        if(wcslen(w->bstyleptr->Fontname)){
+	                wcscpy(lf.lfFaceName, w->bstyleptr->Fontname);
 	        }
 		if(w->bstyleptr->FontHeight >0){
 		        lf.lfHeight=w->bstyleptr->FontHeight;
@@ -2274,7 +2275,7 @@ void window_pluginsvisible(bool isvisible)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //window_helper_register
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int window_helper_register(const char *classname, WNDPROC callbackfunc)
+int window_helper_register(const wchar_t *classname, WNDPROC callbackfunc)
 {
 	//Create a window to recieve events
 	//Define the window class
@@ -2296,7 +2297,7 @@ int window_helper_register(const char *classname, WNDPROC callbackfunc)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //window_helper_unregister
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int window_helper_unregister(const char *classname)
+int window_helper_unregister(const wchar_t *classname)
 {
 	//Unregister the class
 	UnregisterClass(classname, plugin_instance_plugin);
@@ -2308,7 +2309,7 @@ int window_helper_unregister(const char *classname)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //window_helper_create
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-HWND window_helper_create(const char *classname)
+HWND window_helper_create(const wchar_t *classname)
 {
 	HWND hwnd;
 	//Create a window

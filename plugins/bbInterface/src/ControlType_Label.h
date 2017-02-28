@@ -41,7 +41,7 @@ void controltype_label_notify(control *c, int notifytype, void *messagedata);
 int controltype_label_message(control *c, int tokencount, wchar_t *tokens[]);
 void *controltype_label_getdata(control *c, int datatype);
 bool controltype_label_getstringdata(control *c, wchar_t *buffer, wchar_t *propertyname);
-void controltype_label_menu_context(Menu *m, control *c);
+void controltype_label_menu_context(std::shared_ptr<bb::MenuConfig> m, control *c);
 void controltype_label_notifytype(int notifytype, void *messagedata);
 
 int controltype_frame_create(control *c);

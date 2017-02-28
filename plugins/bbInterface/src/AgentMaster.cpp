@@ -338,7 +338,7 @@ void *agent_getdata(agent *a, int datatype)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agent_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agent_menu_set(Menu *m, control *c, agent *a, int controlformat, wchar_t *action)
+void agent_menu_set(std::shared_ptr<bb::MenuConfig> m, control *c, agent *a, int controlformat, wchar_t *action)
 {
 	bool has_nothing = true;
 
@@ -349,7 +349,7 @@ void agent_menu_set(Menu *m, control *c, agent *a, int controlformat, wchar_t *a
 		agenttype *at = (agenttype *) ln->value;
 		if (at->format & controlformat)
 		{
-			Menu *submenu = make_menu(at->agenttypenamefriendly, c);
+			std::shared_ptr<bb::MenuConfig> submenu = make_menu(at->agenttypenamefriendly, c);
 			agent *a_set = a && at == a->agenttypeptr ? a : NULL;
 			if (a_set) has_nothing = false;
 			(at->func_menu_set)(submenu, c, a_set, action, controlformat);
@@ -365,7 +365,7 @@ void agent_menu_set(Menu *m, control *c, agent *a, int controlformat, wchar_t *a
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agent_menu_context
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agent_menu_context(Menu *m, control *c, agent *a)
+void agent_menu_context(std::shared_ptr<bb::MenuConfig> m, control *c, agent *a)
 {
 	if (a) (a->agenttypeptr->func_menu_context)(m, a);
 	else make_menuitem_nop(m, L"Not set.");
@@ -384,8 +384,8 @@ void agent_registertype(
 	int     (*func_message)(agent *a, int tokencount, wchar_t *tokens[]),
 	void    (*func_notify)(agent *a, int notifytype, void *messagedata),    
 	void*   (*func_getdata)(agent *a, int datatype),
-	void    (*func_menu_set)(Menu *m, control *c, agent *a, wchar_t *action, int controlformat),
-	void    (*func_menu_context)(Menu *m, agent *a),
+	void    (*func_menu_set)(std::shared_ptr<bb::MenuConfig> m, control *c, agent *a, wchar_t *action, int controlformat),
+	void    (*func_menu_context)(std::shared_ptr<bb::MenuConfig> m, agent *a),
 	void    (*func_notifytype)(int notifytype, void *messagedata)
 	)
 {

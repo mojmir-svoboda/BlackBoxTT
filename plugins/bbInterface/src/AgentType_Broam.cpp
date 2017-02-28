@@ -189,7 +189,7 @@ void *agenttype_broam_getdata(agent *a, int datatype)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_broam_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_broam_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
+void agenttype_broam_menu_set(std::shared_ptr<bb::MenuConfig> m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
 	make_menuitem_str(m, L"Entry:", config_getfull_control_setagent_s(c, action, L"Bro@m"),
 		a ? ((agenttype_broam_details *) a->agentdetails)->command : L"");
@@ -202,11 +202,11 @@ void agenttype_broam_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, i
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_broam_bbicontrols_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_broam_bbicontrols_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
+void agenttype_broam_bbicontrols_menu_set(std::shared_ptr<bb::MenuConfig> m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
 	//Declare variables
 	listnode *ln, *ln2;
-	Menu *sub, *sub2;
+	std::shared_ptr<bb::MenuConfig> sub, sub2;
 	int n;
 	const bool btrue = true;
 	const bool bfalse = false;
@@ -261,7 +261,7 @@ void agenttype_broam_bbicontrols_menu_set(Menu *m, control *c, agent *a,  wchar_
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_broam_menu_context
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_broam_menu_context(Menu *m, agent *a)
+void agenttype_broam_menu_context(std::shared_ptr<bb::MenuConfig> m, agent *a)
 {
 	make_menuitem_nop(m, L"No options available.");
 }

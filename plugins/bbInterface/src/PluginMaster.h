@@ -19,7 +19,7 @@ void plugin_startup();
 void plugin_shutdown(bool save);
 void plugin_reconfigure(bool force);
 int plugin_message(int tokencount, wchar_t *tokens[], bool from_core, module* caller);
-Menu *plugin_menu_settings(void);
+std::shared_ptr<bb::MenuConfig> plugin_menu_settings(void);
 void plugin_save();
 
 int CALLBACK EnumFontFamExProc(ENUMLOGFONTEX *lpelfe, NEWTEXTMETRICEX *lpntme,int FontType , LPARAM lParam);
@@ -47,7 +47,7 @@ extern int plugin_icon_sat;
 extern int plugin_icon_hue;
 
 extern int BBVersion;
-extern std::list<std::string> fontList;
+extern std::list<bbstring> fontList;
 extern _locale_t locale;
 extern bool fullscreen_app_exist;
 extern HMONITOR fullscreen_app_hMon;

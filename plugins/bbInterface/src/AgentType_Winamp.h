@@ -28,16 +28,16 @@ int     agenttype_winamp_destroy(agent *a);
 int     agenttype_winamp_message(agent *a, int tokencount, wchar_t *tokens[]);
 void    agenttype_winamp_notify(agent *a, int notifytype, void *messagedata);
 void*   agenttype_winamp_getdata(agent *a, int datatype);
-void    agenttype_winamp_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat);
-void    agenttype_winamp_menu_context(Menu *m, agent *a);
+void    agenttype_winamp_menu_set(std::shared_ptr<bb::MenuConfig> m, control *c, agent *a,  wchar_t *action, int controlformat);
+void    agenttype_winamp_menu_context(std::shared_ptr<bb::MenuConfig> m, agent *a);
 void    agenttype_winamp_notifytype(int notifytype, void *messagedata);
 
 int     agenttype_winamppoller_create(agent *a, wchar_t *parameterstring);
 void    agenttype_winamppoller_notify(agent *a, int notifytype, void *messagedata);
 void*   agenttype_winamppoller_getdata(agent *a, int datatype);
-void    agenttype_winamppoller_bool_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat);
-void    agenttype_winamppoller_scale_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat);
-void    agenttype_winamppoller_text_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat);
+void    agenttype_winamppoller_bool_menu_set(std::shared_ptr<bb::MenuConfig> m, control *c, agent *a,  wchar_t *action, int controlformat);
+void    agenttype_winamppoller_scale_menu_set(std::shared_ptr<bb::MenuConfig> m, control *c, agent *a,  wchar_t *action, int controlformat);
+void    agenttype_winamppoller_text_menu_set(std::shared_ptr<bb::MenuConfig> m, control *c, agent *a,  wchar_t *action, int controlformat);
 void    agenttype_winamppoller_notifytype(int notifytype, void *messagedata);
 
 #endif

@@ -345,7 +345,7 @@ void *agenttype_graph_getdata(agent *a, int datatype)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_graph_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_graph_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
+void agenttype_graph_menu_set(std::shared_ptr<bb::MenuConfig> m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
 	for (int i = 0; i < AGENTTYPE_GRAPH_CHARTTYPECOUNT; i++)
 	{
@@ -356,7 +356,7 @@ void agenttype_graph_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, i
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_graph_menu_context
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_graph_menu_context(Menu *m, agent *a)
+void agenttype_graph_menu_context(std::shared_ptr<bb::MenuConfig> m, agent *a)
 {
 	agenttype_graph_details *details = (agenttype_graph_details *) a->agentdetails;
 
