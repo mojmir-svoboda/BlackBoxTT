@@ -7,12 +7,13 @@
 #include <shellapi.h>
 #include <bblibcompat/winutils.h>
 #include <algorithm>
+#include <blackbox/bbversion.h>
 
 int Settings_snapThreshold = 7;
 int Settings_snapPadding = 2;
 bool Settings_snapPlugins = true;
 
-
+wchar_t const * GetBBVersion () { return BBAPPVERSIONW; }
 
 inline void _CopyOffsetRect(RECT * dst, RECT const * src, int dx, int dy)
 {

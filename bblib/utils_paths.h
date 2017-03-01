@@ -5,6 +5,7 @@
 #include "unicode.h"
 #include <Shlwapi.h>
 #include <Pathcch.h>
+#include <filesystem>
 
 namespace bb {
 
@@ -111,12 +112,16 @@ inline bool joinPath(bbstring const & filedir, bbstring const & filename, bbstri
 
 inline bool fileExists (bbstring const & fname)
 {
-	return fileExists(fname.c_str());
+	std::experimental::filesystem::path p(fname.c_str());
+	return std::experimental::filesystem::exists(p);
 }
-inline bool fileExists (TCHAR const * szFileName)
+
+inline bool fileExists (wchar_t const * fname)
 {
-	DWORD a = ::GetFileAttributes(szFileName);
-	return (DWORD)-1 != a && 0 == (a & FILE_ATTRIBUTE_DIRECTORY);
+	std::experimental::filesystem::path p(fname);
+	return std::experimental::filesystem::exists(p);
+// 	DWORD a = ::GetFileAttributes(szFileName);
+// 	return (DWORD)-1 != a && 0 == (a & FILE_ATTRIBUTE_DIRECTORY);
 }
 
 inline bool isAbsolutePath (wchar_t const * path)
