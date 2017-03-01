@@ -24,12 +24,12 @@
 #include <cmath>
 
 //Define these variables
-char *config_masterbroam;
-FILE *config_file_out = NULL;
-bool config_first_line;
+wchar_t *config_masterbroam = nullptr;
+FILE * config_file_out = NULL;
+bool config_first_line = false;
 
-char *config_path_plugin = NULL;
-char *config_path_mainscript = NULL;
+wchar_t *config_path_plugin = NULL;
+wchar_t *config_path_mainscript = NULL;
 
 FILETIME config_mainscript_filetime;
 
@@ -42,7 +42,7 @@ void config_paths_shutdown();
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 int config_startup()
 {
-	config_masterbroam = new char[BBI_MAX_LINE_LENGTH];
+	config_masterbroam = new wchar_t[BBI_MAX_LINE_LENGTH];
 	config_paths_startup();
 	return 0;
 }
@@ -53,6 +53,7 @@ int config_startup()
 int config_shutdown()
 {
 	delete config_masterbroam;
+	config_masterbroam = nullptr;
 	config_paths_shutdown();
 	return 0;
 }
@@ -60,9 +61,9 @@ int config_shutdown()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //config_save
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int config_save(char *filename)
+int config_save(wchar_t const *filename)
 {
-	config_file_out = config_open(filename, "wt");
+	config_file_out = config_open(filename, L"wt");
 	if (config_file_out)
 	{
 		//Save plugin specific data
@@ -80,7 +81,7 @@ int config_save(char *filename)
 		//Close the file
 		fclose(config_file_out);
 
-		if (0 == _stricmp(config_path_mainscript, filename))
+		if (0 == _wcsicmp(config_path_mainscript, filename))
 			check_mainscript_filetime();
 
 		//Save the other files, too
@@ -89,7 +90,7 @@ int config_save(char *filename)
 	}
 
 	//Must have had an error
-	if (!plugin_suppresserrors) BBMessageBox(NULL, "There was an error saving the configuration file.", szAppName, MB_OK|MB_SYSTEMMODAL);
+	if (!plugin_suppresserrors) BBMessageBox(NULL, L"There was an error saving the configuration file.", szAppName, MB_OK|MB_SYSTEMMODAL);
 	return 1;
 }
 // Just a few utility type quick functions.
@@ -133,7 +134,7 @@ char *config_read_line(char *buf, FILE* in_file)
 int config_load(wchar_t const *filename, module* caller, const char *section)
 {
 	//Open the file
-	FILE *config_file_in = config_open(filename, "rt");
+	FILE *config_file_in = config_open(filename, L"rt");
 
 	char config_line[BBI_MAX_LINE_LENGTH];
 	if (config_file_in)
@@ -155,7 +156,9 @@ int config_load(wchar_t const *filename, module* caller, const char *section)
 			if (config_line[0] == '@')
 			{
 				//Interpret the message
-				message_interpret(config_line, false, caller);
+				wchar_t config_line_w[BBI_MAX_LINE_LENGTH];
+				bb::codecvt_utf8_utf16(config_line, strlen(config_line), config_line_w, BBI_MAX_LINE_LENGTH);
+				message_interpret(config_line_w, false, caller);
 			}
 		}
 		//Close the file
@@ -166,8 +169,9 @@ int config_load(wchar_t const *filename, module* caller, const char *section)
 	//Must have been an error
 	if (!plugin_suppresserrors)
 	{
-		sprintf(config_line, "%s:\nThere was an error loading the configuration file.", filename);
-		BBMessageBox(NULL, config_line, szAppName, MB_OK|MB_SYSTEMMODAL);
+		wchar_t config_line_w[BBI_MAX_LINE_LENGTH];
+		swprintf(config_line_w, BBI_MAX_LINE_LENGTH, L"%s:\nThere was an error loading the configuration file.", filename);
+		BBMessageBox(NULL, config_line_w, szAppName, MB_OK|MB_SYSTEMMODAL);
 	}
 	return 1;
 }
@@ -176,26 +180,26 @@ int config_load(wchar_t const *filename, module* caller, const char *section)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //config_backup
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int config_backup(char *filename)
+int config_backup(wchar_t *filename)
 {
-	char bakfile[MAX_PATH];
-	sprintf(bakfile, "%s.bak", filename);
+	wchar_t bakfile[MAX_PATH];
+	swprintf(bakfile, MAX_PATH,L"%s.bak", filename);
 
-	char temp[MAX_PATH + 500];
-	sprintf(temp,
-		"%s"
-		"\n"
-		"\nPlease note that the script format in this version is not compatible "
-		"\nto the previous version."
-		"\n"
-		"\nYour original script will be backed up as:"
-		"\n%s"
+	wchar_t temp[MAX_PATH + 500];
+	swprintf(temp, MAX_PATH + 500,
+		L"%s"
+		L"\n"
+		L"\nPlease note that the script format in this version is not compatible "
+		L"\nto the previous version."
+		L"\n"
+		L"\nYour original script will be backed up as:"
+		L"\n%s"
 		, szVersion, bakfile
 	);
 	BBMessageBox(NULL, temp, szAppName, MB_OK|MB_SYSTEMMODAL);
 
 	if (!FileExists(bakfile) || IDYES == BBMessageBox(NULL,
-			"Backup file already exists. Overwrite?",
+			L"Backup file already exists. Overwrite?",
 			szAppName, MB_YESNO|MB_SYSTEMMODAL
 			))
 		CopyFile(filename, bakfile, FALSE);
@@ -203,25 +207,25 @@ int config_backup(char *filename)
 	return 0;
 }
 
-char* config_makepath(char *buffer, char const *filename)
+wchar_t * config_makepath(wchar_t *buffer, wchar_t const *filename)
 {
-	if (NULL == strchr(filename, ':'))
-		return strcat(strcpy(buffer, config_path_plugin), filename);
+	if (NULL == wcschr(filename, L':'))
+		return wcscat(wcscpy(buffer, config_path_plugin), filename);
 	else
-		return strcpy(buffer, filename);
+		return wcscpy(buffer, filename);
 }
 
-FILE *config_open(char const * filename, const char *mode)
+FILE *config_open(wchar_t const * filename, const wchar_t *mode)
 {
-	char buffer[MAX_PATH];
+	wchar_t buffer[MAX_PATH];
 	config_first_line = true;
-	return fopen(config_makepath(buffer, filename), mode);
+	return _wfopen(config_makepath(buffer, filename), mode);
 }
 
-int config_delete(char *filename)
+int config_delete(wchar_t const *filename)
 {
-	char buffer[MAX_PATH];
-	return 0 != DeleteFile(config_makepath(buffer, filename));
+	wchar_t buffer[MAX_PATH];
+	return 0 != ::DeleteFile(config_makepath(buffer, filename));
 }
 
 int config_write(char *string)
@@ -254,17 +258,18 @@ void config_printf_noskip (const char *fmt, ...)
 	fputc('\n', config_file_out);
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int getftime(const char *fn, FILETIME *ft)
+int getftime(const wchar_t *fn, FILETIME *ft)
 {
-	HANDLE hf; int r;
+	HANDLE hf;
 	hf = CreateFile(fn, 0, FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
-	if (INVALID_HANDLE_VALUE == hf) return 0;
-	r = GetFileTime(hf, NULL, NULL, ft);
+	if (INVALID_HANDLE_VALUE == hf)
+		return 0;
+	int r = GetFileTime(hf, NULL, NULL, ft);
 	CloseHandle(hf);
 	return r!=0;
 }
 
-int check_filetime(const char *fn, FILETIME *ft)
+int check_filetime(const wchar_t *fn, FILETIME *ft)
 {
 	FILETIME t0;
 	if (getftime (fn, &t0) && CompareFileTime(&t0, ft) > 0)
@@ -283,7 +288,7 @@ int check_mainscript_filetime(void)
 bool check_mainscript_version(void)
 {
 	//Open the file
-	FILE *config_file_in = config_open(config_path_mainscript, "rt");
+	FILE *config_file_in = config_open(config_path_mainscript, L"rt");
 
 	char config_line[BBI_MAX_LINE_LENGTH];
 	if (config_file_in)
@@ -574,21 +579,21 @@ bool config_set_double_expr(char *str, double* value, double min, double max)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //Lots of simple functions that are useful
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-bool config_set_long(char *string, long *valptr)
+bool config_set_long(wchar_t *string, long *valptr)
 {
-	long value = atol(string);
+	long value = _wtol(string);
 	if ((value == 0 && !config_isstringzero(string))) return false;
 	*valptr = value;
 	return true;
 }
-bool config_set_int(const char *string, int *valptr)
+bool config_set_int(const wchar_t *string, int *valptr)
 {
-	int value = atoi(string);
+	int value = _wtoi(string);
 	if ((value == 0 && !config_isstringzero(string))) return false;
 	*valptr = value;
 	return true;
 }
-bool config_set_str(char *string, char **valptr)
+bool config_set_str(wchar_t *string, wchar_t **valptr)
 {
 	free_string(valptr);
 	if (*string) *valptr = new_string(string);
@@ -600,41 +605,41 @@ bool config_set_str(wchar_t const *string, bbstring & valptr)
 		valptr = string;
 	return true;
 }
-bool config_set_double(char *string, double *valptr)
+bool config_set_double(wchar_t *string, double *valptr)
 {
-	double value = atof(string);
+	double value = _wtof(string);
 	if ((value == 0 && !config_isstringzero(string))) return false;
 	*valptr = value;
 	return true;
 }
-bool config_set_long(char *string, long *valptr, long min, long max)
+bool config_set_long(wchar_t *string, long *valptr, long min, long max)
 {
-	long value = atol(string);
+	long value = _wtol(string);
 	if (value < min || value > max || (value == 0 && !config_isstringzero(string))) return false;
 	*valptr = value;
 	return true;
 }
-bool config_set_int(const char *string, int *valptr, int min, int max)
+bool config_set_int(const wchar_t *string, int *valptr, int min, int max)
 {
-	int value = atoi(string);
+	int value = _wtoi(string);
 	if (value < min || value > max || (value == 0 && !config_isstringzero(string))) return false;
 	*valptr = value;
 	return true;
 }
-bool config_set_double(char *string, double *valptr, double min, double max)
+bool config_set_double(wchar_t *string, double *valptr, double min, double max)
 {
-	double value = atof(string);
+	double value = _wtof(string);
 	if (value < min || value > max || (value == 0 && !config_isstringzero(string))) return false;
 	*valptr = value;
 	return true;
 }
-bool config_set_bool(char *string, bool *valptr)
+bool config_set_bool(wchar_t *string, bool *valptr)
 {
-	if (!_stricmp(string, szTrue)) {*valptr = true; return true;}
-	else if (!_stricmp(string, szFalse)) {*valptr = false; return true;}
+	if (!_wcsicmp(string, szTrue)) {*valptr = true; return true;}
+	else if (!_wcsicmp(string, szFalse)) {*valptr = false; return true;}
 	return false;
 }
-bool config_isstringzero(const char *string)
+bool config_isstringzero(const wchar_t *string)
 {
 	//The simple case, for speed
 	if (string[0] == '0' && string[1] == '\0') return true;
@@ -655,286 +660,286 @@ bool config_isstringzero(const char *string)
 	return isvalid;
 }
 
-char *config_get_control_create(controltype *ct)
-{   sprintf(config_masterbroam, "%s %s %s %s", szBBroam, szBEntityControl, szBActionCreate, ct->controltypename);   return config_masterbroam;  }
-char *config_get_control_create_named(controltype *ct, control *c)
-{   sprintf(config_masterbroam, "%s %s %s %s %s", szBBroam, szBEntityControl, szBActionCreate, ct->controltypename, c->controlname);    return config_masterbroam;  }
-char *config_get_control_create_child(control *c_p, controltype *ct)
-{   sprintf(config_masterbroam, "%s %s %s %s %s", szBBroam, szBEntityControl, szBActionCreateChild, c_p->controlname, ct->controltypename); return config_masterbroam;  }
-char *config_get_control_create_child_named(control *c_p, controltype *ct, control *c)
-{   sprintf(config_masterbroam, "%s %s %s %s %s %s", szBBroam, szBEntityControl, szBActionCreateChild, c_p->controlname, ct->controltypename, c->controlname);  return config_masterbroam;  }
-char *config_get_control_delete(control *c)
-{   sprintf(config_masterbroam, "%s %s %s %s", szBBroam, szBEntityControl, szBActionDelete, c->controlname);    return config_masterbroam;  }
-char *config_get_control_saveas(control *c, const char *filename)
-{   sprintf(config_masterbroam, "%s %s %s %s %s", szBBroam, szBEntityControl, szBActionSaveAs, c->controlname, filename);    return config_masterbroam;  }
-char *config_get_control_renamecontrol_s(control *c)
-{   sprintf(config_masterbroam, "%s %s %s %s", szBBroam, szBEntityControl, szBActionRename, c->controlname);    return config_masterbroam;  }
-char *config_get_control_clone(control *c)
-{   sprintf(config_masterbroam, "%s %s %s %s", szBBroam, szBEntityControl, "Clone", c->controlname);    return config_masterbroam;  }
+wchar_t *config_get_control_create(controltype *ct)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s", szBBroam, szBEntityControl, szBActionCreate, ct->controltypename);   return config_masterbroam;  }
+wchar_t *config_get_control_create_named(controltype *ct, control *c)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s", szBBroam, szBEntityControl, szBActionCreate, ct->controltypename, c->controlname);    return config_masterbroam;  }
+wchar_t *config_get_control_create_child(control *c_p, controltype *ct)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s", szBBroam, szBEntityControl, szBActionCreateChild, c_p->controlname, ct->controltypename); return config_masterbroam;  }
+wchar_t *config_get_control_create_child_named(control *c_p, controltype *ct, control *c)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s %s", szBBroam, szBEntityControl, szBActionCreateChild, c_p->controlname, ct->controltypename, c->controlname);  return config_masterbroam;  }
+wchar_t *config_get_control_delete(control *c)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s", szBBroam, szBEntityControl, szBActionDelete, c->controlname);    return config_masterbroam;  }
+wchar_t *config_get_control_saveas(control *c, const wchar_t *filename)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s", szBBroam, szBEntityControl, szBActionSaveAs, c->controlname, filename);    return config_masterbroam;  }
+wchar_t *config_get_control_renamecontrol_s(control *c)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s", szBBroam, szBEntityControl, szBActionRename, c->controlname);    return config_masterbroam;  }
+wchar_t *config_get_control_clone(control *c)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s", szBBroam, szBEntityControl, "Clone", c->controlname);    return config_masterbroam;  }
 
-char *config_get_control_setagent_s(control *c, const char *action, const char *agenttype)
-{   sprintf(config_masterbroam, "%s %s %s %s %s %s", szBBroam, szBEntityControl, szBActionSetAgent, c->controlname, action, agenttype); return config_masterbroam;  }
-char *config_get_control_setagent_c(control *c, const char *action, const char *agenttype, const char *parameters)
-{   sprintf(config_masterbroam, "%s %s %s %s %s %s \"%s\"", szBBroam, szBEntityControl, szBActionSetAgent, c->controlname, action, agenttype, parameters);  return config_masterbroam;  }
-char *config_get_control_setagent_b(control *c, const char *action, const char *agenttype, const bool *parameters)
-{   sprintf(config_masterbroam, "%s %s %s %s %s %s %s", szBBroam, szBEntityControl, szBActionSetAgent, c->controlname, action, agenttype, (*parameters ? szTrue : szFalse));    return config_masterbroam;  }
-char *config_get_control_setagent_i(control *c, const char *action, const char *agenttype, const int *parameters)
-{   sprintf(config_masterbroam, "%s %s %s %s %s %s %d", szBBroam, szBEntityControl, szBActionSetAgent, c->controlname, action, agenttype, *parameters); return config_masterbroam;  }
-char *config_get_control_setagent_d(control *c, const char *action, const char *agenttype, const double *parameters)
-{   sprintf(config_masterbroam, "%s %s %s %s %s %s %f", szBBroam, szBEntityControl, szBActionSetAgent, c->controlname, action, agenttype, *parameters); return config_masterbroam;  }
+wchar_t *config_get_control_setagent_s(control *c, const wchar_t *action, const wchar_t *agenttype)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s %s", szBBroam, szBEntityControl, szBActionSetAgent, c->controlname, action, agenttype); return config_masterbroam;  }
+wchar_t *config_get_control_setagent_c(control *c, const wchar_t *action, const wchar_t *agenttype, const wchar_t *parameters)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s %s \"%s\"", szBBroam, szBEntityControl, szBActionSetAgent, c->controlname, action, agenttype, parameters);  return config_masterbroam;  }
+wchar_t *config_get_control_setagent_b(control *c, const wchar_t *action, const wchar_t *agenttype, const bool *parameters)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s %s %s", szBBroam, szBEntityControl, szBActionSetAgent, c->controlname, action, agenttype, (*parameters ? szTrue : szFalse));    return config_masterbroam;  }
+wchar_t *config_get_control_setagent_i(control *c, const wchar_t *action, const wchar_t *agenttype, const int *parameters)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s %s %d", szBBroam, szBEntityControl, szBActionSetAgent, c->controlname, action, agenttype, *parameters); return config_masterbroam;  }
+wchar_t *config_get_control_setagent_d(control *c, const wchar_t *action, const wchar_t *agenttype, const double *parameters)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s %s %f", szBBroam, szBEntityControl, szBActionSetAgent, c->controlname, action, agenttype, *parameters); return config_masterbroam;  }
 
-char *config_get_control_removeagent(control *c, const char *action)
-{   sprintf(config_masterbroam, "%s %s %s %s %s", szBBroam, szBEntityControl, szBActionRemoveAgent, c->controlname, action);    return config_masterbroam;  }
+wchar_t *config_get_control_removeagent(control *c, const wchar_t *action)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s", szBBroam, szBEntityControl, szBActionRemoveAgent, c->controlname, action);    return config_masterbroam;  }
 
-char *config_get_control_setagentprop_s(control *c, const char *action, const char *key)
-{   sprintf(config_masterbroam, "%s %s %s %s %s %s", szBBroam, szBEntityControl, szBActionSetAgentProperty, c->controlname, action, key);  return config_masterbroam;  }
-char *config_get_control_setagentprop_c(control *c, const char *action, const char *key, const char *value)
-{   sprintf(config_masterbroam, "%s %s %s %s %s %s \"%s\"", szBBroam, szBEntityControl, szBActionSetAgentProperty, c->controlname, action, key, value); return config_masterbroam;  }
-char *config_get_control_setagentprop_b(control *c, const char *action, const char *key, const bool *value)
-{   sprintf(config_masterbroam, "%s %s %s %s %s %s %s", szBBroam, szBEntityControl, szBActionSetAgentProperty, c->controlname, action, key, (*value ? szTrue : szFalse));   return config_masterbroam;  }
-char *config_get_control_setagentprop_i(control *c, const char *action, const char *key, const int *value)
-{   sprintf(config_masterbroam, "%s %s %s %s %s %s %d", szBBroam, szBEntityControl, szBActionSetAgentProperty, c->controlname, action, key, *value);    return config_masterbroam;  }
-char *config_get_control_setagentprop_d(control *c, const char *action, const char *key, const double *value)
-{   sprintf(config_masterbroam, "%s %s %s %s %s %s %f", szBBroam, szBEntityControl, szBActionSetAgentProperty, c->controlname, action, key, *value);    return config_masterbroam;  }
+wchar_t *config_get_control_setagentprop_s(control *c, const wchar_t *action, const wchar_t *key)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s %s", szBBroam, szBEntityControl, szBActionSetAgentProperty, c->controlname, action, key);  return config_masterbroam;  }
+wchar_t *config_get_control_setagentprop_c(control *c, const wchar_t *action, const wchar_t *key, const wchar_t *value)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s %s \"%s\"", szBBroam, szBEntityControl, szBActionSetAgentProperty, c->controlname, action, key, value); return config_masterbroam;  }
+wchar_t *config_get_control_setagentprop_b(control *c, const wchar_t *action, const wchar_t *key, const bool *value)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s %s %s", szBBroam, szBEntityControl, szBActionSetAgentProperty, c->controlname, action, key, (*value ? szTrue : szFalse));   return config_masterbroam;  }
+wchar_t *config_get_control_setagentprop_i(control *c, const wchar_t *action, const wchar_t *key, const int *value)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s %s %d", szBBroam, szBEntityControl, szBActionSetAgentProperty, c->controlname, action, key, *value);    return config_masterbroam;  }
+wchar_t *config_get_control_setagentprop_d(control *c, const wchar_t *action, const wchar_t *key, const double *value)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s %s %f", szBBroam, szBEntityControl, szBActionSetAgentProperty, c->controlname, action, key, *value);    return config_masterbroam;  }
 
-char *config_get_control_setcontrolprop_s(control *c, const char *key)
-{   sprintf(config_masterbroam, "%s %s %s %s %s", szBBroam, szBEntityControl, szBActionSetControlProperty, c->controlname, key);    return config_masterbroam;  }
-char *config_get_control_setcontrolprop_c(control *c, const char *key, const char *value)
-{   sprintf(config_masterbroam, "%s %s %s %s %s \"%s\"", szBBroam, szBEntityControl, szBActionSetControlProperty, c->controlname, key, value);  return config_masterbroam;  }
-char *config_get_control_setcontrolprop_b(control *c, const char *key, const bool *value)
-{   sprintf(config_masterbroam, "%s %s %s %s %s %s", szBBroam, szBEntityControl, szBActionSetControlProperty, c->controlname, key, (*value ? szTrue : szFalse));    return config_masterbroam;  }
-char *config_get_control_setcontrolprop_i(control *c, const char *key, const int *value)
-{   sprintf(config_masterbroam, "%s %s %s %s %s %d", szBBroam, szBEntityControl, szBActionSetControlProperty, c->controlname, key, *value); return config_masterbroam;  }
-char *config_get_control_setcontrolprop_d(control *c, const char *key, const double *value)
-{   sprintf(config_masterbroam, "%s %s %s %s %s %f", szBBroam, szBEntityControl, szBActionSetControlProperty, c->controlname, key, *value); return config_masterbroam;  }
+wchar_t *config_get_control_setcontrolprop_s(control *c, const wchar_t *key)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s", szBBroam, szBEntityControl, szBActionSetControlProperty, c->controlname, key);    return config_masterbroam;  }
+wchar_t *config_get_control_setcontrolprop_c(control *c, const wchar_t *key, const wchar_t *value)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s \"%s\"", szBBroam, szBEntityControl, szBActionSetControlProperty, c->controlname, key, value);  return config_masterbroam;  }
+wchar_t *config_get_control_setcontrolprop_b(control *c, const wchar_t *key, const bool *value)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s %s", szBBroam, szBEntityControl, szBActionSetControlProperty, c->controlname, key, (*value ? szTrue : szFalse));    return config_masterbroam;  }
+wchar_t *config_get_control_setcontrolprop_i(control *c, const wchar_t *key, const int *value)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s %d", szBBroam, szBEntityControl, szBActionSetControlProperty, c->controlname, key, *value); return config_masterbroam;  }
+wchar_t *config_get_control_setcontrolprop_d(control *c, const wchar_t *key, const double *value)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s %f", szBBroam, szBEntityControl, szBActionSetControlProperty, c->controlname, key, *value); return config_masterbroam;  }
 
-char *config_get_control_setwindowprop_s(control *c, const char *key)
-{   sprintf(config_masterbroam, "%s %s %s %s %s", szBBroam, szBEntityControl, szBActionSetWindowProperty, c->controlname, key); return config_masterbroam;  }
-char *config_get_control_setwindowprop_c(control *c, const char *key, const char *value)
-{   sprintf(config_masterbroam, "%s %s %s %s %s \"%s\"", szBBroam, szBEntityControl, szBActionSetWindowProperty, c->controlname, key, value);   return config_masterbroam;  }
-char *config_get_control_setwindowprop_b(control *c, const char *key, const bool *value)
-{   sprintf(config_masterbroam, "%s %s %s %s %s %s", szBBroam, szBEntityControl, szBActionSetWindowProperty, c->controlname, key, (*value ? szTrue : szFalse)); return config_masterbroam;  }
-char *config_get_control_setwindowprop_i(control *c, const char *key, const int *value)
-{   sprintf(config_masterbroam, "%s %s %s %s %s %d", szBBroam, szBEntityControl, szBActionSetWindowProperty, c->controlname, key, *value);  return config_masterbroam;  }
-char *config_get_control_setwindowprop_d(control *c, const char *key, const double *value)
-{   sprintf(config_masterbroam, "%s %s %s %s %s %f", szBBroam, szBEntityControl, szBActionSetWindowProperty, c->controlname, key, *value);  return config_masterbroam;  }
+wchar_t *config_get_control_setwindowprop_s(control *c, const wchar_t *key)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s", szBBroam, szBEntityControl, szBActionSetWindowProperty, c->controlname, key); return config_masterbroam;  }
+wchar_t *config_get_control_setwindowprop_c(control *c, const wchar_t *key, const wchar_t *value)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s \"%s\"", szBBroam, szBEntityControl, szBActionSetWindowProperty, c->controlname, key, value);   return config_masterbroam;  }
+wchar_t *config_get_control_setwindowprop_b(control *c, const wchar_t *key, const bool *value)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s %s", szBBroam, szBEntityControl, szBActionSetWindowProperty, c->controlname, key, (*value ? szTrue : szFalse)); return config_masterbroam;  }
+wchar_t *config_get_control_setwindowprop_i(control *c, const wchar_t *key, const int *value)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s %d", szBBroam, szBEntityControl, szBActionSetWindowProperty, c->controlname, key, *value);  return config_masterbroam;  }
+wchar_t *config_get_control_setwindowprop_d(control *c, const wchar_t *key, const double *value)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s %f", szBBroam, szBEntityControl, szBActionSetWindowProperty, c->controlname, key, *value);  return config_masterbroam;  }
 
-char *config_get_agent_setagentprop_s(const char *agenttype, const char *key)
-{   sprintf(config_masterbroam, "%s %s %s %s %s", szBBroam, szBEntityAgent, szBActionSetAgentProperty, agenttype, key); return config_masterbroam;  }
-char *config_get_agent_setagentprop_c(const char *agenttype, const char *key, const char *value)
-{   sprintf(config_masterbroam, "%s %s %s %s %s \"%s\"", szBBroam, szBEntityAgent, szBActionSetAgentProperty, agenttype, key, value);   return config_masterbroam;  }
-char *config_get_agent_setagentprop_b(const char *agenttype, const char *key, const bool *value)
-{   sprintf(config_masterbroam, "%s %s %s %s %s %s", szBBroam, szBEntityAgent, szBActionSetAgentProperty, agenttype, key, (*value ? szTrue : szFalse)); return config_masterbroam;  }
-char *config_get_agent_setagentprop_i(const char *agenttype, const char *key, const int *value)
-{   sprintf(config_masterbroam, "%s %s %s %s %s %d", szBBroam, szBEntityAgent, szBActionSetAgentProperty, agenttype, key, *value);  return config_masterbroam;  }
-char *config_get_agent_setagentprop_d(const char *agenttype, const char *key, const double *value)
-{   sprintf(config_masterbroam, "%s %s %s %s %s %f", szBBroam, szBEntityAgent, szBActionSetAgentProperty, agenttype, key, *value);  return config_masterbroam;  }
+wchar_t *config_get_agent_setagentprop_s(const wchar_t *agenttype, const wchar_t *key)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s", szBBroam, szBEntityAgent, szBActionSetAgentProperty, agenttype, key); return config_masterbroam;  }
+wchar_t *config_get_agent_setagentprop_c(const wchar_t *agenttype, const wchar_t *key, const wchar_t *value)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s \"%s\"", szBBroam, szBEntityAgent, szBActionSetAgentProperty, agenttype, key, value);   return config_masterbroam;  }
+wchar_t *config_get_agent_setagentprop_b(const wchar_t *agenttype, const wchar_t *key, const bool *value)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s %s", szBBroam, szBEntityAgent, szBActionSetAgentProperty, agenttype, key, (*value ? szTrue : szFalse)); return config_masterbroam;  }
+wchar_t *config_get_agent_setagentprop_i(const wchar_t *agenttype, const wchar_t *key, const int *value)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s %d", szBBroam, szBEntityAgent, szBActionSetAgentProperty, agenttype, key, *value);  return config_masterbroam;  }
+wchar_t *config_get_agent_setagentprop_d(const wchar_t *agenttype, const wchar_t *key, const double *value)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s %f", szBBroam, szBEntityAgent, szBActionSetAgentProperty, agenttype, key, *value);  return config_masterbroam;  }
 
-char *config_get_control_setpluginprop_s(control *c, const char *key)
-{   sprintf(config_masterbroam, "%s %s %s %s %s", szBBroam, szBEntityControl, szBActionSetPluginProperty, c->controlname, key); return config_masterbroam;  }
-char *config_get_control_setpluginprop_b(control *c, const char *key, const bool *value)
-{   sprintf(config_masterbroam, "%s %s %s %s %s %s", szBBroam, szBEntityControl, szBActionSetPluginProperty, c->controlname, key, (*value ? szTrue : szFalse)); return config_masterbroam;  }
+wchar_t *config_get_control_setpluginprop_s(control *c, const wchar_t *key)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s", szBBroam, szBEntityControl, szBActionSetPluginProperty, c->controlname, key); return config_masterbroam;  }
+wchar_t *config_get_control_setpluginprop_b(control *c, const wchar_t *key, const bool *value)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s %s", szBBroam, szBEntityControl, szBActionSetPluginProperty, c->controlname, key, (*value ? szTrue : szFalse)); return config_masterbroam;  }
 
-char *config_get_plugin_setpluginprop_s(const char *key)
-{   sprintf(config_masterbroam, "%s %s %s %s", szBBroam, szBEntityPlugin, szBActionSetPluginProperty, key);   return config_masterbroam;  }
-char *config_get_plugin_setpluginprop_c(const char *key, const char *value)
-{   sprintf(config_masterbroam, "%s %s %s %s \"%s\"", szBBroam, szBEntityPlugin, szBActionSetPluginProperty, key, value ? value : "");   return config_masterbroam;  }
-char *config_get_plugin_setpluginprop_b(const char *key, const bool *value)
-{   sprintf(config_masterbroam, "%s %s %s %s %s", szBBroam, szBEntityPlugin, szBActionSetPluginProperty, key, (*value ? szTrue : szFalse)); return config_masterbroam;  }
-char *config_get_plugin_setpluginprop_i(const char *key, const int *value)
-{   sprintf(config_masterbroam, "%s %s %s %s %d", szBBroam, szBEntityPlugin, szBActionSetPluginProperty, key, *value);  return config_masterbroam;  }
-char *config_get_plugin_setpluginprop_d(const char *key, const double *value)
-{   sprintf(config_masterbroam, "%s %s %s %s %f", szBBroam, szBEntityPlugin, szBActionSetPluginProperty, key, *value);  return config_masterbroam;  }
+wchar_t *config_get_plugin_setpluginprop_s(const wchar_t *key)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s", szBBroam, szBEntityPlugin, szBActionSetPluginProperty, key);   return config_masterbroam;  }
+wchar_t *config_get_plugin_setpluginprop_c(const wchar_t *key, const wchar_t *value)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s \"%s\"", szBBroam, szBEntityPlugin, szBActionSetPluginProperty, key, value ? value : L"");   return config_masterbroam;  }
+wchar_t *config_get_plugin_setpluginprop_b(const wchar_t *key, const bool *value)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s", szBBroam, szBEntityPlugin, szBActionSetPluginProperty, key, (*value ? szTrue : szFalse)); return config_masterbroam;  }
+wchar_t *config_get_plugin_setpluginprop_i(const wchar_t *key, const int *value)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %d", szBBroam, szBEntityPlugin, szBActionSetPluginProperty, key, *value);  return config_masterbroam;  }
+wchar_t *config_get_plugin_setpluginprop_d(const wchar_t *key, const double *value)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %f", szBBroam, szBEntityPlugin, szBActionSetPluginProperty, key, *value);  return config_masterbroam;  }
 
-char *config_get_plugin_load_dialog()
-{   sprintf(config_masterbroam, "%s %s %s", szBBroam, szBEntityPlugin, szBActionLoad);  return config_masterbroam;  }
-char *config_get_plugin_load(const char *file)
-{   sprintf(config_masterbroam, "%s %s %s \"%s\"", szBBroam, szBEntityPlugin, szBActionLoad, file); return config_masterbroam;  }
-char *config_get_plugin_save()
-{   sprintf(config_masterbroam, "%s %s %s", szBBroam, szBEntityPlugin, szBActionSave);  return config_masterbroam;  }
-char *config_get_plugin_saveas()
-{   sprintf(config_masterbroam, "%s %s %s", szBBroam, szBEntityPlugin, szBActionSaveAs);    return config_masterbroam;  }
-char *config_get_plugin_revert()
-{   sprintf(config_masterbroam, "%s %s %s", szBBroam, szBEntityPlugin, szBActionRevert);    return config_masterbroam;  }
-char *config_get_plugin_edit()
-{   sprintf(config_masterbroam, "%s %s %s", szBBroam, szBEntityPlugin, szBActionEdit);  return config_masterbroam;  }
+wchar_t *config_get_plugin_load_dialog()
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s", szBBroam, szBEntityPlugin, szBActionLoad);  return config_masterbroam;  }
+wchar_t *config_get_plugin_load(const wchar_t *file)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s \"%s\"", szBBroam, szBEntityPlugin, szBActionLoad, file); return config_masterbroam;  }
+wchar_t *config_get_plugin_save()
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s", szBBroam, szBEntityPlugin, szBActionSave);  return config_masterbroam;  }
+wchar_t *config_get_plugin_saveas()
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s", szBBroam, szBEntityPlugin, szBActionSaveAs);    return config_masterbroam;  }
+wchar_t *config_get_plugin_revert()
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s", szBBroam, szBEntityPlugin, szBActionRevert);    return config_masterbroam;  }
+wchar_t *config_get_plugin_edit()
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s", szBBroam, szBEntityPlugin, szBActionEdit);  return config_masterbroam;  }
 
-char *config_get_module_create()
-{   sprintf(config_masterbroam, "%s %s %s", szBBroam, szBEntityModule, szBActionCreate);  return config_masterbroam;  }
-char *config_get_module_load_dialog()
-{   sprintf(config_masterbroam, "%s %s %s", szBBroam, szBEntityModule, szBActionLoad);  return config_masterbroam;  }
-char *config_get_module_load(module *m)
-{   sprintf(config_masterbroam, "%s %s %s \"%s\"", szBBroam, szBEntityModule, szBActionLoad, m->filepath);  return config_masterbroam;  }
-char *config_get_module_toggle(module *m)
-{   sprintf(config_masterbroam, "%s %s %s %s", szBBroam, szBEntityModule, szBActionToggle, m->name);  return config_masterbroam;  }
-char *config_get_module_edit(module *m)
-{   sprintf(config_masterbroam, "%s %s %s %s", szBBroam, szBEntityModule, szBActionEdit, m->name);  return config_masterbroam;  }
-char *config_get_module_setdefault(module *m)
-{   sprintf(config_masterbroam, "%s %s %s %s", szBBroam, szBEntityModule, szBActionSetDefault, m == &globalmodule ? "*global*" : m->name);  return config_masterbroam;  }
+wchar_t *config_get_module_create()
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s", szBBroam, szBEntityModule, szBActionCreate);  return config_masterbroam;  }
+wchar_t *config_get_module_load_dialog()
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s", szBBroam, szBEntityModule, szBActionLoad);  return config_masterbroam;  }
+wchar_t *config_get_module_load(module *m)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s \"%s\"", szBBroam, szBEntityModule, szBActionLoad, m->filepath);  return config_masterbroam;  }
+wchar_t *config_get_module_toggle(module *m)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s", szBBroam, szBEntityModule, szBActionToggle, m->name);  return config_masterbroam;  }
+wchar_t *config_get_module_edit(module *m)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s", szBBroam, szBEntityModule, szBActionEdit, m->name);  return config_masterbroam;  }
+wchar_t *config_get_module_setdefault(module *m)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s", szBBroam, szBEntityModule, szBActionSetDefault, m == &globalmodule ? L"*global*" : m->name);  return config_masterbroam;  }
 
-char *config_get_module_setauthor_s(module *m)
-{   sprintf(config_masterbroam, "%s %s %s %s %s", szBBroam, szBEntityModule, szBActionSetModuleProperty, m->name, "Author");  return config_masterbroam;  }
-char *config_get_module_setcomments_s(module *m)
-{   sprintf(config_masterbroam, "%s %s %s %s %s", szBBroam, szBEntityModule, szBActionSetModuleProperty, m->name, "Comments");  return config_masterbroam;  }
-char *config_get_module_rename_s(module *m)
-{   sprintf(config_masterbroam, "%s %s %s %s", szBBroam, szBEntityModule, szBActionRename, m->name);    return config_masterbroam;  }
-char *config_get_module_onload_s(module *m)
-{   sprintf(config_masterbroam, "%s %s %s %s", szBBroam, szBEntityModule, szBActionOnLoad, m->name, m->actions[MODULE_ACTION_ONLOAD] ? m->actions[MODULE_ACTION_ONLOAD] : "");  return config_masterbroam;  }
-char *config_get_module_onunload_s(module *m)
-{   sprintf(config_masterbroam, "%s %s %s %s", szBBroam, szBEntityModule, szBActionOnUnload, m->name, m->actions[MODULE_ACTION_ONUNLOAD] ? m->actions[MODULE_ACTION_ONUNLOAD] : "");  return config_masterbroam;  }
+wchar_t *config_get_module_setauthor_s(module *m)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s", szBBroam, szBEntityModule, szBActionSetModuleProperty, m->name, L"Author");  return config_masterbroam;  }
+wchar_t *config_get_module_setcomments_s(module *m)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s", szBBroam, szBEntityModule, szBActionSetModuleProperty, m->name, L"Comments");  return config_masterbroam;  }
+wchar_t *config_get_module_rename_s(module *m)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s", szBBroam, szBEntityModule, szBActionRename, m->name);    return config_masterbroam;  }
+wchar_t *config_get_module_onload_s(module *m)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s", szBBroam, szBEntityModule, szBActionOnLoad, m->name, !m->actions[MODULE_ACTION_ONLOAD].empty() ? m->actions[MODULE_ACTION_ONLOAD] : L"");  return config_masterbroam;  }
+wchar_t *config_get_module_onunload_s(module *m)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s", szBBroam, szBEntityModule, szBActionOnUnload, m->name, !m->actions[MODULE_ACTION_ONUNLOAD].empty() ? m->actions[MODULE_ACTION_ONUNLOAD] : L"");  return config_masterbroam;  }
 
 
-char *config_get_control_assigntomodule(control *c, module *m)
-{   sprintf(config_masterbroam, "%s %s %s %s %s", szBBroam, szBEntityControl, szBActionAssignToModule, c->controlname, m->name);  return config_masterbroam;  }
-char *config_get_control_detachfrommodule(control *c)
-{   sprintf(config_masterbroam, "%s %s %s %s", szBBroam, szBEntityControl, szBActionDetachFromModule, c->controlname);  return config_masterbroam;  }
-char *config_get_module_onload(module *m)
-{   sprintf(config_masterbroam, "%s %s %s %s \"%s\"", szBBroam, szBEntityModule, szBActionOnLoad, m->name, m->actions[MODULE_ACTION_ONLOAD] ? m->actions[MODULE_ACTION_ONLOAD] : "");  return config_masterbroam;  }
-char *config_get_module_onunload(module *m)
-{   sprintf(config_masterbroam, "%s %s %s %s \"%s\"", szBBroam, szBEntityModule, szBActionOnUnload, m->name, m->actions[MODULE_ACTION_ONUNLOAD] ? m->actions[MODULE_ACTION_ONUNLOAD] : "");  return config_masterbroam;  }
-char *config_get_plugin_onload()
-{   sprintf(config_masterbroam, "%s %s %s \"%s\"", szBBroam, szBEntityPlugin, szBActionOnLoad, globalmodule.actions[MODULE_ACTION_ONLOAD] ? globalmodule.actions[MODULE_ACTION_ONLOAD] : "");  return config_masterbroam;  }
-char *config_get_plugin_onunload()
-{   sprintf(config_masterbroam, "%s %s %s \"%s\"", szBBroam, szBEntityPlugin, szBActionOnUnload, globalmodule.actions[MODULE_ACTION_ONUNLOAD] ? globalmodule.actions[MODULE_ACTION_ONUNLOAD] : "");  return config_masterbroam;  }
+wchar_t *config_get_control_assigntomodule(control *c, module *m)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s", szBBroam, szBEntityControl, szBActionAssignToModule, c->controlname, m->name);  return config_masterbroam;  }
+wchar_t *config_get_control_detachfrommodule(control *c)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s", szBBroam, szBEntityControl, szBActionDetachFromModule, c->controlname);  return config_masterbroam;  }
+wchar_t *config_get_module_onload(module *m)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s \"%s\"", szBBroam, szBEntityModule, szBActionOnLoad, m->name, !m->actions[MODULE_ACTION_ONLOAD].empty() ? m->actions[MODULE_ACTION_ONLOAD] : L"");  return config_masterbroam;  }
+wchar_t *config_get_module_onunload(module *m)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s \"%s\"", szBBroam, szBEntityModule, szBActionOnUnload, m->name, !m->actions[MODULE_ACTION_ONUNLOAD].empty() ? m->actions[MODULE_ACTION_ONUNLOAD] : L"");  return config_masterbroam;  }
+wchar_t *config_get_plugin_onload()
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s \"%s\"", szBBroam, szBEntityPlugin, szBActionOnLoad, !globalmodule.actions[MODULE_ACTION_ONLOAD].empty() ? globalmodule.actions[MODULE_ACTION_ONLOAD] : L"");  return config_masterbroam;  }
+wchar_t *config_get_plugin_onunload()
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s \"%s\"", szBBroam, szBEntityPlugin, szBActionOnUnload, !globalmodule.actions[MODULE_ACTION_ONUNLOAD].empty() ? globalmodule.actions[MODULE_ACTION_ONUNLOAD] : L"");  return config_masterbroam;  }
 
-char *config_get_variable_set(listnode *ln)
-{   sprintf(config_masterbroam, "%s %s %s \"%s\"", szBBroam, szBEntityVarset, ln->key, (char *)ln->value);  return config_masterbroam;  }
-char *config_get_variable_set_static(listnode *ln)
-{   sprintf(config_masterbroam, "%s %s %s %s \"%s\"", szBBroam, szBEntityVarset, "Static", ln->key, (char *)ln->value);  return config_masterbroam;  }
+wchar_t *config_get_variable_set(listnode *ln)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s \"%s\"", szBBroam, szBEntityVarset, ln->key, (wchar_t *)ln->value);  return config_masterbroam;  }
+wchar_t *config_get_variable_set_static(listnode *ln)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s \"%s\"", szBBroam, szBEntityVarset, "Static", ln->key, (wchar_t *)ln->value);  return config_masterbroam;  }
 
 //--------------- copied, using fully qualified names
 
-char *config_getfull_control_create_child(control *c_p, controltype *ct)
-{   sprintf(config_masterbroam, "%s %s %s %s:%s %s", szBBroam, szBEntityControl, szBActionCreateChild, c_p->moduleptr->name, c_p->controlname, ct->controltypename); return config_masterbroam;  }
-char *config_getfull_control_create_child_named(control *c_p, controltype *ct, control *c)
-{   sprintf(config_masterbroam, "%s %s %s %s:%s %s %s", szBBroam, szBEntityControl, szBActionCreateChild, c_p->moduleptr->name, c_p->controlname, ct->controltypename, c->controlname);  return config_masterbroam;  }
-char *config_getfull_control_delete(control *c)
-{   sprintf(config_masterbroam, "%s %s %s %s:%s", szBBroam, szBEntityControl, szBActionDelete, c->moduleptr->name, c->controlname);    return config_masterbroam;  }
-char *config_getfull_control_saveas(control *c, const char *filename)
-{   sprintf(config_masterbroam, "%s %s %s %s:%s %s", szBBroam, szBEntityControl, szBActionSaveAs, c->moduleptr->name, c->controlname, filename);    return config_masterbroam;  }
-char *config_getfull_control_renamecontrol_s(control *c)
-{   sprintf(config_masterbroam, "%s %s %s %s:%s", szBBroam, szBEntityControl, szBActionRename, c->moduleptr->name, c->controlname);    return config_masterbroam;  }
-char *config_getfull_control_clone(control *c)
-{   sprintf(config_masterbroam, "%s %s %s %s:%s", szBBroam, szBEntityControl, "Clone", c->moduleptr->name, c->controlname);    return config_masterbroam;  }
+wchar_t *config_getfull_control_create_child(control *c_p, controltype *ct)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s %s", szBBroam, szBEntityControl, szBActionCreateChild, c_p->moduleptr->name, c_p->controlname, ct->controltypename); return config_masterbroam;  }
+wchar_t *config_getfull_control_create_child_named(control *c_p, controltype *ct, control *c)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s %s %s", szBBroam, szBEntityControl, szBActionCreateChild, c_p->moduleptr->name, c_p->controlname, ct->controltypename, c->controlname);  return config_masterbroam;  }
+wchar_t *config_getfull_control_delete(control *c)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s", szBBroam, szBEntityControl, szBActionDelete, c->moduleptr->name, c->controlname);    return config_masterbroam;  }
+wchar_t *config_getfull_control_saveas(control *c, const wchar_t *filename)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s %s", szBBroam, szBEntityControl, szBActionSaveAs, c->moduleptr->name, c->controlname, filename);    return config_masterbroam;  }
+wchar_t *config_getfull_control_renamecontrol_s(control *c)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s", szBBroam, szBEntityControl, szBActionRename, c->moduleptr->name, c->controlname);    return config_masterbroam;  }
+wchar_t *config_getfull_control_clone(control *c)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s", szBBroam, szBEntityControl, "Clone", c->moduleptr->name, c->controlname);    return config_masterbroam;  }
 
-char *config_getfull_control_setagent_s(control *c, const char *action, const char *agenttype)
-{   sprintf(config_masterbroam, "%s %s %s %s:%s %s %s", szBBroam, szBEntityControl, szBActionSetAgent, c->moduleptr->name, c->controlname, action, agenttype); return config_masterbroam;  }
-char *config_getfull_control_setagent_c(control *c, const char *action, const char *agenttype, const char *parameters)
-{   sprintf(config_masterbroam, "%s %s %s %s:%s %s %s \"%s\"", szBBroam, szBEntityControl, szBActionSetAgent, c->moduleptr->name, c->controlname, action, agenttype, parameters);  return config_masterbroam;  }
-char *config_getfull_control_setagent_b(control *c, const char *action, const char *agenttype, const bool *parameters)
-{   sprintf(config_masterbroam, "%s %s %s %s:%s %s %s %s", szBBroam, szBEntityControl, szBActionSetAgent, c->moduleptr->name, c->controlname, action, agenttype, (*parameters ? szTrue : szFalse));    return config_masterbroam;  }
-char *config_getfull_control_setagent_i(control *c, const char *action, const char *agenttype, const int *parameters)
-{   sprintf(config_masterbroam, "%s %s %s %s:%s %s %s %d", szBBroam, szBEntityControl, szBActionSetAgent, c->moduleptr->name, c->controlname, action, agenttype, *parameters); return config_masterbroam;  }
-char *config_getfull_control_setagent_d(control *c, const char *action, const char *agenttype, const double *parameters)
-{   sprintf(config_masterbroam, "%s %s %s %s:%s %s %s %f", szBBroam, szBEntityControl, szBActionSetAgent, c->moduleptr->name, c->controlname, action, agenttype, *parameters); return config_masterbroam;  }
+wchar_t *config_getfull_control_setagent_s(control *c, const wchar_t *action, const wchar_t *agenttype)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s %s %s", szBBroam, szBEntityControl, szBActionSetAgent, c->moduleptr->name, c->controlname, action, agenttype); return config_masterbroam;  }
+wchar_t *config_getfull_control_setagent_c(control *c, const wchar_t *action, const wchar_t *agenttype, const wchar_t *parameters)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s %s %s \"%s\"", szBBroam, szBEntityControl, szBActionSetAgent, c->moduleptr->name, c->controlname, action, agenttype, parameters);  return config_masterbroam;  }
+wchar_t *config_getfull_control_setagent_b(control *c, const wchar_t *action, const wchar_t *agenttype, const bool *parameters)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s %s %s %s", szBBroam, szBEntityControl, szBActionSetAgent, c->moduleptr->name, c->controlname, action, agenttype, (*parameters ? szTrue : szFalse));    return config_masterbroam;  }
+wchar_t *config_getfull_control_setagent_i(control *c, const wchar_t *action, const wchar_t *agenttype, const int *parameters)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s %s %s %d", szBBroam, szBEntityControl, szBActionSetAgent, c->moduleptr->name, c->controlname, action, agenttype, *parameters); return config_masterbroam;  }
+wchar_t *config_getfull_control_setagent_d(control *c, const wchar_t *action, const wchar_t *agenttype, const double *parameters)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s %s %s %f", szBBroam, szBEntityControl, szBActionSetAgent, c->moduleptr->name, c->controlname, action, agenttype, *parameters); return config_masterbroam;  }
 
-char *config_getfull_control_removeagent(control *c, const char *action)
-{   sprintf(config_masterbroam, "%s %s %s %s:%s %s", szBBroam, szBEntityControl, szBActionRemoveAgent, c->moduleptr->name, c->controlname, action);    return config_masterbroam;  }
+wchar_t *config_getfull_control_removeagent(control *c, const wchar_t *action)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s %s", szBBroam, szBEntityControl, szBActionRemoveAgent, c->moduleptr->name, c->controlname, action);    return config_masterbroam;  }
 
-char *config_getfull_control_setagentprop_s(control *c, const char *action, const char *key)
-{   sprintf(config_masterbroam, "%s %s %s %s:%s %s %s", szBBroam, szBEntityControl, szBActionSetAgentProperty, c->moduleptr->name, c->controlname, action, key);  return config_masterbroam;  }
-char *config_getfull_control_setagentprop_c(control *c, const char *action, const char *key, const char *value)
-{   sprintf(config_masterbroam, "%s %s %s %s:%s %s %s \"%s\"", szBBroam, szBEntityControl, szBActionSetAgentProperty, c->moduleptr->name, c->controlname, action, key, value); return config_masterbroam;  }
-char *config_getfull_control_setagentprop_b(control *c, const char *action, const char *key, const bool *value)
-{   sprintf(config_masterbroam, "%s %s %s %s:%s %s %s %s", szBBroam, szBEntityControl, szBActionSetAgentProperty, c->moduleptr->name, c->controlname, action, key, (*value ? szTrue : szFalse));   return config_masterbroam;  }
-char *config_getfull_control_setagentprop_i(control *c, const char *action, const char *key, const int *value)
-{   sprintf(config_masterbroam, "%s %s %s %s:%s %s %s %d", szBBroam, szBEntityControl, szBActionSetAgentProperty, c->moduleptr->name, c->controlname, action, key, *value);    return config_masterbroam;  }
-char *config_getfull_control_setagentprop_d(control *c, const char *action, const char *key, const double *value)
-{   sprintf(config_masterbroam, "%s %s %s %s:%s %s %s %f", szBBroam, szBEntityControl, szBActionSetAgentProperty, c->moduleptr->name, c->controlname, action, key, *value);    return config_masterbroam;  }
+wchar_t *config_getfull_control_setagentprop_s(control *c, const wchar_t *action, const wchar_t *key)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s %s %s", szBBroam, szBEntityControl, szBActionSetAgentProperty, c->moduleptr->name, c->controlname, action, key);  return config_masterbroam;  }
+wchar_t *config_getfull_control_setagentprop_c(control *c, const wchar_t *action, const wchar_t *key, const wchar_t *value)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s %s %s \"%s\"", szBBroam, szBEntityControl, szBActionSetAgentProperty, c->moduleptr->name, c->controlname, action, key, value); return config_masterbroam;  }
+wchar_t *config_getfull_control_setagentprop_b(control *c, const wchar_t *action, const wchar_t *key, const bool *value)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s %s %s %s", szBBroam, szBEntityControl, szBActionSetAgentProperty, c->moduleptr->name, c->controlname, action, key, (*value ? szTrue : szFalse));   return config_masterbroam;  }
+wchar_t *config_getfull_control_setagentprop_i(control *c, const wchar_t *action, const wchar_t *key, const int *value)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s %s %s %d", szBBroam, szBEntityControl, szBActionSetAgentProperty, c->moduleptr->name, c->controlname, action, key, *value);    return config_masterbroam;  }
+wchar_t *config_getfull_control_setagentprop_d(control *c, const wchar_t *action, const wchar_t *key, const double *value)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s %s %s %f", szBBroam, szBEntityControl, szBActionSetAgentProperty, c->moduleptr->name, c->controlname, action, key, *value);    return config_masterbroam;  }
 
-char *config_getfull_control_setcontrolprop_s(control *c, const char *key)
-{   sprintf(config_masterbroam, "%s %s %s %s:%s %s", szBBroam, szBEntityControl, szBActionSetControlProperty, c->moduleptr->name, c->controlname, key);    return config_masterbroam;  }
-char *config_getfull_control_setcontrolprop_c(control *c, const char *key, const char *value)
-{   sprintf(config_masterbroam, "%s %s %s %s:%s %s \"%s\"", szBBroam, szBEntityControl, szBActionSetControlProperty, c->moduleptr->name, c->controlname, key, value);  return config_masterbroam;  }
-char *config_getfull_control_setcontrolprop_b(control *c, const char *key, const bool *value)
-{   sprintf(config_masterbroam, "%s %s %s %s:%s %s %s", szBBroam, szBEntityControl, szBActionSetControlProperty, c->moduleptr->name, c->controlname, key, (*value ? szTrue : szFalse));    return config_masterbroam;  }
-char *config_getfull_control_setcontrolprop_i(control *c, const char *key, const int *value)
-{   sprintf(config_masterbroam, "%s %s %s %s:%s %s %d", szBBroam, szBEntityControl, szBActionSetControlProperty, c->moduleptr->name, c->controlname, key, *value); return config_masterbroam;  }
-char *config_getfull_control_setcontrolprop_d(control *c, const char *key, const double *value)
-{   sprintf(config_masterbroam, "%s %s %s %s:%s %s %f", szBBroam, szBEntityControl, szBActionSetControlProperty, c->moduleptr->name, c->controlname, key, *value); return config_masterbroam;  }
+wchar_t *config_getfull_control_setcontrolprop_s(control *c, const wchar_t *key)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s %s", szBBroam, szBEntityControl, szBActionSetControlProperty, c->moduleptr->name, c->controlname, key);    return config_masterbroam;  }
+wchar_t *config_getfull_control_setcontrolprop_c(control *c, const wchar_t *key, const wchar_t *value)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s %s \"%s\"", szBBroam, szBEntityControl, szBActionSetControlProperty, c->moduleptr->name, c->controlname, key, value);  return config_masterbroam;  }
+wchar_t *config_getfull_control_setcontrolprop_b(control *c, const wchar_t *key, const bool *value)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s %s %s", szBBroam, szBEntityControl, szBActionSetControlProperty, c->moduleptr->name, c->controlname, key, (*value ? szTrue : szFalse));    return config_masterbroam;  }
+wchar_t *config_getfull_control_setcontrolprop_i(control *c, const wchar_t *key, const int *value)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s %s %d", szBBroam, szBEntityControl, szBActionSetControlProperty, c->moduleptr->name, c->controlname, key, *value); return config_masterbroam;  }
+wchar_t *config_getfull_control_setcontrolprop_d(control *c, const wchar_t *key, const double *value)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s %s %f", szBBroam, szBEntityControl, szBActionSetControlProperty, c->moduleptr->name, c->controlname, key, *value); return config_masterbroam;  }
 
-char *config_getfull_control_setwindowprop_s(control *c, const char *key)
-{   sprintf(config_masterbroam, "%s %s %s %s:%s %s", szBBroam, szBEntityControl, szBActionSetWindowProperty, c->moduleptr->name, c->controlname, key); return config_masterbroam;  }
-char *config_getfull_control_setwindowprop_c(control *c, const char *key, const char *value)
-{   sprintf(config_masterbroam, "%s %s %s %s:%s %s \"%s\"", szBBroam, szBEntityControl, szBActionSetWindowProperty, c->moduleptr->name, c->controlname, key, value);   return config_masterbroam;  }
-char *config_getfull_control_setwindowprop_b(control *c, const char *key, const bool *value)
-{   sprintf(config_masterbroam, "%s %s %s %s:%s %s %s", szBBroam, szBEntityControl, szBActionSetWindowProperty, c->moduleptr->name, c->controlname, key, (*value ? szTrue : szFalse)); return config_masterbroam;  }
-char *config_getfull_control_setwindowprop_i(control *c, const char *key, const int *value)
-{   sprintf(config_masterbroam, "%s %s %s %s:%s %s %d", szBBroam, szBEntityControl, szBActionSetWindowProperty, c->moduleptr->name, c->controlname, key, *value);  return config_masterbroam;  }
-char *config_getfull_control_setwindowprop_d(control *c, const char *key, const double *value)
-{   sprintf(config_masterbroam, "%s %s %s %s:%s %s %f", szBBroam, szBEntityControl, szBActionSetWindowProperty, c->moduleptr->name, c->controlname, key, *value);  return config_masterbroam;  }
+wchar_t *config_getfull_control_setwindowprop_s(control *c, const wchar_t *key)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s %s", szBBroam, szBEntityControl, szBActionSetWindowProperty, c->moduleptr->name, c->controlname, key); return config_masterbroam;  }
+wchar_t *config_getfull_control_setwindowprop_c(control *c, const wchar_t *key, const wchar_t *value)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s %s \"%s\"", szBBroam, szBEntityControl, szBActionSetWindowProperty, c->moduleptr->name, c->controlname, key, value);   return config_masterbroam;  }
+wchar_t *config_getfull_control_setwindowprop_b(control *c, const wchar_t *key, const bool *value)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s %s %s", szBBroam, szBEntityControl, szBActionSetWindowProperty, c->moduleptr->name, c->controlname, key, (*value ? szTrue : szFalse)); return config_masterbroam;  }
+wchar_t *config_getfull_control_setwindowprop_i(control *c, const wchar_t *key, const int *value)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s %s %d", szBBroam, szBEntityControl, szBActionSetWindowProperty, c->moduleptr->name, c->controlname, key, *value);  return config_masterbroam;  }
+wchar_t *config_getfull_control_setwindowprop_d(control *c, const wchar_t *key, const double *value)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s %s %f", szBBroam, szBEntityControl, szBActionSetWindowProperty, c->moduleptr->name, c->controlname, key, *value);  return config_masterbroam;  }
 
-char *config_getfull_control_setpluginprop_s(control *c, const char *key)
-{   sprintf(config_masterbroam, "%s %s %s %s:%s %s", szBBroam, szBEntityControl, szBActionSetPluginProperty, c->moduleptr->name, c->controlname, key); return config_masterbroam;  }
-char *config_getfull_control_setpluginprop_b(control *c, const char *key, const bool *value)
-{   sprintf(config_masterbroam, "%s %s %s %s:%s %s %s", szBBroam, szBEntityControl, szBActionSetPluginProperty, c->moduleptr->name, c->controlname, key, (*value ? szTrue : szFalse)); return config_masterbroam;  }
+wchar_t *config_getfull_control_setpluginprop_s(control *c, const wchar_t *key)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s %s", szBBroam, szBEntityControl, szBActionSetPluginProperty, c->moduleptr->name, c->controlname, key); return config_masterbroam;  }
+wchar_t *config_getfull_control_setpluginprop_b(control *c, const wchar_t *key, const bool *value)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s %s %s", szBBroam, szBEntityControl, szBActionSetPluginProperty, c->moduleptr->name, c->controlname, key, (*value ? szTrue : szFalse)); return config_masterbroam;  }
 
-char *config_getfull_control_assigntomodule(control *c, module *m)
-{   sprintf(config_masterbroam, "%s %s %s %s:%s %s", szBBroam, szBEntityControl, szBActionAssignToModule, c->moduleptr->name, c->controlname, m->name);  return config_masterbroam;  }
-char *config_getfull_control_detachfrommodule(control *c)
-{   sprintf(config_masterbroam, "%s %s %s %s:%s", szBBroam, szBEntityControl, szBActionDetachFromModule, c->moduleptr->name, c->controlname);  return config_masterbroam;  }
+wchar_t *config_getfull_control_assigntomodule(control *c, module *m)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s %s", szBBroam, szBEntityControl, szBActionAssignToModule, c->moduleptr->name, c->controlname, m->name);  return config_masterbroam;  }
+wchar_t *config_getfull_control_detachfrommodule(control *c)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s", szBBroam, szBEntityControl, szBActionDetachFromModule, c->moduleptr->name, c->controlname);  return config_masterbroam;  }
 
-char *config_getfull_variable_set_static(module *m, listnode *ln)
-{   sprintf(config_masterbroam, "%s %s %s %s:%s \"%s\"", szBBroam, szBEntityVarset, "Static", m->name, ln->key, (char *)ln->value);  return config_masterbroam;  }
-char *config_getfull_variable_set_static_s(module *m, listnode *ln)
-{   sprintf(config_masterbroam, "%s %s %s %s:%s", szBBroam, szBEntityVarset, "Static", m->name, ln->key);  return config_masterbroam;  }
+wchar_t *config_getfull_variable_set_static(module *m, listnode *ln)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s \"%s\"", szBBroam, szBEntityVarset, "Static", m->name, ln->key, (wchar_t *)ln->value);  return config_masterbroam;  }
+wchar_t *config_getfull_variable_set_static_s(module *m, listnode *ln)
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s", szBBroam, szBEntityVarset, "Static", m->name, ln->key);  return config_masterbroam;  }
 
 //##################################################
 //config_paths_startup
 //##################################################
 void config_paths_startup()
 {
-	const char *bbinterfacedotrc = "BBInterface.rc";
-	const char *bbinterfacerc = "BBInterfacerc";
+	const wchar_t *bbinterfacedotrc = L"BBInterface.rc";
+	const wchar_t *bbinterfacerc = L"BBInterfacerc";
 
-	config_path_plugin = new char[MAX_PATH];
-	config_path_mainscript = new char[MAX_PATH];
+	config_path_plugin = new wchar_t[MAX_PATH];
+	config_path_mainscript = new wchar_t[MAX_PATH];
 
 	//Create a temporary string
-	char *temp = new char[MAX_PATH];
+	wchar_t *temp = new wchar_t[MAX_PATH];
 
 	//Get the name of this file
 	GetModuleFileName(plugin_instance_plugin, temp, MAX_PATH);
 
 	//Find the last slash
-	char *lastslash = strrchr(temp, '\\');
+	wchar_t *lastslash = wcsrchr(temp, '\\');
 	if (lastslash) lastslash[1] = '\0';
 
 	//Copy the path of the plugin
-	strcpy(config_path_plugin, temp);
+	wcscpy(config_path_plugin, temp);
 
 	//Find the plugin .rc file
 	bool found = false;
 	//Try the plugin directory, "BBInterface.rc"
-	strcpy(config_path_mainscript, config_path_plugin);
-	strcat(config_path_mainscript, bbinterfacedotrc);
+	wcscpy(config_path_mainscript, config_path_plugin);
+	wcscat(config_path_mainscript, bbinterfacedotrc);
 	if (FileExists(config_path_mainscript)) found = true;
 	//If not found, try the plugin directory, "BBInterfacerc"
 	if (!found)
 	{
-		strcpy(config_path_mainscript, config_path_plugin);
-		strcat(config_path_mainscript, bbinterfacerc);
+		wcscpy(config_path_mainscript, config_path_plugin);
+		wcscat(config_path_mainscript, bbinterfacerc);
 		if (FileExists(config_path_mainscript)) found = true;
 	}
 	//If not found, try the Blackbox directory, "BBInterface.rc"
 	if (!found)
 	{
 		GetBlackboxPath(config_path_mainscript, MAX_PATH);
-		strcat(config_path_mainscript, bbinterfacedotrc);
+		wcscat(config_path_mainscript, bbinterfacedotrc);
 		if (FileExists(config_path_mainscript)) found = true;
 	}
 	//If not found, try the Blackbox directory, "BBInterfacerc"
 	if (!found)
 	{
 		GetBlackboxPath(config_path_mainscript, MAX_PATH);
-		strcat(config_path_mainscript, bbinterfacerc);
+		wcscat(config_path_mainscript, bbinterfacerc);
 		if (FileExists(config_path_mainscript)) found = true;
 	}
 	//All hope is lost
 	if (!found)
 	{
-		strcpy(config_path_mainscript, config_path_plugin);
-		strcat(config_path_mainscript, bbinterfacedotrc);
+		wcscpy(config_path_mainscript, config_path_plugin);
+		wcscat(config_path_mainscript, bbinterfacedotrc);
 	}
 
 	//Delete the temporary string

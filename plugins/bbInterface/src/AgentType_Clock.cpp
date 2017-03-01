@@ -44,8 +44,6 @@ list *agenttype_clock_agents;
 bool agenttype_clock_hastimer = false;
 struct tm *ltp;
 
-#define select_fmt(x) ((x) ? (x) : L"%H:%M:%S")
-
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //controltype_clock_startup
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -176,7 +174,7 @@ int agenttype_clock_destroy(agent *a)
 
 		//Free the string
 		free_string(&details->internal_identifier);
-		free_string(&details->format);
+		details->format.clear();
 
 		delete details;
 		a->agentdetails = NULL;
@@ -192,7 +190,7 @@ int agenttype_clock_destroy(agent *a)
 int agenttype_clock_message(agent *a, int tokencount, wchar_t *tokens[])
 {
 	agenttype_clock_details *details = (agenttype_clock_details *)a->agentdetails;
-	if (!wcscmp(L"ClockFormat",tokens[5]) && config_set_str(tokens[6],&details->format)){
+	if (!wcscmp(L"ClockFormat",tokens[5]) && config_set_str(tokens[6],details->format)){
 		agenttype_clock_updatevalue(details);
 		control_notify(a->controlptr,NOTIFY_NEEDUPDATE,NULL);
 	}
@@ -217,7 +215,7 @@ void agenttype_clock_notify(agent *a, int notifytype, void *messagedata)
 		case NOTIFY_SAVE_AGENT:
 			//Write existance
 			config_write(config_get_control_setagent_c(a->controlptr, a->agentaction, a->agenttypeptr->agenttypename, L"Clock"));
-			config_write(config_get_control_setagentprop_c(a->controlptr, a->agentaction, L"ClockFormat",select_fmt(details->format)));
+			config_write(config_get_control_setagentprop_c(a->controlptr, a->agentaction, L"ClockFormat", details->format.empty() ? L"%H:%M:%S" : details->format.c_str()));
 			
 			break;
 	}
@@ -248,7 +246,7 @@ void agenttype_clock_menu_set(std::shared_ptr<bb::MenuConfig> m, control *c, age
 void agenttype_clock_menu_context(std::shared_ptr<bb::MenuConfig> m, agent *a)
 {
 	agenttype_clock_details *details = (agenttype_clock_details *)a->agentdetails;
-	make_menuitem_str(m, L"Clock Format",config_getfull_control_setagentprop_s(a->controlptr, a->agentaction, L"ClockFormat"),select_fmt(details->format));
+	make_menuitem_str(m, L"Clock Format",config_getfull_control_setagentprop_s(a->controlptr, a->agentaction, L"ClockFormat"),details->format.empty() ? L"%H:%M:%S" : details->format.c_str());
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_clock_notifytype
@@ -327,7 +325,7 @@ void agenttype_clock_updatevalue(agenttype_clock_details *details)
 	len = wcsftime(
 		details->timestr,
 		sizeof(details->timestr), 
-		select_fmt(details->format),
+		details->format.empty() ? L"%H:%M:%S" : details->format.c_str(),
 		ltp);
 	if(len == 0)
 		wcscpy(details->timestr, L"Invalid Format");

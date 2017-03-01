@@ -275,7 +275,7 @@ void agenttype_diskspacemonitor_notify(agent *a, int notifytype, void *messageda
 		case NOTIFY_SAVE_AGENT:
 			//Write existance
 			config_write(config_get_control_setagent_c(a->controlptr, a->agentaction, a->agenttypeptr->agenttypename, agenttype_diskspacemonitor_types[details->monitor_type]));
-			config_write(config_get_control_setagentprop_c(a->controlptr, a->agentaction, L"MonitoringPath",details->path));
+			config_write(config_get_control_setagentprop_c(a->controlptr, a->agentaction, L"MonitoringPath",details->path.c_str()));
 			break;
 	}
 }
@@ -318,7 +318,7 @@ void agenttype_diskspacemonitor_menu_set(std::shared_ptr<bb::MenuConfig> m, cont
 void agenttype_diskspacemonitor_menu_context(std::shared_ptr<bb::MenuConfig> m, agent *a)
 {
 	agenttype_diskspacemonitor_details *details = (agenttype_diskspacemonitor_details *)a->agentdetails;
-	make_menuitem_str(m, L"Monitoring  Path",config_getfull_control_setagentprop_s(a->controlptr,a->agentaction, L"MonitoringPath"),details->path? details->path : L"");
+	make_menuitem_str(m, L"Monitoring  Path",config_getfull_control_setagentprop_s(a->controlptr,a->agentaction, L"MonitoringPath"), !details->path.empty() ? details->path.c_str() : L"");
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_diskspacemonitor_notifytype
@@ -400,7 +400,7 @@ void agenttype_diskspacemonitor_updatevalue(agenttype_diskspacemonitor_details *
 	if (d->value != -1) return;
 
 	static ULONGLONG diskfree,disktotal;	
-	wchar_t const *path= d->path ? d->path : L"C:\\";
+	wchar_t const *path= !d->path.empty() ? d->path.c_str() : L"C:\\";
 	GetDiskFreeSpaceEx(path,NULL,(ULARGE_INTEGER *)&disktotal,(ULARGE_INTEGER *)&diskfree);
 	//Otherwise, figure it out
 	switch(monitor_type)

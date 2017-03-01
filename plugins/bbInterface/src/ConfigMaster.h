@@ -2,6 +2,7 @@
 #include "Definitions.h"
 //Only needed because variables store themselves directly in a listnode.
 #include "ListMaster.h"
+#include <bblib/bbstring.h>
 
 struct controltype; struct module; struct control;
 
@@ -17,11 +18,11 @@ int config_shutdown();
 
 
 FILE *config_open(wchar_t const *filename, const wchar_t *mode);
-int config_save(wchar_t *filename);
-int config_delete(wchar_t *filename);
+int config_save(wchar_t const *filename);
+int config_delete(wchar_t const *filename);
 int config_load(wchar_t const *filename, module* caller, const wchar_t *section = NULL);
 int config_write(wchar_t *string);
-int config_backup(wchar_t *filename);
+int config_backup(wchar_t const *filename);
 wchar_t* config_makepath(wchar_t *buffer, const wchar_t *filename);
 
 void config_printf (const wchar_t *fmt, ...);
