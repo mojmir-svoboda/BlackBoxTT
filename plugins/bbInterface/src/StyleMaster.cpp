@@ -110,14 +110,14 @@ int style_startup()
 	StyleItem * B = (StyleItem *)GetSettingPtr(SN_TOOLBARBUTTON);
 	StyleItem * P = (StyleItem *)GetSettingPtr(SN_TOOLBARBUTTONP);
 	StyleItem * X;
-	if (BBP_is_bbversion_lean())
-	{
+// 	if (BBP_is_bbversion_lean())
+// 	{
 		T->ShadowX = T->ShadowY = 1;
 		W->ShadowX = W->ShadowY = 1;
 		L->ShadowX = L->ShadowY = 1;
 		C->ShadowX = C->ShadowY = 1;
 		B->ShadowX = B->ShadowY = 1;
-	}
+//	}
 	if (T->validated & VALID_TEXTCOLOR) X = T;
 	else
 	if (W->parentRelative)  X = W;

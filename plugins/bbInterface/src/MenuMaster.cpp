@@ -367,27 +367,27 @@ void make_menuitem_str(std::shared_ptr<bb::MenuConfig> m, const wchar_t *title, 
 {
 	wchar_t buffer[BBI_MAX_LINE_LENGTH];
 
-	if (BBP_is_bbversion_lean())
-		swprintf(buffer, BBI_MAX_LINE_LENGTH,L"%s \"%%s\"", cmd), cmd = buffer;
+//	if (BBP_is_bbversion_lean())
+	swprintf(buffer, BBI_MAX_LINE_LENGTH,L"%s \"%%s\"", cmd), cmd = buffer;
 
-	if (BBP_is_bbversion_09x())
-		swprintf(buffer, BBI_MAX_LINE_LENGTH, L"\"%s\"", init_string), init_string = buffer;
+// 	if (BBP_is_bbversion_09x())
+// 		swprintf(buffer, BBI_MAX_LINE_LENGTH, L"\"%s\"", init_string), init_string = buffer;
 
 	MakeMenuItemString(m, title, cmd, init_string);
 }
 
 void make_menuitem_int(std::shared_ptr<bb::MenuConfig> m, const wchar_t *title, const wchar_t* cmd, int val, int minval, int maxval)
 {
-	if (BBP_is_bbversion_09x())
-	{
-		wchar_t buffer[20];
-		swprintf(buffer, 20, L"%d", val);
-		MakeMenuItemString(m, title, cmd, buffer);
-	}
-	else
-	{
+// 	if (BBP_is_bbversion_09x())
+// 	{
+// 		wchar_t buffer[20];
+// 		swprintf(buffer, 20, L"%d", val);
+// 		MakeMenuItemString(m, title, cmd, buffer);
+// 	}
+// 	else
+// 	{
 		MakeMenuItemInt(m, title, cmd, val, minval, maxval);
-	}
+//	}
 }
 
 void make_menuitem_bol(std::shared_ptr<bb::MenuConfig> m, const wchar_t *title, const wchar_t* cmd, bool checked)
