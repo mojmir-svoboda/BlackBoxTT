@@ -33,7 +33,7 @@ namespace bb {
 		dst = convert.from_bytes(src);
 		return true;
 	}
-	inline size_t codecvt_utf8_utf16 (char * src, std::wstring & dst)
+	inline size_t codecvt_utf8_utf16 (char const * src, std::wstring & dst)
 	{
 		std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> convert;
 		dst = convert.from_bytes(src);
