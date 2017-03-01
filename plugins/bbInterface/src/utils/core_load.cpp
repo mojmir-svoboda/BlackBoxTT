@@ -112,7 +112,7 @@ CoreLoad::CoreLoad ()
 		//_tprintf(TEXT("\nPdhEnumObjectItems failed with %ld."), pdhStatus);
 	}
 	m_worker = new JobWorkerThread(*this);
-	m_pool.Create(*m_worker);
+	m_pool.Create(m_worker);
 }
 
 CoreLoad::~CoreLoad ()

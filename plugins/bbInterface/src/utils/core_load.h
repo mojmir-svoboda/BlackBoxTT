@@ -4,7 +4,8 @@
 #include <Pdh.h>
 #include <vector>
 #include <string>
-#include <blackbox/worker.h>
+#include <thread>
+#include <atomic>
 
 struct CoreInfo
 {
@@ -14,6 +15,34 @@ struct CoreInfo
 	double m_proc;
 	CoreInfo () : m_core(0), m_idle(0.0), m_kernel(0.0), m_proc(0.0) { }
 	CoreInfo (int n, double idl, double ker, double proc) : m_core(n), m_idle(idl), m_kernel(ker), m_proc(proc) { }
+};
+
+struct Runnable
+{
+	virtual void Run () = 0;
+};
+
+struct ThreadPool
+{
+	std::vector<std::thread> m_threads;
+
+	ThreadPool () { }
+
+	size_t size () const { return m_threads.size(); }
+	void clear () { m_threads.clear(); }
+
+	void Create (Runnable * runnable)
+	{
+		std::thread t(&Runnable::Run, runnable);
+		m_threads.push_back(std::move(t));
+	}
+
+	void WaitForTerminate ()
+	{
+		for (std::thread & t : m_threads)
+			t.join();
+		m_threads.clear();
+	}
 };
 
 struct JobWorkerThread;
@@ -41,6 +70,25 @@ struct CoreLoad
 	CoreInfo const & GetCoreInfo (size_t i) const { return m_coreInfos[i]; }
 };
 
+class WorkerThread : public Runnable
+{
+	std::atomic<bool> m_terminate;
+
+	virtual void Run () = 0;
+
+public:
+	WorkerThread () : m_terminate(false) { }
+
+	bool GetTerminate () const
+	{
+		return m_terminate.load(std::memory_order_relaxed);
+	}
+
+	void SetTerminate ()
+	{
+		m_terminate.store(true, std::memory_order_relaxed);
+	}
+};
 struct JobWorkerThread : WorkerThread
 {
 	CoreLoad & m_job;
