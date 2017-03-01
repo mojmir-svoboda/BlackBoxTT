@@ -205,9 +205,6 @@ bool plugin_load = false;
 int plugin_icon_sat = 255;
 int plugin_icon_hue = 0;
 
-int BBVersion;
-
-
 //using COM 
 bool com_initialized = false;
 CComModule _Module;
@@ -281,7 +278,6 @@ int beginPlugin(HINSTANCE hMainInstance)
 	plugin_hwnd_blackbox = GetBBWnd();
 
 	const wchar_t *bbv = GetBBVersion();
-	BBVersion = BBP_bbversion();
 
 	//Deal with os info
 	plugin_getosinfo();
@@ -611,7 +607,7 @@ int plugin_message(int tokencount, wchar_t *tokens[], bool from_core, module* ca
 	{
 		//SendMessage(plugin_hwnd_blackbox, BB_EDITFILE, (WPARAM)-1, (LPARAM) config_path_mainscript);
 		//return 0;
-		wchar_t temp[MAX_PATH]; GetBlackboxEditor(temp);
+		wchar_t temp[MAX_PATH]; GetBlackboxEditor(temp, MAX_PATH);
 		BBExecute(NULL, L"", temp , config_path_mainscript, NULL, SW_SHOWNORMAL, false);
 		return 0;
 	}

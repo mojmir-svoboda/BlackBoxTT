@@ -26,6 +26,7 @@
 #define V_SPLIT (V_FROMSPLITTO|V_TOSPLITTO)
 
 API_EXPORT const wchar_t * GetBBVersion ();
+API_EXPORT void GetBlackboxEditor (/*OUT*/ wchar_t * editor, size_t n);
 /* Draw a Gradient Rectangle from StyleItem, optional using the style border. */
 API_EXPORT void MakeStyleGradient (HDC hDC, RECT const * p_rect, StyleItem const * m_si, bool withBorder);
 /* Draw a Border */

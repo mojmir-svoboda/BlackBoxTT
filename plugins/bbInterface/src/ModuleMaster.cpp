@@ -275,7 +275,8 @@ int module_message(int tokencount, wchar_t *tokens[], bool from_core, module* ca
 
 	if (tokencount == 4 && !_wcsicmp(tokens[2], szBActionEdit) )
 	{
-		wchar_t editor[MAX_PATH]; GetBlackboxEditor(editor);
+		wchar_t editor[MAX_PATH];
+		GetBlackboxEditor(editor, MAX_PATH);
 		wchar_t temppath[MAX_PATH]; config_makepath(temppath, m->filepath.c_str());
 		BBExecute(NULL, L"", editor , temppath, NULL, SW_SHOWNORMAL, false);
 		return 0;

@@ -15,6 +15,11 @@ bool Settings_snapPlugins = true;
 
 wchar_t const * GetBBVersion () { return BBAPPVERSIONW; }
 
+void GetBlackboxEditor (/*OUT*/ wchar_t * editor, size_t n)
+{
+	editor[0] = L'\0';
+}
+
 inline void _CopyOffsetRect(RECT * dst, RECT const * src, int dx, int dy)
 {
 	dst->left = src->left + dx;
