@@ -8,7 +8,9 @@
 
 // Global Include
 #include <blackbox/plugin/bb.h>
+#include <bblib/utils_paths.h>
 #include <bblibcompat/winutils.h>
+#include <bblibcompat/bblibcompat.h>
 
 #include "ControlType_Label.h"
 #include "SlitManager.h"
@@ -380,7 +382,7 @@ ModuleInfo * m_loadPlugin(HWND hSlit, const wchar_t *file_name)
 
 	wchar_t message[MAX_PATH + 512];
 	swprintf (message, MAX_PATH + 512, L"%s\n%s", file_name, errormsg);
-	MBoxErrorValue(message);
+	BBMessageBox(MB_OK, L"Error: %s", message);
 	return NULL;
 }
 
@@ -396,7 +398,7 @@ const wchar_t * check_relative_path(const wchar_t *filename)
 {
 	// get relative path to blackbox process
 	wchar_t bb_path[MAX_PATH];
-	GetBlackboxPath(bb_path, MAX_PATH);
+	bb::getExePath(bb_path, MAX_PATH);
 	int len = wcslen(bb_path);
 
 	if (0 == _memicmp(bb_path, filename, len))
