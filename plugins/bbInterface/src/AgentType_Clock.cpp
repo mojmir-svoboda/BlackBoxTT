@@ -130,7 +130,7 @@ int agenttype_clock_create(agent *a, wchar_t *parameterstring)
 
 	//Create the details
 	agenttype_clock_details *details = new agenttype_clock_details;
-	details->format = NULL;
+	details->format.clear();
 	
 	//Create a unique string to assign to this (just a number from a counter)
 	wchar_t identifierstring[64];

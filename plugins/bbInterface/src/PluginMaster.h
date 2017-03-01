@@ -8,6 +8,12 @@
 #ifndef BBInterface_PluginMaster_h
 #define BBInterface_PluginMaster_h
 
+#if defined (bbInterface_EXPORTS)
+#	define BBI_API __declspec(dllexport)
+#else
+#	define BBI_API __declspec(dllimport)
+#endif
+
 //Includes
 #include "MenuMaster.h"
 #include <list>

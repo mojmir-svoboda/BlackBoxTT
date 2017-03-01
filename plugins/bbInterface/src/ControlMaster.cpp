@@ -37,7 +37,7 @@ int control_message_delete(control *c, int tokencount, wchar_t *tokens[]);
 void control_save_control(control *c, struct renamed_control **);
 void control_child_add(control *c_parent, control *c_child);
 void control_child_remove(control *c_child);
-bool control_is_valid_name(wchar_t *name);
+bool control_is_valid_name(char *name);
 //control* control_get(const char *name);
 
 // These were unused?

@@ -8,9 +8,9 @@ set(bbInterface_SOURCES
 	./src/AgentType_CompoundText.cpp
 	./src/AgentType_DiskSpaceMonitor.cpp
 	./src/AgentType_Graph.cpp
-	./src/AgentType_iTunes.cpp
+#	./src/AgentType_iTunes.cpp
 	./src/AgentType_Mixer.cpp
-	./src/AgentType_Mixer_XP.cpp
+#	./src/AgentType_Mixer_XP.cpp
 	./src/AgentType_Mixer_Vista.cpp
 	./src/AgentType_NetworkMonitor.cpp
 	./src/AgentType_Run.cpp

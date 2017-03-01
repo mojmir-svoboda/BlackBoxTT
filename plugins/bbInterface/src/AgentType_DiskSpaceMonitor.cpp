@@ -190,7 +190,7 @@ int agenttype_diskspacemonitor_create(agent *a, wchar_t *parameterstring)
 	details->monitor_type = monitor_type;
 	details->value=-1.0;
 	details->previous_value = 0;
-	details->path=NULL;
+	details->path.clear();
 	wcscpy(details->str_value, L"");
 	
 	//Create a unique string to assign to this (just a number from a counter)
@@ -249,7 +249,7 @@ int agenttype_diskspacemonitor_destroy(agent *a)
 int agenttype_diskspacemonitor_message(agent *a, int tokencount, wchar_t *tokens[])
 {
 	agenttype_diskspacemonitor_details *details = (agenttype_diskspacemonitor_details *) a->agentdetails;
-	if (!wcscmp(L"MonitoringPath",tokens[5]) && config_set_str(tokens[6],&details->path)){
+	if (!wcscmp(L"MonitoringPath",tokens[5]) && config_set_str(tokens[6],details->path)){
 		details->value=-1.0;
 		agenttype_diskspacemonitor_updatevalue(details);
 		control_notify(a->controlptr,NOTIFY_NEEDUPDATE,NULL);

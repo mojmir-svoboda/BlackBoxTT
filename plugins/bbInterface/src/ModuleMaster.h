@@ -11,17 +11,17 @@ struct module
 {
 	//Info fields - the first one is necessary.
 	wchar_t name[64];
-	wchar_t *author;
-	wchar_t *comments;
+	bbstring author;
+	bbstring comments;
 
-	wchar_t *filepath;       //path to the module file
+	bbstring filepath;       //path to the module file
 	bool enabled;
 
 	list *controllist; // list of controls associated with module
 	list *controllist_parentsonly; // list of controls associated with module
 	list *variables; // list of variables associated with module
 
-	wchar_t *actions[MODULE_ACTION_COUNT];
+	bbstring actions[MODULE_ACTION_COUNT];
 };
 
 extern module *currentmodule;
@@ -31,8 +31,8 @@ extern module globalmodule;
 int module_startup();
 int module_shutdown();
 
-module* module_create(wchar_t *filepath);
-module* module_create_new(wchar_t *filename);
+module* module_create(wchar_t const *filepath);
+module* module_create_new(wchar_t const *filename);
 int module_destroy(module *m, bool remove_from_list);
 int module_toggle(module *m);
 int module_toggle(wchar_t *modulename);

@@ -16,13 +16,13 @@ int config_startup();
 int config_shutdown();
 
 
-FILE *config_open(wchar_t *filename, const wchar_t *mode);
+FILE *config_open(wchar_t const *filename, const wchar_t *mode);
 int config_save(wchar_t *filename);
 int config_delete(wchar_t *filename);
-int config_load(wchar_t *filename, module* caller, const wchar_t *section = NULL);
+int config_load(wchar_t const *filename, module* caller, const wchar_t *section = NULL);
 int config_write(wchar_t *string);
 int config_backup(wchar_t *filename);
-wchar_t* config_makepath(wchar_t *buffer, wchar_t *filename);
+wchar_t* config_makepath(wchar_t *buffer, const wchar_t *filename);
 
 void config_printf (const wchar_t *fmt, ...);
 void config_printf_noskip (const wchar_t *fmt, ...);
@@ -34,6 +34,7 @@ bool config_set_long(wchar_t *string, long *valptr);
 bool config_set_int(const wchar_t *string, int *valptr);
 bool config_set_int_expr(wchar_t *string, int *valptr);
 bool config_set_str(wchar_t *string, wchar_t **valptr);
+bool config_set_str(wchar_t const * string, bbstring & valptr);
 bool config_set_double(wchar_t *string, double *valptr);
 bool config_set_double_expr(wchar_t *str, double* value);
 bool config_set_double_expr(wchar_t *str, double* value, double min, double max);

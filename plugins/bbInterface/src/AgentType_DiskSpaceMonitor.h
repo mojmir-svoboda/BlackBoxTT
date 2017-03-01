@@ -16,7 +16,7 @@ struct agenttype_diskspacemonitor_details
 {
 	wchar_t *internal_identifier;
 	int monitor_type;
-	wchar_t *path;
+	bbstring path;
 	wchar_t str_value[16];
 	double value;
 	double previous_value;

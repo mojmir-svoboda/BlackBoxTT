@@ -15,7 +15,7 @@
 struct agenttype_clock_details
 {
 	wchar_t *internal_identifier;
-	wchar_t *format;
+	bbstring format;
 	wchar_t timestr[256];
 };
 

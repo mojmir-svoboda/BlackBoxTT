@@ -130,7 +130,7 @@ char *config_read_line(char *buf, FILE* in_file)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int config_load(char *filename, module* caller, const char *section)
+int config_load(wchar_t const *filename, module* caller, const char *section)
 {
 	//Open the file
 	FILE *config_file_in = config_open(filename, "rt");
@@ -203,7 +203,7 @@ int config_backup(char *filename)
 	return 0;
 }
 
-char* config_makepath(char *buffer, char *filename)
+char* config_makepath(char *buffer, char const *filename)
 {
 	if (NULL == strchr(filename, ':'))
 		return strcat(strcpy(buffer, config_path_plugin), filename);
@@ -211,7 +211,7 @@ char* config_makepath(char *buffer, char *filename)
 		return strcpy(buffer, filename);
 }
 
-FILE *config_open(char *filename, const char *mode)
+FILE *config_open(char const * filename, const char *mode)
 {
 	char buffer[MAX_PATH];
 	config_first_line = true;
@@ -592,6 +592,12 @@ bool config_set_str(char *string, char **valptr)
 {
 	free_string(valptr);
 	if (*string) *valptr = new_string(string);
+	return true;
+}
+bool config_set_str(wchar_t const *string, bbstring & valptr)
+{
+	if (*string)
+		valptr = string;
 	return true;
 }
 bool config_set_double(char *string, double *valptr)

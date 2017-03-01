@@ -70,110 +70,110 @@
 /*=================================================*/
 //Plugin information
 
-const char szVersion      [] = "BBInterface 0.9.9_k10b";   // Used in MessageBox titlebars
-const char szAppName      [] = "BBInterface";          // The name of our window class, etc.
-const char szInfoVersion  [] = "0.9.9_k10b";
-const char szInfoAuthor   [] = "psyci - additions by grischka/kana/ysuke/pkt-zer0/kazmix";
-const char szInfoRelDate  [] = "2010/10/09";
-const char szInfoLink     [] = "";
-const char szInfoEmail    [] = "";
+const wchar_t szVersion      [] = L"BBInterface 0.9.9_bbTT";   // Used in MessageBox titlebars
+const wchar_t szAppName      [] = L"BBInterface";          // The name of our window class, etc.
+const wchar_t szInfoVersion  [] = L"0.9.9_bbTT";
+const wchar_t szInfoAuthor   [] = L"psyci - additions by grischka/kana/ysuke/pkt-zer0/kazmix";
+const wchar_t szInfoRelDate  [] = L"2010/10/09";
+const wchar_t szInfoLink     [] = L"";
+const wchar_t szInfoEmail    [] = L"";
 
 //Local variables
-const char szPluginAbout  [] =
-"BBInterface - Written Feb 2004 by psyci in many long, caffeine filled hours."
-"\n"
-"\nThanks to:"
-"\n    The BlackBox for Windows Development Team,"
-"\n    the folks from Freenode #bb4win,"
-"\n    \"jglatt\", for loads of information on Windows Mixers,"
-"\n    and a very sexy young lady who somehow put up with me coding until 5 AM\t"
-"\n    while she tried to sleep five feet away."
-"\n"
-"\nBBInterface is licensed under the GPL."
-"\n"
-"\nHistory:"
-"\nFeb 2004 - Original release by psyci."
-"\nNov 2004 - Snap controls and plugin management added by grischka."
-"\nMay 2006 - Added new agents and window properties by psyci."
+const wchar_t szPluginAbout  [] =
+L"BBInterface - Written Feb 2004 by psyci in many long, caffeine filled hours."
+L"\n"
+L"\nThanks to:"
+L"\n    The BlackBox for Windows Development Team,"
+L"\n    the folks from Freenode #bb4win,"
+L"\n    \"jglatt\", for loads of information on Windows Mixers,"
+L"\n    and a very sexy young lady who somehow put up with me coding until 5 AM\t"
+L"\n    while she tried to sleep five feet away."
+L"\n"
+L"\nBBInterface is licensed under the GPL."
+L"\n"
+L"\nHistory:"
+L"\nFeb 2004 - Original release by psyci."
+L"\nNov 2004 - Snap controls and plugin management added by grischka."
+L"\nMay 2006 - Added new agents and window properties by psyci."
 ;
 
-const char szPluginAboutLastControl [] =
-"This control has been created because there are no more\n"
-"BBInterface controls.\n\n"
-"To create a new one, Control+Right Click this button, and\n"
-"use the menus to create new controls.\n\n"
-"If you don't want any more controls, please just unload\n"
-"the plugin."
+const wchar_t szPluginAboutLastControl [] =
+L"This control has been created because there are no more\n"
+L"BBInterface controls.\n\n"
+L"To create a new one, Control+Right Click this button, and\n"
+L"use the menus to create new controls.\n\n"
+L"If you don't want any more controls, please just unload\n"
+L"the plugin."
 ;
 
-const char szPluginAboutQuickRef [] =
-"Control + Right Click = Show Menu.\n"
-"Control + Drag = Move\n"
-"Control + Shift + Drag = Move Parent\n"
-"Alt + Drag = Resize\n"
+const wchar_t szPluginAboutQuickRef [] =
+L"Control + Right Click = Show Menu.\n"
+L"Control + Drag = Move\n"
+L"Control + Shift + Drag = Move Parent\n"
+L"Alt + Drag = Resize\n"
 ;
 
 //Strings used frequently
-const char szBBroam                     []  = "@BBInterface";
+const wchar_t szBBroam                     []  = L"@BBInterface";
 const int szBBroamLength = sizeof szBBroam-1;
 
-const char szBEntityControl             [] = "Control";
-const char szBEntityAgent               [] = "Agent";
-const char szBEntityPlugin              [] = "Plugin";
-const char szBEntityVarset              [] = "Set";
-const char szBEntityWindow              [] = "Window";
-const char szBEntityModule              [] = "Module";
+const wchar_t szBEntityControl             [] = L"Control";
+const wchar_t szBEntityAgent               [] = L"Agent";
+const wchar_t szBEntityPlugin              [] = L"Plugin";
+const wchar_t szBEntityVarset              [] = L"Set";
+const wchar_t szBEntityWindow              [] = L"Window";
+const wchar_t szBEntityModule              [] = L"Module";
 
-const char szBActionCreate              [] = "Create";
-const char szBActionCreateChild         [] = "CreateChild";
-const char szBActionDelete              [] = "Delete";
+const wchar_t szBActionCreate              [] = L"Create";
+const wchar_t szBActionCreateChild         [] = L"CreateChild";
+const wchar_t szBActionDelete              [] = L"Delete";
 
-const char szBActionSetAgent            [] = "SetAgent";
-const char szBActionRemoveAgent         [] = "RemoveAgent";
+const wchar_t szBActionSetAgent            [] = L"SetAgent";
+const wchar_t szBActionRemoveAgent         [] = L"RemoveAgent";
 
-const char szBActionSetAgentProperty    [] = "SetAgentProperty";
-const char szBActionSetControlProperty  [] = "SetControlProperty";  
-const char szBActionSetWindowProperty   [] = "SetWindowProperty";
-const char szBActionSetPluginProperty   [] = "SetPluginProperty";
-const char szBActionSetModuleProperty   [] = "SetModuleProperty";
+const wchar_t szBActionSetAgentProperty    [] = L"SetAgentProperty";
+const wchar_t szBActionSetControlProperty  [] = L"SetControlProperty";  
+const wchar_t szBActionSetWindowProperty   [] = L"SetWindowProperty";
+const wchar_t szBActionSetPluginProperty   [] = L"SetPluginProperty";
+const wchar_t szBActionSetModuleProperty   [] = L"SetModuleProperty";
 
-//const char szBActionAddModule           [] = "AddModule";
-const char szBActionToggle				[] = "Toggle";
-const char szBActionSetDefault		    [] = "SetDefault";
-const char szBActionAssignToModule      [] = "AssignToModule";
-const char szBActionDetachFromModule    [] = "DetachFromModule";
+//const wchar_t szBActionAddModule           [] = "AddModule";
+const wchar_t szBActionToggle				[] = L"Toggle";
+const wchar_t szBActionSetDefault		    [] = L"SetDefault";
+const wchar_t szBActionAssignToModule      [] = L"AssignToModule";
+const wchar_t szBActionDetachFromModule    [] = L"DetachFromModule";
 
-const char szBActionOnLoad				[] = "OnLoad";
-const char szBActionOnUnload			[] = "OnUnload";
+const wchar_t szBActionOnLoad				[] = L"OnLoad";
+const wchar_t szBActionOnUnload			[] = L"OnUnload";
 
-const char szBActionRename              [] = "Rename"; 
-const char szBActionLoad                [] = "Load";
-const char szBActionEdit                [] = "Edit";
-const char szBActionSave                [] = "Save";
-const char szBActionSaveAs              [] = "SaveAs"; 
-const char szBActionRevert              [] = "Revert"; 
-const char szBActionAbout               [] = "About";
+const wchar_t szBActionRename              [] = L"Rename"; 
+const wchar_t szBActionLoad                [] = L"Load";
+const wchar_t szBActionEdit                [] = L"Edit";
+const wchar_t szBActionSave                [] = L"Save";
+const wchar_t szBActionSaveAs              [] = L"SaveAs"; 
+const wchar_t szBActionRevert              [] = L"Revert"; 
+const wchar_t szBActionAbout               [] = L"About";
 
-const char szTrue                       [] = "true";
-const char szFalse                      [] = "false";
+const wchar_t szTrue                       [] = L"true";
+const wchar_t szFalse                      [] = L"false";
 
-const char szFilterProgram  [] = "Programs\0*.exe;*.bat;*.com\0Screen Savers\0*.scr\0All Files\0*.*\0";
-const char szFilterScript   [] = "Script Files\0*.rc;\0All Files\0*.*\0";
-const char szFilterAll      [] = "All Files\0*.*\0";
+const wchar_t szFilterProgram  [] = L"Programs\0*.exe;*.bat;*.com\0Screen Savers\0*.scr\0All Files\0*.*\0";
+const wchar_t szFilterScript   [] = L"Script Files\0*.rc;\0All Files\0*.*\0";
+const wchar_t szFilterAll      [] = L"All Files\0*.*\0";
 
 //Convenient arrays of strings
-const char *szBoolArray[2] = {  szFalse, szTrue };
+const wchar_t *szBoolArray[2] = {  szFalse, szTrue };
 
 /*=================================================*/
 //Special Functions
 
 extern "C"
 {
-	DLL_EXPORT int beginPlugin(HINSTANCE hMainInstance);
-	DLL_EXPORT void endPlugin(HINSTANCE hMainInstance);
-	DLL_EXPORT LPCSTR pluginInfo(int field);
-	DLL_EXPORT int beginSlitPlugin(HINSTANCE hMainInstance, HWND hSlit);
-	DLL_EXPORT int beginPluginEx(HINSTANCE hMainInstance, HWND hSlit);
+	BBI_API int beginPlugin(HINSTANCE hMainInstance);
+	BBI_API void endPlugin(HINSTANCE hMainInstance);
+	BBI_API LPCWSTR pluginInfo(int field);
+	BBI_API int beginSlitPlugin(HINSTANCE hMainInstance, HWND hSlit);
+	BBI_API int beginPluginEx(HINSTANCE hMainInstance, HWND hSlit);
 }
 
 /*=================================================*/
@@ -193,7 +193,7 @@ bool plugin_suppresserrors = true;
 bool plugin_click_raise = false;
 bool plugin_snapwindows = true;
 // bool plugin_backup_script = true; // A global variable didn't seem to be the most compatible option.
-char *plugin_desktop_drop_command = NULL;
+wchar_t *plugin_desktop_drop_command = NULL;
 bool plugin_clear_configuration_on_load = false;
 bool plugin_save_modules_on_unload = true;
 
@@ -212,7 +212,7 @@ bool com_initialized = false;
 CComModule _Module;
 
 //Font List
-std::list<std::string> fontList;
+std::list<bbstring> fontList;
 bool flist_initialized = false;
 _locale_t locale = NULL;
 
@@ -224,26 +224,35 @@ HMONITOR fullscreen_app_hMon = NULL;
 #define M_INT 2
 #define M_STR 3
 
-struct plugin_properties { const char *key; const char *menutext; void *data; unsigned char type:3, update:1; short minval, maxval; } plugin_properties[] =
+struct plugin_properties
 {
-	{ "SnapWindows",            "Snap To Edges",        &plugin_snapwindows,    M_BOL, 0 },
-	{ "SnapDistance",           "Snap Trigger Distance", &plugin_snap_dist,     M_INT, 0,   0,  20 },
-	{ "SnapPadding",            "Snap Padding",         &plugin_snap_padding,   M_INT, 0, -10,  40 },
-	{ "" },
-	{ "IconSaturation",         "Icon Saturation",      &plugin_icon_sat,       M_INT, 1, 0, 255 },
-	{ "IconHue",                "Icon Hue",             &plugin_icon_hue,       M_INT, 1, 0, 255 },
-	{ "" },
-	{ "DeskDropCommand",        "Desktop OnDrop Command", &plugin_desktop_drop_command, M_STR, 0 },
-	{ "GlobalOnload",        "Global OnLoad", &globalmodule.actions[MODULE_ACTION_ONLOAD], M_STR, 0 },
-	{ "GlobalOnunload",        "Global OnUnload", &globalmodule.actions[MODULE_ACTION_ONUNLOAD], M_STR, 0 },
-	{ "" },
-	{ "ClickRaise",             "Click Raise",          &plugin_click_raise,    M_BOL, 0 },
-	{ "SuppressErrors",         "Suppress Errors",      &plugin_suppresserrors, M_BOL, 0 },
-	{ "ZeroControlsAllowed",    "Allow Zero Controls",  &plugin_zerocontrolsallowed, M_BOL, 0 },
+	const wchar_t *key;
+	const wchar_t *menutext;
+	void *data;
+	unsigned char type:3;
+	unsigned char update:1;
+	short minval;
+	short maxval;
+} plugin_properties[] =
+{
+	{ L"SnapWindows",            L"Snap To Edges",        &plugin_snapwindows,    M_BOL, 0 },
+	{ L"SnapDistance",           L"Snap Trigger Distance", &plugin_snap_dist,     M_INT, 0,   0,  20 },
+	{ L"SnapPadding",            L"Snap Padding",         &plugin_snap_padding,   M_INT, 0, -10,  40 },
+	{ L"" },
+	{ L"IconSaturation",         L"Icon Saturation",      &plugin_icon_sat,       M_INT, 1, 0, 255 },
+	{ L"IconHue",                L"Icon Hue",             &plugin_icon_hue,       M_INT, 1, 0, 255 },
+	{ L"" },
+	{ L"DeskDropCommand",        L"Desktop OnDrop Command", &plugin_desktop_drop_command, M_STR, 0 },
+	{ L"GlobalOnload",        L"Global OnLoad", &globalmodule.actions[MODULE_ACTION_ONLOAD], M_STR, 0 },
+	{ L"GlobalOnunload",        L"Global OnUnload", &globalmodule.actions[MODULE_ACTION_ONUNLOAD], M_STR, 0 },
+	{ L"" },
+	{ L"ClickRaise",             L"Click Raise",          &plugin_click_raise,    M_BOL, 0 },
+	{ L"SuppressErrors",         L"Suppress Errors",      &plugin_suppresserrors, M_BOL, 0 },
+	{ L"ZeroControlsAllowed",    L"Allow Zero Controls",  &plugin_zerocontrolsallowed, M_BOL, 0 },
 //	{ "EnableShadows",			"Enable Shadows",		&plugin_enableshadows, M_BOL, 1 },
-	{ "UseTooltip",             "Use Tooltip",          &tooltip_enabled, M_BOL, 0 },
-	{ "ClearConfigurationOnLoad", "Clear Configuration On Load", &plugin_clear_configuration_on_load, M_BOL, 0 },
-	{ "ModuleAutoSave", "Save Modules On Unload", &plugin_save_modules_on_unload, M_BOL, 0 },
+	{ L"UseTooltip",             L"Use Tooltip",          &tooltip_enabled, M_BOL, 0 },
+	{ L"ClearConfigurationOnLoad", L"Clear Configuration On Load", &plugin_clear_configuration_on_load, M_BOL, 0 },
+	{ L"ModuleAutoSave", L"Save Modules On Unload", &plugin_save_modules_on_unload, M_BOL, 0 },
 	{ NULL, NULL, 0 }
 };
 
@@ -262,7 +271,7 @@ int beginPlugin(HINSTANCE hMainInstance)
 {
 	if (plugin_hwnd_blackbox)
 	{
-		MessageBox(plugin_hwnd_blackbox, "Dont load me twice!", szAppName, MB_OK|MB_SETFOREGROUND);
+		MessageBox(plugin_hwnd_blackbox, L"Dont load me twice!", szAppName, MB_OK|MB_SETFOREGROUND);
 		return 1;
 	}
 
@@ -270,7 +279,7 @@ int beginPlugin(HINSTANCE hMainInstance)
 	plugin_instance_plugin = hMainInstance;
 	plugin_hwnd_blackbox = GetBBWnd();
 
-	const char *bbv = GetBBVersion();
+	const wchar_t *bbv = GetBBVersion();
 	BBVersion = BBP_bbversion();
 
 	//Deal with os info
@@ -291,7 +300,7 @@ int beginPlugin(HINSTANCE hMainInstance)
 			_Module.Init(NULL, ::GetModuleHandle(NULL),NULL);
 			com_initialized = true;
 		}else{
-			MessageBox(0, "Error initializing COM", szAppName, MB_OK | MB_ICONERROR | MB_TOPMOST);
+			MessageBox(0, L"Error initializing COM", szAppName, MB_OK | MB_ICONERROR | MB_TOPMOST);
 			return 1;
 		}
 	}
@@ -360,7 +369,7 @@ void endPlugin(HINSTANCE hMainInstance)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //pluginInfo
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-LPCSTR pluginInfo(int field)
+LPCWSTR pluginInfo(int field)
 {
 	switch (field)
 	{
@@ -418,7 +427,7 @@ void plugin_startup()
 	}
 	control_checklast();
 
-	message_interpret(globalmodule.actions[MODULE_ACTION_ONLOAD], false, &globalmodule);
+	message_interpret(globalmodule.actions[MODULE_ACTION_ONLOAD].c_str(), false, &globalmodule);
 
 }
 
@@ -427,7 +436,7 @@ void plugin_startup()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void plugin_shutdown(bool save)
 {
-	message_interpret(globalmodule.actions[MODULE_ACTION_ONUNLOAD], false, &globalmodule);
+	message_interpret(globalmodule.actions[MODULE_ACTION_ONUNLOAD].c_str(), false, &globalmodule);
 
 	//Save config settings
 	if (save) config_save(config_path_mainscript);
@@ -507,7 +516,7 @@ void plugin_reconfigure(bool force)
 }
 
 
-static int config_load2(char *filename, module* caller)
+static int config_load2(wchar_t *filename, module* caller)
 {
 	if (plugin_clear_configuration_on_load)
 		_restart_specific_systems();
@@ -521,12 +530,12 @@ int plugin_message(int tokencount, wchar_t *tokens[], bool from_core, module* ca
 {
 	wchar_t *filename;
 
-	if (tokencount == 3 && !_stricmp(tokens[2], szBActionSave))
+	if (tokencount == 3 && !_wcsicmp(tokens[2], szBActionSave))
 	{
 		config_save(config_path_mainscript);
 		return 0;
 	}
-	else if (!_stricmp(tokens[2], szBActionSaveAs))
+	else if (!_wcsicmp(tokens[2], szBActionSaveAs))
 	{
 		if (tokencount == 4)
 		{
@@ -534,19 +543,19 @@ int plugin_message(int tokencount, wchar_t *tokens[], bool from_core, module* ca
 		}
 		else
 		{       
-			if ((filename = dialog_file(szFilterScript, "Save Configuration Script", ".rc", config_path_plugin, true)))
+			if ((filename = dialog_file(szFilterScript, L"Save Configuration Script", L".rc", config_path_plugin, true)))
 			{
 				config_save(filename);
 			}           
 		}       
 		return 0;
 	}
-	else if (tokencount == 3 && !_stricmp(tokens[2], szBActionRevert))
+	else if (tokencount == 3 && !_wcsicmp(tokens[2], szBActionRevert))
 	{
 		plugin_reconfigure(true);
 		return 0;
 	}
-	else if (!_stricmp(tokens[2], szBActionLoad))
+	else if (!_wcsicmp(tokens[2], szBActionLoad))
 	{
 		if (tokencount == 4)
 		{
@@ -555,7 +564,7 @@ int plugin_message(int tokencount, wchar_t *tokens[], bool from_core, module* ca
 		}
 		else if (tokencount == 3)
 		{
-			if ((filename = dialog_file(szFilterScript, "Load Configuration Script", ".rc", config_path_plugin, false)))
+			if ((filename = dialog_file(szFilterScript, L"Load Configuration Script", L".rc", config_path_plugin, false)))
 			{
 				config_load2(filename, caller);
 			}
@@ -563,59 +572,59 @@ int plugin_message(int tokencount, wchar_t *tokens[], bool from_core, module* ca
 		}
 		else if (tokencount == 6)
 		{
-			if (0 == _stricmp(tokens[4], "from"))
+			if (0 == _wcsicmp(tokens[4], L"from"))
 			{
 				config_load(tokens[5], caller, tokens[3]);
 				return 0;
-			} else if (0 == _stricmp(tokens[4], "into"))
+			} else if (0 == _wcsicmp(tokens[4], L"into"))
 			{
 				config_load(tokens[3], module_get(tokens[5]));
 				return 0;
 			}
 		}
-		else if (tokencount == 8 && 0 == _stricmp(tokens[4], "from") && 0 == _stricmp(tokens[6], "into"))
+		else if (tokencount == 8 && 0 == _wcsicmp(tokens[4], L"from") && 0 == _wcsicmp(tokens[6], L"into"))
 		{
 			config_load(tokens[5], module_get(tokens[7]), tokens[3]);
 			return 0;
 		}
 	}
-	else if (!_stricmp(tokens[2], szBActionAbout))
+	else if (!_wcsicmp(tokens[2], szBActionAbout))
 	{
 		if (tokencount == 3)
 		{
 			MessageBox(NULL, szPluginAbout, szVersion, MB_OK|MB_SYSTEMMODAL);
 			return 0;
 		}
-		else if (tokencount == 4 && !_stricmp(tokens[3], "LastControl"))
+		else if (tokencount == 4 && !_wcsicmp(tokens[3], L"LastControl"))
 		{
 			MessageBox(NULL, szPluginAboutLastControl, szAppName, MB_OK|MB_SYSTEMMODAL);
 			return 0;
 		}
-		else if (tokencount == 4 && !_stricmp(tokens[3], "QuickHelp"))
+		else if (tokencount == 4 && !_wcsicmp(tokens[3], L"QuickHelp"))
 		{
 			MessageBox(NULL, szPluginAboutQuickRef, szAppName, MB_OK|MB_SYSTEMMODAL);
 			return 0;
 		}
 	}
-	else if (!_stricmp(tokens[2], szBActionEdit))
+	else if (!_wcsicmp(tokens[2], szBActionEdit))
 	{
 		//SendMessage(plugin_hwnd_blackbox, BB_EDITFILE, (WPARAM)-1, (LPARAM) config_path_mainscript);
 		//return 0;
-		char temp[MAX_PATH]; GetBlackboxEditor(temp);
-		BBExecute(NULL, "",temp , config_path_mainscript, NULL, SW_SHOWNORMAL, false);
+		wchar_t temp[MAX_PATH]; GetBlackboxEditor(temp);
+		BBExecute(NULL, L"", temp , config_path_mainscript, NULL, SW_SHOWNORMAL, false);
 		return 0;
 	}
-	else if (tokencount == 5 && !_stricmp(tokens[2], szBActionSetPluginProperty))
+	else if (tokencount == 5 && !_wcsicmp(tokens[2], szBActionSetPluginProperty))
 	{
 		for (struct plugin_properties *p = plugin_properties; p->key; p++)
-			if (p->data && 0 == _stricmp(tokens[3], p->key)) {
+			if (p->data && 0 == _wcsicmp(tokens[3], p->key)) {
 				switch (p->type) {
 					case M_BOL:
 						if (config_set_bool(tokens[4], (bool*)p->data)) break; return 1;
 					case M_INT:
 						if (config_set_int(tokens[4], (int*)p->data)) break; return 1;
 					case M_STR:
-						if (config_set_str(tokens[4], (char**)p->data)) break; return 1;
+						if (config_set_str(tokens[4], (wchar_t**)p->data)) break; return 1;
 					default: return 1;
 				}
 				if (p->update) control_invalidate();
@@ -623,14 +632,14 @@ int plugin_message(int tokencount, wchar_t *tokens[], bool from_core, module* ca
 				return 0;
 			}
 	}
-	else if (tokencount == 4 && !_stricmp(tokens[2], szBActionOnLoad) )
+	else if (tokencount == 4 && !_wcsicmp(tokens[2], szBActionOnLoad) )
 	{
-		config_set_str(tokens[3],&(globalmodule.actions[MODULE_ACTION_ONLOAD]));
+		config_set_str(tokens[3], globalmodule.actions[MODULE_ACTION_ONLOAD]);
 		return 0;
 	}
-	else if (tokencount == 4 && !_stricmp(tokens[2], szBActionOnUnload) )
+	else if (tokencount == 4 && !_wcsicmp(tokens[2], szBActionOnUnload) )
 	{
-		config_set_str(tokens[3],&(globalmodule.actions[MODULE_ACTION_ONUNLOAD]));
+		config_set_str(tokens[3], globalmodule.actions[MODULE_ACTION_ONUNLOAD]);
 		return 0;
 	}
 	return 1;
@@ -641,12 +650,12 @@ int plugin_message(int tokencount, wchar_t *tokens[], bool from_core, module* ca
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void plugin_save()
 {
-	config_printf("!---- %s ----", szVersion);
+	config_printf(L"!---- %s ----", szVersion);
 	for (struct plugin_properties *p = plugin_properties; p->key; p++)
 		if (p->data) switch (p->type) {
 			case M_BOL: config_write(config_get_plugin_setpluginprop_b(p->key, (bool*)p->data)); break;
 			case M_INT: config_write(config_get_plugin_setpluginprop_i(p->key, (const int*)p->data)); break;
-			case M_STR: config_write(config_get_plugin_setpluginprop_c(p->key, *(const char**)p->data)); break;
+			case M_STR: config_write(config_get_plugin_setpluginprop_c(p->key, *(const wchar_t**)p->data)); break;
 		}
 	//Save OnLoad/OnUnload actions
 	config_write(config_get_plugin_onload());
@@ -672,7 +681,7 @@ std::shared_ptr<bb::MenuConfig> plugin_menu_settings(void)
 				make_menuitem_int(m, p->menutext, config_get_plugin_setpluginprop_s(p->key), *(const int*)p->data, p->minval, p->maxval);
 				break;
 			case M_STR:
-				make_menuitem_str(m, p->menutext, config_get_plugin_setpluginprop_s(p->key), *(const char **)p->data ? *(const char**)p->data : "");
+				make_menuitem_str(m, p->menutext, config_get_plugin_setpluginprop_s(p->key), *(const wchar_t **)p->data ? *(const wchar_t**)p->data : L"");
 				break;
 			default:
 				make_menuitem_nop(m, NULL);
@@ -773,10 +782,12 @@ void plugin_agents_shutdown()
 
 int CALLBACK EnumFontFamExProc(ENUMLOGFONTEX *lpelfe, NEWTEXTMETRICEX *lpntme,int FontType , LPARAM lParam) {
 	if(FontType != TRUETYPE_FONTTYPE)
-        	return 1;
-	static std::map<std::string,int> unique_check;
-	char *tmp = (char *)lpelfe->elfLogFont.lfFaceName;
-	if(*tmp!='@' && unique_check[tmp]==0){
+     return 1;
+
+	static std::map<bbstring, int> unique_check;
+
+	wchar_t *tmp = (wchar_t *)lpelfe->elfLogFont.lfFaceName;
+	if(*tmp != L'@' && unique_check[tmp] == 0){
 		unique_check[tmp]=1;
 		fontList.push_back(lpelfe->elfLogFont.lfFaceName);
 	}
