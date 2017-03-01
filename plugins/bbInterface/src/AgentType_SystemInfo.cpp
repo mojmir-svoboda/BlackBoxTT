@@ -309,7 +309,7 @@ void *agenttype_systeminfo_getdata(agent *a, int datatype)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_systeminfo_menu_set
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_systeminfo_menu_set(Menu *m, control *c, agent *a,  wchar_t *action, int controlformat)
+void agenttype_systeminfo_menu_set(std::shared_ptr<bb::MenuConfig> m, control *c, agent *a,  wchar_t *action, int controlformat)
 {
 	//Add a menu item for every type
 	for (int i = 1; i < SYSTEMINFO_NUMTYPES; i++)
@@ -321,7 +321,7 @@ void agenttype_systeminfo_menu_set(Menu *m, control *c, agent *a,  wchar_t *acti
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_systeminfo_menu_context
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void agenttype_systeminfo_menu_context(Menu *m, agent *a)
+void agenttype_systeminfo_menu_context(std::shared_ptr<bb::MenuConfig> m, agent *a)
 {
 	make_menuitem_nop(m, L"No options available.");
 }

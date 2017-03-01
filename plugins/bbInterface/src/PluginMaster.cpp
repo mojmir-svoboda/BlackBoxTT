@@ -6,6 +6,7 @@
 // Global Include
 #include <blackbox/plugin/bb.h>
 #include <blackbox/BlackBox_compat.h>
+#include <bblib/utils_paths.h>
 
 //Define the ALPHA SOFTWARE flag
 //This will cause an annoying message box to pop up and confirm
@@ -499,7 +500,7 @@ static void _restart_specific_systems(void)
 
 void plugin_reconfigure(bool force)
 {
-	if (force || (FileExists(config_path_mainscript) && check_mainscript_filetime()))
+	if (force || (bb::fileExists(config_path_mainscript) && check_mainscript_filetime()))
 	{
 		_restart_specific_systems();
 

@@ -20,23 +20,23 @@
 #include "ListMaster.h"
 
 //Define these variables
-const char szMessageMasterName[] = "BBInterfaceMessageMaster";
+const wchar_t szMessageMasterName[] = L"BBInterfaceMessageMaster";
 HWND message_window = NULL;
 
-int varset_message(int tokencount, char *tokens[], bool from_core, module* caller);
+int varset_message(int tokencount, wchar_t *tokens[], bool from_core, module* caller);
 
 const int MESSAGE_ENTITY_COUNT = 6;
 
-int (*message_functions[MESSAGE_ENTITY_COUNT])(int tokencount, char *tokens[], bool from_core, module* caller)
+int (*message_functions[MESSAGE_ENTITY_COUNT])(int tokencount, wchar_t *tokens[], bool from_core, module* caller)
 		= {&control_message, &window_message, &agent_message, &plugin_message, &varset_message, &module_message};
 
-const char *message_entitynames[MESSAGE_ENTITY_COUNT]
+const wchar_t *message_entitynames[MESSAGE_ENTITY_COUNT]
 		= {szBEntityControl, szBEntityWindow, szBEntityAgent, szBEntityPlugin, szBEntityVarset, szBEntityModule };
 
 //Define these functions internally
 LRESULT CALLBACK message_event(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-int tokenize_message(const char * srcString, int nBuffers, char **lpszBuffers, char *buffer, module* defmodule);
+int tokenize_message(const wchar_t * srcString, int nBuffers, wchar_t **lpszBuffers, wchar_t *buffer, module* defmodule);
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -70,50 +70,50 @@ int message_shutdown()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //message_interpret
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void message_interpret(const char *message, bool from_core, module* caller)
+void message_interpret(const wchar_t *message, bool from_core, module* caller)
 {
 	if (!message || !(*message)) return; //If the message is invalid, or empty, don't bother
 	if (caller == NULL) caller = currentmodule;
 
-	char buffer[BBI_MAX_LINE_LENGTH];
+	wchar_t buffer[BBI_MAX_LINE_LENGTH];
 
 	// Check, if the message is for us...
 	if (memcmp(message, szBBroam, szBBroamLength))
 	{
 		//The standard BlackBox Messages
-		if (!_stricmp(message, "@BBShowPlugins"))
+		if (!_wcsicmp(message, L"@BBShowPlugins"))
 		{
 			control_pluginsvisible(true);
 			return;
 		}
-		if (!_stricmp(message, "@BBHidePlugins"))
+		if (!_wcsicmp(message, L"@BBHidePlugins"))
 		{
 			control_pluginsvisible(false);
 			return;
 		}
-		if (!_memicmp(message, "@Script",7))
+		if (!_memicmp(message, L"@Script",7))
 		{
-			char* buf = new char[strlen(message)+1]; // local buffer.
-			strcpy(buf,message); //NOTE: possible alternate method would be copying out the messages one by one.
-			char *start = strchr(buf,'[');
-			char *end = strrchr(buf,']');
+			wchar_t* buf = new wchar_t[wcslen(message)+1]; // local buffer.
+			wcscpy(buf,message); //NOTE: possible alternate method would be copying out the messages one by one.
+			wchar_t *start = wcschr(buf, L'[');
+			wchar_t *end = wcsrchr(buf, L']');
 			if (start && end)
 			{
 				++start;
 				*end = 0; //terminate string here.
-				while (end = strchr(start,'|'))
+				while (end = wcschr(start, L'|'))
 				{
 					*end = 0;
-					while (*start == ' ') ++start; // skip whitespace
+					while (*start == L' ') ++start; // skip whitespace
 					message_interpret(start, from_core, caller);
 					start = end+1;
 				}
-				while (*start == ' ') ++start; // skip whitespace
+				while (*start == L' ') ++start; // skip whitespace
 				message_interpret(start, from_core, caller); // interpret message after last separator character
 			}
 			else if (!plugin_suppresserrors)
 			{
-				sprintf(buffer,"Invalid @Script syntax in line:\n\n%s",buf);
+				swprintf(buffer, BBI_MAX_LINE_LENGTH, L"Invalid @Script syntax in line:\n\n%s",buf);
 				MessageBox(NULL, buffer, szAppName, MB_OK|MB_SYSTEMMODAL);
 			}
 			delete[] buf;
@@ -121,7 +121,7 @@ void message_interpret(const char *message, bool from_core, module* caller)
 		}
 
 		if (from_core) return;
-		message = message_preprocess(strcpy(buffer, message)); //NOTE: FIX, possibly should this use the caller argument as well?
+		message = message_preprocess(wcscpy(buffer, message)); //NOTE: FIX, possibly should this use the caller argument as well?
 		if ('@' == message[0])
 		{
 			SendMessage(plugin_hwnd_blackbox, BB_BROADCAST, 0, (LPARAM)buffer);
@@ -129,14 +129,15 @@ void message_interpret(const char *message, bool from_core, module* caller)
 		else
 		{
 			// bblean only: SendMessage(plugin_hwnd_blackbox, BB_EXECUTE, 0, (LPARAM)string);
-			char command[MAX_PATH], arguments[MAX_PATH], *token = command;
-			BBTokenize(message, &token, 1, arguments);
+			wchar_t command[MAX_PATH], arguments[MAX_PATH], *token = command;
+			size_t sz[] = { MAX_PATH };
+			BBTokenize(message, &token, &sz, 1, arguments, MAX_PATH, false);
 			shell_exec(command, arguments);
 		}
 		return;
 	}
 	//Tokenize the string
-	char *message_tokenptrs[32];
+	wchar_t *message_tokenptrs[32];
 	int tokensfound = tokenize_message(message, 32, message_tokenptrs, buffer, caller);
 
 	//Token Check - we always need at least two tokens for all purposes
@@ -147,7 +148,7 @@ void message_interpret(const char *message, bool from_core, module* caller)
 
 	for (int i = 0; i < MESSAGE_ENTITY_COUNT; i++)
 	{
-		if (!strcmp(message_tokenptrs[1], message_entitynames[i]))
+		if (!wcscmp(message_tokenptrs[1], message_entitynames[i]))
 		{   
 			result = (message_functions[i])(tokensfound, message_tokenptrs, from_core, caller);
 				break;
@@ -159,15 +160,15 @@ void message_interpret(const char *message, bool from_core, module* caller)
 		//On an error
 		if (!plugin_suppresserrors) 
 		{
-			sprintf(buffer,
-				"There was an error executing your Bro@m command:"
-				"\n"
-				"\n%s"
-				"\n"
-				"\nPossible reasons:"
-				"\n - An control or agent referenced may not exist"
-				"\n - The command may be malformed"				
-				"\n - An error occurred while performing the requested action"
+			swprintf(buffer, BBI_MAX_LINE_LENGTH,
+				L"There was an error executing your Bro@m command:"
+				L"\n"
+				L"\n%s"
+				L"\n"
+				L"\nPossible reasons:"
+				L"\n - An control or agent referenced may not exist"
+				L"\n - The command may be malformed"				
+				L"\n - An error occurred while performing the requested action"
 				, message
 				);
 			MessageBox(NULL, buffer, szAppName, MB_OK|MB_SYSTEMMODAL);
@@ -199,7 +200,7 @@ LRESULT CALLBACK message_event(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 			if (NULL == plugin_desktop_drop_command) return false;
 			if (!(wParam & 1))
 			{
-				variables_set(false,"DroppedFile", (const char *)lParam);
+				variables_set(false,L"DroppedFile", (const wchar_t *)lParam);
 				message_interpret(plugin_desktop_drop_command, false, NULL);
 			}
 			return true;
@@ -208,7 +209,7 @@ LRESULT CALLBACK message_event(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 			break;
 		case BBI_POSTCOMMAND:
 			SendMessage(plugin_hwnd_blackbox, BB_BROADCAST, 0, lParam);
-			delete (char *)lParam;
+			delete (wchar_t *)lParam;
 			break;
 
 		case BB_RECONFIGURE:
@@ -221,7 +222,7 @@ LRESULT CALLBACK message_event(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 			break;
 
 		case BB_BROADCAST:
-			message_interpret((const char *)lParam, true, NULL);
+			message_interpret((const wchar_t *)lParam, true, NULL);
 			break;
 
 		case WM_TIMER:
@@ -237,17 +238,17 @@ LRESULT CALLBACK message_event(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 }
 
 //===========================================================================
-int varset_message(int tokencount, char *tokens[], bool from_core, module* caller)
+int varset_message(int tokencount, wchar_t *tokens[], bool from_core, module* caller)
 {
 	int varnameidx; bool is_static;
 	if (tokencount == 4)
 		{	varnameidx = 2; is_static = false;	}
-	else if (tokencount == 5 && !strcmp(tokens[2], "Static") )
+	else if (tokencount == 5 && !wcscmp(tokens[2], L"Static") )
 		{	varnameidx = 3; is_static = true;	}
 	else
 		return 1;
 
-	int i = atoi(variables_get(tokens[varnameidx],"0", caller));
+	int i = _wtoi(variables_get(tokens[varnameidx],L"0", caller));
 	if	(	config_set_int(tokens[varnameidx+1],&i) //Try reading it as an int
 		||	config_set_int_expr(tokens[varnameidx+1],&i) // Try calculating the string as an expression
 		) 
@@ -260,30 +261,30 @@ int varset_message(int tokencount, char *tokens[], bool from_core, module* calle
 // Function: tokenize_message
 //===========================================================================
 
-int tokenize_message(const char * srcString, int nBuffers, char **lpszBuffers, char *buffer_ptr, module* defmodule)
+int tokenize_message(const wchar_t * srcString, int nBuffers, wchar_t **lpszBuffers, wchar_t *buffer_ptr, module* defmodule)
 {
 	int tokencount = 0;
 	while (tokencount < nBuffers)
 	{
-		const char *a, *e; char  c;
-		while (0 != (c = *srcString) && (unsigned char) c <= 32 ) ++srcString;
+		const wchar_t *a, *e; wchar_t  c;
+		while (0 != (c = *srcString) && (unsigned wchar_t) c <= 32 ) ++srcString;
 		if (0 == c) break;
 
-		if ('\"' == c)
+		if (L'\"' == c)
 		{
 			a = ++srcString, e = (srcString += strlen(a));
-			if (e > a && e[-1] == '\"') --e;
+			if (e > a && e[-1] == L'\"') --e;
 		}
 		else
 		{
 			a = srcString;
-			while (0 != (c = *srcString) && (unsigned char) c > ' ')
+			while (0 != (c = *srcString) && (unsigned wchar_t) c > L' ')
 			{
 				++srcString;
 				//if ('$' == c) { e = strchr(srcString, c); if (e) srcString = e+1; }
 			}
 			e = srcString;
-			while (e > a && (unsigned char) e[-1] <= 32) --e;
+			while (e > a && (unsigned wchar_t) e[-1] <= 32) --e;
 			if (c) ++srcString;
 		}
 
@@ -304,13 +305,13 @@ int tokenize_message(const char * srcString, int nBuffers, char **lpszBuffers, c
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // token_check
-int token_check(struct token_check *t, int *curtok, int tokencount, char *tokens[])
+int token_check(struct token_check *t, int *curtok, int tokencount, wchar_t *tokens[])
 {
 start:
 	if (*curtok < tokencount)
 		while (t->key)
 		{
-			if (0 == _stricmp(t->key, tokens[*curtok]))
+			if (0 == _wcsicmp(t->key, tokens[*curtok]))
 			{
 				if (t->id > 100)
 				{
@@ -332,7 +333,7 @@ start:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-void get_property_by_name(char *targetstr, control *c, char *propname)
+void get_property_by_name(wchar_t *targetstr, control *c, wchar_t *propname)
 {
 	window *w = c->windowptr;
 	if (!strcmp(propname,"X"))
@@ -354,14 +355,14 @@ void get_property_by_name(char *targetstr, control *c, char *propname)
 
 wchar_t *message_preprocess(wchar_t *buffer, module* defmodule)
 {
-	char *start = buffer, *end = NULL;
+	wchar_t *start = buffer, *end = NULL;
 	while (NULL != (start = strchr(start, '$')) && NULL != (end = strchr(start+1, '$')))
 	{
 		int varlen = ++end - start - 2;
-		const char *replacement = NULL;
+		const wchar_t *replacement = NULL;
 		if (varlen)
 		{
-			char expression[400]; extract_string(expression, start+1, varlen);
+			wchar_t expression[400]; extract_string(expression, start+1, varlen);
 			if (0 == memcmp(expression, "Mouse.", 6))
 			{
 				POINT pt; GetCursorPos(&pt);
@@ -374,9 +375,9 @@ wchar_t *message_preprocess(wchar_t *buffer, module* defmodule)
 			else if (expression[0] == '*')
 			{
 				//Indirection.
-				if (char* cnameend = strchr(expression, '.')) // Refers to a property of a control.
+				if (wchar_t* cnameend = strchr(expression, '.')) // Refers to a property of a control.
 				{
-					char cname[64], propname[64];
+					wchar_t cname[64], propname[64];
 					int cnamelen = cnameend-expression-1;
 					extract_string(cname, expression+1, cnamelen);
 					extract_string(propname, cnameend+1, varlen-cnamelen-1);
@@ -388,44 +389,44 @@ wchar_t *message_preprocess(wchar_t *buffer, module* defmodule)
 				}
 				else
 				{
-					const char *key = variables_get(expression+1, NULL, defmodule);
+					const wchar_t *key = variables_get(expression+1, NULL, defmodule);
 					replacement = key ? variables_get(key,NULL, defmodule) : NULL;
 				}
 			}
 			else
 			{
 				//No indirection.
-				if (char* cnameend = strchr(expression, '.')) // Refers to a property of a control.
+				if (wchar_t* cnameend = strchr(expression, '.')) // Refers to a property of a control.
 				{
-					char cname[64], propname[64];
+					wchar_t cname[64], propname[64];
 					int cnamelen = cnameend-expression;
 					extract_string(cname, expression, cnamelen);
 					extract_string(propname, cnameend+1, varlen-cnamelen-1);
 					// Try and look up the control with the given name
 					if (!strcmp(cname,"DroppedFile")) // "fake" properties of the DroppedFile
 					{
-						strcpy(expression, variables_get("DroppedFile", NULL, defmodule));
+						wcscpy(expression, variables_get("DroppedFile", NULL, defmodule));
 						if (!strcmp(propname, "Path"))
 						{
-							char* s = strrchr(expression, '\\');
+							wchar_t* s = strrchr(expression, '\\');
 							replacement = s ? *s = 0, expression : NULL;
 						}
 						else if (!strcmp(propname, "Name"))
 						{
-							char* s = strrchr(expression, '\\');
-							char* t = strrchr(expression, '.');
+							wchar_t* s = strrchr(expression, '\\');
+							wchar_t* t = strrchr(expression, '.');
 							s = s ? s+1 : expression; // step s past final slash, or set to start
 							if (t && (t-s > 0)) *t = 0;
 							replacement = s;
 						}
 						else if (!strcmp(propname, "Extension"))
 						{
-							char* s = strrchr(expression, '.');
+							wchar_t* s = strrchr(expression, '.');
 							replacement = s ? s+1 : NULL;
 						}
 						else if (!strcmp(propname, "Filename"))
 						{
-							char* s = strrchr(expression, '\\');
+							wchar_t* s = strrchr(expression, '\\');
 							replacement = s ? s+1 : NULL;
 						}
 						else replacement = NULL;
@@ -459,7 +460,7 @@ wchar_t *message_preprocess(wchar_t *buffer, module* defmodule)
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-char *get_dragged_file(char *buffer, WPARAM wParam)
+wchar_t *get_dragged_file(wchar_t *buffer, WPARAM wParam)
 {
 	HDROP hDrop = (HDROP) wParam;
 	buffer[0] = 0;
@@ -471,16 +472,16 @@ char *get_dragged_file(char *buffer, WPARAM wParam)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // execute shell command + argumenent
 
-void shell_exec(const char *command, const char *arguments, const char *workingdir)
+void shell_exec(const wchar_t *command, const wchar_t *arguments, const wchar_t *workingdir)
 {
-	char buffer[MAX_PATH];
+	wchar_t buffer[MAX_PATH];
 	if (NULL == workingdir)
 	{
 		workingdir = strrchr(command, '\\');
 		if (workingdir)
 		{
 			int l = workingdir - command;
-			((char*)memcpy(buffer, command, l))[l] = 0;
+			((wchar_t*)memcpy(buffer, command, l))[l] = 0;
 			workingdir = buffer;
 		}
 	}
@@ -505,18 +506,18 @@ void free_string(wchar_t **s)
 	}
 }
 
-char *extract_string(char *d, const char *s, int n)
+wchar_t *extract_string(wchar_t *d, const wchar_t *s, int n)
 {
-	((char*)memcpy(d, s, n))[n] = 0;
+	((wchar_t*)memcpy(d, s, n))[n] = 0;
 	return d;
 }
 
 //get_string_index
-int get_string_index (const char *key, const char **string_list)
+int get_string_index (const wchar_t *key, const wchar_t **string_list)
 {
 	int i;
 	for (i=0; *string_list; i++, string_list++)
-		if (0==_stricmp(key, *string_list)) return i;
+		if (0==_wcsicmp(key, *string_list)) return i;
 	return -1;
 }
 
@@ -537,9 +538,9 @@ int iminmax(int a, int b, int c) {
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // debug
-void dbg_printf (const char *fmt, ...)
+void dbg_printf (const wchar_t *fmt, ...)
 {
-	char buffer[4096]; va_list arg;
+	wchar_t buffer[4096]; va_list arg;
 	va_start(arg, fmt);
 	vsprintf (buffer, fmt, arg);
 	OutputDebugString(buffer);

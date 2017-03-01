@@ -5,6 +5,7 @@
 ===================================================*/
 // Global Include
 #include <blackbox/plugin/bb.h>
+#include <bblib/utils_paths.h>
 #include <stdlib.h>
 
 //Parent include
@@ -198,7 +199,7 @@ int config_backup(wchar_t *filename)
 	);
 	BBMessageBox(NULL, temp, szAppName, MB_OK|MB_SYSTEMMODAL);
 
-	if (!FileExists(bakfile) || IDYES == BBMessageBox(NULL,
+	if (!bb::fileExists(bakfile) || IDYES == BBMessageBox(NULL,
 			L"Backup file already exists. Overwrite?",
 			szAppName, MB_YESNO|MB_SYSTEMMODAL
 			))
@@ -913,27 +914,27 @@ void config_paths_startup()
 	//Try the plugin directory, "BBInterface.rc"
 	wcscpy(config_path_mainscript, config_path_plugin);
 	wcscat(config_path_mainscript, bbinterfacedotrc);
-	if (FileExists(config_path_mainscript)) found = true;
+	if (bb::fileExists(config_path_mainscript)) found = true;
 	//If not found, try the plugin directory, "BBInterfacerc"
 	if (!found)
 	{
 		wcscpy(config_path_mainscript, config_path_plugin);
 		wcscat(config_path_mainscript, bbinterfacerc);
-		if (FileExists(config_path_mainscript)) found = true;
+		if (bb::fileExists(config_path_mainscript)) found = true;
 	}
 	//If not found, try the Blackbox directory, "BBInterface.rc"
 	if (!found)
 	{
-		GetBlackboxPath(config_path_mainscript, MAX_PATH);
+		bb::getExePath(config_path_mainscript, MAX_PATH);
 		wcscat(config_path_mainscript, bbinterfacedotrc);
-		if (FileExists(config_path_mainscript)) found = true;
+		if (bb::fileExists(config_path_mainscript)) found = true;
 	}
 	//If not found, try the Blackbox directory, "BBInterfacerc"
 	if (!found)
 	{
-		GetBlackboxPath(config_path_mainscript, MAX_PATH);
+		bb::getExePath(config_path_mainscript, MAX_PATH);
 		wcscat(config_path_mainscript, bbinterfacerc);
-		if (FileExists(config_path_mainscript)) found = true;
+		if (bb::fileExists(config_path_mainscript)) found = true;
 	}
 	//All hope is lost
 	if (!found)

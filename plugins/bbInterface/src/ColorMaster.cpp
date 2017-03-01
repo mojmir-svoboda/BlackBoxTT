@@ -281,22 +281,22 @@ COLORREF switch_rgb (COLORREF c)
 // Purpose: parse a literal or hexadezimal color string
 // --- Straight from the bblean source.
 
-COLORREF ReadColorFromString(char * string)
+COLORREF ReadColorFromString(wchar_t * string)
 {
     if (NULL == string) return (COLORREF)-1;
-    char rgbstr[7];
-    char *s = _strlwr(string);
+		wchar_t rgbstr[7] = { 0 };
+		wchar_t *s = _wcslwr(string);
     if ('#'==*s) s++;
     for (;;)
     {
-        COLORREF cr = 0; char *d, c;
+        COLORREF cr = 0; wchar_t *d, c;
         // check if its a valid hex number
         for (d = s; (c = *d) != 0; ++d)
         {
             cr <<= 4;
-            if (c >= '0' && c <= '9') cr |= c - '0';
+            if (c >= L'0' && c <= L'9') cr |= c - L'0';
             else
-            if (c >= 'a' && c <= 'f') cr |= c - ('a'-10);
+            if (c >= L'a' && c <= L'f') cr |= c - (L'a'-10);
             else goto check_rgb;
         }
 
@@ -324,9 +324,9 @@ check_rgb:
         {
             s+=6;
 			int cval[3];
-			if (sscanf(s,"%d/%d/%d",cval,cval+1,cval+2) == 3)
+			if (swscanf(s,L"%d/%d/%d",cval,cval+1,cval+2) == 3)
 			{
-				sprintf(rgbstr,"%02x%02x%02x",cval[0]%256,cval[1]%256,cval[2]%256);
+				swprintf(rgbstr, 7,L"%02x%02x%02x",cval[0]%256,cval[1]%256,cval[2]%256);
 				s = rgbstr;
 				continue;
 			}
