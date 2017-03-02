@@ -26,6 +26,7 @@
  *
  *	from OpenBSD: strlcpy.c,v 1.4 1999/05/01 18:56:41 millert Exp
  */
+#pragma once
 
 //#include <sys/cdefs.h>
 #if 0
@@ -34,7 +35,6 @@ __RCSID("$NetBSD: wcslcpy.c,v 1.1 2000/12/23 23:14:36 itojun Exp $");
 #endif /* LIBC_SCCS and not lint */
 #endif
 //__FBSDID("$FreeBSD: src/lib/libc/string/wcslcpy.c,v 1.6 2002/09/21 00:29:23 tjr Exp $");
-
 #include <sys/types.h>
 #include <wchar.h>
 

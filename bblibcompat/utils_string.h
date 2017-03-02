@@ -1,6 +1,7 @@
 #pragma once
 #include <tchar.h>
 #include <shlwapi.h>
+#include <bblib/wcslcpy.h>
 
 #ifdef UNICODE
 # define tmemcpy wmemcpy
@@ -18,7 +19,7 @@
 
 inline TCHAR * extract_string (TCHAR * dst, TCHAR const * src, int n)
 {
-    _tcsncpy_s(dst, n, src, _TRUNCATE);
+    wcslcpy(dst, src, n);
     return dst;
 }
 
@@ -105,7 +106,7 @@ void unquote (TCHAR (&buf)[buf_sz], TCHAR const * src)
 
 
 #include <3rd_party/fnv/fnv.h>
-inline Fnv32_t calc_hash32 (char const * buff, size_t length_of_buf)
+inline Fnv32_t calc_hash32 (void const * buff, size_t length_of_buf)
 {
     Fnv32_t const hash_val = fnv_32a_buf(buff, length_of_buf, FNV1_32_INIT);
     return hash_val;
@@ -115,6 +116,11 @@ inline Fnv32_t calc_hash32 (char const * buff)
 {
     Fnv32_t const hash_val = fnv_32a_str(buff, FNV1_32_INIT);
     return hash_val;
+}
+inline Fnv32_t calc_hash32 (wchar_t const * buff)
+{
+	Fnv32_t const hash_val = fnv_32a_buf(buff, sizeof(wchar_t) * wcslen(buff), FNV1_32_INIT);
+	return hash_val;
 }
 
 inline Fnv64_t calc_hash64 (const char * buff, size_t length_of_buf)

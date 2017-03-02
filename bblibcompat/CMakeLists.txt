@@ -19,5 +19,5 @@ set(bblibcompat_HEADERS
 
 add_library(bblibcompat STATIC ${bblibcompat_SOURCES})
 
-target_link_libraries(bblibcompat version comctl32)
+target_link_libraries(bblibcompat version comctl32 fnv)
 #target_link_libraries(bblibcompat)

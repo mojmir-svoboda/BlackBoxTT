@@ -23,6 +23,7 @@ for more details.
 #include "gfx/MenuWidget.h"
 #include "menu/MenuConfig.h"
 #include "gfx/utils_widgets.h"
+#include "bbversion.h"
 //===========================================================================
 // API: MakeNamedMenu
 // Purpose:         Create or refresh a bb::MenuConfig
@@ -237,10 +238,13 @@ bb::MenuConfigItem* MakeMenuInsertPath (std::shared_ptr<bb::MenuConfig>ParentMen
 // API: MenuExists
 //===========================================================================
 
-bool MenuExists(wchar_t const * IDString_part)
+bool MenuExists (wchar_t const * id)
 {
+	bb::BlackBox & bb = bb::BlackBox::Instance();
+
+	if (bb.GetGfx().FindWidget(id))
+		return true;
 	return false;
-/*	return NULL != bb::MenuConfig::find_named_menu(IDString_part, true);*/
 }
 
 //===========================================================================
@@ -363,3 +367,7 @@ void MenuOption(std::shared_ptr<bb::MenuConfig>pMenu, int flags, ...)
 // 		bb::MenuConfig::Sort(&pMenu->m_pMenuItems->next, item_compare);
 }
 
+//===========================================================================
+// API: BBMessageBox
+// Purpose:  standard BB-MessageBox
+//===========================================================================

@@ -796,3 +796,42 @@ skip:
 // 			strcpy_max(szExtraParameters, s, MAX_PATH);
 // 		return stored;
 	}
+
+	int BBMessageBox(int flg, const wchar_t *fmt, ...)
+	{
+		const wchar_t *caption = BBAPPNAMEW;
+		wchar_t *p, *q;
+		va_list args;
+
+		va_start(args, fmt);
+		wchar_t message[1024];
+		wchar_t * m_ptr = message;
+		vswprintf(m_ptr, 1024, fmt, args);
+		if (L'#' == p[0] && NULL != (q = wcschr(p + 1, p[0])))
+			// "#Title#Message" is wanted
+			*q = 0, caption = p + 1, m_ptr = q + 1;
+
+		int r = MessageBox (NULL, m_ptr, caption, flg | MB_SYSTEMMODAL);
+		return r;
+
+		// 	static int (WINAPI *pMessageBoxIndirectW)(CONST MSGBOXPARAMSW*);
+		// 
+		// 	va_start(args, fmt);
+		// 	message = p = m_formatv(fmt, args);
+		// 	if ('#' == p[0] && NULL != (q = strchr(p + 1, p[0])))
+		// 		// "#Title#Message" is wanted
+		// 		*q = 0, caption = p + 1, message = q + 1;
+		// 
+		// 	MSGBOXPARAMSA mp;
+		// 	memset(&mp, 0, sizeof mp);
+		// 	mp.cbSize = sizeof mp;
+		// 	mp.hInstance = hMainInstance;
+		// 	//mp.hwndOwner = NULL;
+		// 	mp.lpszText = message;
+		// 	mp.lpszCaption = caption;
+		// 	mp.dwStyle = flg | MB_USERICON | MB_SYSTEMMODAL;
+		// 	mp.lpszIcon = MAKEINTRESOURCE(IDI_BLACKBOX);
+		// 	r = MessageBoxIndirect(&mp);
+		// 
+		// 	m_free(p);
+	}
