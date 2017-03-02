@@ -40,7 +40,7 @@ LRESULT controltype_label_event(control *c, HWND hwnd, UINT msg, WPARAM wParam, 
 void controltype_label_notify(control *c, int notifytype, void *messagedata);
 int controltype_label_message(control *c, int tokencount, wchar_t *tokens[]);
 void *controltype_label_getdata(control *c, int datatype);
-bool controltype_label_getstringdata(control *c, wchar_t *buffer, wchar_t *propertyname);
+bool controltype_label_getstringdata(control *c, wchar_t * buffer, size_t n, wchar_t const * propertyname);
 void controltype_label_menu_context(std::shared_ptr<bb::MenuConfig> m, control *c);
 void controltype_label_notifytype(int notifytype, void *messagedata);
 

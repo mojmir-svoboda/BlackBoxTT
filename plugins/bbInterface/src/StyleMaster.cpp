@@ -362,7 +362,7 @@ void style_draw_box(RECT &rect, HDC &buffer, StyleItem* styleptr, bool is_border
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //style_draw_text
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void style_draw_text(RECT &rect, HDC &buffer, StyleItem* styleptr, char *text, UINT settings, HFONT font)
+void style_draw_text(RECT &rect, HDC &buffer, StyleItem* styleptr, wchar_t *text, UINT settings, HFONT font)
 {
 	HFONT *newfont = font!=NULL?&font:&style_font;
 	
@@ -407,7 +407,7 @@ void style_draw_text(RECT &rect, HDC &buffer, StyleItem* styleptr, char *text, U
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //style_draw_text
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void style_draw_text(RECT &rect, HDC &buffer, int style, char *text, UINT settings, HFONT font)
+void style_draw_text(RECT &rect, HDC &buffer, int style, wchar_t *text, UINT settings, HFONT font)
 {
 	style_draw_text(rect, buffer, &style_fill[style], text, settings, font);
 }

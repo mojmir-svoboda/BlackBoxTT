@@ -268,7 +268,7 @@ int agenttype_systeminfo_destroy(agent *a)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_systeminfo_message
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agenttype_systeminfo_message(agent *a, int tokencount, char *tokens[])
+int agenttype_systeminfo_message(agent *a, int tokencount, wchar_t *tokens[])
 {
 	//No errors
 	return 0;

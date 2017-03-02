@@ -6,7 +6,9 @@
 
 // Global Include
 #include <blackbox/plugin/bb.h>
-#include <string.h>
+#include <cstring>
+#include <string>
+#include <bblibcompat/utils_string.h>
 
 //Includes
 #include "Definitions.h"
@@ -72,8 +74,14 @@
 unsigned char hash_func(char const *str)
 {
 	int i;
-    for( i=0; *str; str++ ) i = 53*i + *str;
-    return( i % 256 );
+  for( i=0; *str; str++ )
+		i = 53*i + *str;
+   return( i % 256 );
+}
+unsigned char hash_func(wchar_t const *str)
+{
+	int i = calc_hash32(str);
+	return(i % 256);
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -137,13 +145,13 @@ int list_add(list *l, const wchar_t *key, void *value, void **old_value)
 	//Check for error conditions
 	if (
 		!! !l                  //If no list, forget it
-		|| strlen(key) >= 96    //If key is longer than 96 chars, forget it      
+		|| wcslen(key) >= 96    //If key is longer than 96 chars, forget it      
 		) return 1;
 
 	//Look it up, and make sure it is unique!
 	unsigned char hash_val = hash_func(key);
 	listnode *ln = l->hash_table[hash_val];
-	while (ln && strcmp(key, ln->key)) ln = ln->hash_next; // only check among elements with the same hash
+	while (ln && wcscmp(key, ln->key)) ln = ln->hash_next; // only check among elements with the same hash
 	if (ln)
 	{
 		if (NULL == old_value) return 1;
@@ -154,7 +162,7 @@ int list_add(list *l, const wchar_t *key, void *value, void **old_value)
 
 	//Create the new list node
 	ln = new listnode;
-	strcpy(ln->key, key);
+	wcscpy(ln->key, key);
 	ln->value = value;
 	
 	//Set its prev and next pointers
@@ -183,7 +191,7 @@ int list_remove(list *l, const wchar_t *key)
 	unsigned char hash_val = hash_func(key);
 	listnode *ln = l->hash_table[hash_val];
 
-	while (ln && strcmp(key, ln->key)) { ln = ln->hash_next; }
+	while (ln && wcscmp(key, ln->key)) { ln = ln->hash_next; }
 
 	//If found, remove it
 	if (ln)
@@ -198,7 +206,7 @@ int list_remove(list *l, const wchar_t *key)
 		else {
 			// A hash_prev pointer would be wasting space, so this is how it'll have to be done. Ugly, yes.
 			listnode *lnprev = l->hash_table[hash_val];
-			while (lnprev->hash_next && strcmp(key, lnprev->hash_next->key)) { lnprev = lnprev->hash_next; }
+			while (lnprev->hash_next && wcscmp(key, lnprev->hash_next->key)) { lnprev = lnprev->hash_next; }
 			lnprev->hash_next = lnprev->hash_next->hash_next;
 		}
 		delete ln;
@@ -216,13 +224,13 @@ int list_remove(list *l, const wchar_t *key)
 void *list_lookup(list *l, const wchar_t *key)
 {
 	//Shortcut, the last found is cached for quick lookup
-	if (l->last_found && !strcmp(key, l->last_found->key))
+	if (l->last_found && !wcscmp(key, l->last_found->key))
 		return l->last_found->value;
 
 	//Hash table lookup
 	unsigned char hash_val = hash_func(key);
 	listnode *ln = l->hash_table[hash_val];
-	while (ln && strcmp(key, ln->key)) ln = ln->hash_next;
+	while (ln && wcscmp(key, ln->key)) ln = ln->hash_next;
 	if (ln)
 	{
 		l->last_found = ln;
@@ -234,12 +242,12 @@ void *list_lookup(list *l, const wchar_t *key)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //list_rename
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int list_rename(list *l, const char *key, const char *newkey)
+int list_rename(list *l, const wchar_t *key, const wchar_t *newkey)
 {
 	//Lookup the old item
 	unsigned char hash_val = hash_func(key);
 	listnode *ln = l->hash_table[hash_val], *lnprev = NULL;
-	while (ln && strcmp(key, ln->key))
+	while (ln && wcscmp(key, ln->key))
 	{
 		lnprev = ln;
 		ln = ln->hash_next;
@@ -256,7 +264,7 @@ int list_rename(list *l, const char *key, const char *newkey)
 	l->hash_table[hash_val] = ln;
 
 	//Copy the key
-	strcpy(ln->key, newkey);
+	wcscmp(ln->key, newkey);
 
 	//No errors
 	return 0;

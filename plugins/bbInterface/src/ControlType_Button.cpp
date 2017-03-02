@@ -589,7 +589,7 @@ void *controltype_button_getdata(control *c, int datatype)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //controltype_button_getstringdata
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-bool controltype_button_getstringdata(control *c, wchar_t *buffer, wchar_t *propertyname)
+bool controltype_button_getstringdata(control *c, wchar_t *buffer, size_t n, wchar_t const *propertyname)
 {
 	controltype_button_details *details = (controltype_button_details *) c->controldetails;
 	if (details->is_twostate && !_wcsicmp(propertyname,L"Pressed"))

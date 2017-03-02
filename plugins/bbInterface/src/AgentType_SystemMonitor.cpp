@@ -407,7 +407,7 @@ int agenttype_systemmonitor_destroy (agent * a)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_systemmonitor_message
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agenttype_systemmonitor_message (agent * a, int tokencount, char * tokens[] ) { return 0; }
+int agenttype_systemmonitor_message (agent * a, int tokencount, wchar_t * tokens[] ) { return 0; }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_systemmonitor_notify

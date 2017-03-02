@@ -18,7 +18,7 @@ struct listnode;
 struct listnode
 {
 	wchar_t key[96];
-	void *value;
+	void * value;
 
 	listnode *next;
 	listnode *prev;

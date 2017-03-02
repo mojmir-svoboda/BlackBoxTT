@@ -111,7 +111,7 @@ int agenttype_broam_destroy(agent *a)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_broam_message
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agenttype_broam_message(agent *a, int tokencount, char *tokens[])
+int agenttype_broam_message(agent *a, int tokencount, wchar_t *tokens[])
 {
 	return 1;
 }
@@ -145,7 +145,7 @@ void agenttype_broam_notify(agent *a, int notifytype, void *messagedata)
 				endptr = stage + wcslen(stage);
 
 				//Get the broadcast value from the agent
-				gotdata = control_getstringdata(a->controlptr, endptr, L"BroadcastValue");
+				gotdata = control_getstringdata(a->controlptr, endptr, endptr - stage, L"BroadcastValue");
 
 				//Add the rest of the string
 				wcscat(stage, varptr + wcslen(L"$BroadcastValue$"));				

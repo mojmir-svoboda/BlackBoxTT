@@ -39,19 +39,19 @@ void set_plugin_position(PluginInfo *p)
 }
 
 //=============================================================================
-PluginInfo *get_plugin(PluginInfo *PI, char *module_name)
+PluginInfo *get_plugin(PluginInfo *PI, wchar_t *module_name)
 {
 	PluginInfo *p;
-	int l = strlen(module_name);
+	int l = wcslen(module_name);
 	dolist (p, PI)
-		if (0 == _memicmp(module_name, p->module_name, l)
+		if (0 == _wcsicmp(module_name, p->module_name)
 			&& (0 == p->module_name[l] || '.' == p->module_name[l]))
 			break;
 	return p;
 }
 
 //=============================================================================
-bool plugin_setpos(PluginInfo *PI, char *module_name, int x, int y)
+bool plugin_setpos(PluginInfo *PI, wchar_t *module_name, int x, int y)
 {
 	PluginInfo *p = get_plugin(PI, module_name);
 	if (NULL == p) return false;
@@ -65,7 +65,7 @@ bool plugin_setpos(PluginInfo *PI, char *module_name, int x, int y)
 // well, for instance BBIcons has more than one window,
 // so we hide/show all of them
 
-bool plugin_getset_show_state(PluginInfo *PI, char *module_name, int state)
+bool plugin_getset_show_state(PluginInfo *PI, wchar_t *module_name, int state)
 {
 	PluginInfo *p = PI;
 	bool result = false;
@@ -319,12 +319,12 @@ int SlitWndProc(control *c, HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 ModuleInfo * m_loadPlugin(HWND hSlit, const wchar_t *file_name)
 {
-	const char *errormsg = NULL;
+	const wchar_t *errormsg = NULL;
 
 	HMODULE hMO = LoadLibrary(file_name);
 	if (NULL == hMO)
 	{
-		errormsg = "The plugin you are trying to load does not exist or cannot be loaded.";
+		errormsg = L"The plugin you are trying to load does not exist or cannot be loaded.";
 	}
 	else
 	{
@@ -343,7 +343,7 @@ ModuleInfo * m_loadPlugin(HWND hSlit, const wchar_t *file_name)
 			*(FARPROC*)&endPlugin       = GetProcAddress(hMO, "endPlugin");
 
 			if (NULL == endPlugin)
-				errormsg = "This plugin doesn't have a 'endPlugin'."
+				errormsg = L"This plugin doesn't have a 'endPlugin'."
 					"\nProbably it is not a plugin designed for bb4win.";
 			else
 			if (beginSlitPlugin)
@@ -355,7 +355,7 @@ ModuleInfo * m_loadPlugin(HWND hSlit, const wchar_t *file_name)
 			if (beginPlugin)
 				result = beginPlugin(hMO);
 			else
-				errormsg = "This plugin doesn't have an 'beginPlugin'.";
+				errormsg = L"This plugin doesn't have an 'beginPlugin'.";
 
 			if (NULL == errormsg)
 			{
@@ -369,12 +369,12 @@ ModuleInfo * m_loadPlugin(HWND hSlit, const wchar_t *file_name)
 					plugin_get_displayname(file_name, m->module_name);
 					return m;
 				}
-				errormsg = "This plugin signaled an error on loading.";
+				errormsg = L"This plugin signaled an error on loading.";
 			}
 		}
 		catch(...)
 		{
-			errormsg = "This plugin crashed on loading.";
+			errormsg = L"This plugin crashed on loading.";
 		}
 
 		FreeLibrary(hMO);

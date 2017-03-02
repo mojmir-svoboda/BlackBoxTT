@@ -17,9 +17,7 @@
 @BBInterface Plugin OnUnload ""
 
 !---- Loaded modules ----
-@BBInterface Module Load "kazmix_samplescript\itunesModule.rc"
 @BBInterface Module Load "kazmix_samplescript\sysmeterModule.rc"
 
 !---- Active modules ----
-@BBInterface Module Toggle iTunesControlModule
 @BBInterface Module Toggle SystemMeterModule

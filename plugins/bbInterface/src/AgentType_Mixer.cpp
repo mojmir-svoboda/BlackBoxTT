@@ -12,7 +12,6 @@
 #include "MenuMaster.h"
 
 #include "AgentType_Mixer.h"
-#include "AgentType_Mixer_XP.h"
 #include "AgentType_Mixer_Vista.h"
 
 // @TODO: tmp
@@ -33,10 +32,8 @@ bool is_vista ()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 int agenttype_mixer_startup ()
 {
-	if (is_vista())
-		return agenttype_mixer_startup_vista();
-	else
-		return agenttype_mixer_startup_xp();
+	Assert(is_vista());
+	return agenttype_mixer_startup_vista();
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -44,10 +41,7 @@ int agenttype_mixer_startup ()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 int agenttype_mixer_shutdown ()
 {
-	if (is_vista())
-		return agenttype_mixer_shutdown_vista();
-	else
-		return agenttype_mixer_shutdown_xp();
+	return agenttype_mixer_shutdown_vista();
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -55,11 +49,8 @@ int agenttype_mixer_shutdown ()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 int agenttype_mixer_create (agent * a, wchar_t * parameterstring)
 {
-	if (is_vista())
-		return agenttype_mixer_create_vista(a, parameterstring);
-	else
-		return agenttype_mixer_create_xp(a, parameterstring);
-	return 0;
+	Assert(is_vista());
+	return agenttype_mixer_create_vista(a, parameterstring);
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -67,17 +58,13 @@ int agenttype_mixer_create (agent * a, wchar_t * parameterstring)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 int agenttype_mixer_destroy (agent * a)
 {
-	if (is_vista())
-		return agenttype_mixer_destroy_vista(a);
-	else
-		return agenttype_mixer_destroy_xp(a);
-	return 0;
+	return agenttype_mixer_destroy_vista(a);
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_mixer_message
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agenttype_mixer_message (agent *a, int tokencount, char *tokens[])
+int agenttype_mixer_message (agent *a, int tokencount, wchar_t *tokens[])
 {
 	return 1;
 }
@@ -87,10 +74,7 @@ int agenttype_mixer_message (agent *a, int tokencount, char *tokens[])
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void agenttype_mixer_notify (agent *a, int notifytype, void *messagedata)
 {
-	if (is_vista())
-		agenttype_mixer_notify_vista(a, notifytype, messagedata);
-	else
-		agenttype_mixer_notify_xp(a, notifytype, messagedata);
+	agenttype_mixer_notify_vista(a, notifytype, messagedata);
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -98,10 +82,7 @@ void agenttype_mixer_notify (agent *a, int notifytype, void *messagedata)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void * agenttype_mixer_getdata (agent *a, int datatype)
 {
-	if (is_vista())
-		return agenttype_mixer_getdata_vista(a, datatype);
-	else
-		return agenttype_mixer_getdata_xp(a, datatype);
+	return agenttype_mixer_getdata_vista(a, datatype);
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

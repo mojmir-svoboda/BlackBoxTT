@@ -10,6 +10,17 @@
 #include "ConfigMaster.h"
 #include "AgentType_Mixer_Vista.h"
 
+//Local variables
+HWND mixer_hwnd = NULL;
+const wchar_t * mixer_name_scale = L"MixerScale";
+const wchar_t * mixer_name_bool = L"MixerBool";
+char mixertoken1[30], mixertoken2[30], mixertoken3[30], mixertoken4[30];
+char * mixer_tokenptrs[4] = { mixertoken1, mixertoken2, mixertoken3, mixertoken4 };
+const wchar_t mixer_recieverclass[] = L"BBInterfaceAgentMixerReciever";
+bool mixer_recieverregistered = false;
+int s_mixer_controlcount = 0;
+wchar_t mixer_outputbuffer[32] = L"";
+
 //@TODO: place defaultDevice endpoint as first
 //@TODO: use bb unicode routines
 //@TODO: get mute (bool) working
@@ -331,8 +342,7 @@ bool AgentType_Mixer_Vista::Init ()
 
 //@TODO: remove
 #define SAFE_RELEASE(punk)  if ((punk) != NULL)  { (punk)->Release(); (punk) = NULL; }
-extern const wchar_t * mixer_name_scale;
-extern const wchar_t * mixer_name_bool;
+
 
 void agenttype_mixer_menu_devices_vista (std::shared_ptr<bb::MenuConfig> menu, control *c, wchar_t *action, wchar_t *agentname, int format)
 {

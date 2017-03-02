@@ -132,10 +132,18 @@ char *config_read_line(char *buf, FILE* in_file)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int config_load(wchar_t const *filename, module* caller, const char *section)
+int config_load(wchar_t const *filename, module* caller, const wchar_t * section_utf16)
 {
 	//Open the file
 	FILE *config_file_in = config_open(filename, L"rt");
+
+	char * section = nullptr;
+	if (section_utf16)
+	{
+		char section_utf8[1024];
+		bb::codecvt_utf16_utf8(section_utf16, wcslen(section_utf16), section, 1024);
+		section = section_utf8;
+	}
 
 	char config_line[BBI_MAX_LINE_LENGTH];
 	if (config_file_in)
@@ -181,7 +189,7 @@ int config_load(wchar_t const *filename, module* caller, const char *section)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //config_backup
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int config_backup(wchar_t *filename)
+int config_backup(wchar_t const *filename)
 {
 	wchar_t bakfile[MAX_PATH];
 	swprintf(bakfile, MAX_PATH,L"%s.bak", filename);
@@ -229,33 +237,52 @@ int config_delete(wchar_t const *filename)
 	return 0 != ::DeleteFile(config_makepath(buffer, filename));
 }
 
-int config_write(char *string)
+int config_write(wchar_t *w_string)
 {
-	if(!string) return 0;
+	if (!w_string)
+		return 0;
+
+	char tmp[4096];
+	bb::codecvt_utf16_utf8(w_string, wcslen(w_string), tmp, 4096);
+	char * string = tmp;
 	while (*string)
-	{	if (*string == '$') fputc('$', config_file_out); //Replace $ with $$
+	{
+		if (*string == '$')
+			fputc('$', config_file_out); //Replace $ with $$
 		fputc(*(string++),config_file_out);
 	}
 	fputc('\n', config_file_out);
 	return 0;
 }
 
-void config_printf (const char *fmt, ...)
+void config_printf (const wchar_t *fmt, ...)
 {
 	if (config_first_line)
 		config_first_line = false;
 	else
 		fputc('\n', config_file_out);
 
-	va_list arg; va_start(arg, fmt);
-	vfprintf (config_file_out, fmt, arg);
+	va_list arg;
+	va_start(arg, fmt);
+	wchar_t tmpW[4096];
+	swprintf(tmpW, 4096, fmt, arg);
+	char tmp[4096];
+	bb::codecvt_utf16_utf8(tmpW, wcslen(tmpW), tmp, 4096);
+
+	fprintf (config_file_out, "%s", tmp);
 	fputc('\n', config_file_out);
 }
 
-void config_printf_noskip (const char *fmt, ...)
+void config_printf_noskip (const wchar_t *fmt, ...)
 {
-	va_list arg; va_start(arg, fmt);
-	vfprintf (config_file_out, fmt, arg);
+	va_list arg;
+	va_start(arg, fmt);
+	wchar_t tmpW[4096];
+	swprintf(tmpW, 4096, fmt, arg);
+	char tmp[4096];
+	bb::codecvt_utf16_utf8(tmpW, wcslen(tmpW), tmp, 4096);
+
+	fprintf (config_file_out, "%s", tmp);
 	fputc('\n', config_file_out);
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -318,7 +345,7 @@ int roundtoint(double d)
 
 class Calculator
 {
-    std::istream& in;
+    std::wistream& in;
     enum Token_type
     {
         NUMBER,
@@ -354,7 +381,7 @@ class Calculator
     Token_type get_token();
 
 public:
-    Calculator(double *def, std::istream & input) : def_value(def), in(input) {};
+    Calculator(double *def, std::wistream & input) : def_value(def), in(input) {};
     bool Eval();
 };
 
@@ -482,51 +509,51 @@ double Calculator::prim(bool get)
 
 Calculator::Token_type Calculator::get_token()
 {
-    char ch = 0;
-	char ch2 = 0;
+    wchar_t ch = 0;
+		wchar_t ch2 = 0;
     in >> ch;
     
     switch (ch)
     {
         case 0:
             return cur_tok = END;
-        case '+':
-        case '-':
-        case '*':
-        case '/':
-        case '(':
-        case ')':
-		case '=':
-		case '?':
-		case ':':
-        case '&':
-        case '|':
-        case '^':
+        case L'+':
+        case L'-':
+        case L'*':
+        case L'/':
+        case L'(':
+        case L')':
+		case L'=':
+		case L'?':
+		case L':':
+        case L'&':
+        case L'|':
+        case L'^':
             return cur_tok = Token_type(ch);
-		case '<':
-		case '>':
-		case '!':
+		case L'<':
+		case L'>':
+		case L'!':
 			in >> ch2;
-			if (ch2 == '=')
+			if (ch2 == L'=')
 				return	cur_tok = 
-                        (ch == '>') ?	GEQ : (
-						(ch == '<') ?	LEQ :
+                        (ch == L'>') ?	GEQ : (
+						(ch == L'<') ?	LEQ :
 										NEQ	);
 			else {
 				in.putback(ch2);
 				return cur_tok = Token_type(ch);
 			}
-        case '0': case '1': case '2': case '3': case '4':
-        case '5': case '6': case '7': case '8': case '9':
+        case L'0': case L'1': case L'2': case L'3': case L'4':
+        case L'5': case L'6': case L'7': case L'8': case L'9':
 //		case '.':
             in.putback(ch);
             in >> cur_value;
             return cur_tok = NUMBER;
-		case '%':
+		case L'%':
             cur_value = *def_value;
             return cur_tok = NUMBER;
         default:
-            throw "Unknown token.";
+            throw L"Unknown token.";
     }
 }
 
@@ -546,9 +573,9 @@ bool Calculator::Eval()
     }
 }
 
-bool config_set_int_expr(char *str, int* value)
+bool config_set_int_expr(wchar_t *str, int* value)
 {
-	std::istringstream expr(str); //Now, this might be not the fastest decision, but it is easier this way on the tokenizer function. Still, it can be optimized for speed separately.
+	std::wistringstream expr(str); //Now, this might be not the fastest decision, but it is easier this way on the tokenizer function. Still, it can be optimized for speed separately.
 	double temp = *value; //Argh, this conversion stuff got ugly. references could possibly solve this.
 	Calculator calc(&temp,expr);
 	bool result = calc.Eval();
@@ -556,16 +583,16 @@ bool config_set_int_expr(char *str, int* value)
 	return result;
 }
 
-bool config_set_double_expr(char *str, double* value)
+bool config_set_double_expr(wchar_t *str, double* value)
 {
-	std::istringstream expr(str);
+	std::wistringstream expr(str);
 	Calculator calc(value,expr);
 	return calc.Eval();
 }
 
-bool config_set_double_expr(char *str, double* value, double min, double max)
+bool config_set_double_expr(wchar_t *str, double* value, double min, double max)
 {
-	std::istringstream expr(str);
+	std::wistringstream expr(str);
 	Calculator calc(value,expr);
 	bool result = calc.Eval();
 	if (result)
@@ -676,7 +703,7 @@ wchar_t *config_get_control_saveas(control *c, const wchar_t *filename)
 wchar_t *config_get_control_renamecontrol_s(control *c)
 {   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s", szBBroam, szBEntityControl, szBActionRename, c->controlname);    return config_masterbroam;  }
 wchar_t *config_get_control_clone(control *c)
-{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s", szBBroam, szBEntityControl, "Clone", c->controlname);    return config_masterbroam;  }
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s", szBBroam, szBEntityControl, L"Clone", c->controlname);    return config_masterbroam;  }
 
 wchar_t *config_get_control_setagent_s(control *c, const wchar_t *action, const wchar_t *agenttype)
 {   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s %s", szBBroam, szBEntityControl, szBActionSetAgent, c->controlname, action, agenttype); return config_masterbroam;  }
@@ -770,7 +797,7 @@ wchar_t *config_get_module_create()
 wchar_t *config_get_module_load_dialog()
 {   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s", szBBroam, szBEntityModule, szBActionLoad);  return config_masterbroam;  }
 wchar_t *config_get_module_load(module *m)
-{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s \"%s\"", szBBroam, szBEntityModule, szBActionLoad, m->filepath);  return config_masterbroam;  }
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s \"%s\"", szBBroam, szBEntityModule, szBActionLoad, m->filepath.c_str());  return config_masterbroam;  }
 wchar_t *config_get_module_toggle(module *m)
 {   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s", szBBroam, szBEntityModule, szBActionToggle, m->name);  return config_masterbroam;  }
 wchar_t *config_get_module_edit(module *m)
@@ -785,9 +812,9 @@ wchar_t *config_get_module_setcomments_s(module *m)
 wchar_t *config_get_module_rename_s(module *m)
 {   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s", szBBroam, szBEntityModule, szBActionRename, m->name);    return config_masterbroam;  }
 wchar_t *config_get_module_onload_s(module *m)
-{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s", szBBroam, szBEntityModule, szBActionOnLoad, m->name, !m->actions[MODULE_ACTION_ONLOAD].empty() ? m->actions[MODULE_ACTION_ONLOAD] : L"");  return config_masterbroam;  }
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s", szBBroam, szBEntityModule, szBActionOnLoad, m->name, !m->actions[MODULE_ACTION_ONLOAD].empty() ? m->actions[MODULE_ACTION_ONLOAD].c_str() : L"");  return config_masterbroam;  }
 wchar_t *config_get_module_onunload_s(module *m)
-{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s", szBBroam, szBEntityModule, szBActionOnUnload, m->name, !m->actions[MODULE_ACTION_ONUNLOAD].empty() ? m->actions[MODULE_ACTION_ONUNLOAD] : L"");  return config_masterbroam;  }
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s %s", szBBroam, szBEntityModule, szBActionOnUnload, m->name, !m->actions[MODULE_ACTION_ONUNLOAD].empty() ? m->actions[MODULE_ACTION_ONUNLOAD].c_str() : L"");  return config_masterbroam;  }
 
 
 wchar_t *config_get_control_assigntomodule(control *c, module *m)
@@ -795,18 +822,18 @@ wchar_t *config_get_control_assigntomodule(control *c, module *m)
 wchar_t *config_get_control_detachfrommodule(control *c)
 {   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s", szBBroam, szBEntityControl, szBActionDetachFromModule, c->controlname);  return config_masterbroam;  }
 wchar_t *config_get_module_onload(module *m)
-{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s \"%s\"", szBBroam, szBEntityModule, szBActionOnLoad, m->name, !m->actions[MODULE_ACTION_ONLOAD].empty() ? m->actions[MODULE_ACTION_ONLOAD] : L"");  return config_masterbroam;  }
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s \"%s\"", szBBroam, szBEntityModule, szBActionOnLoad, m->name, !m->actions[MODULE_ACTION_ONLOAD].empty() ? m->actions[MODULE_ACTION_ONLOAD].c_str() : L"");  return config_masterbroam;  }
 wchar_t *config_get_module_onunload(module *m)
-{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s \"%s\"", szBBroam, szBEntityModule, szBActionOnUnload, m->name, !m->actions[MODULE_ACTION_ONUNLOAD].empty() ? m->actions[MODULE_ACTION_ONUNLOAD] : L"");  return config_masterbroam;  }
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s \"%s\"", szBBroam, szBEntityModule, szBActionOnUnload, m->name, !m->actions[MODULE_ACTION_ONUNLOAD].empty() ? m->actions[MODULE_ACTION_ONUNLOAD].c_str() : L"");  return config_masterbroam;  }
 wchar_t *config_get_plugin_onload()
-{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s \"%s\"", szBBroam, szBEntityPlugin, szBActionOnLoad, !globalmodule.actions[MODULE_ACTION_ONLOAD].empty() ? globalmodule.actions[MODULE_ACTION_ONLOAD] : L"");  return config_masterbroam;  }
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s \"%s\"", szBBroam, szBEntityPlugin, szBActionOnLoad, !globalmodule.actions[MODULE_ACTION_ONLOAD].empty() ? globalmodule.actions[MODULE_ACTION_ONLOAD].c_str() : L"");  return config_masterbroam;  }
 wchar_t *config_get_plugin_onunload()
-{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s \"%s\"", szBBroam, szBEntityPlugin, szBActionOnUnload, !globalmodule.actions[MODULE_ACTION_ONUNLOAD].empty() ? globalmodule.actions[MODULE_ACTION_ONUNLOAD] : L"");  return config_masterbroam;  }
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s \"%s\"", szBBroam, szBEntityPlugin, szBActionOnUnload, !globalmodule.actions[MODULE_ACTION_ONUNLOAD].empty() ? globalmodule.actions[MODULE_ACTION_ONUNLOAD].c_str() : L"");  return config_masterbroam;  }
 
 wchar_t *config_get_variable_set(listnode *ln)
 {   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s \"%s\"", szBBroam, szBEntityVarset, ln->key, (wchar_t *)ln->value);  return config_masterbroam;  }
 wchar_t *config_get_variable_set_static(listnode *ln)
-{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s \"%s\"", szBBroam, szBEntityVarset, "Static", ln->key, (wchar_t *)ln->value);  return config_masterbroam;  }
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s \"%s\"", szBBroam, szBEntityVarset, L"Static", ln->key, (wchar_t *)ln->value);  return config_masterbroam;  }
 
 //--------------- copied, using fully qualified names
 
@@ -821,7 +848,7 @@ wchar_t *config_getfull_control_saveas(control *c, const wchar_t *filename)
 wchar_t *config_getfull_control_renamecontrol_s(control *c)
 {   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s", szBBroam, szBEntityControl, szBActionRename, c->moduleptr->name, c->controlname);    return config_masterbroam;  }
 wchar_t *config_getfull_control_clone(control *c)
-{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s", szBBroam, szBEntityControl, "Clone", c->moduleptr->name, c->controlname);    return config_masterbroam;  }
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s", szBBroam, szBEntityControl, L"Clone", c->moduleptr->name, c->controlname);    return config_masterbroam;  }
 
 wchar_t *config_getfull_control_setagent_s(control *c, const wchar_t *action, const wchar_t *agenttype)
 {   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s %s %s", szBBroam, szBEntityControl, szBActionSetAgent, c->moduleptr->name, c->controlname, action, agenttype); return config_masterbroam;  }
@@ -881,9 +908,9 @@ wchar_t *config_getfull_control_detachfrommodule(control *c)
 {   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s", szBBroam, szBEntityControl, szBActionDetachFromModule, c->moduleptr->name, c->controlname);  return config_masterbroam;  }
 
 wchar_t *config_getfull_variable_set_static(module *m, listnode *ln)
-{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s \"%s\"", szBBroam, szBEntityVarset, "Static", m->name, ln->key, (wchar_t *)ln->value);  return config_masterbroam;  }
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s \"%s\"", szBBroam, szBEntityVarset, L"Static", m->name, ln->key, (wchar_t *)ln->value);  return config_masterbroam;  }
 wchar_t *config_getfull_variable_set_static_s(module *m, listnode *ln)
-{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s", szBBroam, szBEntityVarset, "Static", m->name, ln->key);  return config_masterbroam;  }
+{   swprintf(config_masterbroam, BBI_MAX_LINE_LENGTH, L"%s %s %s %s:%s", szBBroam, szBEntityVarset, L"Static", m->name, ln->key);  return config_masterbroam;  }
 
 //##################################################
 //config_paths_startup

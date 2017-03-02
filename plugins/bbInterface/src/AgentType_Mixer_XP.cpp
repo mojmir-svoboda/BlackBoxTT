@@ -30,16 +30,7 @@ struct AgentType_Mixer_XP
 	bool m_value_bool;
 };
 
-//Local variables
-HWND mixer_hwnd = NULL;
-const char * mixer_name_scale = "MixerScale";
-const char * mixer_name_bool = "MixerBool";
-char mixertoken1[30], mixertoken2[30], mixertoken3[30], mixertoken4[30];
-char * mixer_tokenptrs[4] = {mixertoken1, mixertoken2, mixertoken3, mixertoken4};
-const char mixer_recieverclass[] = "BBInterfaceAgentMixerReciever";
-bool mixer_recieverregistered = false;
-int s_mixer_controlcount = 0;
-char mixer_outputbuffer[32] = "";
+
 
 //Internal functions
 void agenttype_mixer_createreciever();

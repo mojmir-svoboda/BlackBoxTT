@@ -26,8 +26,8 @@
 #include "Shellapi.h"
 
 //Local functions
-int agenttype_bitmaporicon_create(agent *a, char *parameterstring, bool is_icon);
-int agenttype_bitmaporicon_setsource(agent *a, char *parameterstring);
+int agenttype_bitmaporicon_create(agent *a, wchar_t *parameterstring, bool is_icon);
+int agenttype_bitmaporicon_setsource(agent *a, wchar_t *parameterstring);
 
 void drawIcon (int px, int py, int size, HICON IconHop, HDC hDC, bool f);
 #define saturationValue plugin_icon_sat
@@ -108,7 +108,7 @@ int agenttype_bitmap_shutdown()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_bitmap_create
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agenttype_bitmap_create(agent *a, char *parameterstring)
+int agenttype_bitmap_create(agent *a, wchar_t *parameterstring)
 {
 	return agenttype_bitmaporicon_create(a, parameterstring, false);
 }
@@ -372,7 +372,7 @@ void agenttype_bitmap_notifytype(int notifytype, void *messagedata)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_icon_create
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agenttype_icon_create(agent *a, char *parameterstring)
+int agenttype_icon_create(agent *a, wchar_t *parameterstring)
 {
 	return agenttype_bitmaporicon_create(a, parameterstring, true);
 }
@@ -381,7 +381,7 @@ int agenttype_icon_create(agent *a, char *parameterstring)
 //agenttype_icon_create
 //##################################################
 
-int agenttype_bitmaporicon_create(agent *a, char *parameterstring, bool is_icon)
+int agenttype_bitmaporicon_create(agent *a, wchar_t *parameterstring, bool is_icon)
 {
 	//Create the details
 	agenttype_bitmap_details *details = new agenttype_bitmap_details;

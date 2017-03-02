@@ -583,7 +583,7 @@ void *controltype_label_getdata(control *c, int datatype)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //controltype_label_getstringdata
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-bool controltype_label_getstringdata(control *c, char *buffer, char *propertyname)
+bool controltype_label_getstringdata(control *c, wchar_t * buffer, size_t n, wchar_t const * propertyname)
 {
 	//No data to return - return false
 	return false;

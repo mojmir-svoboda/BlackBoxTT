@@ -386,12 +386,12 @@ void *controltype_slider_getdata(control *c, int datatype)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //controltype_slider_getstringdata
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-bool controltype_slider_getstringdata(control *c, wchar_t *buffer, wchar_t *propertyname)
+bool controltype_slider_getstringdata(control *c, wchar_t *buffer, size_t n, wchar_t const * propertyname)
 {
 	controltype_slider_details *details = (controltype_slider_details *) c->controldetails;
 	if (!_wcsicmp(propertyname,L"Value"))
 	{
-		wprintf(buffer, L"%lf", details->value);
+		swprintf(buffer, n, L"%lf", details->value);
 		return true;
 	}
 	//Broadcast value is a special text value that ALL controls should be able to broadcast
@@ -401,7 +401,7 @@ bool controltype_slider_getstringdata(control *c, wchar_t *buffer, wchar_t *prop
 	else if (!_wcsicmp(propertyname,L"BroadcastValue"))
 	{
 		long broadcastvalue = (long) (details->value * (((long) details->broadcast_value_maximum) - ((long) details->broadcast_value_minimum)) + details->broadcast_value_minimum);
-		wprintf(buffer, L"%d", broadcastvalue);
+		swprintf(buffer, n, L"%d", broadcastvalue);
 	}
 
 	//No data to return - return false

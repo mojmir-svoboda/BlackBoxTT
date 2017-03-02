@@ -66,8 +66,8 @@ Plugins:
     is_slit: true
     in_slit: false
 
-  - plugin: 'bbSDK'
-    path: 'c:/bb_devel/plugins/bbSDK/bbSDK.dll'
+  - plugin: 'bbInterface'
+    path: 'c:/bb_devel/plugins/bbInterface/bbInterface.dll'
     enabled: false
     in_slit: false
 
@@ -83,6 +83,11 @@ Plugins:
 
   - plugin: 'bbAnalogExMod'
     path: 'c:/bb_devel/plugins/bbAnalogExMod/bbAnalogExMod.dll'
+    enabled: false
+    in_slit: false
+
+  - plugin: 'bbSDK'
+    path: 'c:/bb_devel/plugins/bbSDK/bbSDK.dll'
     enabled: false
     in_slit: false
 
@@ -176,6 +181,11 @@ Widgets:
                 id: 'bbTT Config'
                 widget: 'Menu'
                 items:
+                  - name: 'bbInterface'
+                    checkbox:
+                    get: '(IsPluginLoaded "bbInterface")'
+                    onCheck: '(LoadPlugin "bbInterface")'
+                    onUncheck: '(UnloadPlugin "bbInterface")'
                   - name: 'bbSDK'
                     checkbox:
                     get: '(IsPluginLoaded "bbSDK")'

@@ -157,7 +157,7 @@ int agenttype_tga_destroy(agent *a)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_tga_message
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agenttype_tga_message(agent *a, int tokencount, char *tokens[])
+int agenttype_tga_message(agent *a, int tokencount, wchar_t *tokens[])
 {
 	return 1;
 }

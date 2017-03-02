@@ -367,7 +367,7 @@ int agenttype_winamp_destroy(agent *a)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_winamp_message
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agenttype_winamp_message(agent *a, int tokencount, char *tokens[])
+int agenttype_winamp_message(agent *a, int tokencount, wchar_t *tokens[])
 {
 	return 1;
 }

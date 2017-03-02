@@ -118,7 +118,7 @@ int agenttype_statictext_destroy(agent *a)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agenttype_statictext_message
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agenttype_statictext_message(agent *a, int tokencount, char *tokens[])
+int agenttype_statictext_message(agent *a, int tokencount, wchar_t *tokens[])
 {
 	return 1;
 }

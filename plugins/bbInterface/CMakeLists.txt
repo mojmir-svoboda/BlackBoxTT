@@ -46,19 +46,21 @@ set(bbInterface_RESOURCES bbInterface.rc)
 #add_definitions(-DUNICODE)
 include_directories(${CMAKE_SOURCE_DIR}/blackbox)
 include_directories(${CMAKE_SOURCE_DIR}/lib)
-include_directories(${CMAKE_SOURCE_DIR}/plugins/bbPlugin)
-include_directories(${CMAKE_SOURCE_DIR}/3rd_party/iTunesCOMWindowsSDK)
+#include_directories(${CMAKE_SOURCE_DIR}/plugins/bbPlugin)
+#include_directories(${CMAKE_SOURCE_DIR}/3rd_party/iTunesCOMWindowsSDK)
 add_library(bbInterface SHARED ${bbInterface_SOURCES})
-target_link_libraries(bbInterface blackbox bblib bbPlugin)
+target_link_libraries(bbInterface blackbox bblib bblibcompat)
 target_link_libraries(bbInterface version gdiplus comsuppw iphlpapi comctl32 winmm)
-target_link_libraries(bbInterface iTunesCOMWindowsSDK)
+
+#target_link_libraries(bbInterface bbPlugin)
+#target_link_libraries(bbInterface iTunesCOMWindowsSDK)
 
 set_property(TARGET bbInterface PROPERTY FOLDER "plugins/bbInterface")
 
 #INSTALL_IF_NEW = bbinterface.rc
 #install(FILES changes.txt DESTINATION plugins/bbInterface)
 install(TARGETS bbInterface RUNTIME DESTINATION plugins/bbInterface)
-#if(NOT EXISTS "${CMAKE_INSTALL_PREFIX}/plugins/bbInterface/${bbInterface_RESOURCES}")
-#	install(FILES ${bbInterface_RESOURCES} DESTINATION plugins/bbInterface)
-#endif()
+if(NOT EXISTS "${CMAKE_INSTALL_PREFIX}/plugins/bbInterface/${bbInterface_RESOURCES}")
+	install(FILES ${bbInterface_RESOURCES} DESTINATION plugins/bbInterface)
+endif()
 

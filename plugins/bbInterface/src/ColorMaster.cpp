@@ -273,9 +273,6 @@ COLORREF ParseLiteralColor(LPCSTR colour)
     return (COLORREF)-1;
 }
 
-
-COLORREF switch_rgb (COLORREF c)
-{ return (c&0x0000ff)<<16 | (c&0x00ff00) | (c&0xff0000)>>16; }
 //===========================================================================
 // Function: ReadColorFromString
 // Purpose: parse a literal or hexadezimal color string

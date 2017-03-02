@@ -72,7 +72,6 @@ namespace bb {
   {
 		PluginsConfig m_config;
 		PluginInfos m_infos;
-		std::vector<PluginInfoPtr> m_tmp;
 		HWND m_hSlit { nullptr };
 
     bool Init (PluginsConfig const & cfg);

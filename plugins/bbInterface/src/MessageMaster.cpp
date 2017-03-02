@@ -131,7 +131,7 @@ void message_interpret(const wchar_t *message, bool from_core, module* caller)
 			// bblean only: SendMessage(plugin_hwnd_blackbox, BB_EXECUTE, 0, (LPARAM)string);
 			wchar_t command[MAX_PATH], arguments[MAX_PATH], *token = command;
 			size_t sz[] = { MAX_PATH };
-			BBTokenize(message, &token, &sz, 1, arguments, MAX_PATH, false);
+			BBTokenize(message, &token, sz, 1, arguments, MAX_PATH, false);
 			shell_exec(command, arguments);
 		}
 		return;
@@ -333,22 +333,23 @@ start:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-void get_property_by_name(wchar_t *targetstr, control *c, wchar_t *propname)
+void get_property_by_name(wchar_t *targetstr, size_t n, control *c, wchar_t const *propname)
 {
 	window *w = c->windowptr;
-	if (!strcmp(propname,"X"))
-		sprintf(targetstr, "%d", w->x);
-	else if (!strcmp(propname,"Y"))
-		sprintf(targetstr, "%d", w->y);
-	else if (!strcmp(propname,"Width"))
-		sprintf(targetstr, "%d", w->width);
-	else if (!strcmp(propname,"Height"))
-		sprintf(targetstr, "%d", w->height);
+	if (!wcscmp(propname, L"X"))
+		swprintf(targetstr, n, L"%d", w->x);
+	else if (!wcscmp(propname, L"Y"))
+		swprintf(targetstr, n, L"%d", w->y);
+	else if (!wcscmp(propname, L"Width"))
+		swprintf(targetstr, n, L"%d", w->width);
+	else if (!wcscmp(propname, L"Height"))
+		swprintf(targetstr, n, L"%d", w->height);
 	else
 	{
 		//If we didn't get any value from the above, see if the control can return it's own value
-		bool gotvalue = c->controltypeptr->func_getstringvalue(c, targetstr, propname);
-		if (gotvalue == false) sprintf(targetstr, "");
+		bool gotvalue = c->controltypeptr->func_getstringvalue(c, targetstr, n, propname);
+		if (gotvalue == false)
+			swprintf(targetstr, n, L"");
 	}
 	
 }
@@ -477,7 +478,7 @@ void shell_exec(const wchar_t *command, const wchar_t *arguments, const wchar_t 
 	wchar_t buffer[MAX_PATH];
 	if (NULL == workingdir)
 	{
-		workingdir = strrchr(command, '\\');
+		workingdir = wcsrchr(command, L'\\');
 		if (workingdir)
 		{
 			int l = workingdir - command;
@@ -485,7 +486,7 @@ void shell_exec(const wchar_t *command, const wchar_t *arguments, const wchar_t 
 			workingdir = buffer;
 		}
 	}
-	BBExecute(plugin_hwnd_blackbox, "", command, arguments, workingdir, SW_SHOWNORMAL, false);
+	BBExecute(plugin_hwnd_blackbox, L"", command, arguments, workingdir, SW_SHOWNORMAL, false);
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -506,12 +507,6 @@ void free_string(wchar_t **s)
 	}
 }
 
-wchar_t *extract_string(wchar_t *d, const wchar_t *s, int n)
-{
-	((wchar_t*)memcpy(d, s, n))[n] = 0;
-	return d;
-}
-
 //get_string_index
 int get_string_index (const wchar_t *key, const wchar_t **string_list)
 {
@@ -521,28 +516,14 @@ int get_string_index (const wchar_t *key, const wchar_t **string_list)
 	return -1;
 }
 
-// integer min/max functions
-int imax(int a, int b) {
-	return a>b?a:b;
-}
-
-int imin(int a, int b) {
-	return a<b?a:b;
-}
-
-int iminmax(int a, int b, int c) {
-	if (a<b) a=b;
-	if (a>c) a=c;
-	return a;
-}
-
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // debug
 void dbg_printf (const wchar_t *fmt, ...)
 {
-	wchar_t buffer[4096]; va_list arg;
+	wchar_t buffer[4096];
+	va_list arg;
 	va_start(arg, fmt);
-	vsprintf (buffer, fmt, arg);
+	vswprintf (buffer, 4096, fmt, arg);
 	OutputDebugString(buffer);
 }
 

@@ -193,7 +193,7 @@ void agent_notify(agent *a, int notifytype, void *data)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //agent_message
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int agent_message(int tokencount, char *tokens[], bool from_core, module* caller)
+int agent_message(int tokencount, wchar_t *tokens[], bool from_core, module* caller)
 {
 	return 1;
 }

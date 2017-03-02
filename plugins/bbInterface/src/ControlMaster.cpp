@@ -233,21 +233,45 @@ int control_destroy(control *c, bool remove_from_list, bool save_last)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //control_event
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int control_rename(control *c, wchar_t *newname)
+int control_rename(control *c, char *newname)
 {
 	//Check the name to make sure it is valid
 	if (!control_is_valid_name(newname)) return 1;
 
+	wchar_t tmp[64];
+	bb::codecvt_utf8_utf16(newname, strlen(newname), tmp, 64);
+
 	//Rename the control if possible
-	if (list_rename(c->moduleptr->controllist, c->controlname, newname)) return 1;
+	if (list_rename(c->moduleptr->controllist, c->controlname, tmp)) return 1;
 
 	//Rename it in the parents list, if it's there
 	if (!c->parentptr) {
-		list_rename(c->moduleptr->controllist_parentsonly, c->controlname, newname);
+		list_rename(c->moduleptr->controllist_parentsonly, c->controlname, tmp);
 	}
 
 	//Change the name
-	wcscpy(c->controlname, newname);
+	wcscpy(c->controlname, tmp);
+
+	return 0;
+}
+int control_rename(control *c, wchar_t *w_newname)
+{
+	char tmp[64];
+	bb::codecvt_utf16_utf8(w_newname, wcslen(w_newname), tmp, 64);
+
+	//Check the name to make sure it is valid
+	if (!control_is_valid_name(tmp)) return 1;
+
+	//Rename the control if possible
+	if (list_rename(c->moduleptr->controllist, c->controlname, w_newname)) return 1;
+
+	//Rename it in the parents list, if it's there
+	if (!c->parentptr) {
+		list_rename(c->moduleptr->controllist_parentsonly, c->controlname, w_newname);
+	}
+
+	//Change the name
+	wcscpy(c->controlname, w_newname);
 
 	return 0;
 }
@@ -310,8 +334,8 @@ struct renamed_control
 
 int control_clone(control *c)
 {
-	static char tmp_file[] = "BBI_TEMPFILE.$$$";
-	config_file_out = config_open(tmp_file, "wt");
+	wchar_t const tmp_file[] = L"BBI_TEMPFILE.$$$";
+	config_file_out = config_open(tmp_file, L"wt");
 	if (NULL == config_file_out) return 1;
 
 	c->windowptr->x += 3;
@@ -921,14 +945,14 @@ void control_registertype(
 	bool    can_parentless,
 	bool    can_parent,
 	bool    can_child,
-	char    id,
+	int    id,
 	int     (*func_create)(control *c),
 	int     (*func_destroy)(control *c),
 	LRESULT (*func_event)(control *c, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam),
 	void    (*func_notify)(control *c, int notifytype, void *messagedata),
 	int     (*func_message)(control *c, int tokencount, wchar_t *tokens[]),
 	void*   (*func_getdata)(control *c, int datatype),
-	bool    (*func_getstringvalue)(control *c, wchar_t *buffer, wchar_t *propertyname),
+	bool    (*func_getstringvalue)(control *c, wchar_t *buffer, size_t n, wchar_t const *propertyname),
 	void    (*func_menu_context)(std::shared_ptr<bb::MenuConfig> m, control *c),
 	void    (*func_notifytype)(int notifytype, void *messagedata)
 	)
@@ -1024,8 +1048,11 @@ int control_message_create(int tokencount, wchar_t *tokens[], bool ischild, modu
 	else
 	if (index_newname + 1 == tokencount)
 	{
+		char tmp[64];
+		bb::codecvt_utf16_utf8(tokens[index_newname], wcslen(tokens[index_newname]), tmp, 64);
+
 		//We were given a name - check it for proper encoding
-		if (!control_is_valid_name(tokens[index_newname]))
+		if (!control_is_valid_name(tmp))
 			return 1;
 
 		//Create the control, return the result
@@ -1142,10 +1169,10 @@ control* control_get(const wchar_t *name, module* deflt)
 //##################################################
 //control_getstringdata
 //##################################################
-bool control_getstringdata(control *c, wchar_t *buffer, wchar_t *propertyname)
+bool control_getstringdata(control *c, wchar_t * buffer, size_t buffsz, wchar_t const * propertyname)
 {
 	if (c == NULL) return NULL;
-	return c->controltypeptr->func_getstringvalue(c, buffer, propertyname);
+	return c->controltypeptr->func_getstringvalue(c, buffer, buffsz, propertyname);
 }
 
 //##################################################

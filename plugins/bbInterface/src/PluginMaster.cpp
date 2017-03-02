@@ -44,7 +44,7 @@
 
 #include "AgentType_Broam.h"
 #include "AgentType_Winamp.h"
-#include "AgentType_iTunes.h"
+//#include "AgentType_iTunes.h"
 #include "AgentType_Mixer.h"
 #include "AgentType_StaticText.h"
 #include "AgentType_CompoundText.h"
@@ -70,10 +70,17 @@
 
 /*=================================================*/
 //Plugin information
+const char szVersionA[] = "BBInterface 0.9.10_bbTT";   // Used in MessageBox titlebars
+const char szAppNameA[] = "BBInterface";          // The name of our window class, etc.
+const char szInfoVersionA[] = "0.9.10_bbTT";
+const char szInfoAuthorA[] = "psyci - additions by grischka/kana/ysuke/pkt-zer0/kazmix";
+const char szInfoRelDateA[] = "2016/10/09";
+const char szInfoLinkA[] = "";
+const char szInfoEmailA[] = "";
 
-const wchar_t szVersion      [] = L"BBInterface 0.9.9_bbTT";   // Used in MessageBox titlebars
+const wchar_t szVersion      [] = L"BBInterface 0.9.10_bbTT";   // Used in MessageBox titlebars
 const wchar_t szAppName      [] = L"BBInterface";          // The name of our window class, etc.
-const wchar_t szInfoVersion  [] = L"0.9.9_bbTT";
+const wchar_t szInfoVersion  [] = L"0.9.10_bbTT";
 const wchar_t szInfoAuthor   [] = L"psyci - additions by grischka/kana/ysuke/pkt-zer0/kazmix";
 const wchar_t szInfoRelDate  [] = L"2010/10/09";
 const wchar_t szInfoLink     [] = L"";
@@ -172,9 +179,10 @@ extern "C"
 {
 	BBI_API int beginPlugin(HINSTANCE hMainInstance);
 	BBI_API void endPlugin(HINSTANCE hMainInstance);
-	BBI_API LPCWSTR pluginInfo(int field);
+	BBI_API LPCSTR pluginInfo(int field);
 	BBI_API int beginSlitPlugin(HINSTANCE hMainInstance, HWND hSlit);
 	BBI_API int beginPluginEx(HINSTANCE hMainInstance, HWND hSlit);
+	BBI_API LPCWSTR pluginInfoW(int field);
 }
 
 /*=================================================*/
@@ -366,20 +374,36 @@ void endPlugin(HINSTANCE hMainInstance)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //pluginInfo
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-LPCWSTR pluginInfo(int field)
+LPCSTR pluginInfo(int field)
 {
 	switch (field)
 	{
 		default:
-		case 0: return szVersion;
-		case 1: return szAppName;
-		case 2: return szInfoVersion;
-		case 3: return szInfoAuthor;
-		case 4: return szInfoRelDate;
-		case 5: return szInfoLink;
-		case 6: return szInfoEmail;
+		case 0: return szVersionA;
+		case 1: return szAppNameA;
+		case 2: return szInfoVersionA;
+		case 3: return szInfoAuthorA;
+		case 4: return szInfoRelDateA;
+		case 5: return szInfoLinkA;
+		case 6: return szInfoEmailA;
 	}
 }
+
+LPCWSTR pluginInfoW (int field)
+{
+	switch (field)
+	{
+	default:
+	case 0: return szVersion;
+	case 1: return szAppName;
+	case 2: return szInfoVersion;
+	case 3: return szInfoAuthor;
+	case 4: return szInfoRelDate;
+	case 5: return szInfoLink;
+	case 6: return szInfoEmail;
+	}
+}
+
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //plugin_startup
@@ -731,7 +755,7 @@ void plugin_agents_startup()
 	agenttype_broam_startup();
 	agenttype_system_startup();
 	agenttype_winamp_startup();
-	agenttype_itunes_startup();
+//	agenttype_itunes_startup();
 	agenttype_mixer_startup();
 	agenttype_statictext_startup();
 	agenttype_compoundtext_startup();
@@ -756,7 +780,7 @@ void plugin_agents_shutdown()
 	agenttype_broam_shutdown();
 	agenttype_system_shutdown();
 	agenttype_winamp_shutdown();
-	agenttype_itunes_shutdown();
+//	agenttype_itunes_shutdown();
 	agenttype_mixer_shutdown();
 	agenttype_statictext_shutdown();
 	agenttype_compoundtext_shutdown();

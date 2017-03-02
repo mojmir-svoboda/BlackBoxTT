@@ -311,16 +311,9 @@ static bool defMenuExists(LPCWSTR IDString_start)
 
 static bool menu_exists(control *c)
 {
-	static bool (*pMenuExists)(LPCWSTR IDString_start);
-	if (NULL == pMenuExists)
-	{
-		*(FARPROC*)&pMenuExists = GetProcAddress(GetModuleHandle(NULL), L"MenuExists");
-		if (NULL == pMenuExists) pMenuExists = defMenuExists;
-	}
-
 	wchar_t menu_id[200];
 	get_menu_id(menu_id, 200, c, NULL, NULL);
-	return pMenuExists(menu_id);
+	return MenuExists(menu_id);
 }
 
 static bool menu_initialize(control *c, bool pop)

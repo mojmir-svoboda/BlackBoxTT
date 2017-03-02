@@ -213,7 +213,7 @@ int module_get_info(wchar_t const *filename, module *m)
 	if (!plugin_suppresserrors)
 	{
 		wchar_t tmp[1024];
-		swprintf(tmp, L"%s:\nThere was an error loading the module.", filename);
+		swprintf(tmp, 1024, L"%s:\nThere was an error loading the module.", filename);
 		MessageBox(NULL, tmp, szAppName, MB_OK|MB_SYSTEMMODAL);
 	}
 	return 1;

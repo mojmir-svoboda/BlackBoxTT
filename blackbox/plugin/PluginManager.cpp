@@ -45,13 +45,15 @@ void PluginManager::LoadPlugin (bbstring const & plugin_id)
 }
 void PluginManager::UnloadPlugin (bbstring const & plugin_id)
 {
-	for (PluginInfoPtr & pi : m_tmp)
+	for (PluginInfoPtr & pi : m_infos.m_infos)
 	{
 		TRACE_MSG(LL_INFO, CTX_BB | CTX_PLUGINMGR, "Unloading plugin: %ws", pi->m_config.m_name.c_str());
-		if (pi->m_isSlit)
-			m_hSlit = nullptr;
-
-		pi->UnloadPlugin();
+		if (plugin_id == pi->m_config.m_name && pi->m_enabled)
+		{
+			pi->UnloadPlugin();
+			if (pi->m_isSlit)
+				m_hSlit = nullptr;
+		}
 	}
 }
 bool PluginManager::IsPluginLoaded (bbstring const & plugin_id) const
@@ -65,7 +67,8 @@ bool PluginManager::IsPluginLoaded (bbstring const & plugin_id) const
 bool PluginManager::Init (PluginsConfig const & cfg)
 {
 	TRACE_SCOPE(LL_INFO, CTX_BB | CTX_PLUGINMGR | CTX_INIT);
-	m_tmp = std::move(m_infos.m_infos);
+
+	std::vector<PluginInfoPtr> m_tmp = std::move(m_infos.m_infos);
 
 	for (PluginConfig const & pc : cfg.m_plugins)
 	{
