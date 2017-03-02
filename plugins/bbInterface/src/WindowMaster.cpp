@@ -7,6 +7,7 @@
 // Global Include
 #include <blackbox/plugin/bb.h>
 #include <bblibcompat/StyleStruct.h>
+#include <bblibcompat/iminmax.h>
 #include <shellapi.h>
 #include <stdlib.h>
 //#include "BB.h"
