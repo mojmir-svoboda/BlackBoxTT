@@ -357,26 +357,27 @@ void get_property_by_name(wchar_t *targetstr, size_t n, control *c, wchar_t cons
 wchar_t *message_preprocess(wchar_t *buffer, module* defmodule)
 {
 	wchar_t *start = buffer, *end = NULL;
-	while (NULL != (start = strchr(start, '$')) && NULL != (end = strchr(start+1, '$')))
+	while (NULL != (start = wcschr(start, L'$')) && NULL != (end = wcschr(start + 1, L'$')))
 	{
 		int varlen = ++end - start - 2;
 		const wchar_t *replacement = NULL;
 		if (varlen)
 		{
-			wchar_t expression[400]; extract_string(expression, start+1, varlen);
+			wchar_t expression[400];
+			extract_string(expression, start + 1, varlen);
 			if (0 == memcmp(expression, "Mouse.", 6))
 			{
 				POINT pt; GetCursorPos(&pt);
 				switch (expression[6]) {
-				case 'X': sprintf(expression, "%d", (int)pt.x-10),  replacement = expression; break;
-				case 'Y': sprintf(expression, "%d", (int)pt.y-10),  replacement = expression; break;
+				case 'X': swprintf(expression, 400, L"%d", (int)pt.x-10),  replacement = expression; break;
+				case 'Y': swprintf(expression, 400, L"%d", (int)pt.y-10),  replacement = expression; break;
 				}
 			}
 			// Check if it's indirect access
 			else if (expression[0] == '*')
 			{
 				//Indirection.
-				if (wchar_t* cnameend = strchr(expression, '.')) // Refers to a property of a control.
+				if (wchar_t* cnameend = wcschr(expression, L'.')) // Refers to a property of a control.
 				{
 					wchar_t cname[64], propname[64];
 					int cnamelen = cnameend-expression-1;
@@ -384,7 +385,7 @@ wchar_t *message_preprocess(wchar_t *buffer, module* defmodule)
 					extract_string(propname, cnameend+1, varlen-cnamelen-1);
 					if (control *c = control_get(variables_get(cname, NULL, defmodule),defmodule) )
 					{
-						get_property_by_name(expression, c, propname);
+						get_property_by_name(expression, 400, c, propname);
 						replacement = expression;
 					} else replacement = NULL; // No '.' in other variable names - we failed locating the control.
 				}
@@ -397,44 +398,44 @@ wchar_t *message_preprocess(wchar_t *buffer, module* defmodule)
 			else
 			{
 				//No indirection.
-				if (wchar_t* cnameend = strchr(expression, '.')) // Refers to a property of a control.
+				if (wchar_t* cnameend = wcschr(expression, L'.')) // Refers to a property of a control.
 				{
 					wchar_t cname[64], propname[64];
 					int cnamelen = cnameend-expression;
 					extract_string(cname, expression, cnamelen);
 					extract_string(propname, cnameend+1, varlen-cnamelen-1);
 					// Try and look up the control with the given name
-					if (!strcmp(cname,"DroppedFile")) // "fake" properties of the DroppedFile
+					if (!wcscmp(cname, L"DroppedFile")) // "fake" properties of the DroppedFile
 					{
-						wcscpy(expression, variables_get("DroppedFile", NULL, defmodule));
-						if (!strcmp(propname, "Path"))
+						wcscpy(expression, variables_get(L"DroppedFile", NULL, defmodule));
+						if (!wcscmp(propname, L"Path"))
 						{
-							wchar_t* s = strrchr(expression, '\\');
+							wchar_t* s = wcsrchr(expression, L'\\');
 							replacement = s ? *s = 0, expression : NULL;
 						}
-						else if (!strcmp(propname, "Name"))
+						else if (!wcscmp(propname, L"Name"))
 						{
-							wchar_t* s = strrchr(expression, '\\');
-							wchar_t* t = strrchr(expression, '.');
+							wchar_t* s = wcsrchr(expression, L'\\');
+							wchar_t* t = wcsrchr(expression, L'.');
 							s = s ? s+1 : expression; // step s past final slash, or set to start
 							if (t && (t-s > 0)) *t = 0;
 							replacement = s;
 						}
-						else if (!strcmp(propname, "Extension"))
+						else if (!wcscmp(propname, L"Extension"))
 						{
-							wchar_t* s = strrchr(expression, '.');
+							wchar_t* s = wcsrchr(expression, L'.');
 							replacement = s ? s+1 : NULL;
 						}
-						else if (!strcmp(propname, "Filename"))
+						else if (!wcscmp(propname, L"Filename"))
 						{
-							wchar_t* s = strrchr(expression, '\\');
+							wchar_t* s = wcsrchr(expression, L'\\');
 							replacement = s ? s+1 : NULL;
 						}
 						else replacement = NULL;
 					}
 					else if (control *c = control_get(cname, defmodule) )
 					{
-						get_property_by_name(expression, c, propname);
+						get_property_by_name(expression, 400, c, propname);
 						replacement = expression;
 					} else replacement = NULL; // No '.' in other variable names - we failed locating the control.
 
@@ -444,7 +445,7 @@ wchar_t *message_preprocess(wchar_t *buffer, module* defmodule)
 
 		}
 		else
-			replacement = "$"; // default: $$ becomes $
+			replacement = L"$"; // default: $$ becomes $
 
 		if (replacement)
 		{
