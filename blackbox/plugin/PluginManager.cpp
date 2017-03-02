@@ -250,6 +250,16 @@ plugin_errors PluginInfo::LoadPlugin (HWND hSlit)
 
 bool PluginInfo::UnloadPlugin()
 {
+	plugin_errors error = error_plugin_success;
+	__try
+	{
+		m_endPlugin(m_module);
+	}
+	__except(EXCEPTION_EXECUTE_HANDLER)
+	{
+		error = error_plugin_crash_on_unload;
+	}
+
 	if (m_module)
 		FreeLibrary(m_module);
 	m_enabled = false;

@@ -184,29 +184,33 @@ int beginSlitPlugin (HINSTANCE hPluginInstance, HWND hwndBBSlit)
 
 void endPlugin (HINSTANCE hPluginInstance)
 {
-	if (!hwndSlit)
-		return;
-
-	getSettings().WriteRCSettings();
-
-	if (hwndSlit)
+	if (SlitExists && getSettings().FooDockedToSlit)
 	{
 		// Remove from slit...
 		SendMessage(hwndSlit, SLIT_REMOVE, NULL, (LPARAM)hwndPlugin);
-		// Kill update timer...
-		KillTimer(hwndPlugin, BBFOOMP_UPDATE_TIMER);
-		// Delete the main plugin menu if it exists (PLEASE NOTE: This takes care of submenus as well!)
-		if (scMenu) 
-			DelMenu(scMenu);
-		// Unregister Blackbox messages...
-		SendMessage(hwndBlackbox, BB_UNREGISTERMESSAGE, (WPARAM)hwndPlugin, (LPARAM)msgs);
-		// Destroy our window...
-		DestroyWindow(hwndPlugin);
-		// Unregister window class...
-		UnregisterClass(szAppNameW, hPluginInstance);
-		// Delete used FooInfo...
-		if (FooClass) delete FooClass;
 	}
+
+	getSettings().WriteRCSettings();
+
+	// Kill update timer...
+	KillTimer(hwndPlugin, BBFOOMP_UPDATE_TIMER);
+	// Delete the main plugin menu if it exists (PLEASE NOTE: This takes care of submenus as well!)
+	if (scMenu) 
+		DelMenu(scMenu);
+	// Unregister Blackbox messages...
+	SendMessage(hwndBlackbox, BB_UNREGISTERMESSAGE, (WPARAM)hwndPlugin, (LPARAM)msgs);
+	// Destroy our window...
+	DestroyWindow(hwndPlugin);
+	// Unregister window class...
+	UnregisterClass(szAppNameW, hPluginInstance);
+
+	// Delete used FooInfo...
+	if (FooClass)
+	{
+		delete FooClass;
+		FooClass = nullptr;
+	}
+
 }
 
 //===========================================================================
