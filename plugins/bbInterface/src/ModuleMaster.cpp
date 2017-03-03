@@ -227,7 +227,7 @@ int module_message(int tokencount, wchar_t *tokens[], bool from_core, module* ca
 
 	if ((tokencount == 3) && !_wcsicmp(tokens[2], szBActionCreate))
 	{
-		if (filename = dialog_file(szFilterScript, L"Save new Module in...", L".rc", config_path_plugin, true))
+		if (filename = dialog_file(szFilterScript, L"Save new Module in...", config_path_plugin, L".rc", true))
 		{
 			if (module *m = module_create_new(filename)) { module_toggle(m); return 0; }
 			else return 1;
@@ -237,7 +237,7 @@ int module_message(int tokencount, wchar_t *tokens[], bool from_core, module* ca
 	{
 		if (tokencount == 3)
 		{
-			if ((filename = dialog_file(szFilterScript, L"Load BBI Module", L".rc", config_path_plugin, false)))
+			if ((filename = dialog_file(szFilterScript, L"Load BBI Module", config_path_plugin, L".rc", false)))
 			{
 				if (module *m = module_create(filename)) module_toggle(m);
 				else return 1;

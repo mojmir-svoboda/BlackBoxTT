@@ -401,7 +401,7 @@ const wchar_t * check_relative_path(const wchar_t *filename)
 	bb::getExePath(bb_path, MAX_PATH);
 	int len = wcslen(bb_path);
 
-	if (0 == _memicmp(bb_path, filename, len))
+	if (0 == wcsnicmp(bb_path, filename, len))
 		return filename + len;
 	return filename;
 }

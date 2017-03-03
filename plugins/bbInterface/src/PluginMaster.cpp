@@ -123,7 +123,7 @@ L"Alt + Drag = Resize\n"
 
 //Strings used frequently
 const wchar_t szBBroam                     []  = L"@BBInterface";
-const int szBBroamLength = sizeof szBBroam-1;
+const int szBBroamLength = sizeof(szBBroam) / sizeof(*szBBroam) -1;
 
 const wchar_t szBEntityControl             [] = L"Control";
 const wchar_t szBEntityAgent               [] = L"Agent";
@@ -564,7 +564,7 @@ int plugin_message(int tokencount, wchar_t *tokens[], bool from_core, module* ca
 		}
 		else
 		{       
-			if ((filename = dialog_file(szFilterScript, L"Save Configuration Script", L".rc", config_path_plugin, true)))
+			if ((filename = dialog_file(szFilterScript, L"Save Configuration Script", config_path_plugin, L".rc", true)))
 			{
 				config_save(filename);
 			}           
@@ -585,7 +585,7 @@ int plugin_message(int tokencount, wchar_t *tokens[], bool from_core, module* ca
 		}
 		else if (tokencount == 3)
 		{
-			if ((filename = dialog_file(szFilterScript, L"Load Configuration Script", L".rc", config_path_plugin, false)))
+			if ((filename = dialog_file(szFilterScript, L"Load Configuration Script", config_path_plugin, L".rc", false)))
 			{
 				config_load2(filename, caller);
 			}

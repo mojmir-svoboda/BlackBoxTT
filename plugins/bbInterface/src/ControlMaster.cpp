@@ -306,7 +306,7 @@ int control_saveas_control(control *c, int tokencount, wchar_t **tokens)
 	//If the browse option is chosen
 	if (!_wcsicmp(filename, L"*browse*"))
 	{       
-		filename = dialog_file(szFilterScript, L"Save This Control As", L".rc", config_path_plugin, true);
+		filename = dialog_file(szFilterScript, L"Save This Control As", config_path_plugin, L".rc", true);
 		if (!filename)
 		{
 			//message_override = true;

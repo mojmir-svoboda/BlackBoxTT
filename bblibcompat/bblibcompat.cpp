@@ -807,13 +807,12 @@ skip:
 		wchar_t message[1024];
 		wchar_t * m_ptr = message;
 		vswprintf(m_ptr, 1024, fmt, args);
-		if (L'#' == p[0] && NULL != (q = wcschr(p + 1, p[0])))
-			// "#Title#Message" is wanted
-			*q = 0, caption = p + 1, m_ptr = q + 1;
-
 		int r = MessageBox (NULL, m_ptr, caption, flg | MB_SYSTEMMODAL);
 		return r;
 
+// 		if (L'#' == p[0] && NULL != (q = wcschr(p + 1, p[0])))
+// 			// "#Title#Message" is wanted
+// 			*q = 0, caption = p + 1, m_ptr = q + 1;
 		// 	static int (WINAPI *pMessageBoxIndirectW)(CONST MSGBOXPARAMSW*);
 		// 
 		// 	va_start(args, fmt);

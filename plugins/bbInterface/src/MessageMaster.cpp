@@ -8,6 +8,7 @@
 #include <blackbox/plugin/bb.h>
 #include <stdlib.h>
 #include <shellapi.h>
+#include <cwctype>
 
 //Includes
 #include "AgentMaster.h"
@@ -78,23 +79,23 @@ void message_interpret(const wchar_t *message, bool from_core, module* caller)
 	wchar_t buffer[BBI_MAX_LINE_LENGTH];
 
 	// Check, if the message is for us...
-	if (memcmp(message, szBBroam, szBBroamLength))
+	if (wcsncmp(message, szBBroam, szBBroamLength))
 	{
 		//The standard BlackBox Messages
-		if (!_wcsicmp(message, L"@BBShowPlugins"))
+		if (!wcsicmp(message, L"@BBShowPlugins"))
 		{
 			control_pluginsvisible(true);
 			return;
 		}
-		if (!_wcsicmp(message, L"@BBHidePlugins"))
+		if (!wcsicmp(message, L"@BBHidePlugins"))
 		{
 			control_pluginsvisible(false);
 			return;
 		}
-		if (!_memicmp(message, L"@Script",7))
+		if (!_wcsnicmp(message, L"@Script", 7))
 		{
-			wchar_t* buf = new wchar_t[wcslen(message)+1]; // local buffer.
-			wcscpy(buf,message); //NOTE: possible alternate method would be copying out the messages one by one.
+			wchar_t * buf = new wchar_t[ wcslen(message) + 1 ]; // local buffer.
+			wcscpy(buf, message); //NOTE: possible alternate method would be copying out the messages one by one.
 			wchar_t *start = wcschr(buf, L'[');
 			wchar_t *end = wcsrchr(buf, L']');
 			if (start && end)
@@ -120,7 +121,9 @@ void message_interpret(const wchar_t *message, bool from_core, module* caller)
 			return;
 		}
 
-		if (from_core) return;
+		if (from_core)
+			return;
+
 		message = message_preprocess(wcscpy(buffer, message)); //NOTE: FIX, possibly should this use the caller argument as well?
 		if ('@' == message[0])
 		{
@@ -267,34 +270,38 @@ int tokenize_message(const wchar_t * srcString, int nBuffers, wchar_t **lpszBuff
 	while (tokencount < nBuffers)
 	{
 		const wchar_t *a, *e; wchar_t  c;
-		while (0 != (c = *srcString) && (unsigned wchar_t) c <= 32 ) ++srcString;
+		while (0 != (c = *srcString) && (std::iswcntrl(c) || std::iswspace(c)))
+			++srcString;
 		if (0 == c) break;
 
 		if (L'\"' == c)
 		{
-			a = ++srcString, e = (srcString += strlen(a));
+			a = ++srcString, e = (srcString += wcslen(a));
 			if (e > a && e[-1] == L'\"') --e;
 		}
 		else
 		{
 			a = srcString;
-			while (0 != (c = *srcString) && (unsigned wchar_t) c > L' ')
+			//while (0 != (c = *srcString) && (unsigned wchar_t) c > L' ')
+			while (0 != (c = *srcString) && (!std::iswcntrl(c) && !std::iswspace(c)))
 			{
 				++srcString;
 				//if ('$' == c) { e = strchr(srcString, c); if (e) srcString = e+1; }
 			}
 			e = srcString;
-			while (e > a && (unsigned wchar_t) e[-1] <= 32) --e;
+			//while (e > a && (unsigned wchar_t) e[-1] <= 32)
+			while (e > a && (std::iswcntrl(e[-1]) || std::iswspace(e[-1])))
+				--e;
 			if (c) ++srcString;
 		}
 
 		int len = e - a;
-		extract_string(buffer_ptr, a, len);
+		extract_string(buffer_ptr, a, len + 1);
 
 		// Removed "buffer_ptr[0] != '@'" from the 'if'
 		// dont preprocess (quoted) broams
-		if (strchr(buffer_ptr, '$'))
-			len = strlen(message_preprocess(buffer_ptr,defmodule));
+		if (wcschr(buffer_ptr, L'$'))
+			len = wcslen(message_preprocess(buffer_ptr, defmodule));
 
 		*lpszBuffers++ = buffer_ptr;
 		buffer_ptr += len + 1;
@@ -364,13 +371,13 @@ wchar_t *message_preprocess(wchar_t *buffer, module* defmodule)
 		if (varlen)
 		{
 			wchar_t expression[400];
-			extract_string(expression, start + 1, varlen);
-			if (0 == memcmp(expression, "Mouse.", 6))
+			extract_string(expression, start + 1, varlen + 1);
+			if (0 == wcsncmp(expression, L"Mouse.", 6))
 			{
 				POINT pt; GetCursorPos(&pt);
 				switch (expression[6]) {
-				case 'X': swprintf(expression, 400, L"%d", (int)pt.x-10),  replacement = expression; break;
-				case 'Y': swprintf(expression, 400, L"%d", (int)pt.y-10),  replacement = expression; break;
+					case 'X': swprintf(expression, 400, L"%d", (int)pt.x-10),  replacement = expression; break;
+					case 'Y': swprintf(expression, 400, L"%d", (int)pt.y-10),  replacement = expression; break;
 				}
 			}
 			// Check if it's indirect access
@@ -381,8 +388,8 @@ wchar_t *message_preprocess(wchar_t *buffer, module* defmodule)
 				{
 					wchar_t cname[64], propname[64];
 					int cnamelen = cnameend-expression-1;
-					extract_string(cname, expression+1, cnamelen);
-					extract_string(propname, cnameend+1, varlen-cnamelen-1);
+					extract_string(cname, expression+1, cnamelen +1);
+					extract_string(propname, cnameend+1, varlen-cnamelen);
 					if (control *c = control_get(variables_get(cname, NULL, defmodule),defmodule) )
 					{
 						get_property_by_name(expression, 400, c, propname);
@@ -402,8 +409,8 @@ wchar_t *message_preprocess(wchar_t *buffer, module* defmodule)
 				{
 					wchar_t cname[64], propname[64];
 					int cnamelen = cnameend-expression;
-					extract_string(cname, expression, cnamelen);
-					extract_string(propname, cnameend+1, varlen-cnamelen-1);
+					extract_string(cname, expression, cnamelen + 1);
+					extract_string(propname, cnameend+1, varlen-cnamelen);
 					// Try and look up the control with the given name
 					if (!wcscmp(cname, L"DroppedFile")) // "fake" properties of the DroppedFile
 					{
@@ -449,9 +456,9 @@ wchar_t *message_preprocess(wchar_t *buffer, module* defmodule)
 
 		if (replacement)
 		{
-			int newlen = strlen(replacement);
-			memmove(start + newlen, end, strlen(end) + 1);
-			memmove(start, replacement, newlen);
+			int newlen = wcslen(replacement);
+			wmemmove(start + newlen, end, wcslen(end) + 1);
+			wmemmove(start, replacement, newlen);
 			end = start + newlen;
 		}
 		start = end;
