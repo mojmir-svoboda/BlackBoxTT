@@ -27,7 +27,6 @@ wchar_t mixer_outputbuffer[32] = L"";
 
 int agenttype_mixer_startup_vista ()
 {
-	CoInitialize(NULL);
 	//Register this type with the ControlMaster
 	agent_registertype(
 		L"Mixer",                            //Friendly name of agent type
@@ -63,7 +62,6 @@ int agenttype_mixer_startup_vista ()
 
 int agenttype_mixer_shutdown_vista ()
 {
-	CoUninitialize();
 	return 0;
 }
 

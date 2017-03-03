@@ -213,10 +213,6 @@ bool plugin_load = false;
 int plugin_icon_sat = 255;
 int plugin_icon_hue = 0;
 
-//using COM 
-bool com_initialized = false;
-CComModule _Module;
-
 //Font List
 std::list<bbstring> fontList;
 bool flist_initialized = false;
@@ -300,15 +296,6 @@ int beginPlugin(HINSTANCE hMainInstance)
 		MB_ICONWARNING|MB_DEFBUTTON2|MB_YESNO);
 	if (result != IDYES) return 0;
 #endif
-	if(!com_initialized){
-		if(SUCCEEDED(::CoInitialize(NULL)) ){
-			_Module.Init(NULL, ::GetModuleHandle(NULL),NULL);
-			com_initialized = true;
-		}else{
-			MessageBox(0, L"Error initializing COM", szAppName, MB_OK | MB_ICONERROR | MB_TOPMOST);
-			return 1;
-		}
-	}
 
 	//get font list 
 	if(!flist_initialized){
@@ -358,11 +345,6 @@ void endPlugin(HINSTANCE hMainInstance)
 	if(locale){
 		_free_locale(locale);
 		locale = NULL;
-	}
-	if(com_initialized){
-		_Module.Term();
-		::CoUninitialize(); 
-		com_initialized = false;
 	}
 
 #ifdef _DEBUG

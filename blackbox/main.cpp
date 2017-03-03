@@ -6,7 +6,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 {
 	bb::initTrace("BBTT", "127.0.0.1", "13127");
 	TRACE_MSG(LL_INFO, CTX_BB, "Loading...");
-	::CoInitialize(nullptr);
+	::CoInitializeEx(nullptr, COINIT_MULTITHREADED | COINIT_DISABLE_OLE1DDE);
 
 	bb::BlackBox & bb = bb::BlackBox::Instance();
 	if (bb.Init(hInstance))
