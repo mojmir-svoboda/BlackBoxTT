@@ -49,7 +49,19 @@ namespace imgui {
 
 		char name[256];
 		codecvt_utf16_utf8(GetId(), name, 256);
-		ImGui::Begin(name, &m_config.m_show, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+		bool win_opened = true;
+		if (!ImGui::Begin(name, &win_opened, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize))
+		{
+			ImGui::End();
+			return;
+		}
+
+		if (!win_opened)
+		{
+			ImGui::End();
+			m_gfxWindow->SetDestroyTree();
+			return;
+		}
 
 		ImGui::ShowStyleEditor();
 

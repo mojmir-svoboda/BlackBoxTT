@@ -91,7 +91,19 @@ namespace imgui {
 			resizeWindowToContents(m_gfxWindow->m_hwnd, m_contentSize.x, m_contentSize.y, style.WindowMinSize.x, style.WindowMinSize.y, style.WindowRounding);
 		}
 
-		ImGui::Begin(title, &m_config.m_show, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);
+		bool win_opened = true;
+		if (!ImGui::Begin(title, &win_opened, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize))
+		{
+			ImGui::End();
+			return;
+		}
+
+		if (!win_opened)
+		{
+			ImGui::End();
+			m_gfxWindow->SetDestroyTree();
+			return;
+		}
 
 		UpdateTasks();
 
