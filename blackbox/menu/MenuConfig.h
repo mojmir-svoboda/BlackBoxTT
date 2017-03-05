@@ -17,6 +17,7 @@ namespace bb {
 		e_MenuItemBroam,
 		e_MenuItemBroamBool,
 		e_MenuItemBroamInt,
+		e_MenuItemBroamString,
 	};
 
 	struct MenuConfig;
@@ -100,6 +101,12 @@ namespace bb {
 		int m_val { 0 };
 		int m_max { 0 };
 		MenuConfigItemBroamInt (bbstring const & name, bbstring const & broam, int min, int val, int max) : MenuConfigItem(e_MenuItemBroamInt, name), m_broam(broam), m_min(min), m_val(val), m_max(max) { }
+	};
+	struct MenuConfigItemBroamString : MenuConfigItem
+	{
+		bbstring m_broam;
+		bbstring m_text;
+		MenuConfigItemBroamString (bbstring const & name, bbstring const & broam, bbstring const & text) : MenuConfigItem(e_MenuItemBroamString, name), m_broam(broam), m_text(text) { }
 	};
 }
 

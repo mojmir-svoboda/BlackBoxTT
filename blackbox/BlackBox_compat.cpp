@@ -123,26 +123,12 @@ void UpdateMenu (std::shared_ptr<bb::MenuConfig> pluginMenu)
 	}
 }
 
-//===========================================================================
-// API: MakeSubmenu
-//===========================================================================
-
 bb::MenuConfigItem * MakeSubmenu (std::shared_ptr<bb::MenuConfig> parentMenu, std::shared_ptr<bb::MenuConfig> childMenu, wchar_t const * title)
 {
 	std::shared_ptr<bb::MenuConfigItemSubMenu> item(new bb::MenuConfigItemSubMenu(title, childMenu));
 	parentMenu->m_items.push_back(item);
 	return item.get();
-// 	//dbg_printf("MakeSubmenu %x %s - %x %s", ParentMenu, ParentMenu->m_pMenuItems->m_pszTitle, ChildMenu, Title);
-// 	if (Title)
-// 		Title = NLS1(Title);
-// 	else
-// 		Title = ChildMenu->m_pMenuItems->m_pszTitle;
-// 	return ParentMenu->AddMenuItem(new FolderItem(ChildMenu, Title));
 }
-
-//===========================================================================
-// API: MakeMenuItem
-//===========================================================================
 
 bb::MenuConfigItem * MakeMenuItem (std::shared_ptr<bb::MenuConfig> menu, wchar_t const * title, wchar_t const * cmd)
 {
@@ -158,10 +144,6 @@ bb::MenuConfigItem * MakeMenuItemBool (std::shared_ptr<bb::MenuConfig> menu, con
 	return item.get();
 }
 
-//===========================================================================
-// API: MakeMenuItemInt
-//===========================================================================
-
 bb::MenuConfigItem * MakeMenuItemInt (std::shared_ptr<bb::MenuConfig> menu, wchar_t const * title, wchar_t const * cmd, int val, int minval, int maxval)
 {
 	std::shared_ptr<bb::MenuConfigItemBroamInt> item(new bb::MenuConfigItemBroamInt(title, cmd, minval, val, maxval));
@@ -169,15 +151,11 @@ bb::MenuConfigItem * MakeMenuItemInt (std::shared_ptr<bb::MenuConfig> menu, wcha
 	return item.get();
 }
 
-//===========================================================================
-// API: MakeMenuItemString
-//===========================================================================
-
-bb::MenuConfigItem *MakeMenuItemString(std::shared_ptr<bb::MenuConfig>pluginMenu, wchar_t const * Title, wchar_t const * Cmd, wchar_t const * init_string)
+bb::MenuConfigItem * MakeMenuItemString (std::shared_ptr<bb::MenuConfig> menu, wchar_t const * title, wchar_t const * cmd, wchar_t const * init_string)
 {
-	return nullptr;
-// 	return helper_menu(pluginMenu, Title, MENU_ID_STRING,
-// 		new StringItem(Cmd, init_string));
+	std::shared_ptr<bb::MenuConfigItemBroamString> item(new bb::MenuConfigItemBroamString(title, cmd, init_string));
+	menu->m_items.push_back(item);
+	return item.get();
 }
 
 //===========================================================================

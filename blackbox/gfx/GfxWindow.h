@@ -1,6 +1,7 @@
 #pragma once
 #include "platform_win.h"
 #include <bblib/bbstring.h>
+#include <algorithm>
 
 namespace bb {
 	struct Gui;
@@ -48,6 +49,7 @@ namespace bb {
 		GfxWindow * GetParent () { return m_parent; }
 		GfxWindow const * GetParent () const { return m_parent; }
 		bool AddChild (GfxWindow * child) { m_children.push_back(child); return true; }
+		bool RemoveChild (GfxWindow * child) { m_children.erase(std::remove(m_children.begin(), m_children.end(), child), m_children.end()); return true; }
 		GfxWindow * GetRoot ()
 		{
 			GfxWindow * root = this;

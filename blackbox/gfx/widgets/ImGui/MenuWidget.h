@@ -23,6 +23,7 @@ namespace imgui {
 		void DrawBroam (size_t idx, std::shared_ptr<MenuConfigItem> item);
 		void DrawBroamInt (size_t idx, std::shared_ptr<MenuConfigItem> item);
 		void DrawBroamBool (size_t idx, std::shared_ptr<MenuConfigItem> item);
+		void DrawBroamString (size_t idx, std::shared_ptr<MenuConfigItem> item);
 
 		void DrawCheckBox (size_t idx, std::shared_ptr<MenuConfigItem> item);
 		void DrawScript (size_t idx, std::shared_ptr<MenuConfigItem> item);

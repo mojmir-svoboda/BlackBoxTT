@@ -85,6 +85,7 @@ namespace imgui {
 			case e_MenuItemBroam: DrawBroam(idx, item); return;
 			case e_MenuItemBroamBool: DrawBroamBool(idx, item); return;
 			case e_MenuItemBroamInt: DrawBroamInt(idx, item); return;
+			case e_MenuItemBroamString: DrawBroamString(idx, item); return;
 // 		e_MenuItemFolder,
 // 		e_MenuItemExec,
 			default:
@@ -140,6 +141,25 @@ namespace imgui {
 			bb::BlackBox::Instance().GetBroamServer().PostCommand(L"%s %s", bbroam->m_broam.c_str(), bbroam->m_checked ? L"true" : L"false");
 
 			m_gfxWindow->GetRoot()->SetDestroyTree();
+		}
+	}
+	void MenuWidget::DrawBroamString (size_t idx, std::shared_ptr<MenuConfigItem> item)
+	{
+		Assert(item->m_type == e_MenuItemBroamString);
+		MenuConfigItemBroamString * sbroam = static_cast<MenuConfigItemBroamString *>(item.get());
+
+		char item_text[1024];
+		codecvt_utf16_utf8(item->m_name.c_str(), item_text, 1024);
+		char inputBuf[256] = {0};
+		codecvt_utf16_utf8(sbroam->m_text.c_str(), inputBuf, 256);
+		if (ImGui::InputText(item_text, inputBuf, 256, ImGuiInputTextFlags_EnterReturnsTrue))
+		{
+			codecvt_utf8_utf16(inputBuf, sbroam->m_text);
+
+			if (sbroam->m_broam.find(L"%s") != std::string::npos)
+				bb::BlackBox::Instance().GetBroamServer().PostCommand(sbroam->m_broam.c_str(), sbroam->m_text.c_str());
+			else
+				bb::BlackBox::Instance().GetBroamServer().PostCommand(L"%s %s", sbroam->m_broam.c_str(), sbroam->m_text.c_str());
 		}
 	}
 
