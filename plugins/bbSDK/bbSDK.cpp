@@ -300,7 +300,7 @@ void endPlugin (HINSTANCE hPluginInstance)
 		SendMessage(g_hSlit, SLIT_REMOVE, 0, (LPARAM)my.hwnd);
 
 	/* Destroy the window... */
-	DestroyWindow(my.hwnd);
+	::DestroyWindow(my.hwnd);
 
 	/* clean up HBITMAP object */
 	if (my.bufbmp)

@@ -82,12 +82,12 @@ void message_interpret(const wchar_t *message, bool from_core, module* caller)
 	if (wcsncmp(message, szBBroam, szBBroamLength))
 	{
 		//The standard BlackBox Messages
-		if (!wcsicmp(message, L"@BBShowPlugins"))
+		if (!_wcsicmp(message, L"@BBShowPlugins"))
 		{
 			control_pluginsvisible(true);
 			return;
 		}
-		if (!wcsicmp(message, L"@BBHidePlugins"))
+		if (!_wcsicmp(message, L"@BBHidePlugins"))
 		{
 			control_pluginsvisible(false);
 			return;

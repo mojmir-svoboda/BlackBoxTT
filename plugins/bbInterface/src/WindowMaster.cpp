@@ -281,7 +281,7 @@ int window_destroy(window **pw)
 	RemoveSticky(w->hwnd);
 
 	// Destroy the hwnd...
-	DestroyWindow(w->hwnd);
+	::DestroyWindow(w->hwnd);
 
 	// Clear cached bitmap
 	if (w->bitmap)
@@ -2342,7 +2342,7 @@ HWND window_helper_create(const wchar_t *classname)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 int window_helper_destroy(HWND hwnd)
 {
-	DestroyWindow(hwnd);
+	::DestroyWindow(hwnd);
 
 	//No errors
 	return 0;

@@ -413,7 +413,7 @@ void agenttype_diskspacemonitor_updatevalue(agenttype_diskspacemonitor_details *
 			d->value = diskfree/(double)disktotal;
 			if(d->value > 1)
 				d->value=1.0;
-			swprintf(d->str_value, 16, L"%d%%", ((int)100*d->value));
+			swprintf(d->str_value, 16, L"%d%%", (int)(100.0 * d->value));
 			break;
 		case DISKSPACEMONITOR_TYPE_DISKUSEVAL:
 			d->value = (disktotal-diskfree)/(double)disktotal;
@@ -423,7 +423,7 @@ void agenttype_diskspacemonitor_updatevalue(agenttype_diskspacemonitor_details *
 			d->value = (disktotal-diskfree)/(double)disktotal;
 			if(d->value > 1)
 				d->value=1.0;
-			swprintf(d->str_value, 16, L"%d%%", ((int)100*d->value));
+			swprintf(d->str_value, 16, L"%d%%", (int)(100.0 * d->value));
 			break;
 		default:
 			d->value=0.0;

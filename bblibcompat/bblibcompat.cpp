@@ -800,7 +800,7 @@ skip:
 	int BBMessageBox(int flg, const wchar_t *fmt, ...)
 	{
 		const wchar_t *caption = BBAPPNAMEW;
-		wchar_t *p, *q;
+//		wchar_t *p, *q;
 		va_list args;
 
 		va_start(args, fmt);

@@ -59,7 +59,7 @@ int
 tooltip_shutdown(void)
 {
 	if (tooltip_window != NULL)
-		DestroyWindow(tooltip_window);
+		::DestroyWindow(tooltip_window);
 
 	return 0;
 }
