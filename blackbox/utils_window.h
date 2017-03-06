@@ -133,6 +133,16 @@ inline void focusWindow (HWND hwnd)
 	SwitchToThisWindow(hwnd, 1);
 }
 
+inline void setOnTop (HWND hwnd)
+{
+	if (::IsWindow(hwnd) && ::IsWindowVisible(hwnd)
+		&& !(GetWindowLongPtr(hwnd, GWL_EXSTYLE) & WS_EX_TOPMOST))
+	{
+		::SetWindowPos(hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE | SWP_NOSENDCHANGING);
+	}
+}
+
+
 inline void showInFromTaskBar (HWND hwnd, bool show)
 {
 	if (show)

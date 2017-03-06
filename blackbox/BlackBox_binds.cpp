@@ -86,6 +86,7 @@ namespace bb {
 			{
 				w->MoveWindow(p.x, p.y);
 				m_tasks.Focus(w->m_gfxWindow->m_hwnd);
+				setOnTop(w->m_gfxWindow->m_hwnd);
 				w->Show(true);
 			}
 		}

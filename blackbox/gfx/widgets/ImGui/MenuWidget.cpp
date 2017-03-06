@@ -44,7 +44,7 @@ namespace imgui {
 		}
 
 		char name[256];
-		codecvt_utf16_utf8(GetId(), name, 256);
+		codecvt_utf16_utf8(m_config.m_displayName.c_str(), name, 256);
 		bool win_opened = true;
 		if (!ImGui::Begin(name, &win_opened, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize))
 		{

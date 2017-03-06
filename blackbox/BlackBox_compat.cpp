@@ -40,7 +40,7 @@ std::shared_ptr<bb::MenuConfig> MakeNamedMenu (wchar_t const * headerText, wchar
 	std::shared_ptr<bb::MenuConfig> m(new bb::MenuConfig());
 	m->m_widgetType = bb::MenuWidget::c_type;
 	m->m_id = id;
-	m->m_titlebar = headerText;
+	m->m_displayName = headerText;
 	m->m_show = true;
 	return m;
 }

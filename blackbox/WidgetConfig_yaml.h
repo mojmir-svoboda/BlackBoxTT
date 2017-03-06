@@ -12,6 +12,7 @@ namespace YAML {
 			Node node;
 			node.push_back(rhs.m_id);
 			node.push_back(rhs.m_widgetType);
+			node.push_back(rhs.m_displayName);
 			node.push_back(rhs.m_x);
 			node.push_back(rhs.m_y);
 			node.push_back(rhs.m_w);
@@ -28,6 +29,8 @@ namespace YAML {
 			{
 				rhs.m_id = node["id"].as<bbstring>();
 				rhs.m_widgetType = node["widget"].as<bbstring>();
+				if (node["name"])
+					rhs.m_displayName = node["name"].as<bbstring>();
 				if (node["x"])
 					rhs.m_x = node["x"].as<int>();
 				if (node["y"])

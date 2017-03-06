@@ -6,3 +6,4 @@
 #include <bblib/ScopeGuard.h>
 #include <Assert/Assert.h>
 #include <bblib/wcslcpy.h>
+#include <cwctype>
