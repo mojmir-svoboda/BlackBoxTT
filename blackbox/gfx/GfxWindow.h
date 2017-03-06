@@ -68,12 +68,25 @@ namespace bb {
 		}
 		void SetDestroyTree ()
 		{
+			if (m_parent)
+				m_parent->RemoveChild(this);
+
 			this->ForEach(
 				[] (bb::GfxWindow * w)
 				{
 					w->SetDestroy(true);
 				});
 		}
+
+		void SetDestroyChildren ()
+		{
+			for (GfxWindow * ch : m_children)
+				ch->ForEach(
+					[] (bb::GfxWindow * w)
+					{
+						w->SetDestroy(true);
+					});
+			m_children.clear();
+		}
 	};
 }
-

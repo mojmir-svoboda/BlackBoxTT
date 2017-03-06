@@ -249,12 +249,7 @@ namespace imgui {
 		ImGui::PushID(idx);
 		if (ImGui::Selectable(item_text, item_selected))
 		{
-			// close other
-			for (bb::GfxWindow * w : m_gfxWindow->m_children)
-			{
-				w->SetDestroyTree();
-			}
-			m_gfxWindow->m_children.clear();
+			m_gfxWindow->SetDestroyChildren();
 
 			ImGui::SameLine();
 			ImGui::Bullet();
