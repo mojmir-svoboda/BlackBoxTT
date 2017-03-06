@@ -253,11 +253,11 @@ bool get_070 (TCHAR const * path)
 void check_070 (fil_list * fl)
 {
     lin_list * tl = 0;
-    dolist(tl, fl->lines)
+    do_list(tl, fl->lines)
         if (tl->k > 11 && 0 == tmemcmp(tl->str+tl->k-11, TEXT("appearance"), 10))
             break;
     fl->is_070 = NULL != tl;
-    dolist (tl, fl->lines)
+    do_list (tl, fl->lines)
         if (stristr(tl->str+tl->k, TEXT("gradient"))
          || stristr(tl->str+tl->k, TEXT("solid")))
             break;
@@ -301,13 +301,13 @@ void write_rcfile (fil_list * fl)
 
     if (fl->tabify) {
         // calculate the max. keyword length
-        dolist (tl, fl->lines)
+        do_list (tl, fl->lines)
             if (tl->k > ml)
                 ml = tl->k;
         ml = (ml+4) & ~3; // round up to the next tabstop
     }
 
-    dolist (tl, fl->lines) {
+    do_list (tl, fl->lines) {
         TCHAR const * s = tl->str + tl->k;
         if (0 == *tl->str)
             fprintf (fp, "%s\n", s); //comment
@@ -568,7 +568,7 @@ lin_list * search_line (fil_list * fl, TCHAR const * key, int fwild, LONG * p_se
     {
         long seekpos = *p_seekpos;
         int n = 0;
-        dolist (tl, fl->lines)
+        do_list (tl, fl->lines)
             if (++n > seekpos && tl->hash == h && 0==memcmp(tl->str, buff, key_len)) {
                 *p_seekpos = n;
                 break;

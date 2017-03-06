@@ -15,7 +15,7 @@ struct string_node
     TCHAR str[1];
 };
 
-#define dolist(_e,_l) \
+#define do_list(_e,_l) \
     for (_e=(_l); _e; _e = _e->m_next)
 
 #define skipUntil(_e, _l, _pred)  \
@@ -25,7 +25,7 @@ template <typename NodeT>
 NodeT * member (NodeT * list, NodeT * e0)
 {
     NodeT * l;
-    dolist (l, list)
+    do_list (l, list)
         if (l == e0)
             break;
     return l;
@@ -35,7 +35,7 @@ template <typename NodeT, typename ValueT>
 NodeT * assoc (NodeT * list, ValueT value)
 {
     NodeT * l = 0;
-    dolist (l, list)
+    do_list (l, list)
         if (l->m_val == value)
             break;
     return l;
@@ -132,7 +132,7 @@ NodeT * copy_list (NodeT * l0)
 {
     NodeT *p = 0, *l = 0;
     NodeT **pp = &p;
-    dolist(l, l0)
+    do_list(l, l0)
         *pp = new_node<NodeT>(l->m_val), pp = &(*pp)->m_next;
     return p;
 }

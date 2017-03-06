@@ -2158,7 +2158,7 @@ void BBP_Exit_Plugin(plugin_info *PI)
     {
         if (PI->inSlit)
             SendMessage(PI->hSlit, SLIT_REMOVE, 0, (LPARAM)PI->hwnd);
-        DestroyWindow(PI->hwnd);
+        ::DestroyWindow(PI->hwnd);
         class_info_decref(PI->class_name);
     }
 }

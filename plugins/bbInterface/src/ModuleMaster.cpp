@@ -320,10 +320,10 @@ module* module_create_new(wchar_t const * filename)
 	{
 		swprintf(tempname, 64, L"Module%d", number);
 		number++;
+	}
+	while (list_lookup(modulelist, tempname));
 
-	} while (list_lookup(modulelist, tempname));
-
-	fprintf(module_file,"!------ Module: %s", tempname);
+	fprintf(module_file, "!------ Module: %s", tempname);
 	fclose(module_file);
 	
 	//Read back the generated info
