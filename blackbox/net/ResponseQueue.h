@@ -6,7 +6,13 @@ namespace boost {
 	namespace lockfree {
 		template <size_t Size>
 		struct capacity;
-		template <typename T, class A0 = boost::parameter::void_, class A1 = boost::parameter::void_>
+#ifdef BOOST_NO_CXX11_VARIADIC_TEMPLATES
+		template <typename T,
+			class A0 = boost::parameter::void_,
+			class A1 = boost::parameter::void_>
+#else
+		template <typename T, typename ...Options>
+#endif
 		class spsc_queue;
 }}
 

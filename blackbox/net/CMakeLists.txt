@@ -1,5 +1,10 @@
 
-include_directories(c:/devel/boost_1_61_0) # tmp @TODO @FIXME
+#set(Boost_DEBUG 1)
+FIND_PACKAGE(Boost)
+if (Boost_FOUND)
+  include_directories(${Boost_INCLUDE_DIR})
+  add_definitions("-DHAS_BOOST")
+endif (Boost_FOUND)
 
 set(net_SOURCES
   Server.cpp
