@@ -6,16 +6,16 @@ namespace bb {
 void initTrace (char const * appName, char const * addr, char const * port)
 {
 	// 1) setup app_name, buffering, starting levels, level and context dictionaries
-	TRACE_APPNAME(appName);
-	TRACE_SETBUFFERED(0);
+	TRACE_INIT("SampleClient");
+	TRACE_INIT_SINK(0, "bbTT.log");
 
 	const trace::context_t all_contexts = -1;
 	const trace::level_t errs = LL_ERROR | LL_FATAL;
-	TRACE_SET_LEVEL(all_contexts, errs);
+	TRACE_SET_LEVEL_FOR_SINK(0, all_contexts, errs);
 	const trace::level_t normal_lvl = LL_INFO | LL_WARNING;
-	TRACE_SET_LEVEL(CTX_TASKS | CTX_WSPACE | CTX_INIT | CTX_NET | CTX_GFX, normal_lvl);
+	TRACE_SET_LEVEL_FOR_SINK(0, CTX_TASKS | CTX_WSPACE | CTX_INIT | CTX_NET | CTX_GFX, normal_lvl);
 	const trace::level_t all_lvl = LL_VERBOSE | LL_DEBUG | LL_INFO | LL_WARNING | LL_ERROR | LL_FATAL;
-	TRACE_SET_LEVEL(CTX_BB, all_lvl);
+	TRACE_SET_LEVEL_FOR_SINK(0, CTX_BB, all_lvl);
 
 	trace::level_t lvl_dict_values[] = {
 		LL_VERBOSE,

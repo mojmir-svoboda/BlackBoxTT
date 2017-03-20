@@ -6,6 +6,8 @@ FIND_PACKAGE(Boost)
 if (Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIR})
   add_definitions("-DHAS_BOOST")
+
+  add_definitions(-DBOOST_OPTIONAL_CONFIG_USE_OLD_IMPLEMENTATION_OF_OPTIONAL)
 else (Boost_FOUND)
 
   message("crazyrc requires boost::spirit. that's THE reason for the 'crazy' part in the name...")
