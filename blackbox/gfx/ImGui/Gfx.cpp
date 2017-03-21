@@ -253,7 +253,7 @@ namespace imgui {
 		gui->m_gfx = this;
 		std::unique_ptr<GfxWindow> gw(new GfxWindow);
 		gui->m_gfxWindow = gw.get();
-		TRACE_MSG(LL_INFO, CTX_BB | CTX_GFX, "Created new gui @ 0x%x iud=%ws", gui, widget->GetId().c_str());
+		TRACE_MSG(LL_INFO, CTX_BB | CTX_GFX, "Created new gui @ 0x%x iud=%ws", gui.get(), widget->GetId().c_str());
 		HWND hwnd = MkWindow(static_cast<void *>(gui.get()), x, y, w, h, a, widget->GetWidgetTypeName(), widget->GetId().c_str());
 		gw->m_hwnd = hwnd;
 		gw->m_chain = m_dx11->CreateSwapChain(hwnd);
