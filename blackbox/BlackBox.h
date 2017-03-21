@@ -41,6 +41,7 @@ namespace bb {
 		BB_API void Run ();
 		bool CreateBBWindow ();
 		bool HomeDir (wchar_t * cfgpath, size_t sz) const;
+		void InitLogging ();
 		bool LoadConfig ();
 		bool FindConfig (wchar_t * cfgpath, size_t sz, const wchar_t * cfgfile) const;
 
@@ -71,6 +72,7 @@ namespace bb {
 
 		// probably future binds
 		bool GetPointerPos (int & x, int & y);
+		bool GetLogDir (wchar_t * dir, size_t dir_sz) const;
 		// binds
 		void LoadPlugin (bbstring const & plugin_id);
 		void UnloadPlugin (bbstring const & plugin_id);

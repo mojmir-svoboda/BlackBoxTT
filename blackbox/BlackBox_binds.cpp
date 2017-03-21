@@ -120,16 +120,16 @@ namespace bb {
 
 	bool BlackBox::GetConfigDir (wchar_t * dir, size_t dir_sz) const
 	{
-		wchar_t name[MAX_PATH];
-		if (!m_cmdLine.ConfigDir().empty())
-		{
-			// conversion utf8->utf16
-			return true;
-		}
-		else if (getExeName(name, MAX_PATH))
-		{
-			return true;
-		}
+// 		wchar_t name[MAX_PATH];
+// 		if (!m_cmdLine.ConfigDir().empty())
+// 		{
+// 			codecvt_utf8_utf16(m_cmdLine.ConfigDir(), dir, dir_sz);
+// 			return true;
+// 		}
+// 		else if (getExeName(dir, MAX_PATH))
+// 		{
+// 			return true;
+// 		}
 		return false;
 	}
 

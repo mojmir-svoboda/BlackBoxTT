@@ -8,6 +8,8 @@ namespace bb {
 		, m_taskhook("t", "taskhook", "Run task hook dll (dll injection)", false)
 		, m_trayhook("y", "trayhook", "Run tray hook dll (dll injection)", false)
 		, m_configdir("d", "dir", "Specify directory with config files.", false, "", "directory")
+		, m_logdir("l", "logdir", "Specify directory for log files.", false, "", "directory")
+		, m_logbuffered("b", "buffered", "Logging is buffered.", true)
 		, m_rcfile("r", "rcfile", "Specify config file.", false, "blackbox.rc", "rc config file")
 		, m_yamlfile("f", "yaml", "Specify config file.", false, "blackbox.yaml", "yaml config file")
 		, m_exec("e", "exec", "Send broadcast message to running WM", false, "@broam", "@broam")
@@ -19,7 +21,6 @@ namespace bb {
 	{
 		try
 		{
-			TRACE_MSG(LL_INFO, CTX_BB | CTX_INIT, "Initializing command line");
 			std::string version; // @TODO: replace by bbversion
 			if (m_cmdLine = new TCLAP::CmdLine("BlackBox for Windows", ' ', version))
 			{
@@ -28,6 +29,7 @@ namespace bb {
 				m_cmdLine->add(m_trayhook);
 				m_cmdLine->add(m_taskhook);
 				m_cmdLine->add(m_configdir);
+				m_cmdLine->add(m_logdir);
 				m_cmdLine->add(m_rcfile);
 				m_cmdLine->add(m_yamlfile);
 				m_cmdLine->add(m_exec);

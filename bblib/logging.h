@@ -1,6 +1,12 @@
 #pragma once
 #include <platform_win.h>
 
+#if defined TRACE_ENABLED
+#	include <3rd_party/logging/logging.h>
+#else
+#	include <3rd_party/logging/trace_dummy.h>
+#endif
+
 // inline void dbg_printf (wchar_t const * fmt, ...)
 // {
 //   wchar_t buffer[1024];
@@ -24,17 +30,4 @@
 // 	buffer[x + 1] = L'\0';
 // 	OutputDebugStringA(buffer);
 // }
-
-
-#if defined TRACE_ENABLED
-#	include <3rd_party/logging/logging.h>
-namespace bb {
-	void initTrace (char const * appName, char const * addr, char const * port);
-}
-#else
-#	include <3rd_party/logging/trace_dummy.h>
-namespace bb {
-	inline void initTrace (char const * appName, char const * addr, char const * port) { }
-}
-#endif
 

@@ -4,8 +4,6 @@
 
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
-	bb::initTrace("BBTT", "127.0.0.1", "13127");
-	TRACE_MSG(LL_INFO, CTX_BB, "Loading...");
 	::CoInitializeEx(nullptr, COINIT_MULTITHREADED | COINIT_DISABLE_OLE1DDE);
 
 	bb::BlackBox & bb = bb::BlackBox::Instance();

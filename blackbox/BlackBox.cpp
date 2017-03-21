@@ -13,6 +13,7 @@
 #include "hooks/taskhook.h"
 #include "gfx/Gfx.h"
 #include "gfx/ImGui/Gfx.h"
+#include <experimental/filesystem>
 
 extern "C"
 {
@@ -152,6 +153,19 @@ namespace bb {
 		ok &= m_config.m_os.Init();
 		ok &= m_config.m_display.Init();
 		return ok;
+	}
+
+	bool BlackBox::GetLogDir (wchar_t * dir, size_t dir_sz) const
+	{
+		if (!m_cmdLine.LogDir().empty())
+		{
+			codecvt_utf8_utf16(m_cmdLine.LogDir(), dir, dir_sz);
+			return true;
+		}
+
+		if (HomeDir(dir, dir_sz))
+			return true;
+		return false;
 	}
 
 	bool BlackBox::HomeDir (wchar_t * cfgpath, size_t sz) const
@@ -322,16 +336,23 @@ namespace bb {
 
 	bool BlackBox::Init (HINSTANCE hmi)
 	{
-		TRACE_SCOPE(LL_INFO, CTX_BB | CTX_INIT);
 		m_hMainInstance = hmi;
 		bool ok = true;
+		if (!m_cmdLine.Init())
+			return false;
+
+		wchar_t homedir[512];
+		HomeDir(homedir, 512);
+		std::experimental::filesystem::create_directory(homedir);
+
+		InitLogging();
+		TRACE_MSG(LL_INFO, CTX_BB | CTX_INIT, "Initializing...");
 
 		if (!DetectConfig())
 			return false;
 		if (!mkJobObject(m_job, m_inJob))
 			return false;
-		if (!m_cmdLine.Init())
-			return false;
+
 		if (!LoadConfig())
 			return false;
 		if (!m_scheme.Init(m_config.m_scheme))
@@ -367,6 +388,7 @@ namespace bb {
 			return false;
 
 		m_wspaces.InitNotifWindow();
+		TRACE_SET_LEVEL_FOR_SINK(0, CTX_TASKS | CTX_WSPACE | CTX_INIT, LL_ERROR | LL_FATAL | LL_INFO | LL_WARNING);
 		return true;
 	}
 
@@ -542,4 +564,93 @@ namespace bb {
 		}
 		return false;
 	}
+
+	void BlackBox::InitLogging ()
+	{
+#if defined TRACE_ENABLED
+		// 1) setup app_name, buffering, starting levels, level and context dictionaries
+		TRACE_INIT("bbTT");
+
+		wchar_t logdir[MAX_PATH];
+		GetLogDir(logdir, MAX_PATH);
+		std::experimental::filesystem::create_directory(logdir);
+		wchar_t logfile[MAX_PATH];
+		combinePath(logdir, L"bbTT.log", logfile, MAX_PATH);
+		char logfile_u8[MAX_PATH];
+		codecvt_utf16_utf8(logfile, logfile_u8, MAX_PATH);
+		TRACE_INIT_SINK(0, logfile_u8);
+		bool const buffered = m_cmdLine.LogBuffered();
+		TRACE_SETBUFFERED_SINK(0, buffered);
+
+		const trace::context_t all_contexts = -1;
+		const trace::level_t errs = LL_ERROR | LL_FATAL;
+		TRACE_SET_LEVEL_FOR_SINK(0, all_contexts, errs);
+		const trace::level_t normal_lvl = LL_INFO | LL_WARNING;
+		TRACE_SET_LEVEL_FOR_SINK(0, CTX_TASKS | CTX_WSPACE | CTX_INIT | CTX_NET | CTX_GFX, normal_lvl);
+		const trace::level_t all_lvl = LL_VERBOSE | LL_DEBUG | LL_INFO | LL_WARNING | LL_ERROR | LL_FATAL;
+		TRACE_SET_LEVEL_FOR_SINK(0, CTX_BB, all_lvl);
+
+		TRACE_SET_LEVEL_FOR_SINK(0, CTX_TASKS | CTX_WSPACE | CTX_INIT, all_lvl);
+
+		trace::level_t lvl_dict_values[] = {
+			LL_VERBOSE,
+			LL_DEBUG,
+			LL_INFO,
+			LL_WARNING,
+			LL_ERROR,
+			LL_FATAL
+		};
+		char const * lvl_dict_names[] = {
+			"vrbs",
+			"dbg",
+			"nfo",
+			"WARN",
+			"ERROR",
+			"FATAL"
+		};
+		static_assert(sizeof(lvl_dict_names) / sizeof(*lvl_dict_names) == sizeof(lvl_dict_values) / sizeof(*lvl_dict_values), "arrays do not match");
+		TRACE_SET_LEVEL_DICTIONARY(lvl_dict_values, lvl_dict_names, sizeof(lvl_dict_values) / sizeof(*lvl_dict_values));
+
+		trace::context_t ctx_dict_values[] = {
+			CTX_INIT,
+			CTX_BB,
+			CTX_TASKS,
+			CTX_WSPACE,
+			CTX_NET,
+			CTX_GFX,
+			CTX_BBLIB,
+			CTX_BBLIBCOMPAT,
+			CTX_CONFIG,
+			CTX_SCRIPT,
+			CTX_BIND,
+			CTX_RESOURCES,
+			CTX_PLUGINMGR,
+			CTX_PLUGIN,
+		};
+		char const * ctx_dict_names[] = {
+			"Init",
+			"BB",
+			"Tasks",
+			"Wspace",
+			"Net",
+			"Gfx",
+			"Lib",
+			"LibCompat",
+			"Cfg",
+			"Script",
+			"Bind",
+			"Rsrcs",
+			"PluginMgr",
+			"Plugin"
+		};
+		static_assert(sizeof(ctx_dict_values) / sizeof(*ctx_dict_values) == sizeof(ctx_dict_names) / sizeof(*ctx_dict_names), "arrays do not match");
+		TRACE_SET_CONTEXT_DICTIONARY(ctx_dict_values, ctx_dict_names, sizeof(ctx_dict_values) / sizeof(*ctx_dict_values));
+
+		// 2) connect
+		TRACE_CONNECT();
+
+		TRACE_MSG(LL_INFO, CTX_INIT, "Connected to server.");
+#endif
+	}
+
 }

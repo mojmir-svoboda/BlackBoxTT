@@ -45,14 +45,11 @@ namespace bb {
 		: m_requestLock()
 		, m_io(nullptr)
 	{
-		TRACE_MSG(LL_DEBUG, CTX_BB | CTX_NET, "Server @ 0x%x", this);
 		m_requests.reserve(64);
 		m_responses.reserve(64);
 	}
 	Server::~Server ()
-	{
-		TRACE_MSG(LL_DEBUG, CTX_BB | CTX_NET, "~Server @ 0x%x", this);
-	}
+	{ }
 	
 	bool Server::AddRequest (std::unique_ptr<Command> c, std::shared_ptr<Session> s)
 	{

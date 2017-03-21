@@ -162,13 +162,8 @@ namespace bb {
 
 	Scheme::Scheme ()
 		: m_scheme(nullptr)
-	{
-		TRACE_MSG(LL_DEBUG, CTX_BB | CTX_NET, "Scheme @ 0x%x", this);
-	}
-	Scheme::~Scheme ()
-	{
-		TRACE_MSG(LL_DEBUG, CTX_BB | CTX_NET, "~Scheme @ 0x%x", this);
-	}
+	{ }
+	Scheme::~Scheme () { }
 	
 	bool Scheme::Init (SchemeConfig const & cfg)
 	{
