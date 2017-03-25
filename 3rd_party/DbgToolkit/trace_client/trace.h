@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2016 Mojmir Svoboda
+ * Copyright (C) 2011-2017 Mojmir Svoboda
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -43,14 +43,9 @@
 #		endif
 #	endif
 
-#	if  defined _MSC_VER
-#		include <vadefs.h>
-#	else
-#		include <stdarg.h>	// for va_args
-#	endif
-
 #include "trace_scope_guard.h"
 #include <cstdint>
+#include <cstdarg>
 
 /**	@macro		TRACE_CONFIG_INCLUDE
  *	@brief		overrides default config with user-specified one
@@ -95,19 +90,19 @@
  *	@brief		logging of the form TRACE_MSG(lvl, ctx, fmt, ...)
  **/
 #	define TRACE_MSG(level, context, fmt, ... )	\
-		trace::Write(TRACE_ADAPT_LEVEL(static_cast<trace::level_t>(level)), context, __FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__)
+		trace::WriteMsg(TRACE_ADAPT_LEVEL(static_cast<trace::level_t>(level)), context, __FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__)
 /**	@macro		TRACE_MSG_IF
  *	@brief		logging of the form TRACE_MSG_IF((foo == bar), lvl, ctx, fmt, ...)
  **/
 #	define TRACE_MSG_IF(condition, level, context, fmt, ... )	\
 		if (condition)	\
-			trace::Write(TRACE_ADAPT_LEVEL(static_cast<trace::level_t>(level)), context, __FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__)
+			trace::WriteMsg(TRACE_ADAPT_LEVEL(static_cast<trace::level_t>(level)), context, __FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__)
 
 /**	@macro		TRACE_MSG_VA
  *	@brief		logging of the form TRACE_MSG_VA(lvl, ctx, fmt, va_list)
  **/
 #	define TRACE_MSG_VA(level, context, fmt, vaargs)	\
-		trace::WriteVA(TRACE_ADAPT_LEVEL(static_cast<trace::level_t>(level)), context, __FILE__, __LINE__, __FUNCTION__, fmt, vaargs)
+		trace::WriteMsgVA(TRACE_ADAPT_LEVEL(static_cast<trace::level_t>(level)), context, __FILE__, __LINE__, __FUNCTION__, fmt, vaargs)
 
 /**	@macro		TRACE_SCOPE_MSG
  *	@brief		logs "entry to" and "exit from" scope
@@ -228,31 +223,40 @@
 /* Basic setup and utilitary macros                                          */
 /*****************************************************************************/
 
-/**	@macro		TRACE_APPNAME
- *	@brief		sets application name that will be sent to server to identify
+/**	@macro		TRACE_INIT
+ *	@brief		initializes trace client
  **/
-#	define TRACE_APPNAME(name) trace::SetAppName(name)
+#	define TRACE_INIT(name) trace::Init(name)
+
+# define TRACE_VA_NARGS_IMPL(_1, _2, _3, _4, _5, N, ...) N
+# define TRACE_VA_NARGS(...) TRACE_VA_NARGS_IMPL(__VA_ARGS__, 5, 4, 3, 2, 1)
+#	define TRACE_SINK_INIT(sink, ...) trace::InitSink(sink, TRACE_VA_NARGS(__VA_ARGS__) , __VA_ARGS__)
+
 /**	@macro		TRACE_CONNECT
  *	@brief		connects to server and sends application name to server
  **/
-#	define TRACE_CONNECT(addr, port) trace::Connect(addr, port)
+#	define TRACE_CONNECT() trace::Connect()
 /**	@macro		TRACE_DISCONNECT
  *	@brief		disconnects from server
  **/
 #	define TRACE_DISCONNECT() trace::Disconnect()
+/**	@macro		TRACE_DONE
+ *	@brief		initializes trace client
+ **/
+#	define TRACE_DONE() trace::Done()
 
 /**	@macro		TRACE_SET_LEVEL_MASK
  *	@brief		sets initial level mask
  **/
-#	define TRACE_SET_LEVEL(ctx, lvl) trace::SetRuntimeLevelForContext(ctx, lvl)
+#	define TRACE_SET_SINK_LEVEL(sink, ctx, lvl) trace::SetRuntimeLevelForContext(sink, ctx, lvl)
 /**	@macro		TRACE_SET_CONTEXT_MASK
  *	@brief		set initial context mask
  **/
-#	define TRACE_SET_CONTEXT_MASK(n) trace::SetRuntimeContextMask(n)
+//#	define TRACE_SET_CONTEXT_MASK_FOR_SINK(n) trace::SetRuntimeContextMask(n)
 /**	@macro		TRACE_SETBUFFERED
  *	@brief		switch between buffered/unbuffered
  **/
-#	define TRACE_SETBUFFERED(n) trace::SetRuntimeBuffering(n)
+#	define TRACE_SINK_SET_BUFFERED(sink, on) trace::SetBuffered(sink, on)
 
 /** @macro		TRACE_EXPORT_CSV
  *  @brief      causes export of current server content as csv format
@@ -276,82 +280,69 @@
 
 	namespace trace {
 
-		/**@fn		SetAppName
-		 * @brief	sets identification string of client application
+		/**@fn		Init
+		 *  @brief	initializes client (creates instance)
+		 *	also sets identification string of client application (appName)
 		 **/
-		TRACE_API void SetAppName (char const *);
-		TRACE_API char const * GetAppName ();
+		TRACE_API bool Init (char const * appName);
 
-		/**@fn		SetHostName
-		 * @brief	sets address of the host the client will connect to
-		 *				if not specified client will connect to "localhost" by default
+		TRACE_API void InitSinkVA (unsigned sink, unsigned arg_count, va_list args);
+
+		/** @fn		InitSink<N>
+		 *  @brief	initializes Nth sink
+		 *  @param [in] arg_count		number of arguments that follow this argument (i.e. not including this one)
+		 *
+		 *  forwards arg_count of arguments to N-th sink
+		 *  @example 	trace::InitSink<0>(2, "127.0.0.1", "13127");
 		 **/
-		TRACE_API void SetHostName (char const * addr);
-		TRACE_API char const * GetHostName ();
+		inline void InitSink (unsigned sink, unsigned arg_count, ...)
+		{
+			va_list args;
+			va_start(args, arg_count);
+			InitSinkVA(sink, arg_count, args);
+			va_end(args);
+		}
 
-		/**@fn		SetHostPort
-		 * @brief	sets port of the host the client will connect to
-		 *				if not specified client will connect to "13127" by default
+		TRACE_API void SetRuntimeLevelForContext (unsigned sink, context_t ctx, level_t level);
+
+		TRACE_API void SetBuffered (unsigned sink, bool on);
+
+		TRACE_API void Connect ();
+
+		/**@fn		SetLevelDictionary
+		 * @brief	setup level dictionary
+		 * @param [in] values		array of level values
+		 * @param [in] names		array of level names
+		 * @param [in] sz		number of elements (both arrays should be same size)
 		 **/
-		TRACE_API void SetHostPort (char const * port);
-		TRACE_API char const * GetHostPort ();
-
-		TRACE_API void Connect (char const * host, char const * port);
-		TRACE_API void Disconnect ();
-
-		/**@fn		SetRuntimeLevelForContext
-		 * @brief	adjusts run-time context of log message filtering
-		 **/
-		TRACE_API void SetRuntimeLevelForContext (context_t ctx, level_t level);
-		TRACE_API level_t GetRuntimeLevelForContextBit (context_t ctx);
-
 		TRACE_API void SetLevelDictionary (level_t const * values, char const * names[], size_t sz);
+		/**@fn		SetContextDictionary
+		 **/
 		TRACE_API void SetContextDictionary (context_t const * values, char const * names[], size_t sz);
 
-		/**@fn		SetRuntimeBuffering
-		 * @brief	adjusts run-time buffering of log message filtering
+		/**@fn		Done
+		 * @brief	deinitializes client (destroys instance)
 		 **/
-		TRACE_API void SetRuntimeBuffering (bool level);
-		TRACE_API bool GetRuntimeBuffering ();
+		TRACE_API void Done ();
 
-		/**@fn		ExportToCSV
-		 * @brief	client sends command to force server dump content to csv
-		 **/
-		TRACE_API void ExportToCSV (char const *);
-
+		TRACE_API void Disconnect ();
 
 		TRACE_API void Flush ();
 
-		/**@fn		RuntimeFilterPredicate
-		 * @brief	decides if message will be logged or not
-		 */
-		inline bool RuntimeFilterPredicate (level_t level, context_t context)
-		{
-			context_t ctx = context;
-			for (unsigned b = 0; ctx; ++b, ctx >>= 1)
-			{
-				if (ctx & 1)
-				{
-					const context_t curr_level_in_ctx = GetRuntimeLevelForContextBit(b);
-					if (curr_level_in_ctx & level)
-						return true;
-				}
-			}
-			return false;
-		}
+
 
 		/**@fn		Write to log
 		 * @brief	write to log of the form (fmt, va_list)
 		 **/
-		TRACE_API void WriteVA (level_t level, context_t context, char const * file, int line, char const * fn, char const * fmt, va_list);
+		TRACE_API void WriteMsgVA (level_t level, context_t context, char const * file, int line, char const * fn, char const * fmt, va_list);
 
 		/**@fn		Write to log
 		 * @brief	write to log of the form (fmt, ...)
 		 **/
 #if defined __GCC__ || defined __MINGW32__ || defined __linux__
-		TRACE_API void Write (level_t level, context_t context, char const * file, int line, char const * fn, char const * fmt, ...) __attribute__ ((format(printf, 6, 7) ));
+		TRACE_API void WriteMsg (level_t level, context_t context, char const * file, int line, char const * fn, char const * fmt, ...) __attribute__ ((format(printf, 6, 7) ));
 #elif defined _MSC_VER
-		TRACE_API void Write (level_t level, context_t context, char const * file, int line, char const * fn, char const * fmt, ...);
+		TRACE_API void WriteMsg (level_t level, context_t context, char const * file, int line, char const * fn, char const * fmt, ...);
 #endif
 
 		/**@fn		WritePlot
@@ -400,7 +391,7 @@
 
 
 		/**@fn		Write table to log
-		 * @brief	writes tavle to log of the form (fmt, ...)
+		 * @brief	writes table to log of the form (fmt, ...)
 		 *
 		 * @param[in]	x	x-coordinate of the table. -1, 0, ...X
 		 * @param[in]	y	y-coordinate of the table  -1, 0, ...Y
@@ -413,7 +404,7 @@
 		 * @param[in]	fmt format for the value to be written
 		 * Note:
 		 *	Message can set values more cells at once separating them by the
-		 *	colum. For example:
+		 *	column. For example:
 		 *		WriteTable(lvl, ctx, 0, -1, "%i|%i|%i|0", a, b, c);
 		 *	sets a,b,c to columns of new row and 0 to 4th column
 		 *

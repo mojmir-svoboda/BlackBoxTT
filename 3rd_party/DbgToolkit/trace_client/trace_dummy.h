@@ -23,7 +23,10 @@
 
 #if !defined TRACE_ENABLED
 
-# define TRACE_APPNAME(name)	((void)0)
+# define TRACE_INIT(name)	((void)0)
+#	define TRACE_SINK_INIT(sink, ...) ((void)0)
+#	define TRACE_SET_SINK_LEVEL(sink, ctx, lvl) ((void)0)
+#	define TRACE_SINK_SET_BUFFERED(sink, on) ((void)0)
 #	define TRACE_SET_LEVEL(c,l)	((void)0)
 #	define TRACE_SET_CONTEXT_MASK(c)	((void)0)
 #	define TRACE_SET_LEVEL_DICTIONARY(dictpairs, size)	((void)0)

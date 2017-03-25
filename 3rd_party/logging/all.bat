@@ -3,8 +3,8 @@ rem this file is intended for usage from cmd.exe or from explorer (clicking on i
 
 pushd %~dp0
 
-call build_all_vs2013.bat
-call build_all_vs2015.bat
+rem call build_all_vs2013.bat
+rem call build_all_vs2015.bat
 call build_all_vs2017.bat
 call install.bat
 

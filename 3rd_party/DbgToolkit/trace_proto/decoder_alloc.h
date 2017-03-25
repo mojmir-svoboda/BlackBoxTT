@@ -1,4 +1,5 @@
 #pragma once
+#if !defined TRACE_CLIENT_DISABLE_NETWORKING
 #include <cassert>
 #define USE_CXX_ALLOCATOR 1
 #include <asn_allocator.h>
@@ -12,4 +13,6 @@ struct Asn1Allocator : Allocator, MemBuffer<HeapBuffer<16384>>
 	//void * reallocate (void * mem, size_t size);
 	virtual void  FREEMEM (void * mem) override;
 };
+
+#endif
 
