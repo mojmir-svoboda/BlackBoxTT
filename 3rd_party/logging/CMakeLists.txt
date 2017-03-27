@@ -61,7 +61,7 @@ set(TRACE_FILES
 
 add_definitions ("-D_CRT_SECURE_NO_WARNINGS") # msvc shut up pls
 
-message("dbg: ${CMAKE_CXX_FLAGS_DEBUG}")
+### replace options - Z7 == debug obj format without .pdb file
 if(MSVC)
 	foreach(flag_var CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
 		 if(${flag_var} MATCHES "/Zi")
@@ -70,7 +70,6 @@ if(MSVC)
 	endforeach(flag_var)
 endif()
 ### end of pigsquill
-message("dbg: ${CMAKE_CXX_FLAGS_DEBUG}")
 
 
 if(OPTION_BUILD_SHARED)

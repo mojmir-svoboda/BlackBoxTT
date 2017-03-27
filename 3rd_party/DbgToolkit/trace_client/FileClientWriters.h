@@ -1,6 +1,8 @@
 #pragma once
 #include "trace_arguments.h"
 #include <ctime>
+#include <process.h>
+#include <thread>
 
 namespace trace {
 
@@ -123,6 +125,25 @@ namespace trace {
 
 	using I = Separator<'|'>;
 
+	struct LogPID
+	{
+		static const constexpr bool c_requires_arg{ false };
+		size_t Write (char * buff, size_t n/*, void*/) const
+		{
+			size_t const written = snprintf(buff, n, "%i", ::_getpid());
+			return written;
+		}
+	};
+
+	struct LogTID
+	{
+		static const constexpr bool c_requires_arg{ false };
+		size_t Write (char * buff, size_t n/*, void*/) const
+		{
+			size_t const written = snprintf(buff, n, "%i", std::this_thread::get_id());
+			return written;
+		}
+	};
 
 }
 
