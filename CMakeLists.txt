@@ -7,7 +7,8 @@ set(CMAKE_VERBOSE_MAKEFILE on)
 ### OPTIONS
 option(OPTION_DEVEL "Development build" OFF)
 option(OPTION_RUN_ASN1C "Generate code from asn.1 (run asn1c)" OFF)
-option(OPTION_USE_TRACE "Logging" OFF)
+option(OPTION_USE_TRACE "Logging" ON)
+option(OPTION_USE_TRACE_TCP "Logging to external application" OFF)
 option(OPTION_USE_TCL "TCL" OFF)
 
 # use this for develoment, if you do not pass it from command line:
@@ -34,6 +35,12 @@ include_directories (bblib)
 include("${CMAKE_CURRENT_SOURCE_DIR}/build/FindReleaseAndDebug.cmake")
 
 if (OPTION_USE_TRACE)
+
+	if (OPTION_USE_TRACE_TCP)
+	else (OPTION_USE_TRACE_TCP)
+		add_definitions("-DTRACE_CLIENT_DISABLE_NETWORKING")
+	endif (OPTION_USE_TRACE_TCP)
+
 	add_definitions ("-DTRACE_ENABLED")
 	FIND_RELEASE_AND_DEBUG(TRACE logging.lib logging.lib ${CMAKE_CURRENT_SOURCE_DIR}/3rd_party/logging/vs15.64/Release ${CMAKE_CURRENT_SOURCE_DIR}/3rd_party/logging/vs15.64/Debug)
 
