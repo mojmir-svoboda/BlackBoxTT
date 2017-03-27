@@ -578,19 +578,22 @@ namespace bb {
 		combinePath(logdir, L"bbTT.log", logfile, MAX_PATH);
 		char logfile_u8[MAX_PATH];
 		codecvt_utf16_utf8(logfile, logfile_u8, MAX_PATH);
-		TRACE_INIT_SINK(0, logfile_u8);
-		bool const buffered = m_cmdLine.LogBuffered();
-		TRACE_SETBUFFERED_SINK(0, buffered);
+		TRACE_SINK_INIT(0, logfile_u8);
 
 		const trace::context_t all_contexts = -1;
 		const trace::level_t errs = LL_ERROR | LL_FATAL;
-		TRACE_SET_LEVEL_FOR_SINK(0, all_contexts, errs);
+		TRACE_SET_SINK_LEVEL(0, all_contexts, errs);
 		const trace::level_t normal_lvl = LL_INFO | LL_WARNING;
-		TRACE_SET_LEVEL_FOR_SINK(0, CTX_TASKS | CTX_WSPACE | CTX_INIT | CTX_NET | CTX_GFX, normal_lvl);
+		TRACE_SET_SINK_LEVEL(0, CTX_TASKS | CTX_WSPACE | CTX_INIT | CTX_NET | CTX_GFX, normal_lvl);
 		const trace::level_t all_lvl = LL_VERBOSE | LL_DEBUG | LL_INFO | LL_WARNING | LL_ERROR | LL_FATAL;
-		TRACE_SET_LEVEL_FOR_SINK(0, CTX_BB, all_lvl);
+		TRACE_SET_SINK_LEVEL(0, CTX_BB, all_lvl);
 
-		TRACE_SET_LEVEL_FOR_SINK(0, CTX_TASKS | CTX_WSPACE | CTX_INIT, all_lvl);
+		TRACE_SET_SINK_LEVEL(0, CTX_TASKS | CTX_WSPACE | CTX_INIT, all_lvl);
+
+#if !defined TRACE_CLIENT_DISABLE_NETWORKING
+		TRACE_SINK_INIT(1, "127.0.0.1", "13127");
+		TRACE_SET_SINK_LEVEL(1, all_contexts, all_lvl);
+#endif
 
 		trace::level_t lvl_dict_values[] = {
 			LL_VERBOSE,
@@ -648,6 +651,8 @@ namespace bb {
 
 		// 2) connect
 		TRACE_CONNECT();
+		bool const buffered = !m_cmdLine.Unbuffered();
+		TRACE_SINK_SET_BUFFERED(0, buffered);
 
 		TRACE_MSG(LL_INFO, CTX_INIT, "Connected to server.");
 #endif

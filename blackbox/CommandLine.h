@@ -9,7 +9,7 @@ namespace bb {
 		TCLAP::SwitchArg m_trayhook;
 		TCLAP::ValueArg<std::string> m_configdir;
 		TCLAP::ValueArg<std::string> m_logdir;
-		TCLAP::SwitchArg m_logbuffered;
+		TCLAP::SwitchArg m_unbuffered;
 		TCLAP::ValueArg<std::string> m_rcfile;
 		TCLAP::ValueArg<std::string> m_yamlfile;
 		TCLAP::ValueArg<std::string> m_exec;
@@ -22,7 +22,7 @@ namespace bb {
 		bool NoStartup () { return m_nostartup.getValue(); }
 		bool NoTaskHook () { return !m_taskhook.getValue(); }
 		bool NoTrayHook () { return !m_trayhook.getValue(); }
-		bool LogBuffered () { return m_logbuffered.getValue(); }
+		bool Unbuffered () { return m_unbuffered.getValue(); }
 		std::string const & YamlFile () const { return m_yamlfile.getValue(); }
 		std::string const & ConfigDir () const { return m_configdir.getValue(); }
 		std::string const & LogDir () const { return m_logdir.getValue(); }
