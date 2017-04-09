@@ -65,6 +65,48 @@ namespace imgui {
 		tasks.MkDataCopy(m_tasks);
 	}
 
+	void PagerWidget::ResizePagerColumns ()
+	{
+		WorkSpaces const & ws = BlackBox::Instance().GetWorkSpaces();
+		bbstring const & cluster_id = ws.GetCurrentClusterId();
+		WorkGraphConfig const * wg = ws.FindCluster(cluster_id);
+		if (wg == nullptr)
+			return;
+
+		uint32_t const rows = wg->MaxRowCount();
+		uint32_t const cols = wg->MaxColCount();
+
+		int const spacing = 3;
+		int * sizes = (int *)alloca(cols * sizeof(int));
+		for (uint32_t c = 0; c < cols; ++c)
+		{
+			sizes[c] = 0;
+			for (uint32_t r = 0; r < rows; ++r)
+			{
+				bbstring const & vertex_id = wg->m_vertexlists[r][c];
+				for (TaskInfo & t : m_tasks)
+				{
+					if (t.m_wspace == vertex_id || t.IsSticky())
+					{
+						if (sizes[c] < m_iconsPerRow)
+							++sizes[c];
+					}
+				}
+			}
+			if (sizes[c] < 1)
+				sizes[c] = 1;
+		}
+
+		int n = 0;
+		ImGui::SetColumnOffset(0, 0);
+		for (uint32_t c = 0; c < cols; ++c)
+		{
+			n += sizes[c];
+			float const offs = n * 32 + (n - 1) * spacing;
+			ImGui::SetColumnOffset(c + 1, offs);
+		}
+	}
+
 	void PagerWidget::DrawUI ()
 	{
 		WorkSpaces const & ws = BlackBox::Instance().GetWorkSpaces();
@@ -113,6 +155,8 @@ namespace imgui {
 		if (cols && rows)
 		{
 			ImGui::Columns(cols, "mixed", true);
+			ResizePagerColumns();
+
 			for (uint32_t r = 0; r < rows; ++r)
 			{
 				for (uint32_t c = 0; c < cols; ++c)
@@ -141,7 +185,7 @@ namespace imgui {
 // 							continue;
 						if (t.m_wspace == vertex_id || t.IsSticky())
 						{
-							if (tmp++ % 3 != 0)
+							if (tmp++ % m_iconsPerRow != 0)
 								ImGui::SameLine();
 
 							Tasks & tasks = BlackBox::Instance().GetTasks();
