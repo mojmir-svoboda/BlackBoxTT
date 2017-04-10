@@ -13,7 +13,7 @@ namespace bb {
 		, m_rcfile("r", "rcfile", "Specify config file.", false, "blackbox.rc", "rc config file")
 		, m_yamlfile("f", "yaml", "Specify config file.", false, "blackbox.yaml", "yaml config file")
 		, m_exec("e", "exec", "Send broadcast message to running WM", false, "@broam", "@broam")
-		, m_verbosity("v", "verbose", "Set verbosity level", false, 0, "level 0 to 3")
+		, m_verbosity("v", "verbosity", "Set verbosity level", false, 1, "level 0 to 5 (0 = quiet, 1 = errs, 2 = info .. 5 = all) ")
 		, m_cmdLine(nullptr)
 	{
 	}

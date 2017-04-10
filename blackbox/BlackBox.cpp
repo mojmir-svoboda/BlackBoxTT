@@ -388,7 +388,7 @@ namespace bb {
 			return false;
 
 		m_wspaces.InitNotifWindow();
-		TRACE_SET_LEVEL_FOR_SINK(0, CTX_TASKS | CTX_WSPACE | CTX_INIT, LL_ERROR | LL_FATAL | LL_INFO | LL_WARNING);
+		//TRACE_SET_SINK_LEVEL(0, CTX_TASKS | CTX_WSPACE | CTX_INIT, LL_ERROR | LL_FATAL | LL_INFO | LL_WARNING);
 		return true;
 	}
 
@@ -586,28 +586,32 @@ namespace bb {
 		const trace::level_t all_lvl = LL_VERBOSE | LL_DEBUG | LL_INFO | LL_WARNING | LL_ERROR | LL_FATAL;
 
 		int const level = m_cmdLine.Verbosity();
-		TRACE_SET_SINK_LEVEL(0, 0, 0);
+		TRACE_SINK_SET_LEVEL(0, 0, 0);
 		if (0 <= level)
 		{
-			TRACE_SET_SINK_LEVEL(0, all_contexts, errs);
 		}
 		if (1 <= level)
 		{
-			TRACE_SET_SINK_LEVEL(0, CTX_TASKS | CTX_WSPACE | CTX_INIT | CTX_NET | CTX_GFX, normal_lvl);
+			TRACE_SINK_SET_LEVEL(0, all_contexts, errs);
 		}
 		if (2 <= level)
 		{
-			TRACE_SET_SINK_LEVEL(0, CTX_BB, all_lvl);
-			TRACE_SET_SINK_LEVEL(0, CTX_TASKS | CTX_WSPACE | CTX_INIT, all_lvl);
+			TRACE_SINK_SET_LEVEL(0, all_contexts, normal_lvl);
+		}
+		if (3 <= level)
+		{
+			TRACE_SINK_SET_LEVEL(0, CTX_TASKS | CTX_WSPACE | CTX_INIT | CTX_NET | CTX_GFX, normal_lvl);
+			TRACE_SINK_SET_LEVEL(0, CTX_BB, all_lvl);
+			TRACE_SINK_SET_LEVEL(0, CTX_TASKS | CTX_WSPACE | CTX_INIT, all_lvl);
 		}
 		if (5 <= level)
 		{
-			TRACE_SET_SINK_LEVEL(0, all_contexts, all_lvl);
+			TRACE_SINK_SET_LEVEL(0, all_contexts, all_lvl);
 		}
 
 #if !defined TRACE_CLIENT_DISABLE_NETWORKING
 		TRACE_SINK_INIT(1, "127.0.0.1", "13127");
-		TRACE_SET_SINK_LEVEL(1, all_contexts, all_lvl);
+		TRACE_SINK_SET_LEVEL(1, all_contexts, all_lvl);
 #endif
 
 		trace::level_t lvl_dict_values[] = {
@@ -670,6 +674,10 @@ namespace bb {
 		TRACE_SINK_SET_BUFFERED(0, buffered);
 
 		TRACE_MSG(LL_INFO, CTX_INIT, "Connected to server.");
+		TRACE_MSG(LL_ERROR, CTX_INIT | CTX_BB, "Test (error)");
+		TRACE_MSG(LL_WARNING, CTX_INIT | CTX_BB, "Test (warn)");
+		TRACE_MSG(LL_DEBUG, CTX_INIT | CTX_BB, "Test (dbg)");
+		TRACE_MSG(LL_VERBOSE, CTX_INIT | CTX_BB, "Test (verb)");
 #endif
 	}
 

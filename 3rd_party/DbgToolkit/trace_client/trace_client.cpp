@@ -2,6 +2,7 @@
 #include "Client.h"
 #include <tuple>
 #include "utils_dbg.h"
+#include "FailoverClient.h"
 //#include "apply.h"
 
 namespace trace {
@@ -12,7 +13,7 @@ namespace trace {
 	{
 		g_Client.reset(new Client);
 		if (g_Client)
-			g_Client->SetAppName(appName);
+			g_Client->Init(appName);
 		return g_Client.get() != nullptr;
 	}
 
@@ -70,7 +71,26 @@ namespace trace {
 		SetRuntimeLevelForContext(sink, std::make_index_sequence<std::tuple_size<Client::sinks_t>::value>{ }, ctx, level);
 	}
 
-	// dispatch SetRuntimeLevelForContext to sink at index N
+	// dispatch UnsetRuntimeLevelForContext to sink at index N
+	template <size_t N>
+	void sinkUnsetRuntimeLevelForContextFn (context_t ctx, level_t level)
+	{
+		std::get<N>(g_Client->m_sinks).UnsetRuntimeLevelForContext(ctx, level);
+	}
+	template <size_t... Ns>
+	void UnsetRuntimeLevelForContext (unsigned sink_index, std::index_sequence<Ns...>, context_t ctx, level_t level)
+	{
+		using fn_t = void(*) (context_t ctx, level_t level);
+		constexpr static fn_t const funcs[] = { &sinkUnsetRuntimeLevelForContextFn<Ns>... };
+		fn_t const & nth = funcs[sink_index];
+		(*nth)(ctx, level);
+	}
+	void UnsetRuntimeLevelForContext (unsigned sink, context_t ctx, level_t level)
+	{
+		UnsetRuntimeLevelForContext(sink, std::make_index_sequence<std::tuple_size<Client::sinks_t>::value>{ }, ctx, level);
+	}
+
+	// dispatch SetBuffered to sink at index N
 	template <unsigned N>
 	void sinkSetBuffered (bool on)
 	{
@@ -84,7 +104,6 @@ namespace trace {
 		fn_t const & nth = funcs[sink_index];
 		(*nth)(on);
 	}
-
 	void SetBuffered (unsigned sink, bool on)
 	{
 		SetBuffered(sink, std::make_index_sequence<std::tuple_size<Client::sinks_t>::value>{ }, on);
@@ -121,7 +140,10 @@ namespace trace {
 	// message logging
 	void WriteMsgVA_impl (level_t level, context_t context, char const * file, int line, char const * fn, char const * fmt, va_list args)
 	{
-		g_Client->WriteMsg(level, context, file, line, fn, fmt, args);
+		if (g_Client)
+			g_Client->WriteMsg(level, context, file, line, fn, fmt, args);
+		else
+			FailoverClient::WriteMsg(level, context, file, line, fn, fmt, args);
 	}
 	void WriteStr (level_t level, context_t context, char const * file, int line, char const * fn, char const * str)
 	{
@@ -129,109 +151,133 @@ namespace trace {
 	}
 	void WriteScopeVA (ScopedLog::E_Type scptype, level_t level, context_t context, char const * file, int line, char const * fn, char const * fmt, va_list args)
 	{
-		g_Client->WriteScope(scptype, level, context, file, line, fn, fmt, args);
+		if (g_Client)
+			g_Client->WriteScope(scptype, level, context, file, line, fn, fmt, args);
 	}
 
 
 	// Plotting
 	void WritePlot_impl (level_t level, context_t context, float x, float y, char const * fmt, va_list args)
 	{
-		g_Client->WritePlot(level, context, x, y, fmt, args);
+		if (g_Client)
+			g_Client->WritePlot(level, context, x, y, fmt, args);
 	}
 	void WritePlotMarker_impl (level_t level, context_t context, float x, float y, char const * fmt, va_list args)
 	{
-		g_Client->WritePlotMarker(level, context, x, y, fmt, args);
+		if (g_Client)
+			g_Client->WritePlotMarker(level, context, x, y, fmt, args);
 	}
 	void WritePlotXYZ (level_t level, context_t context, float x, float y, float z, char const * fmt, va_list args)
 	{
-		g_Client->WritePlotXYZ(level, context, x, y, z, fmt, args);
+		if (g_Client)
+			g_Client->WritePlotXYZ(level, context, x, y, z, fmt, args);
 	}
 	void WritePlotClear_impl (level_t level, context_t context, char const * fmt, va_list args)
 	{
-		g_Client->WritePlotClear(level, context, fmt, args);
+		if (g_Client)
+			g_Client->WritePlotClear(level, context, fmt, args);
 	}
 
 
 	// Table data logging
 	void WriteTable_impl (level_t level, context_t context, int x, int y, char const * fmt, va_list args)
 	{
-		g_Client->WriteTable(level, context, x, y, fmt, args);
+		if (g_Client)
+			g_Client->WriteTable(level, context, x, y, fmt, args);
 	}
 	void WriteTable_impl (level_t level, context_t context, int x, int y, Color c, char const * fmt, va_list args)
 	{
-		g_Client->WriteTable(level, context, x, y, c, fmt, args);
+		if (g_Client)
+			g_Client->WriteTable(level, context, x, y, c, fmt, args);
 	}
 	void WriteTable_impl (level_t level, context_t context, int x, int y, Color fg, Color bg, char const * fmt, va_list args)
 	{
-		g_Client->WriteTable(level, context, x, y, fg, bg, fmt, args);
+		if (g_Client)
+			g_Client->WriteTable(level, context, x, y, fg, bg, fmt, args);
 	}
 	void WriteTableSetColor_impl (level_t level, context_t context, int x, int y, Color fg, char const * fmt, va_list args)
 	{
-		g_Client->WriteTableSetColor(level, context, x, y, fg, fmt, args);
+		if (g_Client)
+			g_Client->WriteTableSetColor(level, context, x, y, fg, fmt, args);
 	}
 	void WriteTableSetColor_impl (level_t level, context_t context, int x, int y, Color fg, Color bg, char const * fmt, va_list args)
 	{
-		g_Client->WriteTableSetColor(level, context, x, y, fg, bg, fmt, args);
+		if (g_Client)
+			g_Client->WriteTableSetColor(level, context, x, y, fg, bg, fmt, args);
 	}
 	void WriteTableSetHHeader_impl (level_t level, context_t context, int x, char const * name, char const * fmt, va_list args)
 	{
-		g_Client->WriteTableSetHHeader(level, context, x, name, fmt, args);
+		if (g_Client)
+			g_Client->WriteTableSetHHeader(level, context, x, name, fmt, args);
 	}
 	void WriteTableClear_impl (level_t level, context_t context, char const * fmt, va_list args)
 	{
-		g_Client->WriteTableClear(level, context, fmt, args);
+		if (g_Client)
+			g_Client->WriteTableClear(level, context, fmt, args);
 	}
 
 
 	// gantt write functions
 	void WriteGanttBgnVA_Impl (level_t level, context_t context, char const * fmt, va_list args)
 	{
-		g_Client->WriteGanttBgn(level, context, fmt, args);
+		if (g_Client)
+			g_Client->WriteGanttBgn(level, context, fmt, args);
 	}
 	void WriteGanttScopeBgnVA_Impl (level_t level, context_t context, char * tag_buff, size_t tag_max_sz, char const * fmt, va_list args)
 	{
+		if (g_Client)
 		g_Client->WriteGanttScopeBgn(level, context, tag_buff, tag_max_sz, fmt, args);
 	}
 	void WriteGanttBgn_Impl (level_t level, context_t context)
 	{
+		if (g_Client)
 		g_Client->WriteGanttBgn(level, context);
 	}
 	void WriteGanttEndVA_Impl (level_t level, context_t context, char const * fmt, va_list args)
 	{
-		g_Client->WriteGanttEnd(level, context, fmt, args);
+		if (g_Client)
+			g_Client->WriteGanttEnd(level, context, fmt, args);
 	}
 	void WriteGanttEnd_Impl (level_t level, context_t context)
 	{
-		g_Client->WriteGanttEnd(level, context);
+		if (g_Client)
+			g_Client->WriteGanttEnd(level, context);
 	}
 	void WriteGanttFrameBgnVA_Impl (level_t level, context_t context, char const * fmt, va_list args)
 	{
-		g_Client->WriteGanttFrameBgn(level, context, fmt, args);
+		if (g_Client)
+			g_Client->WriteGanttFrameBgn(level, context, fmt, args);
 	}
 	void WriteGanttFrameBgn_Impl(level_t level, context_t context)
 	{
-		g_Client->WriteGanttFrameBgn(level, context);
+		if (g_Client)
+			g_Client->WriteGanttFrameBgn(level, context);
 	}
 	void WriteGanttFrameEndVA_Impl (level_t level, context_t context, char const * fmt, va_list args)
 	{
-		g_Client->WriteGanttFrameEnd(level, context, fmt, args);
+		if (g_Client)
+			g_Client->WriteGanttFrameEnd(level, context, fmt, args);
 	}
 	void WriteGanttFrameEnd_Impl (level_t level, context_t context)
 	{
-		g_Client->WriteGanttFrameEnd(level, context);
+		if (g_Client)
+			g_Client->WriteGanttFrameEnd(level, context);
 	}
 	void WriteGanttClearVA_Impl (level_t level, context_t context, char const * fmt, va_list args)
 	{
-		g_Client->WriteGanttClear(level, context, fmt, args);
+		if (g_Client)
+			g_Client->WriteGanttClear(level, context, fmt, args);
 	}
 
 	void ExportToCSV (char const * file)
 	{
-		g_Client->ExportToCSV(file);
+		if (g_Client)
+			g_Client->ExportToCSV(file);
 	}
 
 	void WriteSound_impl (level_t level, context_t context, float vol, int loop, char const * fmt, va_list args)
 	{
-		g_Client->WriteSound(level, context, vol, loop, fmt, args);
+		if (g_Client)
+			g_Client->WriteSound(level, context, vol, loop, fmt, args);
 	}
 }
