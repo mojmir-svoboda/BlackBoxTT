@@ -13,6 +13,7 @@ namespace bb {
 		TCLAP::ValueArg<std::string> m_rcfile;
 		TCLAP::ValueArg<std::string> m_yamlfile;
 		TCLAP::ValueArg<std::string> m_exec;
+		TCLAP::ValueArg<int> m_verbosity;
 		TCLAP::CmdLine * m_cmdLine;
 
 		CommandLine ();
@@ -23,6 +24,7 @@ namespace bb {
 		bool NoTaskHook () { return !m_taskhook.getValue(); }
 		bool NoTrayHook () { return !m_trayhook.getValue(); }
 		bool Unbuffered () { return m_unbuffered.getValue(); }
+		int Verbosity () { return m_verbosity.getValue(); }
 		std::string const & YamlFile () const { return m_yamlfile.getValue(); }
 		std::string const & ConfigDir () const { return m_configdir.getValue(); }
 		std::string const & LogDir () const { return m_logdir.getValue(); }

@@ -220,7 +220,7 @@ namespace imgui {
 					{
 						unsigned const x = (UINT)LOWORD(lParam);
 						unsigned const y = (UINT)HIWORD(lParam);
-						TRACE_MSG(LL_INFO, CTX_BB | CTX_GFX | CTX_INIT, "WM_SIZE for hwnd=0x%x gui=0x%x dim=(%u,%u)", hwnd, this, (UINT)LOWORD(lParam), (UINT)HIWORD(lParam));
+						TRACE_MSG(LL_DEBUG, CTX_GFX, "WM_SIZE for hwnd=0x%x gui=0x%x dim=(%u,%u)", hwnd, this, (UINT)LOWORD(lParam), (UINT)HIWORD(lParam));
 						OnResize(x, y);
 					}
 					return 0;

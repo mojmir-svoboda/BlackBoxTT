@@ -13,6 +13,7 @@ namespace bb {
 		, m_rcfile("r", "rcfile", "Specify config file.", false, "blackbox.rc", "rc config file")
 		, m_yamlfile("f", "yaml", "Specify config file.", false, "blackbox.yaml", "yaml config file")
 		, m_exec("e", "exec", "Send broadcast message to running WM", false, "@broam", "@broam")
+		, m_verbosity("v", "verbose", "Set verbosity level", false, 0, "level 0 to 3")
 		, m_cmdLine(nullptr)
 	{
 	}
@@ -34,8 +35,7 @@ namespace bb {
 				m_cmdLine->add(m_yamlfile);
 				m_cmdLine->add(m_exec);
 				m_cmdLine->add(m_unbuffered);
-
-				//ValueArg<int> itest("i", "intTest", "integer test", true, 5, "int");
+				m_cmdLine->add(m_verbosity);
 
 				m_cmdLine->parse(__argc, __argv);
 				return true;

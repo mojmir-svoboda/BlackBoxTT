@@ -582,13 +582,28 @@ namespace bb {
 
 		const trace::context_t all_contexts = -1;
 		const trace::level_t errs = LL_ERROR | LL_FATAL;
-		TRACE_SET_SINK_LEVEL(0, all_contexts, errs);
 		const trace::level_t normal_lvl = LL_INFO | LL_WARNING;
-		TRACE_SET_SINK_LEVEL(0, CTX_TASKS | CTX_WSPACE | CTX_INIT | CTX_NET | CTX_GFX, normal_lvl);
 		const trace::level_t all_lvl = LL_VERBOSE | LL_DEBUG | LL_INFO | LL_WARNING | LL_ERROR | LL_FATAL;
-		TRACE_SET_SINK_LEVEL(0, CTX_BB, all_lvl);
 
-		TRACE_SET_SINK_LEVEL(0, CTX_TASKS | CTX_WSPACE | CTX_INIT, all_lvl);
+		int const level = m_cmdLine.Verbosity();
+		TRACE_SET_SINK_LEVEL(0, 0, 0);
+		if (0 <= level)
+		{
+			TRACE_SET_SINK_LEVEL(0, all_contexts, errs);
+		}
+		if (1 <= level)
+		{
+			TRACE_SET_SINK_LEVEL(0, CTX_TASKS | CTX_WSPACE | CTX_INIT | CTX_NET | CTX_GFX, normal_lvl);
+		}
+		if (2 <= level)
+		{
+			TRACE_SET_SINK_LEVEL(0, CTX_BB, all_lvl);
+			TRACE_SET_SINK_LEVEL(0, CTX_TASKS | CTX_WSPACE | CTX_INIT, all_lvl);
+		}
+		if (5 <= level)
+		{
+			TRACE_SET_SINK_LEVEL(0, all_contexts, all_lvl);
+		}
 
 #if !defined TRACE_CLIENT_DISABLE_NETWORKING
 		TRACE_SINK_INIT(1, "127.0.0.1", "13127");
