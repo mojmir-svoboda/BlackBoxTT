@@ -25,7 +25,6 @@ namespace trace {
 		char const * GetFileName () const { return m_fileName; }
 
 		void SetRuntimeLevelForContext (context_t ctx, level_t level) { m_mixer.SetRuntimeLevelForContext(ctx, level); }
-		void UnsetRuntimeLevelForContext (context_t ctx, level_t level) { m_mixer.UnsetRuntimeLevelForContext(ctx, level); }
 		level_t GetRuntimeLevelForContextBit (context_t b) { return m_mixer.GetRuntimeLevelForContextBit(b); }
 		//level_t * GetRuntimeCfgData () { return m_mixer.GetRuntimeCfgData(); }
 		//size_t GetRuntimeCfgSize () const { return m_mixer.GetRuntimeCfgSize(); }
@@ -170,16 +169,12 @@ namespace trace {
 			m_config.SetContextDictionary(values, names, sz);
 		}
 		void SetRuntimeLevelForContext (context_t ctx, level_t level) { m_config.SetRuntimeLevelForContext(ctx, level); }
-		void UnsetRuntimeLevelForContext (context_t ctx, level_t level) { m_config.UnsetRuntimeLevelForContext(ctx, level); }
 
 		void SetBuffered (bool on) { m_file.SetBuffered(0); }
 
 		// tracing functionality
 		void WriteMsg (level_t level, context_t context, char const * file, int line, char const * fn, char const * fmt, va_list args)
 		{
-			if (!m_config.m_mixer.RuntimeFilterPredicate(level, context))
-				return;
-
 			enum { N = 16384 };
 			char tmp[N];
 			char * buff_ptr = tmp;
@@ -188,9 +183,7 @@ namespace trace {
 			WriteMsgImpl(std::make_tuple(level, context, file, line, fn), fmt, args);
 		}
 // 	void WriteStr (level_t level, context_t context, char const * file, int line, char const * fn, char const * str);
-		void WriteScope (ScopedLog::E_Type scptype, level_t level, context_t context, char const * file, int line, char const * fn, char const * fmt, va_list args)
-		{
-		}
+		void WriteScope (ScopedLog::E_Type scptype, level_t level, context_t context, char const * file, int line, char const * fn, char const * fmt, va_list args) { }
 		void WritePlot (level_t level, context_t context, float x, float y, char const * fmt, va_list args) { }
 		void WritePlotMarker (level_t level, context_t context, float x, float y, char const * fmt, va_list args) { }
 		void WritePlotXYZ (level_t level, context_t context, float x, float y, float z, char const * fmt, va_list args) { }

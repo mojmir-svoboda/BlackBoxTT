@@ -26,7 +26,6 @@ namespace trace {
 		char const * GetHostPort () const { return m_hostPort; }
 
 		void SetRuntimeLevelForContext (context_t ctx, level_t level) { m_mixer.SetRuntimeLevelForContext(ctx, level); }
-		void UnsetRuntimeLevelForContext (context_t ctx, level_t level) { m_mixer.UnsetRuntimeLevelForContext(ctx, level); }
 		level_t GetRuntimeLevelForContextBit (context_t b) { return m_mixer.GetRuntimeLevelForContextBit(b); }
 		//level_t * GetRuntimeCfgData () { return m_mixer.GetRuntimeCfgData(); }
 		//size_t GetRuntimeCfgSize () const { return m_mixer.GetRuntimeCfgSize(); }

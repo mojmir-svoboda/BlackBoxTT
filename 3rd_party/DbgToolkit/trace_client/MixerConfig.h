@@ -29,15 +29,7 @@ namespace trace {
 			for (unsigned b = 0; ctx; ++b, ctx >>= 1)
 			{
 				if (ctx & 1)
-					m_mixer[b] |= level;
-			}
-		}
-		void UnsetRuntimeLevelForContext (context_t ctx, level_t level)
-		{
-			for (unsigned b = 0; ctx; ++b, ctx >>= 1)
-			{
-				if (ctx & 1)
-					m_mixer[b] &= ~level;
+					m_mixer[b] = level;
 			}
 		}
 		level_t GetRuntimeLevelForContextBit (context_t b)

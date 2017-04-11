@@ -246,13 +246,9 @@
 #	define TRACE_DONE() trace::Done()
 
 /**	@macro		TRACE_SET_LEVEL_MASK
- *	@brief		sets level mask per flagged context
+ *	@brief		sets initial level mask
  **/
-#	define TRACE_SINK_SET_LEVEL(sink, ctx, lvl) trace::SetRuntimeLevelForContext(sink, ctx, lvl)
- /**	@macro		TRACE_UNSET_LEVEL_MASK
- *	@brief		unsets bits in level mask per flagged context
- **/
-#	define TRACE_SINK_UNSET_LEVEL(sink, ctx, lvl) trace::UnsetRuntimeLevelForContext(sink, ctx, lvl)
+#	define TRACE_SET_SINK_LEVEL(sink, ctx, lvl) trace::SetRuntimeLevelForContext(sink, ctx, lvl)
 /**	@macro		TRACE_SET_CONTEXT_MASK
  *	@brief		set initial context mask
  **/
@@ -308,7 +304,6 @@
 		}
 
 		TRACE_API void SetRuntimeLevelForContext (unsigned sink, context_t ctx, level_t level);
-		TRACE_API void UnsetRuntimeLevelForContext (unsigned sink, context_t ctx, level_t level);
 
 		TRACE_API void SetBuffered (unsigned sink, bool on);
 
