@@ -21,6 +21,7 @@ namespace bb {
 
 		bool r = true;
 		r &= InitControlPanel();
+		r &= InitStartMenu();
 
 		return r;
 	}
@@ -28,6 +29,8 @@ namespace bb {
 	bool Explorer::Done ()
 	{
 		TRACE_MSG(LL_INFO, CTX_BB, "Terminating explorer");
+		m_controlPanel.clear();
+		m_startMenu.clear();
 		if (m_shell)
 		{
 			m_shell->Release();
@@ -49,10 +52,20 @@ namespace bb {
 	{
 	}
 
+	// https://msdn.microsoft.com/en-us/library/windows/desktop/bb761742%28v=vs.85%29.aspx
 	bool Explorer::InitControlPanel ()
 	{
-		// https://msdn.microsoft.com/en-us/library/windows/desktop/bb761742%28v=vs.85%29.aspx
 		REFKNOWNFOLDERID rfid = FOLDERID_ControlPanelFolder;
+		return KnownFolderEnumerate(rfid, m_controlPanel);
+	}
+	bool Explorer::InitStartMenu ()
+	{
+		REFKNOWNFOLDERID rfid = FOLDERID_StartMenu;
+		return KnownFolderEnumerate(rfid, m_startMenu);
+	}
+
+	bool Explorer::KnownFolderEnumerate (REFKNOWNFOLDERID rfid, std::vector<ExplorerItem> & result)
+	{
 		PIDLIST_ABSOLUTE ppidl;
 		HRESULT hr = SHGetKnownFolderIDList(rfid, 0, nullptr, &ppidl);
 		if (hr != S_OK)
@@ -111,7 +124,7 @@ namespace bb {
 							BlackBox::Instance().AddIconToCache(name, lrg, lrg_id);
 
 							ExplorerItem ei(final_pidl, bbstring(tmp_name), bbstring(icofile), idx, sml_id, lrg_id);
-							m_controlPanel.push_back(std::move(ei));
+							result.push_back(std::move(ei));
 							
 						}
 						else
@@ -126,7 +139,7 @@ namespace bb {
 								if (id.m_size > 16)
 									lrg_id = id;
 								ExplorerItem ei(final_pidl, bbstring(tmp_name), bbstring(icofile), idx, sml_id, lrg_id);
-								m_controlPanel.push_back(std::move(ei));
+								result.push_back(std::move(ei));
 							}
 						}
 					}
@@ -151,6 +164,7 @@ namespace bb {
 		//ILFree(enumIDL);
 		//ILFree(sfFolder);
 		return true;
+
 	}
 
 	void Explorer::OnClickedAt (Pidl const & pidl)

@@ -63,10 +63,13 @@ namespace bb {
 		LPMALLOC m_allocator;
 		IShellFolder * m_shell;
 		std::vector<ExplorerItem> m_controlPanel;
+		std::vector<ExplorerItem> m_startMenu;
 
 		Explorer ();
 		bool Init ();
 		bool InitControlPanel ();
+		bool InitStartMenu ();
+		bool KnownFolderEnumerate (REFKNOWNFOLDERID rfid, std::vector<ExplorerItem> & result);
 		bool Done ();
 
 		void HideExplorer (ExplorerConfig const & cfg);
