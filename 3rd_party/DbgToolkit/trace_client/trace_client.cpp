@@ -71,7 +71,26 @@ namespace trace {
 		SetRuntimeLevelForContext(sink, std::make_index_sequence<std::tuple_size<Client::sinks_t>::value>{ }, ctx, level);
 	}
 
-	// dispatch SetRuntimeLevelForContext to sink at index N
+	// dispatch UnsetRuntimeLevelForContext to sink at index N
+	template <size_t N>
+	void sinkUnsetRuntimeLevelForContextFn (context_t ctx, level_t level)
+	{
+		std::get<N>(g_Client->m_sinks).UnsetRuntimeLevelForContext(ctx, level);
+	}
+	template <size_t... Ns>
+	void UnsetRuntimeLevelForContext (unsigned sink_index, std::index_sequence<Ns...>, context_t ctx, level_t level)
+	{
+		using fn_t = void(*) (context_t ctx, level_t level);
+		constexpr static fn_t const funcs[] = { &sinkUnsetRuntimeLevelForContextFn<Ns>... };
+		fn_t const & nth = funcs[sink_index];
+		(*nth)(ctx, level);
+	}
+	void UnsetRuntimeLevelForContext (unsigned sink, context_t ctx, level_t level)
+	{
+		UnsetRuntimeLevelForContext(sink, std::make_index_sequence<std::tuple_size<Client::sinks_t>::value>{ }, ctx, level);
+	}
+
+	// dispatch SetBuffered to sink at index N
 	template <unsigned N>
 	void sinkSetBuffered (bool on)
 	{
@@ -85,7 +104,6 @@ namespace trace {
 		fn_t const & nth = funcs[sink_index];
 		(*nth)(on);
 	}
-
 	void SetBuffered (unsigned sink, bool on)
 	{
 		SetBuffered(sink, std::make_index_sequence<std::tuple_size<Client::sinks_t>::value>{ }, on);

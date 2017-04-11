@@ -30,6 +30,9 @@ namespace trace {
 	// message logging
 	void AsioSocketClient::WriteMsg (level_t level, context_t context, char const * file, int line, char const * fn, char const * fmt, va_list args)
 	{
+		if (!m_config.m_mixer.RuntimeFilterPredicate(level, context))
+			return;
+
 		enum { N = 16384 };
 		char tmp[N];
 		asn1::Header & hdr = asn1::encode_header(tmp, N);

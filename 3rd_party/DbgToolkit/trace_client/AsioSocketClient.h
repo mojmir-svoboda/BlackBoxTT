@@ -131,6 +131,7 @@ namespace trace {
 		void SetLevelDictionary (level_t const * values, char const * names[], size_t sz) { m_config.SetLevelDictionary(values, names, sz); }
 		void SetContextDictionary (level_t const * values, char const * names[], size_t sz) { m_config.SetContextDictionary(values, names, sz); }
 		void SetRuntimeLevelForContext (context_t ctx, level_t level) { m_config.SetRuntimeLevelForContext(ctx, level); }
+		void UnsetRuntimeLevelForContext (context_t ctx, level_t level) { m_config.UnsetRuntimeLevelForContext(ctx, level); }
 
 		bool IsConnected () const { return m_connected; }
 		void SetClientTimer (long long ms) // !MT
