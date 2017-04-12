@@ -27,9 +27,8 @@ namespace bb
 		}
 		else if (node["folder"])
 		{
-			//rhs.m_value = node["folder"].as<bbstring>();
-			//rhs.m_type = bb::e_MenuItemFolder;
-			return std::make_shared<MenuConfigItem>(e_MenuItemSeparator);
+			bb::MenuConfigItemFolder fld = node.as<bb::MenuConfigItemFolder>();
+			return std::make_shared<MenuConfigItemFolder>(fld);
 		}
 		else if (node["menu"])
 		{
@@ -185,6 +184,34 @@ namespace YAML {
 		}
 	};
 
+	template<>
+	struct convert<bb::MenuConfigItemFolder>
+	{
+		static Node encode (bb::MenuConfigItemFolder const & rhs)
+		{
+			Node node = convert<bb::MenuConfigItem>::encode(rhs);
+			node.push_back(rhs.m_folder);
+			return node;
+		}
+
+		static bool decode (Node const & node, bb::MenuConfigItemFolder & rhs)
+		{
+			try
+			{
+				if (convert<bb::MenuConfigItem>::decode(node, rhs))
+				{
+					rhs.m_folder = node["folder"].as<bbstring>();
+					rhs.m_type = bb::e_MenuItemFolder;
+				}
+			}
+			catch (std::exception const & e)
+			{
+				TRACE_MSG(LL_ERROR, CTX_CONFIG, "YAML exception in source %s: %s", __FILE__, e.what());
+				return false;
+			}
+			return true;
+		}
+	};
 
 }
 

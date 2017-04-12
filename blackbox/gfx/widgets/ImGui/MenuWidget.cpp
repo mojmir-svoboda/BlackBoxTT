@@ -78,6 +78,7 @@ namespace imgui {
 		switch (item->m_type)
 		{
 			case e_MenuItemSeparator: DrawSeparator(idx, item); return;
+			case e_MenuItemFolder: DrawFolder(idx, item); return;
 			case e_MenuItemSubMenu: DrawSubMenu(idx, item); return;
 			case e_MenuItemScript: DrawScript(idx, item); return;
 			case e_MenuItemInt: DrawInt(idx, item); return;
@@ -86,7 +87,6 @@ namespace imgui {
 			case e_MenuItemBroamBool: DrawBroamBool(idx, item); return;
 			case e_MenuItemBroamInt: DrawBroamInt(idx, item); return;
 			case e_MenuItemBroamString: DrawBroamString(idx, item); return;
-// 		e_MenuItemFolder,
 // 		e_MenuItemExec,
 			default:
 				Assert(0);
@@ -275,6 +275,24 @@ namespace imgui {
 				int const hdr_size = 24; // @TODO 
 				w->MoveWindow(r.left + r.right - r.left, r.top + a.y - hdr_size);
 			}
+
+			m_currentIndex = idx;
+		}
+		ImGui::PopID();
+	}
+
+	void MenuWidget::DrawFolder (size_t idx, std::shared_ptr<MenuConfigItem> item)
+	{
+		const bool item_selected = (idx == m_currentIndex);
+		char item_text[1024];
+		codecvt_utf16_utf8(item->m_name.c_str(), item_text, 1024);
+
+		ImGui::PushID(idx);
+		if (ImGui::Selectable(item_text, item_selected))
+		{
+			MenuConfigItemFolder const * fld = static_cast<MenuConfigItemFolder const *>(item.get());
+
+			m_gfxWindow->GetRoot()->SetDestroyTree();
 
 			m_currentIndex = idx;
 		}

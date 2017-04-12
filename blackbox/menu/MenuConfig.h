@@ -8,7 +8,7 @@ namespace bb {
 
 	enum MenuItemType : uint32_t {
 		e_MenuItemSeparator,
-// 		e_MenuItemFolder,
+ 		e_MenuItemFolder,
 // 		e_MenuItemExec,
 		e_MenuItemSubMenu,
 		e_MenuItemScript,
@@ -60,6 +60,13 @@ namespace bb {
 		std::shared_ptr<MenuConfig> m_menu;
 
 		MenuConfigItemSubMenu (bbstring const & name, std::shared_ptr<MenuConfig> menu) : MenuConfigItem(e_MenuItemSubMenu, name), m_menu(menu) { }
+	};
+
+	struct MenuConfigItemFolder : MenuConfigItem
+	{
+		bbstring m_folder;
+		MenuConfigItemFolder (bbstring const & name, bbstring const & s) : MenuConfigItem(e_MenuItemFolder, name), m_folder(s) { }
+		MenuConfigItemFolder () : MenuConfigItem(e_MenuItemFolder) { }
 	};
 
 	struct MenuConfigItemCheckBox : MenuConfigItem

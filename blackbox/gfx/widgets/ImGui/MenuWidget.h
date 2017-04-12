@@ -30,5 +30,6 @@ namespace imgui {
 		void DrawInt (size_t idx, std::shared_ptr<MenuConfigItem> item);
 		void DrawSeparator (size_t idx, std::shared_ptr<MenuConfigItem> item);
 		void DrawSubMenu (size_t idx, std::shared_ptr<MenuConfigItem> item);
+		void DrawFolder (size_t idx, std::shared_ptr<MenuConfigItem> item);
 	};
 }}
