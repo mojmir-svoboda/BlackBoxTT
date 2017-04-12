@@ -261,6 +261,9 @@ namespace imgui {
 			io.RenderDrawListsFn = nullptr;
 			io.ImeWindowHandle = m_hwnd;
 
+			ImGuiStyle & style = ImGui::GetStyle();
+			style.DisplaySafeAreaPadding = ImVec2(0, 0); // @NOTE: default value (4,4) messes with auto-resizing based on SizeContent
+
 			io.KeyMap[ImGuiKey_Tab] = VK_TAB;												// Keyboard mapping. ImGui will use those indices to peek into the io.KeyDown[] array that we will update during the application lifetime.
 			io.KeyMap[ImGuiKey_LeftArrow] = VK_LEFT;
 			io.KeyMap[ImGuiKey_RightArrow] = VK_RIGHT;
