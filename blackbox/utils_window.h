@@ -342,8 +342,8 @@ inline void resizeWindowToContents (HWND hwnd, int x, int y, int maxx, int maxy,
 		//::AdjustWindowRectEx(&rc, dwStyle, FALSE, dwExStyle);
 
 		destroyRoundedRect(hwnd);
-		::SetWindowPos(hwnd, NULL, 0, 0, rc.right + 24, rc.bottom, SWP_NOZORDER | SWP_NOMOVE);
-		createRoundedRect(hwnd, rc.right + 24, rc.bottom, rnd, rnd);
+		::SetWindowPos(hwnd, NULL, 0, 0, rc.right, rc.bottom, SWP_NOZORDER | SWP_NOMOVE);
+		createRoundedRect(hwnd, rc.right, rc.bottom, rnd, rnd);
 	}
 }
 
