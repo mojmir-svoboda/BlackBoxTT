@@ -326,24 +326,25 @@ inline bool destroyRoundedRect (HWND hwnd)
 	::RemovePropW(hwnd, L"region");
 	return true;
 }
-inline void resizeWindowToContents (HWND hwnd, int x, int y, int maxx, int maxy, int rnd)
+inline void resizeWindowToContents (HWND hwnd, int x_size, int y_size, int maxx, int maxy, int rnd)
 {
-	if (x > maxx && y > maxy)
+	if (x_size > maxx && y_size > maxy)
 	{
 		RECT r;
 		GetWindowRect(hwnd, &r);
-		int Width = r.left = r.right;
-		int Height = r.bottom - r.top;
+		int const w = r.right - r.left;
+		int const h = r.bottom - r.top;
+		if (w == x_size && h == y_size)
+			return; // nothing to do
 
-		DWORD dwStyle = ::GetWindowLongPtr(hwnd, GWL_STYLE);
-		DWORD dwExStyle = ::GetWindowLongPtr(hwnd, GWL_EXSTYLE);
-
-		RECT rc = { 0, 0, x, y };
-		//::AdjustWindowRectEx(&rc, dwStyle, FALSE, dwExStyle);
+// 		DWORD dwStyle = ::GetWindowLongPtr(hwnd, GWL_STYLE);
+// 		DWORD dwExStyle = ::GetWindowLongPtr(hwnd, GWL_EXSTYLE);
+// 		RECT tst = { 0, 0, w, h };
+// 		::AdjustWindowRectEx(&tst, dwStyle, FALSE, dwExStyle);
 
 		destroyRoundedRect(hwnd);
-		::SetWindowPos(hwnd, NULL, 0, 0, rc.right, rc.bottom, SWP_NOZORDER | SWP_NOMOVE);
-		createRoundedRect(hwnd, rc.right, rc.bottom, rnd, rnd);
+		::SetWindowPos(hwnd, NULL, 0, 0, x_size, y_size, SWP_NOZORDER | SWP_NOMOVE);
+		createRoundedRect(hwnd, x_size, y_size, rnd, rnd);
 	}
 }
 
