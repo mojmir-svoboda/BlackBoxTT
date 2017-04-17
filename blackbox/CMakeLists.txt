@@ -71,6 +71,7 @@ set (blackbox_HEADERS
 	BlackBoxConfig.h
 	CommandLine.h
 	Explorer.h
+	ExplorerItem.h
 	VirtualDesktopManager.h
 	DesktopWallpaper.h
 	DesktopWallpaperConfig.h

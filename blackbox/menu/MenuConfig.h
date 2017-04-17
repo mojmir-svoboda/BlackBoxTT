@@ -9,6 +9,7 @@ namespace bb {
 	enum MenuItemType : uint32_t {
 		e_MenuItemSeparator,
  		e_MenuItemFolder,
+		e_MenuItemSubMenuFolder,
 // 		e_MenuItemExec,
 		e_MenuItemSubMenu,
 		e_MenuItemScript,
@@ -60,6 +61,9 @@ namespace bb {
 		std::shared_ptr<MenuConfig> m_menu;
 
 		MenuConfigItemSubMenu (bbstring const & name, std::shared_ptr<MenuConfig> menu) : MenuConfigItem(e_MenuItemSubMenu, name), m_menu(menu) { }
+		MenuConfigItemSubMenu (MenuItemType type, bbstring const & name, std::shared_ptr<MenuConfig> menu) : MenuConfigItem(type, name), m_menu(menu) { }
+		MenuConfigItemSubMenu (MenuItemType type, bbstring const & name) : MenuConfigItem(type, name) { }
+		MenuConfigItemSubMenu (MenuItemType type) : MenuConfigItem(type) { }
 	};
 
 	struct MenuConfigItemFolder : MenuConfigItem
@@ -67,6 +71,13 @@ namespace bb {
 		bbstring m_folder;
 		MenuConfigItemFolder (bbstring const & name, bbstring const & s) : MenuConfigItem(e_MenuItemFolder, name), m_folder(s) { }
 		MenuConfigItemFolder () : MenuConfigItem(e_MenuItemFolder) { }
+	};
+
+	struct MenuConfigItemSubMenuFolder : MenuConfigItemSubMenu
+	{
+		bbstring m_folder;
+		MenuConfigItemSubMenuFolder (bbstring const & name, bbstring const & s) : MenuConfigItemSubMenu(e_MenuItemSubMenuFolder, name), m_folder(s) { }
+		MenuConfigItemSubMenuFolder () : MenuConfigItemSubMenu(e_MenuItemSubMenuFolder) { }
 	};
 
 	struct MenuConfigItemCheckBox : MenuConfigItem

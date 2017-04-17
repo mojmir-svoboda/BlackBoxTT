@@ -4,6 +4,8 @@
 #include <ShlObj.h>
 #include <vector>
 #include "Gfx/IconId.h"
+#include <loki/AssocVector.h>
+#include "ExplorerItem.h"
 
 namespace bb {
 
@@ -13,49 +15,14 @@ namespace bb {
 		bool m_hideTray;
 	};
 
-	struct Pidl
+// 	inline LPITEMIDLIST clone (LPITEMIDLIST src)
+// 	{
+// 	}
+
+	struct KnwnFldr
 	{
-		LPITEMIDLIST m_pidl;
-
-		Pidl () : m_pidl(0) { }
-		Pidl (LPITEMIDLIST id) : m_pidl(ILClone(id)) { }
-		Pidl (Pidl && rhs) : m_pidl(rhs.m_pidl) { rhs.m_pidl = 0; }
-		~Pidl ()
-		{
-			if (m_pidl)
-			{
-				ILFree(m_pidl);
-			}
-		}
-
-		void Deallocate ();
-	};
-
-	inline LPITEMIDLIST clone (LPITEMIDLIST src)
-	{
-	}
-
-	struct ExplorerItem
-	{
-		Pidl m_pidl;
-		bbstring m_name;
-		bbstring m_icoPath;
-		int m_icoIdx;
-		//HICON m_icon; // do i need it? maybe in async case...
-		IconId m_icoSmall;
-		IconId m_icoLarge;
-
-		ExplorerItem (LPITEMIDLIST pidl, bbstring const & name, bbstring const & ico, int icoidx, IconId sml_id, IconId lrg_id)
-			: m_pidl(pidl), m_name(name), m_icoPath(ico), m_icoIdx(icoidx), m_icoSmall(sml_id), m_icoLarge(lrg_id)/*, m_icon(nullptr)*/
-		{ }
-
-		ExplorerItem (ExplorerItem && rhs)
-			: m_pidl(std::move(rhs.m_pidl)), m_name(std::move(rhs.m_name)), m_icoPath(std::move(rhs.m_icoPath)), m_icoIdx(rhs.m_icoIdx), m_icoSmall(rhs.m_icoSmall), m_icoLarge(rhs.m_icoLarge) /*, m_icon(rhs.m_icon)*/
-		{ }
-
-		~ExplorerItem ()
-		{
-		}
+		KNOWNFOLDERID m_rfid;
+		//ExplorerItem m_item;
 	};
 
 	struct Explorer
@@ -64,12 +31,19 @@ namespace bb {
 		IShellFolder * m_shell;
 		std::vector<ExplorerItem> m_controlPanel;
 		std::vector<ExplorerItem> m_startMenu;
+		Loki::AssocVector<bbstring, KnwnFldr> m_knownFolders;
 
 		Explorer ();
 		bool Init ();
 		bool InitControlPanel ();
 		bool InitStartMenu ();
+		void ScanKnownFolders ();
+		bool GetExplorerItem (PIDLIST_ABSOLUTE ppidl, ExplorerItem & result);
+		bool GetExplorerItem (bbstring const & name, ExplorerItem & result);
+		bool FolderEnumerate (PIDLIST_ABSOLUTE ppidl, std::vector<ExplorerItem> & result);
 		bool KnownFolderEnumerate (REFKNOWNFOLDERID rfid, std::vector<ExplorerItem> & result);
+		bool KnownFolderEnumerate (bbstring const & name, std::vector<ExplorerItem> & result);
+		bool KnownFolder (bbstring const & name, std::vector<ExplorerItem> & result);
 		bool Done ();
 
 		void HideExplorer (ExplorerConfig const & cfg);
@@ -77,5 +51,6 @@ namespace bb {
 		LPITEMIDLIST GetItemId (bbstring const & path);
 
 		void OnClickedAt (Pidl const & pidl);
+		bool IsFolder (Pidl const & pidl);
 	};
 }

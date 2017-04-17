@@ -30,6 +30,11 @@ namespace bb
 			bb::MenuConfigItemFolder fld = node.as<bb::MenuConfigItemFolder>();
 			return std::make_shared<MenuConfigItemFolder>(fld);
 		}
+		else if (node["menufolder"])
+		{
+			bb::MenuConfigItemSubMenuFolder fld = node.as<bb::MenuConfigItemSubMenuFolder>();
+			return std::make_shared<MenuConfigItemSubMenuFolder>(fld);
+		}
 		else if (node["menu"])
 		{
 			bbstring const name = node["name"].as<bbstring>();
@@ -202,6 +207,36 @@ namespace YAML {
 				{
 					rhs.m_folder = node["folder"].as<bbstring>();
 					rhs.m_type = bb::e_MenuItemFolder;
+				}
+			}
+			catch (std::exception const & e)
+			{
+				TRACE_MSG(LL_ERROR, CTX_CONFIG, "YAML exception in source %s: %s", __FILE__, e.what());
+				return false;
+			}
+			return true;
+		}
+	};
+
+	template<>
+	struct convert<bb::MenuConfigItemSubMenuFolder>
+	{
+		static Node encode (bb::MenuConfigItemSubMenuFolder const & rhs)
+		{
+			Node node = convert<bb::MenuConfigItemSubMenu>::encode(rhs);
+			node.push_back(rhs.m_folder);
+			return node;
+		}
+
+		static bool decode (Node const & node, bb::MenuConfigItemSubMenuFolder & rhs)
+		{
+			try
+			{
+				convert<bb::MenuConfigItemSubMenu>::decode(node, rhs);
+				if (node["menufolder"])
+				{
+					rhs.m_folder = node["menufolder"].as<bbstring>();
+					rhs.m_type = bb::e_MenuItemSubMenuFolder;
 				}
 			}
 			catch (std::exception const & e)

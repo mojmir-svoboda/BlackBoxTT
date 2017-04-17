@@ -79,6 +79,7 @@ namespace imgui {
 		{
 			case e_MenuItemSeparator: DrawSeparator(idx, item); return;
 			case e_MenuItemFolder: DrawFolder(idx, item); return;
+			case e_MenuItemSubMenuFolder: DrawSubMenuFolder(idx, item); return;
 			case e_MenuItemSubMenu: DrawSubMenu(idx, item); return;
 			case e_MenuItemScript: DrawScript(idx, item); return;
 			case e_MenuItemInt: DrawInt(idx, item); return;
@@ -281,21 +282,107 @@ namespace imgui {
 		ImGui::PopID();
 	}
 
+	void MenuWidget::DrawSubMenuFolder (size_t idx, std::shared_ptr<MenuConfigItem> item)
+	{
+		const bool item_selected = (idx == m_currentIndex);
+		char item_text[1024];
+		codecvt_utf16_utf8(item->m_name.c_str(), item_text, 1024);
+
+		ImGui::Bullet();
+
+		MenuConfigItemSubMenuFolder * menufld = static_cast<MenuConfigItemSubMenuFolder *>(item.get());
+
+		ImGui::PushID(idx);
+		if (ImGui::Selectable(item_text, item_selected))
+		{
+			m_gfxWindow->SetDestroyChildren();
+
+			ImGui::SameLine();
+			ImGui::Bullet();
+
+			// { ----8<-------
+						// pos of submenu
+						ImDrawList* draw_list = ImGui::GetWindowDrawList();
+						draw_list->PushClipRectFullScreen();
+						ImVec2 a = ImGui::CalcItemRectClosestPoint(ImGui::GetIO().MousePos, true, -2.0f);
+						ImVec2 b = ImGui::GetContentRegionMax();
+						draw_list->PopClipRect();
+			// } ----8<-------
+
+			if (!menufld->m_menu)
+			{
+				bb::MenuConfigItemFolder f;
+				f.m_folder = menufld->m_folder;
+				f.m_name = menufld->m_name;
+				std::shared_ptr<bb::MenuConfigItem> fld = std::make_shared<bb::MenuConfigItemFolder>(f);
+
+				std::shared_ptr<bb::MenuConfig> sub = std::make_shared<bb::MenuConfig>();
+				sub->m_items.push_back(fld);
+				sub->m_widgetType = MenuWidget::c_type;
+				sub->m_id = menufld->m_name;
+
+				menufld->m_menu = sub;
+			
+				// { ----8<-------
+				GuiWidget * w = bb::BlackBox::Instance().GetGfx().FindWidget(menufld->m_menu->m_id.c_str());
+				if (w == nullptr)
+				{
+					w = bb::BlackBox::Instance().GetGfx().MkWidgetFromConfig(*menufld->m_menu);
+					m_gfxWindow->AddChild(w->m_gfxWindow);
+					w->m_gfxWindow->SetParent(m_gfxWindow);
+				}
+
+
+					RECT r;
+					::GetWindowRect(m_gfxWindow->m_hwnd, &r);
+					{
+						int const hdr_size = 24; // @TODO 
+						w->MoveWindow(r.left + r.right - r.left, r.top + a.y - hdr_size);
+					}
+				// } ----8<-------
+			}
+
+			m_currentIndex = idx;
+		}
+		ImGui::PopID();
+	}
+
 	void MenuWidget::DrawFolder (size_t idx, std::shared_ptr<MenuConfigItem> item)
 	{
 		const bool item_selected = (idx == m_currentIndex);
 		char item_text[1024];
 		codecvt_utf16_utf8(item->m_name.c_str(), item_text, 1024);
 
-		ImGui::PushID(idx);
-		if (ImGui::Selectable(item_text, item_selected))
+		MenuConfigItemFolder const * fld = static_cast<MenuConfigItemFolder const *>(item.get());
+
+		if (m_explorerItems.size() == 0)
 		{
-			MenuConfigItemFolder const * fld = static_cast<MenuConfigItemFolder const *>(item.get());
-
-			m_gfxWindow->GetRoot()->SetDestroyTree();
-
-			m_currentIndex = idx;
+			BlackBox::Instance().GetExplorer().KnownFolderEnumerate(fld->m_folder, m_explorerItems);
 		}
+
+		ImGui::PushID(idx);
+// 		if (ImGui::Selectable(item_text, item_selected))
+// 		{
+// 			m_gfxWindow->SetDestroyChildren();
+
+			for (ExplorerItem const & it : m_explorerItems)
+			{
+				//ExplorerItem const & it = ctrlp[i];
+				IconId const icoid = it.m_icoSmall;
+				ImGui::Icon(icoid, ImColor(255, 255, 255, 255), ImColor(255, 255, 255, 128));
+				ImGui::SameLine();
+				std::string name;
+				codecvt_utf16_utf8(it.m_name, name); // @TODO: perf!
+				if (ImGui::Button(name.c_str()))
+				{
+					if (BlackBox::Instance().GetExplorer().IsFolder(it.m_pidl))
+						; // @TODO
+					else
+						BlackBox::Instance().GetExplorer().OnClickedAt(it.m_pidl);
+				}
+			}
+			m_currentIndex = idx;
+//		}
 		ImGui::PopID();
 	}
 
