@@ -78,7 +78,7 @@ namespace imgui {
 		switch (item->m_type)
 		{
 			case e_MenuItemSeparator: DrawSeparator(idx, item); return;
-			case e_MenuItemFolder: DrawFolder(idx, item); return;
+			//case e_MenuItemFolder: DrawFolder(idx, item); return;
 			case e_MenuItemSubMenuFolder: DrawSubMenuFolder(idx, item); return;
 			case e_MenuItemSubMenu: DrawSubMenu(idx, item); return;
 			case e_MenuItemScript: DrawScript(idx, item); return;
@@ -239,6 +239,40 @@ namespace imgui {
 		ImGui::Separator();
 	}
 
+	ImVec2 getPosOfChildMenu()
+	{
+		ImDrawList * draw_list = ImGui::GetWindowDrawList();
+		draw_list->PushClipRectFullScreen();
+
+		ImGuiWindow * imwin = ImGui::GetCurrentWindowRead();
+		ImRect tmp = imwin->DC.LastItemRect;
+
+		draw_list->PopClipRect();
+
+		ImGuiStyle & style = ImGui::GetStyle();
+		ImRect const tit = imwin->TitleBarRect();
+		return ImVec2(tmp.Max.x, tmp.Min.y - tit.Max.y - style.WindowPadding.y);
+	}
+
+	GuiWidget * MenuWidget::CreateSubMenu (std::shared_ptr<MenuConfig> menu)
+	{
+		GuiWidget * submenu = bb::BlackBox::Instance().GetGfx().FindWidget(menu->m_id.c_str());
+		if (submenu == nullptr)
+		{
+			submenu = bb::BlackBox::Instance().GetGfx().MkWidgetFromConfig(*menu);
+			m_gfxWindow->AddChild(submenu->m_gfxWindow);
+			submenu->m_gfxWindow->SetParent(m_gfxWindow);
+		}
+		return submenu;
+	}
+
+	void MenuWidget::MoveChildMenuToPos (ImVec2 submenu_pos, GuiWidget * submenu) const
+	{
+		RECT r;
+		if (::GetWindowRect(m_gfxWindow->m_hwnd, &r))
+			submenu->MoveWindow(r.right, r.top + submenu_pos.y);
+	}
+
 	void MenuWidget::DrawSubMenu (size_t idx, std::shared_ptr<MenuConfigItem> item)
 	{
 		const bool item_selected = (idx == m_currentIndex);
@@ -251,148 +285,161 @@ namespace imgui {
 		if (ImGui::Selectable(item_text, item_selected))
 		{
 			m_gfxWindow->SetDestroyChildren();
+			ImVec2 const submenu_pos = getPosOfChildMenu();
 
 			ImGui::SameLine();
 			ImGui::Bullet();
-			// pos of submenu
-			ImDrawList* draw_list = ImGui::GetWindowDrawList();
-			draw_list->PushClipRectFullScreen();
-			ImVec2 a = ImGui::CalcItemRectClosestPoint(ImGui::GetIO().MousePos, true, -2.0f);
-			ImVec2 b = ImGui::GetContentRegionMax();
-			draw_list->PopClipRect();
 
-			MenuConfigItemSubMenu const * submenu = static_cast<MenuConfigItemSubMenu const *>(item.get());
-			// open menu
-			GuiWidget * w = bb::BlackBox::Instance().GetGfx().FindWidget(submenu->m_menu->m_id.c_str());
-			if (w == nullptr)
-			{
-				w = bb::BlackBox::Instance().GetGfx().MkWidgetFromConfig(*submenu->m_menu);
-				m_gfxWindow->AddChild(w->m_gfxWindow);
-				w->m_gfxWindow->SetParent(m_gfxWindow);
-			}
-			RECT r;
-			::GetWindowRect(m_gfxWindow->m_hwnd, &r);
-			{
-				int const hdr_size = 24; // @TODO 
-				w->MoveWindow(r.left + r.right - r.left, r.top + a.y - hdr_size);
-			}
+			MenuConfigItemSubMenu const * submenu_cfg = static_cast<MenuConfigItemSubMenu const *>(item.get());
+			GuiWidget * submenu = CreateSubMenu(submenu_cfg->m_menu);
+			MoveChildMenuToPos(submenu_pos, submenu);
 
 			m_currentIndex = idx;
 		}
 		ImGui::PopID();
-	}
-
-	ImVec2 getPosOfChildMenu ()
-	{
-		ImDrawList * draw_list = ImGui::GetWindowDrawList();
-		draw_list->PushClipRectFullScreen();
-		
-		ImGuiWindow * imwin = ImGui::GetCurrentWindowRead();
-		ImRect tmp = imwin->DC.LastItemRect;
-
-		draw_list->PopClipRect();
-
-		ImRect const tit = imwin->TitleBarRect();
-		int const hdr_size = tit.Max.y;
-		return ImVec2(tmp.Max.x, tmp.Min.y - hdr_size);
 	}
 
 	void MenuWidget::DrawSubMenuFolder (size_t idx, std::shared_ptr<MenuConfigItem> item)
 	{
 		const bool item_selected = (idx == m_currentIndex);
-		char item_text[1024];
-		codecvt_utf16_utf8(item->m_name.c_str(), item_text, 1024);
-
-		ImGui::Bullet();
 
 		MenuConfigItemSubMenuFolder * menufld = static_cast<MenuConfigItemSubMenuFolder *>(item.get());
-
 		ImGui::PushID(idx);
-		if (ImGui::Selectable(item_text, item_selected))
+
+		if (!item->m_name.empty())
 		{
-			m_gfxWindow->SetDestroyChildren();
+			char item_text[1024];
+			codecvt_utf16_utf8(item->m_name.c_str(), item_text, 1024);
 
-			ImVec2 child_pos = getPosOfChildMenu();
-
-			ImGui::SameLine();
 			ImGui::Bullet();
-
-			if (!menufld->m_menu)
+			if (ImGui::Selectable(item_text, item_selected))
 			{
-				bb::MenuConfigItemFolder f;
-				f.m_folder = menufld->m_folder;
-				f.m_name = menufld->m_name;
-				std::shared_ptr<bb::MenuConfigItem> fld = std::make_shared<bb::MenuConfigItemFolder>(f);
+				m_gfxWindow->SetDestroyChildren();
 
-				std::shared_ptr<bb::MenuConfig> sub = std::make_shared<bb::MenuConfig>();
-				sub->m_items.push_back(fld);
-				sub->m_widgetType = MenuWidget::c_type;
-				sub->m_id = menufld->m_name;
+				ImVec2 submenu_pos = getPosOfChildMenu();
 
-				menufld->m_menu = sub;
-			
-				// { ----8<-------
-				GuiWidget * w = bb::BlackBox::Instance().GetGfx().FindWidget(menufld->m_menu->m_id.c_str());
-				if (w == nullptr)
-				{
-					w = bb::BlackBox::Instance().GetGfx().MkWidgetFromConfig(*menufld->m_menu);
-					m_gfxWindow->AddChild(w->m_gfxWindow);
-					w->m_gfxWindow->SetParent(m_gfxWindow);
-				}
-
-				RECT r;
-				::GetWindowRect(m_gfxWindow->m_hwnd, &r);
-				{
-					ImGuiWindow const * const ww = ImGui::GetCurrentWindowRead();
-					int y = r.top + child_pos.y;
-					w->MoveWindow(r.right, y);
-				}
-
-				// } ----8<-------
-			}
-
-			m_currentIndex = idx;
-		}
-		ImGui::PopID();
-	}
-
-	void MenuWidget::DrawFolder (size_t idx, std::shared_ptr<MenuConfigItem> item)
-	{
-		const bool item_selected = (idx == m_currentIndex);
-		char item_text[1024];
-		codecvt_utf16_utf8(item->m_name.c_str(), item_text, 1024);
-
-		MenuConfigItemFolder const * fld = static_cast<MenuConfigItemFolder const *>(item.get());
-
-		if (m_explorerItems.size() == 0)
-		{
-			BlackBox::Instance().GetExplorer().KnownFolderEnumerate(fld->m_folder, m_explorerItems);
-		}
-
-		ImGui::PushID(idx);
-// 		if (ImGui::Selectable(item_text, item_selected))
-// 		{
-// 			m_gfxWindow->SetDestroyChildren();
-
-			for (ExplorerItem const & it : m_explorerItems)
-			{
-				//ExplorerItem const & it = ctrlp[i];
-				IconId const icoid = it.m_icoSmall;
-				ImGui::Icon(icoid, ImColor(255, 255, 255, 255), ImColor(255, 255, 255, 128));
 				ImGui::SameLine();
-				std::string name;
-				codecvt_utf16_utf8(it.m_name, name); // @TODO: perf!
-				if (ImGui::Button(name.c_str()))
+				ImGui::Bullet();
+
+				if (BlackBox::Instance().GetExplorer().IsKnownFolder(menufld->m_folder))
 				{
-					if (BlackBox::Instance().GetExplorer().IsFolder(it.m_pidl))
-						; // @TODO
-					else
-						BlackBox::Instance().GetExplorer().OnClickedAt(it.m_pidl);
+					if (!menufld->m_menu)
+					{
+						bb::MenuConfigItemSubMenuFolder f;
+						f.m_folder = menufld->m_folder;
+						//f.m_name = menufld->m_name;
+
+						std::shared_ptr<bb::MenuConfig> sub = std::make_shared<bb::MenuConfig>();
+						std::shared_ptr<bb::MenuConfigItem> fld = std::make_shared<bb::MenuConfigItemSubMenuFolder>(f);
+						sub->m_items.push_back(fld);
+						sub->m_widgetType = MenuWidget::c_type;
+						sub->m_id = menufld->m_name;
+
+						menufld->m_menu = sub;
+
+						GuiWidget * submenu = CreateSubMenu(menufld->m_menu);
+						MenuWidget * subwidget = static_cast<MenuWidget *>(submenu);
+						BlackBox::Instance().GetExplorer().KnownFolderEnumerate(menufld->m_folder, subwidget->m_explorerItems);
+						MoveChildMenuToPos(submenu_pos, submenu);
+					}
 				}
+
+				m_currentIndex = idx;
 			}
-			m_currentIndex = idx;
-//		}
+		}
+
+		for (ExplorerItem const & it : m_explorerItems)
+		{
+			IconId const icoid = it.m_icoSmall;
+			ImGui::Icon(icoid, ImColor(255, 255, 255, 255), ImColor(255, 255, 255, 128));
+			ImGui::SameLine();
+			std::string name;
+			codecvt_utf16_utf8(it.m_name, name); // @TODO: perf!
+			if (ImGui::Selectable(name.c_str(), item_selected))
+			{
+				if (BlackBox::Instance().GetExplorer().IsFolder(it.m_pidl))
+				{
+					ImVec2 submenu_pos = getPosOfChildMenu();
+
+					bb::MenuConfigItemSubMenuFolder f;
+					f.m_folder = menufld->m_folder;
+					//f.m_name = menufld->m_name;
+					std::shared_ptr<bb::MenuConfigItem> fld = std::make_shared<bb::MenuConfigItemSubMenuFolder>(f);
+					std::shared_ptr<bb::MenuConfig> sub = std::make_shared<bb::MenuConfig>();
+					sub->m_items.push_back(fld);
+					sub->m_widgetType = MenuWidget::c_type;
+					sub->m_id = menufld->m_name;
+
+					menufld->m_menu = sub;
+
+					GuiWidget * submenu = CreateSubMenu(menufld->m_menu);
+					MenuWidget * subwidget = static_cast<MenuWidget *>(submenu);
+					BlackBox::Instance().GetExplorer().FolderEnumerate(it.m_pidl.m_pidl, subwidget->m_explorerItems);
+					MoveChildMenuToPos(submenu_pos, submenu);
+				}
+				else
+					BlackBox::Instance().GetExplorer().OnClickedAt(it.m_pidl);
+			}
+		}
+
 		ImGui::PopID();
 	}
+
+// 	void MenuWidget::DrawFolder (size_t idx, std::shared_ptr<MenuConfigItem> item)
+// 	{
+// 		const bool item_selected = (idx == m_currentIndex);
+// 		char item_text[1024];
+// 		codecvt_utf16_utf8(item->m_name.c_str(), item_text, 1024);
+// 
+// 		MenuConfigItemFolder const * fld = static_cast<MenuConfigItemFolder const *>(item.get());
+// 
+// 		if (m_explorerItems.size() == 0)
+// 		{
+// 			BlackBox::Instance().GetExplorer().KnownFolderEnumerate(fld->m_folder, m_explorerItems);
+// 		}
+// 
+// 		ImGui::PushID(idx);
+// // 		if (ImGui::Selectable(item_text, item_selected))
+// // 		{
+// // 			m_gfxWindow->SetDestroyChildren();
+// 
+// 			for (ExplorerItem const & it : m_explorerItems)
+// 			{
+// 				//ExplorerItem const & it = ctrlp[i];
+// 				IconId const icoid = it.m_icoSmall;
+// 				ImGui::Icon(icoid, ImColor(255, 255, 255, 255), ImColor(255, 255, 255, 128));
+// 				ImGui::SameLine();
+// 				std::string name;
+// 				codecvt_utf16_utf8(it.m_name, name); // @TODO: perf!
+// 				if (ImGui::Button(name.c_str()))
+// 				{
+// 					if (BlackBox::Instance().GetExplorer().IsFolder(it.m_pidl))
+// 					{
+// 						if (!menufld->m_menu)
+// 						{
+// 							bb::MenuConfigItemFolder f;
+// 							f.m_folder = menufld->m_folder;
+// 							f.m_name = menufld->m_name;
+// 							std::shared_ptr<bb::MenuConfigItem> fld = std::make_shared<bb::MenuConfigItemFolder>(f);
+// 
+// 							std::shared_ptr<bb::MenuConfig> sub = std::make_shared<bb::MenuConfig>();
+// 							sub->m_items.push_back(fld);
+// 							sub->m_widgetType = MenuWidget::c_type;
+// 							sub->m_id = menufld->m_name;
+// 
+// 							menufld->m_menu = sub;
+// 
+// 							GuiWidget * submenu = CreateSubMenu(menufld->m_menu);
+// 							MoveChildMenuToPos(submenu_pos, submenu);
+// 						}
+// 					}
+// 					else
+// 						BlackBox::Instance().GetExplorer().OnClickedAt(it.m_pidl);
+// 				}
+// 			}
+// 			m_currentIndex = idx;
+// //		}
+// 		ImGui::PopID();
+// 	}
 
 }}

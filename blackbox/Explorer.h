@@ -44,6 +44,7 @@ namespace bb {
 		bool KnownFolderEnumerate (REFKNOWNFOLDERID rfid, std::vector<ExplorerItem> & result);
 		bool KnownFolderEnumerate (bbstring const & name, std::vector<ExplorerItem> & result);
 		bool KnownFolder (bbstring const & name, std::vector<ExplorerItem> & result);
+		bool IsKnownFolder (bbstring const & name) const;
 		bool Done ();
 
 		void HideExplorer (ExplorerConfig const & cfg);
@@ -51,6 +52,6 @@ namespace bb {
 		LPITEMIDLIST GetItemId (bbstring const & path);
 
 		void OnClickedAt (Pidl const & pidl);
-		bool IsFolder (Pidl const & pidl);
+		bool IsFolder (Pidl const & pidl) const;
 	};
 }

@@ -78,6 +78,14 @@ namespace bb {
 		return false;
 	}
 
+	bool Explorer::IsKnownFolder (bbstring const & name) const
+	{
+		auto it = m_knownFolders.find(name);
+		if (it != m_knownFolders.end())
+			return true;
+		return false;
+	}
+
 	bool Explorer::KnownFolder (bbstring const & name, std::vector<ExplorerItem> & result)
 	{
 		auto it = m_knownFolders.find(name);
@@ -453,7 +461,7 @@ namespace bb {
 		BOOL ret = ::ShellExecuteEx(&info);
 	}
 
-	bool Explorer::IsFolder (Pidl const & pidl)
+	bool Explorer::IsFolder (Pidl const & pidl) const
 	{
 		IShellItem *psi;
 		HRESULT hr = SHCreateItemFromIDList(pidl.m_pidl, IID_PPV_ARGS(&psi));
@@ -463,15 +471,12 @@ namespace bb {
 			hr = psi->GetAttributes(SFGAO_STREAM | SFGAO_FOLDER, &dwAttr);
 			if (SUCCEEDED(hr))
 			{
-				//if (SFGAO_FILESYSANCESTOR == dwAttr)
-				{
 					bool const is_dir = dwAttr & SFGAO_FOLDER;
 					return is_dir;
 				}
-			}
 			psi->Release();
 		}
-
+		return false;
 	}
 }
 
