@@ -282,6 +282,21 @@ namespace imgui {
 		ImGui::PopID();
 	}
 
+	ImVec2 getPosOfChildMenu ()
+	{
+		ImDrawList * draw_list = ImGui::GetWindowDrawList();
+		draw_list->PushClipRectFullScreen();
+		
+		ImGuiWindow * imwin = ImGui::GetCurrentWindowRead();
+		ImRect tmp = imwin->DC.LastItemRect;
+
+		draw_list->PopClipRect();
+
+		ImRect const tit = imwin->TitleBarRect();
+		int const hdr_size = tit.Max.y;
+		return ImVec2(tmp.Max.x, tmp.Min.y - hdr_size);
+	}
+
 	void MenuWidget::DrawSubMenuFolder (size_t idx, std::shared_ptr<MenuConfigItem> item)
 	{
 		const bool item_selected = (idx == m_currentIndex);
@@ -297,17 +312,10 @@ namespace imgui {
 		{
 			m_gfxWindow->SetDestroyChildren();
 
+			ImVec2 child_pos = getPosOfChildMenu();
+
 			ImGui::SameLine();
 			ImGui::Bullet();
-
-			// { ----8<-------
-						// pos of submenu
-						ImDrawList* draw_list = ImGui::GetWindowDrawList();
-						draw_list->PushClipRectFullScreen();
-						ImVec2 a = ImGui::CalcItemRectClosestPoint(ImGui::GetIO().MousePos, true, -2.0f);
-						ImVec2 b = ImGui::GetContentRegionMax();
-						draw_list->PopClipRect();
-			// } ----8<-------
 
 			if (!menufld->m_menu)
 			{
@@ -332,13 +340,14 @@ namespace imgui {
 					w->m_gfxWindow->SetParent(m_gfxWindow);
 				}
 
+				RECT r;
+				::GetWindowRect(m_gfxWindow->m_hwnd, &r);
+				{
+					ImGuiWindow const * const ww = ImGui::GetCurrentWindowRead();
+					int y = r.top + child_pos.y;
+					w->MoveWindow(r.right, y);
+				}
 
-					RECT r;
-					::GetWindowRect(m_gfxWindow->m_hwnd, &r);
-					{
-						int const hdr_size = 24; // @TODO 
-						w->MoveWindow(r.left + r.right - r.left, r.top + a.y - hdr_size);
-					}
 				// } ----8<-------
 			}
 
