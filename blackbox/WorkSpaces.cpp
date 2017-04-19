@@ -620,7 +620,7 @@ namespace bb {
 								}
 								else
 								{
-									TRACE_MSG(LL_ERROR, CTX_BB | CTX_CONFIG, "edgelist error: cannot find vertex: %s", v.c_str());
+									TRACE_MSG(LL_ERROR, CTX_BB | CTX_CONFIG, "edgelist error: cannot find vertex: %ws", v.c_str());
 									m_graph.Clear();
 									return false;
 								}

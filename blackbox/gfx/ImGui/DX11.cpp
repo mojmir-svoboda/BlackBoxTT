@@ -25,7 +25,7 @@ namespace bb {
 
 		m_pd3dDeviceContext->OMSetRenderTargets(1, &view, NULL);
 		pBackBuffer->Release();
-		TRACE_MSG(LL_INFO, CTX_BB | CTX_GFX | CTX_INIT, "Created render target @ 0x%x for chain @ 0x%x", view, chain);
+		TRACE_MSG(LL_VERBOSE, CTX_BB | CTX_GFX | CTX_INIT, "Created render target @ 0x%x for chain @ 0x%x", view, chain);
 		return view;
 	}
 

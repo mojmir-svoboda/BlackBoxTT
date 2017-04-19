@@ -256,6 +256,7 @@ namespace imgui {
 
 	GuiWidget * MenuWidget::CreateSubMenu (std::shared_ptr<MenuConfig> menu)
 	{
+		TRACE_MSG(LL_DEBUG, CTX_BB | CTX_GFX, "created submenu id=%s", menu->m_id.c_str());
 		GuiWidget * submenu = bb::BlackBox::Instance().GetGfx().FindWidget(menu->m_id.c_str());
 		if (submenu == nullptr)
 		{
@@ -325,6 +326,7 @@ namespace imgui {
 				{
 					if (!menufld->m_menu)
 					{
+						TRACE_MSG(LL_DEBUG, CTX_BB | CTX_GFX, "SubMenuFolder %ws not found, creating new(folder=%ws)", menufld->m_name.c_str(), menufld->m_folder.c_str());
 						bb::MenuConfigItemSubMenuFolder f;
 						f.m_folder = menufld->m_folder;
 						//f.m_name = menufld->m_name;
@@ -341,6 +343,10 @@ namespace imgui {
 						MenuWidget * subwidget = static_cast<MenuWidget *>(submenu);
 						BlackBox::Instance().GetExplorer().KnownFolderEnumerate(menufld->m_folder, subwidget->m_explorerItems);
 						MoveChildMenuToPos(submenu_pos, submenu);
+					}
+					else
+					{
+						TRACE_MSG(LL_DEBUG, CTX_BB | CTX_GFX, "SubMenuFolder %ws already exists", menufld->m_name.c_str());
 					}
 				}
 
@@ -361,6 +367,7 @@ namespace imgui {
 				{
 					ImVec2 submenu_pos = getPosOfChildMenu();
 
+					TRACE_MSG(LL_DEBUG, CTX_BB | CTX_GFX, "SubMenuFolder %ws clicked (folder=%ws)", menufld->m_name.c_str(), menufld->m_folder.c_str());
 					bb::MenuConfigItemSubMenuFolder f;
 					f.m_folder = menufld->m_folder;
 					//f.m_name = menufld->m_name;

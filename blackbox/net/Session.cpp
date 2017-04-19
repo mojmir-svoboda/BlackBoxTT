@@ -21,7 +21,7 @@ namespace bb {
 		, m_responses()
 		, m_pendingWrite(false)
 	{
-		TRACE_MSG(LL_DEBUG, CTX_BB | CTX_NET, "Server session @ 0x%x started, waiting for data", this);
+		TRACE_MSG(LL_VERBOSE, CTX_BB | CTX_NET, "Server session @ 0x%x started, waiting for data", this);
 		m_asn1Allocator.resizeStorage(m_asn1Allocator.calcNextSize());
 	}
 
