@@ -388,7 +388,7 @@ namespace bb {
 			return false;
 
 		m_wspaces.InitNotifWindow();
-		//TRACE_SET_SINK_LEVEL(0, CTX_TASKS | CTX_WSPACE | CTX_INIT, LL_ERROR | LL_FATAL | LL_INFO | LL_WARNING);
+		//TRACE_SINK_SET_LEVEL(0, CTX_TASKS | CTX_WSPACE | CTX_INIT, LL_ERROR | LL_FATAL | LL_INFO | LL_WARNING);
 		return true;
 	}
 
@@ -604,6 +604,11 @@ namespace bb {
 			TRACE_SINK_SET_LEVEL(0, CTX_BB, all_lvl);
 			TRACE_SINK_SET_LEVEL(0, CTX_TASKS | CTX_WSPACE | CTX_INIT, all_lvl);
 		}
+		if (4 <= level)
+		{
+			TRACE_SINK_SET_LEVEL(0, all_contexts, all_lvl);
+			TRACE_SINK_UNSET_LEVEL(0, all_contexts, LL_VERBOSE);
+		}
 		if (5 <= level)
 		{
 			TRACE_SINK_SET_LEVEL(0, all_contexts, all_lvl);
@@ -673,7 +678,7 @@ namespace bb {
 		bool const buffered = !m_cmdLine.Unbuffered();
 		TRACE_SINK_SET_BUFFERED(0, buffered);
 
-		TRACE_MSG(LL_INFO, CTX_INIT, "Connected to server.");
+		TRACE_MSG(LL_INFO, CTX_INIT, "Log started, level=%i", level);
 		TRACE_MSG(LL_ERROR, CTX_INIT | CTX_BB, "Test (error)");
 		TRACE_MSG(LL_WARNING, CTX_INIT | CTX_BB, "Test (warn)");
 		TRACE_MSG(LL_DEBUG, CTX_INIT | CTX_BB, "Test (dbg)");
