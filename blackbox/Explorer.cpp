@@ -346,8 +346,7 @@ namespace bb {
 							BlackBox::Instance().AddIconToCache(name, sml, sml_id);
 							BlackBox::Instance().AddIconToCache(name, lrg, lrg_id);
 
-							ExplorerItem ei(final_pidl, bbstring(tmp_name), bbstring(icofile), idx, sml_id, lrg_id);
-							result.push_back(std::move(ei));
+							result.emplace_back(final_pidl, bbstring(tmp_name), bbstring(icofile), idx, sml_id, lrg_id);
 							
 						}
 						else
@@ -361,8 +360,7 @@ namespace bb {
 
 								if (id.m_size > 16)
 									lrg_id = id;
-								ExplorerItem ei(final_pidl, bbstring(tmp_name), bbstring(icofile), idx, sml_id, lrg_id);
-								result.push_back(std::move(ei));
+								result.emplace_back(final_pidl, bbstring(tmp_name), bbstring(icofile), idx, sml_id, lrg_id);
 							}
 						}
 					}
