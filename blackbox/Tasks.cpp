@@ -399,7 +399,7 @@ void Tasks::SwitchWorkSpace (bbstring const & src_vertex_id, bbstring const & ds
 
 	if (src_vertex_id == dst_vertex_id)
 		return;
-	TRACE_MSG(LL_DEBUG, CTX_BB | CTX_WSPACE, "SwitchWorkSpace %ws --> %ws", src_vertex_id.c_str(), dst_vertex_id.c_str());
+	TRACE_MSG(LL_VERBOSE, CTX_BB | CTX_WSPACE, "SwitchWorkSpace %ws --> %ws", src_vertex_id.c_str(), dst_vertex_id.c_str());
 
 	m_lock.Lock();
 
