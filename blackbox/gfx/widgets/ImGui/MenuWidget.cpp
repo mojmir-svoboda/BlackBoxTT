@@ -302,41 +302,52 @@ namespace imgui {
 
 	void MenuConfigItemFolder::InitFromExplorer ()
 	{
-// 		m_knownFolder = BlackBox::Instance().GetExplorer().IsKnownFolder(m_folderName);
-// 		if (m_knownFolder)
-// 		{
-// 				//TRACE_MSG(LL_DEBUG, CTX_BB | CTX_GFX, "SubMenuFolder %ws not found, creating new (folder=%ws)", menufld->m_name.c_str(), menufld->m_folderName.c_str());
-// 				bb::MenuConfigItemFolder f;
-// 				//f.m_folder = m_folder;
-// 				//f.m_name = menufld->m_name;
-// 
-// 				std::shared_ptr<bb::MenuConfig> sub = std::make_shared<bb::MenuConfig>();
-// // 				std::shared_ptr<bb::MenuConfigItem> fld = std::make_shared<bb::MenuConfigItemSubMenuFolder>(f);
-// // 				sub->m_items.push_back(fld);
-// // 				sub->m_widgetType = MenuWidget::c_type;
-// // 				sub->m_id = menufld->m_name;
-// // 
-// // 				menufld->m_menu = sub;
-// // 
-// // 				GuiWidget * submenu = CreateSubMenu(menufld->m_menu);
-// // 				MenuWidget * subwidget = static_cast<MenuWidget *>(submenu);
-// // 				BlackBox::Instance().GetExplorer().KnownFolderEnumerate(menufld->m_folder, subwidget->m_explorerItems);
-// // 				MoveChildMenuToPos(submenu_pos, submenu);
-// 
-// 		}
-// 		else
-// 		{
-// 			ExplorerItem item;
-// 			BlackBox::Instance().GetExplorer().GetExplorerItem(m_folderName, item);
-// 			if (item.IsValid())
-// 			{
-// 				bool const is_folder = BlackBox::Instance().GetExplorer().IsFolder(item.m_pidl.m_pidl);
-// 			}
-// 			else
-// 			{
-// 				TRACE_MSG(LL_DEBUG, CTX_BB | CTX_GFX, "cannot get explorer pidl from folderName=%ws", m_folderName.c_str());
-// 			}
-// 		}
+		m_knownFolder = BlackBox::Instance().GetExplorer().IsKnownFolder(m_folderName);
+		if (m_knownFolder)
+		{
+			TRACE_MSG(LL_DEBUG, CTX_BB | CTX_GFX, "ItemFolder %ws is known folder, expanding (folder=%ws)", m_name.c_str(), m_folderName.c_str());
+			std::shared_ptr<bb::MenuConfig> sub = std::make_shared<bb::MenuConfig>();
+			m_menu = sub;
+
+			// @TODO: perf
+			std::vector<ExplorerItem> items;
+			BlackBox::Instance().GetExplorer().KnownFolderEnumerate(m_folderName, items);
+
+			for (ExplorerItem & it : items)
+			{
+				if (BlackBox::Instance().GetExplorer().IsFolder(it.m_pidl.m_pidl))
+				{
+					MenuConfigItemFolder f;
+					f.m_folderItem = it;
+					f.m_type = e_MenuItemFolder;
+					f.m_name = it.m_name;
+					std::shared_ptr<bb::MenuConfigItem> fld = std::make_shared<bb::MenuConfigItemFolder>(f);
+					sub->m_items.push_back(fld);
+				}
+				else
+				{
+					// @TODO: e_MenuItemExplorer
+					bb::MenuConfigItem itmp;
+					itmp.m_type = e_MenuItemBroamString;
+					itmp.m_name = it.m_name;
+					std::shared_ptr<bb::MenuConfigItem> i = std::make_shared<bb::MenuConfigItem>(itmp);
+					sub->m_items.push_back(i);
+				}
+			}
+		}
+		else
+		{
+			ExplorerItem item;
+			BlackBox::Instance().GetExplorer().GetExplorerItem(m_folderName, item);
+			if (item.IsValid())
+			{
+				bool const is_folder = BlackBox::Instance().GetExplorer().IsFolder(item.m_pidl.m_pidl);
+			}
+			else
+			{
+				TRACE_MSG(LL_DEBUG, CTX_BB | CTX_GFX, "cannot get explorer pidl from folderName=%ws", m_folderName.c_str());
+			}
+		}
 	}
 namespace imgui {
 
