@@ -1,7 +1,6 @@
 #pragma once
 #include <blackbox/gfx/MenuWidget.h>
 #include <imgui/imgui.h>
-#include <blackbox/ExplorerItem.h>
 #include <vector>
 
 namespace bb {
@@ -10,7 +9,6 @@ namespace imgui {
 	struct MenuWidget : bb::MenuWidget
 	{
 		ImVec2 m_contentSize { 0, 0 };
-		std::vector<ExplorerItem> m_explorerItems;
 
 		MenuWidget ();
 		MenuWidget (MenuConfig const & cfg) : bb::MenuWidget(cfg) { }

@@ -78,8 +78,7 @@ namespace imgui {
 		switch (item->m_type)
 		{
 			case e_MenuItemSeparator: DrawSeparator(idx, item); return;
-			//case e_MenuItemFolder: DrawFolder(idx, item); return;
-			case e_MenuItemSubMenuFolder: DrawSubMenuFolder(idx, item); return;
+			case e_MenuItemFolder: DrawSubMenuFolder(idx, item); return;
 			case e_MenuItemSubMenu: DrawSubMenu(idx, item); return;
 			case e_MenuItemScript: DrawScript(idx, item); return;
 			case e_MenuItemInt: DrawInt(idx, item); return;
@@ -299,12 +298,53 @@ namespace imgui {
 		}
 		ImGui::PopID();
 	}
+}
+
+	void MenuConfigItemFolder::InitFromExplorer ()
+	{
+// 		m_knownFolder = BlackBox::Instance().GetExplorer().IsKnownFolder(m_folderName);
+// 		if (m_knownFolder)
+// 		{
+// 				//TRACE_MSG(LL_DEBUG, CTX_BB | CTX_GFX, "SubMenuFolder %ws not found, creating new (folder=%ws)", menufld->m_name.c_str(), menufld->m_folderName.c_str());
+// 				bb::MenuConfigItemFolder f;
+// 				//f.m_folder = m_folder;
+// 				//f.m_name = menufld->m_name;
+// 
+// 				std::shared_ptr<bb::MenuConfig> sub = std::make_shared<bb::MenuConfig>();
+// // 				std::shared_ptr<bb::MenuConfigItem> fld = std::make_shared<bb::MenuConfigItemSubMenuFolder>(f);
+// // 				sub->m_items.push_back(fld);
+// // 				sub->m_widgetType = MenuWidget::c_type;
+// // 				sub->m_id = menufld->m_name;
+// // 
+// // 				menufld->m_menu = sub;
+// // 
+// // 				GuiWidget * submenu = CreateSubMenu(menufld->m_menu);
+// // 				MenuWidget * subwidget = static_cast<MenuWidget *>(submenu);
+// // 				BlackBox::Instance().GetExplorer().KnownFolderEnumerate(menufld->m_folder, subwidget->m_explorerItems);
+// // 				MoveChildMenuToPos(submenu_pos, submenu);
+// 
+// 		}
+// 		else
+// 		{
+// 			ExplorerItem item;
+// 			BlackBox::Instance().GetExplorer().GetExplorerItem(m_folderName, item);
+// 			if (item.IsValid())
+// 			{
+// 				bool const is_folder = BlackBox::Instance().GetExplorer().IsFolder(item.m_pidl.m_pidl);
+// 			}
+// 			else
+// 			{
+// 				TRACE_MSG(LL_DEBUG, CTX_BB | CTX_GFX, "cannot get explorer pidl from folderName=%ws", m_folderName.c_str());
+// 			}
+// 		}
+	}
+namespace imgui {
 
 	void MenuWidget::DrawSubMenuFolder (size_t idx, std::shared_ptr<MenuConfigItem> item)
 	{
 		const bool item_selected = (idx == m_currentIndex);
 
-		MenuConfigItemSubMenuFolder * menufld = static_cast<MenuConfigItemSubMenuFolder *>(item.get());
+		MenuConfigItemFolder * menufld = static_cast<MenuConfigItemFolder *>(item.get());
 		ImGui::PushID(idx);
 
 		if (!item->m_name.empty())

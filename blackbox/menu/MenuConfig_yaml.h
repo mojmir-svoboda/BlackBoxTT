@@ -27,13 +27,8 @@ namespace bb
 		}
 		else if (node["folder"])
 		{
-			bb::MenuConfigItemFolder fld = node.as<bb::MenuConfigItemFolder>();
+			bb::MenuConfigItemFolder fld = std::move(node.as<bb::MenuConfigItemFolder>());
 			return std::make_shared<MenuConfigItemFolder>(fld);
-		}
-		else if (node["menufolder"])
-		{
-			bb::MenuConfigItemSubMenuFolder fld = node.as<bb::MenuConfigItemSubMenuFolder>();
-			return std::make_shared<MenuConfigItemSubMenuFolder>(fld);
 		}
 		else if (node["menu"])
 		{
@@ -194,8 +189,8 @@ namespace YAML {
 	{
 		static Node encode (bb::MenuConfigItemFolder const & rhs)
 		{
-			Node node = convert<bb::MenuConfigItem>::encode(rhs);
-			node.push_back(rhs.m_folder);
+			Node node = convert<bb::MenuConfigItemSubMenu>::encode(rhs);
+			node.push_back(rhs.m_folderName);
 			return node;
 		}
 
@@ -203,40 +198,12 @@ namespace YAML {
 		{
 			try
 			{
-				if (convert<bb::MenuConfigItem>::decode(node, rhs))
-				{
-					rhs.m_folder = node["folder"].as<bbstring>();
-					rhs.m_type = bb::e_MenuItemFolder;
-				}
-			}
-			catch (std::exception const & e)
-			{
-				TRACE_MSG(LL_ERROR, CTX_CONFIG, "YAML exception in source %s: %s", __FILE__, e.what());
-				return false;
-			}
-			return true;
-		}
-	};
-
-	template<>
-	struct convert<bb::MenuConfigItemSubMenuFolder>
-	{
-		static Node encode (bb::MenuConfigItemSubMenuFolder const & rhs)
-		{
-			Node node = convert<bb::MenuConfigItemSubMenu>::encode(rhs);
-			node.push_back(rhs.m_folder);
-			return node;
-		}
-
-		static bool decode (Node const & node, bb::MenuConfigItemSubMenuFolder & rhs)
-		{
-			try
-			{
 				convert<bb::MenuConfigItemSubMenu>::decode(node, rhs);
-				if (node["menufolder"])
+				if (node["folder"])
 				{
-					rhs.m_folder = node["menufolder"].as<bbstring>();
-					rhs.m_type = bb::e_MenuItemSubMenuFolder;
+					rhs.m_folderName = node["folder"].as<bbstring>();
+					rhs.InitFromExplorer();
+					rhs.m_type = bb::e_MenuItemFolder;
 				}
 			}
 			catch (std::exception const & e)

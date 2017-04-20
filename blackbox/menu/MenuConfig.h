@@ -3,13 +3,14 @@
 #include <memory>
 #include <bblib/bbstring.h>
 #include <blackbox/WidgetConfig.h>
+#include <blackbox/ExplorerItem.h>
+
 namespace YAML { class Node; }
 namespace bb {
 
 	enum MenuItemType : uint32_t {
 		e_MenuItemSeparator,
  		e_MenuItemFolder,
-		e_MenuItemSubMenuFolder,
 // 		e_MenuItemExec,
 		e_MenuItemSubMenu,
 		e_MenuItemScript,
@@ -66,18 +67,18 @@ namespace bb {
 		MenuConfigItemSubMenu (MenuItemType type) : MenuConfigItem(type) { }
 	};
 
-	struct MenuConfigItemFolder : MenuConfigItem
+	struct MenuConfigItemFolder : MenuConfigItemSubMenu
 	{
-		bbstring m_folder;
-		MenuConfigItemFolder (bbstring const & name, bbstring const & s) : MenuConfigItem(e_MenuItemFolder, name), m_folder(s) { }
-		MenuConfigItemFolder () : MenuConfigItem(e_MenuItemFolder) { }
-	};
+		bbstring m_folderName;
+		//ExplorerItem m_folderItem;
+		bool m_knownFolder { false };
 
-	struct MenuConfigItemSubMenuFolder : MenuConfigItemSubMenu
-	{
-		bbstring m_folder;
-		MenuConfigItemSubMenuFolder (bbstring const & name, bbstring const & s) : MenuConfigItemSubMenu(e_MenuItemSubMenuFolder, name), m_folder(s) { }
-		MenuConfigItemSubMenuFolder () : MenuConfigItemSubMenu(e_MenuItemSubMenuFolder) { }
+		MenuConfigItemFolder (bbstring const & name, bbstring const & s) : MenuConfigItemSubMenu(e_MenuItemFolder, name), m_folderName(s) { }
+		MenuConfigItemFolder () : MenuConfigItemSubMenu(e_MenuItemFolder) { }
+
+		void InitFromExplorer ();
+
+		//MenuConfigItemFolder (MenuConfigItemFolder const & rhs) : MenuConfigItemSubMenu(rhs), m_folderName(rhs.m_folderName), m_folderItem(rhs.m_folderItem) { }
 	};
 
 	struct MenuConfigItemCheckBox : MenuConfigItem
