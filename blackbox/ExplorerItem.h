@@ -20,7 +20,11 @@ namespace bb {
 			}
 			return *this;
 		}
-		Pidl (Pidl && rhs) : m_pidl(rhs.m_pidl) { rhs.m_pidl = nullptr; }
+		Pidl (Pidl && rhs) noexcept
+			: m_pidl(rhs.m_pidl)
+		{
+			rhs.m_pidl = nullptr;
+		}
 		~Pidl ()
 		{
 			if (m_pidl)
@@ -43,8 +47,12 @@ namespace bb {
 			: m_pidl(pidl), m_name(name), m_icoPath(ico), m_icoIdx(icoidx), m_icoSmall(sml_id), m_icoLarge(lrg_id)
 		{ }
 
-		ExplorerItem (ExplorerItem && rhs)
+		ExplorerItem (ExplorerItem && rhs) noexcept
 			: m_pidl(std::move(rhs.m_pidl)), m_name(std::move(rhs.m_name)), m_icoPath(std::move(rhs.m_icoPath)), m_icoIdx(rhs.m_icoIdx), m_icoSmall(rhs.m_icoSmall), m_icoLarge(rhs.m_icoLarge)
+		{ }
+
+		ExplorerItem (ExplorerItem const & rhs) noexcept
+			: m_pidl(rhs.m_pidl), m_name(rhs.m_name), m_icoPath(rhs.m_icoPath), m_icoIdx(rhs.m_icoIdx), m_icoSmall(rhs.m_icoSmall), m_icoLarge(rhs.m_icoLarge)
 		{ }
 
 		ExplorerItem & operator= (ExplorerItem const & rhs)
