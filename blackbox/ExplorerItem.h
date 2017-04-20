@@ -9,7 +9,7 @@ namespace bb {
 	{
 		LPITEMIDLIST m_pidl;
 
-		Pidl () : m_pidl(0) { }
+		Pidl () : m_pidl(nullptr) { }
 		Pidl (LPITEMIDLIST id) : m_pidl(ILClone(id)) { }
 		Pidl (Pidl const & rhs) : m_pidl(rhs.m_pidl) { }
 		Pidl & operator= (Pidl const & rhs)
@@ -20,7 +20,7 @@ namespace bb {
 			}
 			return *this;
 		}
-		Pidl (Pidl && rhs) : m_pidl(rhs.m_pidl) { rhs.m_pidl = 0; }
+		Pidl (Pidl && rhs) : m_pidl(rhs.m_pidl) { rhs.m_pidl = nullptr; }
 		~Pidl ()
 		{
 			if (m_pidl)
@@ -40,11 +40,11 @@ namespace bb {
 		IconId m_icoLarge;
 
 		ExplorerItem (LPITEMIDLIST pidl, bbstring const & name, bbstring const & ico, int icoidx, IconId sml_id, IconId lrg_id)
-			: m_pidl(pidl), m_name(name), m_icoPath(ico), m_icoIdx(icoidx), m_icoSmall(sml_id), m_icoLarge(lrg_id)/*, m_icon(nullptr)*/
+			: m_pidl(pidl), m_name(name), m_icoPath(ico), m_icoIdx(icoidx), m_icoSmall(sml_id), m_icoLarge(lrg_id)
 		{ }
 
 		ExplorerItem (ExplorerItem && rhs)
-			: m_pidl(std::move(rhs.m_pidl)), m_name(std::move(rhs.m_name)), m_icoPath(std::move(rhs.m_icoPath)), m_icoIdx(rhs.m_icoIdx), m_icoSmall(rhs.m_icoSmall), m_icoLarge(rhs.m_icoLarge) /*, m_icon(rhs.m_icon)*/
+			: m_pidl(std::move(rhs.m_pidl)), m_name(std::move(rhs.m_name)), m_icoPath(std::move(rhs.m_icoPath)), m_icoIdx(rhs.m_icoIdx), m_icoSmall(rhs.m_icoSmall), m_icoLarge(rhs.m_icoLarge)
 		{ }
 
 		ExplorerItem & operator= (ExplorerItem const & rhs)
@@ -66,6 +66,8 @@ namespace bb {
 		~ExplorerItem ()
 		{
 		}
+
+		bool IsValid () const { return m_pidl.m_pidl != nullptr; }
 	};
 }
 
