@@ -178,6 +178,10 @@ namespace bb {
 
 			//return GetExplorerItem(pidl, result);
 		}
+		else
+		{
+
+		}
 		return false;
 	}
 

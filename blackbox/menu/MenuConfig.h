@@ -70,7 +70,7 @@ namespace bb {
 	struct MenuConfigItemFolder : MenuConfigItemSubMenu
 	{
 		bbstring m_folderName;
-		//ExplorerItem m_folderItem;
+		ExplorerItem m_folderItem;
 		bool m_knownFolder { false };
 
 		MenuConfigItemFolder (bbstring const & name, bbstring const & s) : MenuConfigItemSubMenu(e_MenuItemFolder, name), m_folderName(s) { }
