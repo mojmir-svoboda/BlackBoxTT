@@ -28,7 +28,12 @@ namespace bb
 		else if (node["folder"])
 		{
 			bb::MenuConfigItemFolder fld = std::move(node.as<bb::MenuConfigItemFolder>());
-			return std::make_shared<MenuConfigItemFolder>(fld);
+			return std::make_shared<MenuConfigItemFolder>(std::move(fld));
+		}
+		else if (node["file"])
+		{
+			bb::MenuConfigItemFile fl = std::move(node.as<bb::MenuConfigItemFile>());
+			return std::make_shared<MenuConfigItemFile>(std::move(fl));
 		}
 		else if (node["menu"])
 		{
@@ -204,6 +209,39 @@ namespace YAML {
 					rhs.m_folderName = node["folder"].as<bbstring>();
 					rhs.InitFromExplorer();
 					rhs.m_type = bb::e_MenuItemFolder;
+				}
+			}
+			catch (std::exception const & e)
+			{
+				TRACE_MSG(LL_ERROR, CTX_CONFIG, "YAML exception in source %s: %s", __FILE__, e.what());
+				return false;
+			}
+			return true;
+		}
+	};
+
+	template<>
+	struct convert<bb::MenuConfigItemFile>
+	{
+		static Node encode (bb::MenuConfigItemFile const & rhs)
+		{
+			Node node = convert<bb::MenuConfigItem>::encode(rhs);
+			node.push_back(rhs.m_fileName);
+			return node;
+		}
+
+		static bool decode (Node const & node, bb::MenuConfigItemFile & rhs)
+		{
+			try
+			{
+				if (convert<bb::MenuConfigItem>::decode(node, rhs))
+				{
+					if (node["file"])
+					{
+						rhs.m_fileName = node["file"].as<bbstring>();
+						rhs.InitFromExplorer();
+						rhs.m_type = bb::e_MenuItemFile;
+					}
 				}
 			}
 			catch (std::exception const & e)

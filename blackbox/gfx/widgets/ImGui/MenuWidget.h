@@ -32,8 +32,8 @@ namespace imgui {
 		void DrawInt (size_t idx, std::shared_ptr<MenuConfigItem> item);
 		void DrawSeparator (size_t idx, std::shared_ptr<MenuConfigItem> item);
 		void DrawSubMenu (size_t idx, std::shared_ptr<MenuConfigItem> item);
-		//void DrawFolder (size_t idx, std::shared_ptr<MenuConfigItem> item);
 		void DrawSubMenuFolder (size_t idx, std::shared_ptr<MenuConfigItem> item);
+		void DrawItemFile (size_t idx, std::shared_ptr<MenuConfigItem> item);
 
 		GuiWidget * CreateSubMenu (std::shared_ptr<MenuConfig> menu);
 		void MoveChildMenuToPos (ImVec2 submenu_pos, GuiWidget * submenu) const;

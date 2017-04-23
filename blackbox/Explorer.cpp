@@ -180,110 +180,109 @@ namespace bb {
 		}
 		else
 		{
+// 
+// 			PIDLIST_ABSOLUTE pidl;
+// 			HRESULT hresult = ::SHParseDisplayName(name.c_str(), 0, &pidl, SFGAO_FOLDER, 0);
+// 			if (SUCCEEDED(hresult))
+// 				return GetExplorerItem(pidl, result);
+
+			LPITEMIDLIST  pidl;
+			LPSHELLFOLDER pDesktopFolder;
+			if (SUCCEEDED(SHGetDesktopFolder(&pDesktopFolder)))
+			{
+				OLECHAR olePath[MAX_PATH];
+				wcscpy(olePath, name.c_str());
+				HRESULT hr = pDesktopFolder->ParseDisplayName(
+					NULL,
+					NULL,
+					olePath,
+					NULL,
+					&pidl,
+					NULL);
+				if (FAILED(hr))
+				{
+					return false;
+				}
+
+				SHFILEINFO sfi = {};
+				if (SHGetFileInfo(reinterpret_cast<LPCTSTR>(pidl), 0, &sfi, sizeof(sfi), SHGFI_PIDL | SHGFI_SYSICONINDEX | SHGFI_ICON | SHGFI_OPENICON))
+				{
+					IconId id;
+					bbstring icofile(sfi.szDisplayName);
+					BlackBox::Instance().AddIconToCache(icofile, sfi.hIcon, id);
+
+					IconId sml_id;
+					IconId lrg_id;
+
+					if (id.m_size > 16)
+						lrg_id = id;
+					/// %##^#$&% 2x icofile, only dummy for test !!! REove !!!
+					wchar_t dbg[1024];
+					BOOL res = SHGetPathFromIDList(pidl, dbg);
+					ExplorerItem ei(pidl, dbg, icofile, sfi.iIcon, sml_id, lrg_id);
+					result = std::move(ei);
+
+				}
+
+				// 
+				// pidl now contains a pointer to an ITEMIDLIST for .\readme.txt.
+				// This ITEMIDLIST needs to be freed using the IMalloc allocator
+				// returned from SHGetMalloc().
+				// 
+
+				pDesktopFolder->Release();
+			}
 
 		}
 		return false;
 	}
 
+// 	int GetIShellItemSysIconIndex (IShellItem * psi)
+// 	{
+// 		PIDLIST_ABSOLUTE pidl;
+// 		int iIndex = -1;
+// 
+// 		if (SUCCEEDED(SHGetIDListFromObject(psi, &pidl)))
+// 		{
+// 			SHFILEINFO sfi{};
+// 			if (SHGetFileInfo(reinterpret_cast<LPCTSTR>(pidl), 0, &sfi, sizeof(sfi), SHGFI_PIDL | SHGFI_SYSICONINDEX))
+// 				iIndex = sfi.iIcon;
+// 			CoTaskMemFree(pidl);
+// 		}
+// 		return iIndex;
+// 	}
+
+	int GetPidlSysIconIndex (PIDLIST_ABSOLUTE pidl)
+	{
+		int iIndex = -1;
+		SHFILEINFO sfi = {};
+		if (SHGetFileInfo(reinterpret_cast<LPCTSTR>(pidl), 0, &sfi, sizeof(sfi), SHGFI_PIDL | SHGFI_SYSICONINDEX))
+			iIndex = sfi.iIcon;
+		return iIndex;
+	}
+
 	bool Explorer::GetExplorerItem (PIDLIST_ABSOLUTE pidl, ExplorerItem & result)
 	{
-		SHFILEINFOW sfi = { 0 };
+		SHFILEINFO sfi = { };
+		if (SHGetFileInfo(reinterpret_cast<LPCTSTR>(pidl), 0, &sfi, sizeof(sfi), SHGFI_PIDL | SHGFI_SYSICONINDEX | SHGFI_ICON | SHGFI_OPENICON))
+		{
+			IconId id;
+			bbstring icofile(sfi.szDisplayName);
+			BlackBox::Instance().AddIconToCache(icofile, sfi.hIcon, id);
 
+			IconId sml_id;
+			IconId lrg_id;
 
-
-// 		DWORD = SHGetFileInfo((LPCTSTR)pidl,
-// 			-1,
-// 			&sfi,
-// 			sizeof(sfi),
-// 			SHGFI_PIDL | SHGFI_SYSICONINDEX | SHGFI_ICON | SHGFI_OPENICON);
-// 
-// 			if (SUCCEEDED(hr))
-// 			{
-// 				//sfi.iIcon
-// 				
-// 			}
-// 		LPSHELLFOLDER sfFolder = NULL;
-// 		HRESULT hr = m_shell->BindToObject(ppidl, NULL, IID_IShellFolder, (void**)&sfFolder);
-// 		if (hr != S_OK)
-// 		{
-// 			m_allocator->Free(ppidl);
-// 			return false;
-// 		}
-// 
-// // 		LPENUMIDLIST enumIDL = NULL; // IEnumIDList interface for reading contents
-// // 		hr = sfFolder->EnumObjects(NULL, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, &enumIDL);
-// // 		if (S_OK != hr)
-// // 		{
-// // 			m_allocator->Free(ppidl);
-// // 			return false;
-// // 		}
-// // 
-// // 		PITEMID_CHILD pidl;
-// // 		while (enumIDL->Next(1, &pidl, NULL) == S_OK)
-// // 		{
-// // 			STRRET strDispName;
-// // 
-// 			STRRET strDispName;
-// 			HRESULT hr2 = sfFolder->GetDisplayNameOf(ppidl, SHGDN_NORMAL, &strDispName);
-// 			if (hr2 == S_OK)
-// 			{
-// 				IExtractIcon * iico = nullptr;
-// 				if (S_OK == sfFolder->GetUIObjectOf(NULL, 1, (PCITEMID_CHILD*)&ppidl, IID_IExtractIcon, NULL, (void**)&iico))
-// 				{
-// 					//PIDLIST_ABSOLUTE final_pidl = ILCombine(ppidl, pidl);
-// 					wchar_t icofile[1024];
-// 					int idx = -1;
-// 					UINT flags = -1;
-// 					HRESULT hr_ico = iico->GetIconLocation(GIL_ASYNC/* | GIL_DEFAULTICON*/, icofile, 1024, &idx, &flags);
-// 					IconId sml_id;
-// 					IconId lrg_id;
-// 
-// 					wchar_t tmp_name[1024];
-// 					StrRetToBuf(&strDispName, ppidl, tmp_name, 1024);
-// 					bbstring name(tmp_name);
-// 					if (hr_ico == E_PENDING)
-// 					{
-// 						TRACE_MSG(LL_ERROR, CTX_BB | CTX_INIT, "PENDING! %ws icofile=%ws idx=%i", tmp_name, icofile, idx);
-// 					}
-// 					else
-// 					{
-// 						HICON lrg = nullptr;
-// 						HICON sml = nullptr;
-// 						HRESULT hr_ex_ico = iico->Extract(icofile, idx, &lrg, &sml, MAKELONG(32, 16));
-// 						//DBG(L"%ws icofile=%ws idx=%i", tmp_name, icofile, idx);
-// 						if (hr_ex_ico == S_OK)
-// 						{
-// 							BlackBox::Instance().AddIconToCache(name, sml, sml_id);
-// 							BlackBox::Instance().AddIconToCache(name, lrg, lrg_id);
-// 
-// 							ExplorerItem ei(ppidl, bbstring(tmp_name), bbstring(icofile), idx, sml_id, lrg_id);
-// 							result = std::move(ei);
-// 
-// 						}
-// 						else
-// 						{
-// 							WORD wIndex = 0;
-// 							if (HICON exico = ExtractAssociatedIconW(NULL, icofile, &wIndex))
-// 							{
-// 								//DBG(L"extracted icon!");
-// 								IconId id;
-// 								BlackBox::Instance().AddIconToCache(name, exico, id);
-// 
-// 								if (id.m_size > 16)
-// 									lrg_id = id;
-// 								ExplorerItem ei(ppidl, bbstring(tmp_name), bbstring(icofile), idx, sml_id, lrg_id);
-// 								result = std::move(ei);
-// 							}
-// 						}
-// 					}
-// 				}
-// 			}
-// // 			ILFree(ppidl);
-// // 		}
-// 		m_allocator->Free(ppidl);
-// 		//ILFree(enumIDL);
-// 		//ILFree(sfFolder);
-		return true;
+			if (id.m_size > 16)
+				lrg_id = id;
+			/// %##^#$&% 2x icofile, only dummy for test !!! REove !!!
+			wchar_t tmp_name_to_remove[1024];
+			BOOL res = SHGetPathFromIDList(pidl, tmp_name_to_remove);
+			ExplorerItem ei(pidl, tmp_name_to_remove, icofile, sfi.iIcon, sml_id, lrg_id);
+			result = std::move(ei);
+			return true;
+		}
+		return false;
 	}
 
 
@@ -293,7 +292,9 @@ namespace bb {
 		HRESULT hr = SHGetKnownFolderIDList(rfid, 0, nullptr, &ppidl);
 		if (hr != S_OK)
 			return false;
-		return FolderEnumerate(ppidl, result);
+		bool const retval = FolderEnumerate(ppidl, result);
+		ILFree(ppidl);
+		return retval;
 	}
 
 	bool Explorer::FolderEnumerate (PIDLIST_ABSOLUTE ppidl, std::vector<ExplorerItem> & result)
@@ -302,7 +303,6 @@ namespace bb {
 		HRESULT hr = m_shell->BindToObject(ppidl, NULL, IID_IShellFolder, (void**)&sfFolder);
 		if (hr != S_OK)
 		{
-			m_allocator->Free(ppidl);
 			return false;
 		}
 
@@ -310,7 +310,6 @@ namespace bb {
 		hr = sfFolder->EnumObjects(NULL, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, &enumIDL);
 		if (S_OK != hr)
 		{
-			m_allocator->Free(ppidl);
 			return false;
 		}
 
@@ -368,29 +367,78 @@ namespace bb {
 							}
 						}
 					}
-			
+					ILFree(final_pidl);
 				}
-
-//					IQueryInfo * pLink = nullptr;
-//					if (SUCCEEDED(sfFolder->GetUIObjectOf(NULL, 1, (PCITEMID_CHILD*)&pidl, IID_IQueryInfo, NULL, (void**)&pLink)))
-//					{
-//						TCHAR * pwszTip = nullptr;
-//						pLink->GetInfoTip(0, &pwszTip);
-//						if (pwszTip)
-//						{
-//							SHFree(pwszTip);
-//						}
-//						//pLink->Release();						
-//					}
 			}
 			ILFree(pidl);
 		}
-		m_allocator->Free(ppidl);
-		//ILFree(enumIDL);
-		//ILFree(sfFolder);
+		enumIDL->Release();
+		sfFolder->Release();
 		return true;
 
 	}
+
+	//
+// 	void PrintKnownFolder(const CComPtr<IKnownFolder>& folder)
+// 	{
+// 		KNOWNFOLDER_DEFINITION def;
+// 		HRESULT hr = folder->GetFolderDefinition(&def);
+// 		if (SUCCEEDED(hr)) {
+// 			std::wcout << L"Result: " << def.pszName << std::endl;
+// 			FreeKnownFolderDefinitionFields(&def);
+// 		}
+// 		else {
+// 			_com_error err(hr);
+// 			std::wcout << L"Error while querying GetFolderDefinition: " << err.ErrorMessage() << std::endl;
+// 		}
+// 	}
+// 
+// 
+// 	class CCoInitialize
+// 	{
+// 	public:
+// 		CCoInitialize() : m_hr(CoInitialize(NULL)) { }
+// 		~CCoInitialize() { if (SUCCEEDED(m_hr)) CoUninitialize(); }
+// 		operator HRESULT() const { return m_hr; }
+// 	private:
+// 		HRESULT m_hr;
+// 	};
+// 
+// 
+// 	bool test()
+// 	{
+// 		CCoInitialize co;
+// 		CComPtr<IKnownFolderManager> knownFolderManager;
+// 		HRESULT hr = knownFolderManager.CoCreateInstance(CLSID_KnownFolderManager);
+// 		if (!SUCCEEDED(hr)) {
+// 			_com_error err(hr);
+// 			std::wcout << L"Error while creating KnownFolderManager: " << err.ErrorMessage() << std::endl;
+// 			return false;
+// 		}
+// 
+// 		CComPtr<IKnownFolder> folder;
+// 		hr = knownFolderManager->FindFolderFromPath(L"C:\\Users\\All Users\\Microsoft", FFFP_NEARESTPARENTMATCH, &folder);
+// 		if (SUCCEEDED(hr)) {
+// 			PrintKnownFolder(folder);
+// 		}
+// 		else {
+// 			_com_error err(hr);
+// 			std::wcout << L"Error while querying KnownFolderManager for nearest match: " << err.ErrorMessage() << std::endl;
+// 		}
+// 
+// 		// dispose it.
+// 		folder.Attach(NULL);
+// 
+// 		hr = knownFolderManager->FindFolderFromPath(L"C:\\Users\\All Users\\Microsoft", FFFP_EXACTMATCH, &folder);
+// 		if (SUCCEEDED(hr)) {
+// 			PrintKnownFolder(folder);
+// 		}
+// 		else {
+// 			_com_error err(hr);
+// 			std::wcout << L"Error while querying KnownFolderManager for exact match: " << err.ErrorMessage() << std::endl;
+// 		}
+
+// 		hr = knownFolderManager->FindFolderFromPath(L"C:\\Users\\All Users\\Microsoft", FFFP_EXACTMATCH, &folder);
 
 	void Explorer::ScanKnownFolders ()
 	{
@@ -451,31 +499,31 @@ namespace bb {
 		}
 	}
 
-	void Explorer::OnClickedAt (Pidl const & pidl)
+	void Explorer::OnClickedAt (PIDLIST_ABSOLUTE pidl)
 	{
 		SHELLEXECUTEINFO info;
 		memset(&info, 0, sizeof(info));
 		info.cbSize = sizeof(info);
-		info.lpIDList = (void*)pidl.m_pidl;
+		info.lpIDList = (void*)pidl;
 		info.fMask = SEE_MASK_IDLIST;
 		info.lpVerb = L"Open";
 		info.nShow = SW_SHOWNORMAL;
 		BOOL ret = ::ShellExecuteEx(&info);
 	}
 
-	bool Explorer::IsFolder (Pidl const & pidl) const
+	bool Explorer::IsFolder (PIDLIST_ABSOLUTE pidl) const
 	{
-		IShellItem *psi;
-		HRESULT hr = SHCreateItemFromIDList(pidl.m_pidl, IID_PPV_ARGS(&psi));
+		IShellItem * psi = nullptr;
+		HRESULT hr = SHCreateItemFromIDList(pidl, IID_PPV_ARGS(&psi));
 		if (SUCCEEDED(hr))
 		{
 			DWORD dwAttr = 0;
 			hr = psi->GetAttributes(SFGAO_STREAM | SFGAO_FOLDER, &dwAttr);
 			if (SUCCEEDED(hr))
 			{
-					bool const is_dir = dwAttr & SFGAO_FOLDER;
-					return is_dir;
-				}
+				bool const is_dir = dwAttr & SFGAO_FOLDER;
+				return is_dir;
+			}
 			psi->Release();
 		}
 		return false;

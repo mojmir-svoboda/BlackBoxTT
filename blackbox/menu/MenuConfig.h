@@ -11,6 +11,7 @@ namespace bb {
 	enum MenuItemType : uint32_t {
 		e_MenuItemSeparator,
  		e_MenuItemFolder,
+		e_MenuItemFile,
 // 		e_MenuItemExec,
 		e_MenuItemSubMenu,
 		e_MenuItemScript,
@@ -44,6 +45,15 @@ namespace bb {
 	{
 		bbstring m_script;
 		MenuConfigItemScript (bbstring const & name, bbstring const & script) : MenuConfigItem(e_MenuItemScript, name), m_script(script) { }
+	};
+
+	struct MenuConfigItemFile : MenuConfigItem
+	{
+		bbstring m_fileName;
+		ExplorerItem m_fileItem;
+		MenuConfigItemFile (bbstring const & name, bbstring const & file) : MenuConfigItem(e_MenuItemFile, name), m_fileName(file) { }
+		MenuConfigItemFile () : MenuConfigItem(e_MenuItemFile) { }
+		void InitFromExplorer ();
 	};
 
 	struct MenuConfigItemInt : MenuConfigItem

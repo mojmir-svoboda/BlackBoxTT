@@ -51,7 +51,7 @@ namespace bb {
 		void ShowExplorer ();
 		LPITEMIDLIST GetItemId (bbstring const & path);
 
-		void OnClickedAt (Pidl const & pidl);
-		bool IsFolder (Pidl const & pidl) const;
+		void OnClickedAt (PIDLIST_ABSOLUTE pidl);
+		bool IsFolder (PIDLIST_ABSOLUTE pidl) const;
 	};
 }
