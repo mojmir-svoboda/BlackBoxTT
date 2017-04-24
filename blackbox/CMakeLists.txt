@@ -62,6 +62,7 @@ set(blackbox_SOURCES
 	utils_recover.cpp
 	utils_vdm.cpp
 	menu/MenuConfig_yaml.cpp
+	menu/Menuconfig.cpp
 )
 
 set (blackbox_HEADERS

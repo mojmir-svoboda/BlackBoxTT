@@ -299,104 +299,6 @@ namespace imgui {
 		}
 		ImGui::PopID();
 	}
-}
-
-	// @TODO: move to MenuConfig.cpp
-	void MenuConfigItemFile::InitFromExplorer ()
-	{
-		BlackBox::Instance().GetExplorer().GetExplorerItem(m_fileName, m_fileItem);
-		TRACE_MSG(LL_DEBUG, CTX_BB | CTX_GFX, "file pidl=0x%llx name=%ws", m_fileItem.m_pidl.m_pidl, m_fileName.c_str());
-	}
-	void MenuConfigItemFolder::InitFromExplorer ()
-	{
-		m_knownFolder = BlackBox::Instance().GetExplorer().IsKnownFolder(m_folderName);
-		if (m_knownFolder)
-		{
-			TRACE_MSG(LL_DEBUG, CTX_BB | CTX_GFX, "ItemFolder %ws is known folder, expanding (folder=%ws)", m_name.c_str(), m_folderName.c_str());
-			std::shared_ptr<bb::MenuConfig> sub = std::make_shared<bb::MenuConfig>();
-			m_menu = sub;
-			m_menu->m_id = m_folderName;
-			m_menu->m_widgetType = MenuWidget::c_type;
-			m_menu->m_displayName = m_folderName;
-
-			// @TODO: perf
-			std::vector<ExplorerItem> items;
-			BlackBox::Instance().GetExplorer().KnownFolderEnumerate(m_folderName, items);
-
-			for (ExplorerItem & it : items)
-			{
-				if (BlackBox::Instance().GetExplorer().IsFolder(it.m_pidl.m_pidl))
-				{
-					std::shared_ptr<bb::MenuConfigItem> fld = std::make_shared<bb::MenuConfigItemFolder>();
-					MenuConfigItemFolder * f = static_cast<MenuConfigItemFolder *>(fld.get());
-					f->m_name = it.m_name;
-					f->m_folderItem = std::move(it);
-					f->m_folderName = it.m_name; // @TODO: more likely to use some explorer pidl->name fn?
-
-					sub->m_items.push_back(fld);
-				}
-				else
-				{
-					std::shared_ptr<bb::MenuConfigItemFile> fld = std::make_shared<bb::MenuConfigItemFile>();
-					MenuConfigItemFile * f = static_cast<MenuConfigItemFile *>(fld.get());
-					f->m_name = it.m_name;
-					f->m_fileItem = std::move(it);
-					f->m_fileName = it.m_name;
-
-					sub->m_items.push_back(fld);
-				}
-			}
-		}
-		else
-		{
-			BlackBox::Instance().GetExplorer().GetExplorerItem(m_folderName, m_folderItem);
-			TRACE_MSG(LL_DEBUG, CTX_BB | CTX_GFX, "dir parent pidl=0x%llx name=%ws", m_folderItem.m_pidl.m_pidl, m_folderName.c_str());
-
-			if (m_folderItem.IsValid())
-			{
-				bool const is_folder = BlackBox::Instance().GetExplorer().IsFolder(m_folderItem.m_pidl.m_pidl);
-
-				std::shared_ptr<bb::MenuConfig> sub = std::make_shared<bb::MenuConfig>();
-				m_menu = sub;
-				m_menu->m_id = m_folderName;
-				m_menu->m_widgetType = MenuWidget::c_type;
-				m_menu->m_displayName = m_folderName;
-
-				std::vector<ExplorerItem> items;
-				BlackBox::Instance().GetExplorer().FolderEnumerate(m_folderItem.m_pidl.m_pidl, items);
-				
-				for (ExplorerItem & it : items)
-				{
-					TRACE_MSG(LL_DEBUG, CTX_BB | CTX_GFX, "dir   item pidl=0x%llx name=%ws", it.m_pidl.m_pidl, it.m_name.c_str());
-					if (BlackBox::Instance().GetExplorer().IsFolder(it.m_pidl.m_pidl))
-					{
-						std::shared_ptr<bb::MenuConfigItem> fld = std::make_shared<bb::MenuConfigItemFolder>();
-						MenuConfigItemFolder * f = static_cast<MenuConfigItemFolder *>(fld.get());
-						f->m_name = it.m_name;
-						f->m_folderItem = std::move(it);
-						f->m_folderName = it.m_name; // @TODO: more likely to use some explorer pidl->name fn?
-
-						sub->m_items.push_back(fld);
-					}
-					else
-					{
-						std::shared_ptr<bb::MenuConfigItemFile> fld = std::make_shared<bb::MenuConfigItemFile>();
-						MenuConfigItemFile * f = static_cast<MenuConfigItemFile *>(fld.get());
-						f->m_name = it.m_name;
-						f->m_fileItem = std::move(it);
-						f->m_fileName = it.m_name;
-
-						sub->m_items.push_back(fld);
-					}
-				}
-			}
-			else
-			{
-				TRACE_MSG(LL_DEBUG, CTX_BB | CTX_GFX, "cannot get explorer pidl from folderName=%ws", m_folderName.c_str());
-			}
-		}
-	}
-namespace imgui {
 
 	void MenuWidget::DrawSubMenuFolder (size_t idx, std::shared_ptr<MenuConfigItem> item)
 	{
@@ -445,6 +347,7 @@ namespace imgui {
 					ImGui::SameLine();
 					ImGui::Bullet();
 
+					menufld->m_menu = menufld->CreateSubMenuFromFolder();
 					GuiWidget * submenu = CreateSubMenu(menufld->m_menu);
 					MoveChildMenuToPos(submenu_pos, submenu);
 				}

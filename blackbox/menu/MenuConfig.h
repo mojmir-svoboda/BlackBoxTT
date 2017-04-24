@@ -87,6 +87,7 @@ namespace bb {
 		MenuConfigItemFolder () : MenuConfigItemSubMenu(e_MenuItemFolder) { }
 
 		void InitFromExplorer ();
+		std::shared_ptr<bb::MenuConfig> CreateSubMenuFromFolder () const;
 
 		//MenuConfigItemFolder (MenuConfigItemFolder const & rhs) : MenuConfigItemSubMenu(rhs), m_folderName(rhs.m_folderName), m_folderItem(rhs.m_folderItem) { }
 	};
