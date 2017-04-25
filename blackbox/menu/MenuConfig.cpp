@@ -57,6 +57,12 @@ namespace bb {
 		m_knownFolder = BlackBox::Instance().GetExplorer().IsKnownFolder(m_folderName);
 		TRACE_MSG(LL_DEBUG, CTX_BB | CTX_GFX, "ItemFolder %ws is known folder, expanding (folder=%ws)", m_name.c_str(), m_folderName.c_str());
 
+		if (!m_knownFolder)
+		{
+			BlackBox::Instance().GetExplorer().GetExplorerItem(m_folderName, m_folderItem);
+			TRACE_MSG(LL_DEBUG, CTX_BB | CTX_GFX, "folder pidl=0x%llx name=%ws", m_folderItem.m_pidl.m_pidl, m_folderName.c_str());
+		}
+
 		m_menu = CreateSubMenuFromFolder();
 	}
 
