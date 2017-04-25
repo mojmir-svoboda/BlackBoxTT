@@ -27,8 +27,10 @@ namespace YAML {
 		{
 			try
 			{
-				rhs.m_id = node["id"].as<bbstring>();
-				rhs.m_widgetType = node["widget"].as<bbstring>();
+				if (node["id"])
+					rhs.m_id = node["id"].as<bbstring>();
+				if (node["widget"])
+					rhs.m_widgetType = node["widget"].as<bbstring>();
 				if (node["name"])
 					rhs.m_displayName = node["name"].as<bbstring>();
 				if (node["x"])
@@ -48,6 +50,7 @@ namespace YAML {
 			}
 			catch (std::exception const & e)
 			{
+				TRACE_MSG(LL_ERROR, CTX_CONFIG, "YAML exception in source %s:%i %s", __FILE__, __LINE__, e.what());
 				return false;
 			}
 			return true;
