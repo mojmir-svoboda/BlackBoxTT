@@ -215,7 +215,8 @@ namespace bb {
 			else
 				return false;
 
-			TRACE_SCOPE_MSG(LL_INFO, CTX_BB | CTX_CONFIG | CTX_INIT, "Loading config file: %s", cfg_name.c_str());
+			//TRACE_SCOPE_MSG(LL_INFO, CTX_BB | CTX_CONFIG | CTX_INIT, "Loading config file: %s", cfg_name.c_str());
+			TRACE_MSG(LL_INFO, CTX_BB | CTX_CONFIG | CTX_INIT, "Loading config file: %s", cfg_name.c_str());
 			YAML::Node y_config = YAML::LoadFile(cfg_name);
 			if (y_config.IsNull())
 			{
@@ -351,12 +352,21 @@ namespace bb {
 		if (!DetectConfig())
 			return false;
 		if (!mkJobObject(m_job, m_inJob))
+		{
+			TRACE_MSG(LL_ERROR, CTX_BB | CTX_INIT, "Cannot create job object for blackbox");
 			return false;
+		}
 
 		if (!LoadConfig())
+		{
+			TRACE_MSG(LL_ERROR, CTX_BB | CTX_INIT, "Cannot load config.");
 			return false;
+		}
 		if (!m_scheme.Init(m_config.m_scheme))
+		{
+			TRACE_MSG(LL_ERROR, CTX_BB | CTX_INIT, "Cannot initialize Scheme interpreter.");
 			return false;
+		}
 
 		m_taskHookWM = ::RegisterWindowMessage(c_taskHookName);
 		m_taskHook32on64WM = ::RegisterWindowMessage(c_taskHook32Name);
@@ -369,23 +379,50 @@ namespace bb {
 		if (!CreateBBWindow())
 			return false;
 		if (!m_wspaces.Init(m_config.m_wspaces))
+		{
+			TRACE_MSG(LL_ERROR, CTX_BB | CTX_INIT, "Cannot initialize workspaces.");
 			return false;
+		}
 		if (!m_wallpapers.Init(m_config.m_wallpapers))
+		{
+			TRACE_MSG(LL_ERROR, CTX_BB | CTX_INIT, "Cannot initialize wallpapers.");
 			return false;
+		}
 		if (!CreateGfx(m_config.m_gfx))
+		{
+			TRACE_MSG(LL_ERROR, CTX_BB | CTX_INIT, "Cannot create graphics.");
 			return false;
+		}
 		if (!m_tasks.Init(m_config.m_tasks))
+		{
+			TRACE_MSG(LL_ERROR, CTX_BB | CTX_INIT, "Cannot initialize tasks.");
 			return false;
+		}
 		if (!m_gfx->Init(m_config.m_gfx))
+		{
+			TRACE_MSG(LL_ERROR, CTX_BB | CTX_INIT, "Cannot initialize graphics.");
 			return false;
+		}
 		if (!m_explorer->Init())
+		{
+			TRACE_MSG(LL_ERROR, CTX_BB | CTX_INIT, "Cannot initialize explorer.");
 			return false;
+		}
 		if (!m_broamServer.Init(m_hwnd))
+		{
+			TRACE_MSG(LL_ERROR, CTX_BB | CTX_INIT, "Cannot initialize broam server.");
 			return false;
+		}
 		if (!m_plugins.Init(m_config.m_plugins))
+		{
+			TRACE_MSG(LL_ERROR, CTX_BB | CTX_INIT, "Cannot initialize plugins.");
 			return false;
+		}
 		if (!m_server.Init(m_config.m_server))
+		{
+			TRACE_MSG(LL_ERROR, CTX_BB | CTX_INIT, "Cannot initialize tcp server.");
 			return false;
+		}
 
 		m_wspaces.InitNotifWindow();
 		//TRACE_SINK_SET_LEVEL(0, CTX_TASKS | CTX_WSPACE | CTX_INIT, LL_ERROR | LL_FATAL | LL_INFO | LL_WARNING);
