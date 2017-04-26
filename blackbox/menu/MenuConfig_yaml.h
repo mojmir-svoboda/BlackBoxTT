@@ -41,6 +41,7 @@ namespace bb
 			bbstring const name = node["name"].as<bbstring>();
 			YAML::Node y_submenu = node["menu"];
 			std::shared_ptr<bb::MenuConfig> sub = std::make_shared<bb::MenuConfig>(y_submenu.as<bb::MenuConfig>());
+			sub->m_widgetType = MenuWidget::c_type;
 			return std::make_shared<MenuConfigItemSubMenu>(name, sub);
 		}
 		else if (node["checkbox"])
