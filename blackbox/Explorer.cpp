@@ -445,27 +445,23 @@ namespace bb {
 		HRESULT hr;
 		PWSTR pszPath = nullptr;
 
-		// Create an IKnownFolderManager instance
 		IKnownFolderManager * pkfm = nullptr;
-		hr = CoCreateInstance(CLSID_KnownFolderManager, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pkfm));
+		hr = CoCreateInstance(CLSID_KnownFolderManager, nullptr, CLSCTX_ALL, IID_PPV_ARGS(&pkfm));
 		if (SUCCEEDED(hr))
 		{
 			KNOWNFOLDERID * rgKFIDs = nullptr;
-			UINT cKFIDs = 0;
-			// Get the IDs of all known folders
-			hr = pkfm->GetFolderIds(&rgKFIDs, &cKFIDs);
+			UINT cKFIDs = 0;			
+			hr = pkfm->GetFolderIds(&rgKFIDs, &cKFIDs); // Get the IDs of all known folders
 			if (SUCCEEDED(hr))
 			{
 				IKnownFolder * pkfCurrent = nullptr;
-				// Enumerate the known folders. rgKFIDs[i] has the KNOWNFOLDERID
 				for (unsigned i = 0; i < cKFIDs; ++i)
 				{
 					hr = pkfm->GetFolder(rgKFIDs[i], &pkfCurrent);
 					if (SUCCEEDED(hr))
 					{
-						// Get the non-localized, canonical name for the known folder from KNOWNFOLDER_DEFINITION
 						KNOWNFOLDER_DEFINITION kfd;
-						hr = pkfCurrent->GetFolderDefinition(&kfd);
+						hr = pkfCurrent->GetFolderDefinition(&kfd); // Get the non-localized, canonical name for the known folder from KNOWNFOLDER_DEFINITION
 						if (SUCCEEDED(hr))
 						{
 							// Next, get the path of the known folder
