@@ -1,6 +1,6 @@
 ; # = Win  ! = Alt  ^ = Control  + = Shift
 
-^RButton::
++RButton::
    Run, c:\bb_devel\bbcli.exe -c "(ToggleDesktopMenu ""bbTT Menu"")"
 Return
 
