@@ -471,14 +471,11 @@ namespace bb {
 								bbstring name(kfd.pszName);
 								//bbstring ico(kfd.pszIcon);
 
-								if (rgKFIDs[i] == FOLDERID_StartMenu)
-									OutputDebugString(0);
+// 								if (rgKFIDs[i] == FOLDERID_ControlPanelFolder)
+// 									OutputDebugString(0);
 
-								///if (name == L"Start Menu"),KB
+								TRACE_MSG(LL_VERBOSE, CTX_BB | CTX_INIT, "known folder list: %ws", name.c_str());
 					
-								//bbstring path(kfd.pszRelativePath);GH
-
-
 								//ExplorerItem (LPITEMIDLIST pidl, bbstring const & name, bbstring const & ico, int icoidx, IconId sml_id, IconId lrg_id)
 								//m_knownFolders[name] = KnwnFldr { *rgKFIDs, ExplorerItem { } };
 								m_knownFolders[name] = KnwnFldr { rgKFIDs[i] };
