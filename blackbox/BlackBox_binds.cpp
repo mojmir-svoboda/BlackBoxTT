@@ -85,8 +85,23 @@ namespace bb {
 		return hWnd;
 	}
 
+	HWND getDesktopHandle ()
+	{
+		HWND hShellWnd = GetShellWindow();
+		HWND hDefView = FindWindowEx(hShellWnd, NULL, _T("SHELLDLL_DefView"), NULL);
+		HWND folderView = FindWindowEx(hDefView, NULL, _T("SysListView32"), NULL);
+		return folderView;
+	}
+
 	bool isDesktopHandle (HWND hwnd)
 	{
+		// classic method
+		if (HWND d = getDesktopHandle())
+		{
+			return hwnd == d;
+		}
+
+		// workaround if the above does not work (can hapen when progman crashes)
 		HWND const hDefView = getDesktopParentHandle(); //FindWindowEx(shell_wnd, nullptr, L"SHELLDLL_DefView", nullptr);
 		HWND const folderView = FindWindowEx(hDefView, NULL, L"SysListView32", L"FolderView");
 		if (hwnd == folderView)
@@ -98,34 +113,47 @@ namespace bb {
 
 	void BlackBox::ToggleMenu (bbstring const & widget_name)
 	{
-// 		POINT p;
-// 		if (::GetCursorPos(&p))
-// 		{
-// 			bool new_menu = false;
-// 			GuiWidget * w = m_gfx->FindWidget(widget_name.c_str());
-// 			HWND const clicked_window = ::WindowFromPoint(p);
-// 			if (isDesktopHandle(clicked_window))
-// 			
-
-		bool new_menu = false;
-		GuiWidget * w = m_gfx->FindWidget(widget_name.c_str());
-		if (!w)
+		auto destroyWindgetIfInMargin = [this, &widget_name] (GuiWidget * & w, int margin)
 		{
-			w = m_gfx->MkWidgetFromId(widget_name.c_str());
-			new_menu = true;
+			RECT r;
+			::GetWindowRect(w->m_gfxWindow->m_hwnd, &r);
+			r.left += margin;
+			r.top += margin;
+			r.right -= margin;
+			r.bottom -= margin;
+			if (::PtInRect(&r, p))
+			{
+				m_gfx->DestroyWindow(widget_name.c_str());
+				w = nullptr;
 		}
+		};
 
 		POINT p;
 		if (::GetCursorPos(&p))
 		{
-			RECT r;
-			::GetWindowRect(w->m_gfxWindow->m_hwnd, &r);
-			if (::PtInRect(&r, p))
+			GuiWidget * w = m_gfx->FindWidget(widget_name.c_str());
+			HWND const clicked_window = ::WindowFromPoint(p);
+			if (isDesktopHandle(clicked_window))
 			{
-				if (!new_menu)
-					m_gfx->DestroyWindow(widget_name.c_str());
+				if (!w)
+				{
+					w = m_gfx->MkWidgetFromId(widget_name.c_str());
 			}
 			else
+			{
+					destroyWindgetIfInMargin(w, -5);
+				}
+			}
+			else if (w && clicked_window == w->m_gfxWindow->m_hwnd)
+			{
+				destroyWindgetIfInMargin(w, 5);
+			}
+			else if (w && clicked_window != w->m_gfxWindow->m_hwnd)
+			{
+				destroyWindgetIfInMargin(w, -5);
+			}
+
+			if (w)
 			{
 				w->MoveWindow(p.x, p.y);
 				m_tasks.Focus(w->m_gfxWindow->m_hwnd);
