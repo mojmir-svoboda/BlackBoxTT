@@ -62,8 +62,51 @@ namespace bb {
 		MoveOrDestroyOnToggle(new_menu, w);
 	}
 
+	BOOL CALLBACK enumWindowsProc (HWND hwnd, LPARAM lParam)
+	{
+		wchar_t buffer[128];
+		int const written = ::GetClassName(hwnd, buffer, 128);
+		if (written && wcscmp(buffer, L"SHELLDLL_DefView") == 0)
+		{
+			wchar_t buffer2[128];
+			int const written2 = ::GetWindowText(hwnd, buffer2, 128);
+			if (written2 == 0)
+			{
+				*(HWND*)lParam = hwnd;
+				return FALSE;
+			}
+		}
+		return TRUE;
+	}
+	HWND getDesktopParentHandle ()
+	{
+		HWND hWnd = NULL;
+		EnumChildWindows(::GetDesktopWindow(), enumWindowsProc, (LPARAM)&hWnd);
+		return hWnd;
+	}
+
+	bool isDesktopHandle (HWND hwnd)
+	{
+		HWND const hDefView = getDesktopParentHandle(); //FindWindowEx(shell_wnd, nullptr, L"SHELLDLL_DefView", nullptr);
+		HWND const folderView = FindWindowEx(hDefView, NULL, L"SysListView32", L"FolderView");
+		if (hwnd == folderView)
+			return true;
+
+		HWND const desktop_window = ::GetDesktopWindow();
+		return hwnd == desktop_window;
+	}
+
 	void BlackBox::ToggleMenu (bbstring const & widget_name)
 	{
+// 		POINT p;
+// 		if (::GetCursorPos(&p))
+// 		{
+// 			bool new_menu = false;
+// 			GuiWidget * w = m_gfx->FindWidget(widget_name.c_str());
+// 			HWND const clicked_window = ::WindowFromPoint(p);
+// 			if (isDesktopHandle(clicked_window))
+// 			
+
 		bool new_menu = false;
 		GuiWidget * w = m_gfx->FindWidget(widget_name.c_str());
 		if (!w)
