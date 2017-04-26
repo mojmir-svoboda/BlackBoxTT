@@ -78,9 +78,8 @@ namespace bb {
 		void UnloadPlugin (bbstring const & plugin_id);
 		bool IsPluginLoaded (bbstring const & plugin_id) const;
 		void Quit (uint32_t arg);
-		void MoveOrDestroyOnToggle (bool is_new, bb::GuiWidget * w);
 		void CreateWidgetFromId (bbstring const & widget_id);
-		void ToggleMenu (bbstring const & menu_id);
+		void ToggleDesktopMenu (bbstring const & menu_id);
 		void ToggleMenu (std::shared_ptr<bb::MenuConfig> menu_cfg);
 		void MakeSticky (HWND hwnd);
 		void RemoveSticky (HWND hwnd);

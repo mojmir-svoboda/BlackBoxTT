@@ -85,16 +85,16 @@ s7_pointer bind_CreateWidgetFromId (s7_scheme * sc, s7_pointer args)
 	return s7_wrong_type_arg_error(sc, "CreateWidgetFromId", 1, s7_car(args), "utf8 string id in config section [Widgets]");
 }
 
-s7_pointer bind_ToggleMenu (s7_scheme * sc, s7_pointer args)
+s7_pointer bind_ToggleDesktopMenu (s7_scheme * sc, s7_pointer args)
 {
 	if (s7_is_string(s7_car(args)))
 	{
 		char const * widget_name = s7_string(s7_car(args));
 		bbstring name = toString(widget_name);
-		getBlackBoxInstanceRW()->ToggleMenu(name);
+		getBlackBoxInstanceRW()->ToggleDesktopMenu(name);
 		return s7_nil(sc);
 	}
-	return s7_wrong_type_arg_error(sc, "ToggleMenu", 1, s7_car(args), "utf8 string");
+	return s7_wrong_type_arg_error(sc, "ToggleDesktopMenu", 1, s7_car(args), "utf8 string");
 }
 
 s7_pointer bind_SetCurrentVertexId (s7_scheme * sc, s7_pointer args)
@@ -176,7 +176,7 @@ namespace bb {
 		s7_define_function(m_scheme, "UnloadPlugin", bind_UnloadPlugin, 1, 0, false, "(UnloadPlugin plugin_id) Unload plugin with id from config section [Plugins]");
 		s7_define_function(m_scheme, "IsPluginLoaded", bind_IsPluginLoaded, 1, 0, false, "(IsPluginLoaded plugin_id) returns true if plugin is loaded");
 		s7_define_function(m_scheme, "CreateWidgetFromId", bind_CreateWidgetFromId, 1, 0, false, "(CreateWidgetFromId widget_id) Creates widget from id (id from yaml config)");
-		s7_define_function(m_scheme, "ToggleMenu", bind_ToggleMenu, 1, 0, false, "(ToggleMenu widget_name) Show/Hide menu with widget_name if hidden/shown");
+		s7_define_function(m_scheme, "ToggleDesktopMenu", bind_ToggleDesktopMenu, 1, 0, false, "(ToggleDesktopMenu widget_name) Show/Hide menu with widget_name if hidden/shown");
 		s7_define_function(m_scheme, "SetCurrentVertexId", bind_SetCurrentVertexId, 1, 0, false, "(SetCurrentVertexId vertex_id_string) Sets WorkSpace Graph to specified VertexId");
 		s7_define_function(m_scheme, "SwitchVertexViaEdge", bind_SwitchVertexViaEdge, 1, 0, false, "(SwitchVertexViaEdge edge_id_string) Switch WorkSpace via edge to destination vertex_id");
 		s7_define_function(m_scheme, "MaximizeTopWindow", bind_MaximizeTopWindow, 1, 0, false, "(SwitchVertexViaEdge edge_id_string) Switch WorkSpace via edge to destination vertex_id");

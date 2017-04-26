@@ -28,40 +28,6 @@ namespace bb {
 		m_gfx->MkWidgetFromId(widget_id.c_str());
 	}
 
-	void BlackBox::MoveOrDestroyOnToggle (bool is_new, bb::GuiWidget * w)
-	{
-		POINT p;
-		if (::GetCursorPos(&p))
-		{
-			RECT r;
-			::GetWindowRect(w->m_gfxWindow->m_hwnd, &r);
-			if (::PtInRect(&r, p))
-			{
-				if (!is_new)
-					m_gfx->DestroyWindow(w->GetId().c_str());
-			}
-			else
-			{
-				w->MoveWindow(p.x, p.y);
-				m_tasks.Focus(w->m_gfxWindow->m_hwnd);
-				w->Show(true);
-			}
-		}
-	}
-
-	void BlackBox::ToggleMenu (std::shared_ptr<bb::MenuConfig> menu_cfg)
-	{
-		bool new_menu = false;
-		GuiWidget * w = m_gfx->FindWidget(menu_cfg->m_id.c_str());
-		if (!w)
-		{
-			w = m_gfx->MkWidgetFromConfig(*menu_cfg);
-			new_menu = true;
-		}
-
-		MoveOrDestroyOnToggle(new_menu, w);
-	}
-
 	BOOL CALLBACK enumWindowsProc (HWND hwnd, LPARAM lParam)
 	{
 		wchar_t buffer[128];
@@ -84,7 +50,6 @@ namespace bb {
 		EnumChildWindows(::GetDesktopWindow(), enumWindowsProc, (LPARAM)&hWnd);
 		return hWnd;
 	}
-
 	HWND getDesktopHandle ()
 	{
 		HWND hShellWnd = GetShellWindow();
@@ -92,16 +57,16 @@ namespace bb {
 		HWND folderView = FindWindowEx(hDefView, NULL, _T("SysListView32"), NULL);
 		return folderView;
 	}
-
 	bool isDesktopHandle (HWND hwnd)
 	{
 		// classic method
-		if (HWND d = getDesktopHandle())
-		{
-			return hwnd == d;
-		}
+		// gee, diz shite no good
+// 		if (HWND d = getDesktopHandle())
+// 		{
+// 			return hwnd == d;
+// 		}
 
-		// workaround if the above does not work (can hapen when progman crashes)
+		// workaround if the above does not work (can happen when progman crashes)
 		HWND const hDefView = getDesktopParentHandle(); //FindWindowEx(shell_wnd, nullptr, L"SHELLDLL_DefView", nullptr);
 		HWND const folderView = FindWindowEx(hDefView, NULL, L"SysListView32", L"FolderView");
 		if (hwnd == folderView)
@@ -111,23 +76,23 @@ namespace bb {
 		return hwnd == desktop_window;
 	}
 
-	void BlackBox::ToggleMenu (bbstring const & widget_name)
+	void destroyMenuIfInMargin (Gfx * gfx, bb::GuiWidget * w, POINT p, int margin)
 	{
-		auto destroyWindgetIfInMargin = [this, &widget_name] (GuiWidget * & w, int margin)
+		RECT r;
+		::GetWindowRect(w->m_gfxWindow->m_hwnd, &r);
+		r.left += margin;
+		r.top += margin;
+		r.right -= margin;
+		r.bottom -= margin;
+		if (::PtInRect(&r, p))
 		{
-			RECT r;
-			::GetWindowRect(w->m_gfxWindow->m_hwnd, &r);
-			r.left += margin;
-			r.top += margin;
-			r.right -= margin;
-			r.bottom -= margin;
-			if (::PtInRect(&r, p))
-			{
-				m_gfx->DestroyWindow(widget_name.c_str());
-				w = nullptr;
+			gfx->DestroyWindow(w->GetId().c_str());
+			w = nullptr;
 		}
-		};
+	};
 
+	void BlackBox::ToggleDesktopMenu (bbstring const & widget_name)
+	{
 		POINT p;
 		if (::GetCursorPos(&p))
 		{
@@ -138,19 +103,57 @@ namespace bb {
 				if (!w)
 				{
 					w = m_gfx->MkWidgetFromId(widget_name.c_str());
-			}
-			else
-			{
-					destroyWindgetIfInMargin(w, -5);
+				}
+				else
+				{
+					destroyMenuIfInMargin(m_gfx.get(), w, p, -5);
 				}
 			}
 			else if (w && clicked_window == w->m_gfxWindow->m_hwnd)
 			{
-				destroyWindgetIfInMargin(w, 5);
+				destroyMenuIfInMargin(m_gfx.get(), w, p, 5);
 			}
 			else if (w && clicked_window != w->m_gfxWindow->m_hwnd)
 			{
-				destroyWindgetIfInMargin(w, -5);
+				destroyMenuIfInMargin(m_gfx.get(), w, p, -5);
+			}
+
+			if (w)
+			{
+				w->MoveWindow(p.x, p.y);
+				m_tasks.Focus(w->m_gfxWindow->m_hwnd);
+				setOnTop(w->m_gfxWindow->m_hwnd);
+				w->Show(true);
+			}
+		}
+	}
+
+	void BlackBox::ToggleMenu (std::shared_ptr<bb::MenuConfig> menu_cfg)
+	{
+		bool new_menu = false;
+		GuiWidget * w = m_gfx->FindWidget(menu_cfg->m_id.c_str());
+		if (!w)
+		{
+			w = m_gfx->MkWidgetFromConfig(*menu_cfg);
+			new_menu = true;
+		}
+
+		POINT p;
+		if (::GetCursorPos(&p))
+		{
+			GuiWidget * w = m_gfx->FindWidget(menu_cfg->m_id.c_str());
+			HWND const clicked_window = ::WindowFromPoint(p);
+			if (!w)
+			{
+				w = m_gfx->MkWidgetFromConfig(*menu_cfg);
+			}
+			else if (w && clicked_window == w->m_gfxWindow->m_hwnd)
+			{
+				destroyMenuIfInMargin(m_gfx.get(), w, p, 5);
+			}
+			else if (w && clicked_window != w->m_gfxWindow->m_hwnd)
+			{
+				destroyMenuIfInMargin(m_gfx.get(), w, p, -5);
 			}
 
 			if (w)
