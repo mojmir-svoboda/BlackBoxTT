@@ -5,60 +5,22 @@ BlackBox:
   styleCycle:
 
 WorkSpaces:
-  current: 'win10'
+  current: 'default'
   auto: false
   clusters:
-    - id: 'win10'
+    - id: 'default'
       useVDM: true
-      label: 'win10 2d'
-      current: 'a1'
+      label: 'Desks'
+      current: 'Desk1'
       vertexlist:
-        - [ a1, a2, a3 ]
-        - [ b1, b2, b3 ]
-        - [ c1, c2, c3 ]
+        - [ Desk1, Desk2, Desk3 ]
       edgelist:
-        - 'a1 -> a2 -> a3 [label="right"]'
-        - 'b1 -> b2 -> b3 [label="right"]'
-        - 'c1 -> c2 -> c3 [label="right"]'
-        - 'a3 -> a2 -> a1 [label="left"]'
-        - 'b3 -> b2 -> b1 [label="left"]'
-        - 'c3 -> c2 -> c1 [label="left"]'
-        - 'a1 -> b1 -> c1 [label="down"]'
-        - 'a2 -> b2 -> c2 [label="down"]'
-        - 'a3 -> b3 -> c3 [label="down"]'
-        - 'c1 -> b1 -> a1 [label="up"]'
-        - 'c2 -> b2 -> a2 [label="up"]'
-        - 'c3 -> b3 -> a3 [label="up"]'
-
-
-    - id: 'F'
-      label: 'fun'
-      useVDM: false
-      current: 'f1'
-      vertexlist:
-        - [ f1, f2, f3 ]
-      edgelist:
-        - 'f1 -> f2 -> f3 -> f1 [label="right"]'
-        - 'f3 -> f2 -> f1 -> f3 [label="left"]'
-    - id: 'W'
-      label: 'w0rk'
-      useVDM: false
-      current: 'b2'
-      vertexlist:
-        - [ a1, a2, a3 ]
-        - [ b1, b2, b3 ]
-        - [ c1, c2, c3 ]
-      edgelist:
-        - 'a1 -> a2 -> a3 [label="right"]'
-        - 'b1 -> b2 -> b3 [label="right"]'
-        - 'c1 -> c2 -> c3 [label="right"]'
-
+        - 'Desk1 -> Desk2 -> Desk3 [label="right"]'
+        - 'Desk3 -> Desk2 -> Desk1 [label="left"]'
 Tasks:
 #  - window: '^Foo$'
 #    exclude: true
 
-# folder ids: https://msdn.microsoft.com/en-us/library/windows/desktop/dd378457(v=vs.85).aspx
-Menu:
 Plugins:
   - plugin: 'bbSlit'
     path: 'c:/bb_devel/plugins/bbSlit/bbSlit.dll'
@@ -142,70 +104,76 @@ Widgets:
     w: 256
     h: 256
     alpha: 192
-  - widget: 'Tasks'
-    id: 'bbTT Tasks'
-    show: false
-  - widget: 'RecoverWindows'
-    id: 'bbTT RecoverWindows'
-    x: 0
-    y: 512
-    w: 512
-    h: 768
-    show: false
   - widget: 'Menu'
     id: 'bbTT Menu'
     items:
-      - name: 'Start'
-        folder: 'StartMenu'
-      - name: 'Desktop'
-        folder: 'Desktop'
-      - name: 'Explorer'
-        exec: 'explorer.exe'
+      # folder ids: https://msdn.microsoft.com/en-us/library/windows/desktop/dd378457(v=vs.85).aspx
+      - folder: 'Start Menu'
+      - folder: 'Desktop'
+      - folder: 'Quick Launch'
+      - separator:
       - name: 'System'
         menu:
-          id: 'Win'
-          widget: 'Menu'
+          id: 'bbTT System Menu'
           items:
-            - name: 'Drives'
-              folder: 'Drives'
-            - name: 'Controls'
-              folder: 'Controls'
-      - separator:
+            - folder: 'Computer'
+            - folder: 'Control Panel'
+            - folder: 'Personal'
+            - name: 'Admin'
+              folder: 'Administrative Tools'
+            #- name: 'Run...'
       - name: 'bbTT'
         menu:
           id: 'bbTT'
-          widget: 'Menu'
           items:
             - name: 'Configuration'
               menu:
                 id: 'bbTT Config'
-                widget: 'Menu'
                 items:
-                  - name: 'bbInterface'
-                    checkbox:
-                    get: '(IsPluginLoaded "bbInterface")'
-                    onCheck: '(LoadPlugin "bbInterface")'
-                    onUncheck: '(UnloadPlugin "bbInterface")'
-                  - name: 'bbSDK'
-                    checkbox:
-                    get: '(IsPluginLoaded "bbSDK")'
-                    onCheck: '(LoadPlugin "bbSDK")'
-                    onUncheck: '(UnloadPlugin "bbSDK")'
-                  - name: 'bbSlit'
-                    checkbox:
-                    get: '(IsPluginLoaded "bbSlit")'
-                    onCheck: '(LoadPlugin "bbSlit")'
-                    onUncheck: '(UnloadPlugin "bbSlit")'
-                  - name: 'bbAnalog'
-                    checkbox:
-                    get: '(IsPluginLoaded "bbAnalog")'
-                    onCheck: '(LoadPlugin "bbAnalog")'
-                    onUncheck: '(UnloadPlugin "bbAnalog")'
-                  - name: 'bbFooMP'
-                    checkbox:
-                    get: '(IsPluginLoaded "bbFooMP")'
-                    onCheck: '(LoadPlugin "bbFooMP")'
-                    onUncheck: '(UnloadPlugin "bbFooMP")'
+                  - name: 'Plugins'
+                    menu:
+                      id: 'bbTT Plugin Config'
+                      items:
+                        - checkbox: 'bbInterface'
+                          get: '(IsPluginLoaded "bbInterface")'
+                          onCheck: '(LoadPlugin "bbInterface")'
+                          onUncheck: '(UnloadPlugin "bbInterface")'
+                        - checkbox: 'bbSDK'
+                          get: '(IsPluginLoaded "bbSDK")'
+                          onCheck: '(LoadPlugin "bbSDK")'
+                          onUncheck: '(UnloadPlugin "bbSDK")'
+                        - checkbox: 'bbSlit'
+                          get: '(IsPluginLoaded "bbSlit")'
+                          onCheck: '(LoadPlugin "bbSlit")'
+                          onUncheck: '(UnloadPlugin "bbSlit")'
+                        - checkbox: 'bbAnalog'
+                          get: '(IsPluginLoaded "bbAnalog")'
+                          onCheck: '(LoadPlugin "bbAnalog")'
+                          onUncheck: '(UnloadPlugin "bbAnalog")'
+                        - checkbox: 'bbFooMP'
+                          get: '(IsPluginLoaded "bbFooMP")'
+                          onCheck: '(LoadPlugin "bbFooMP")'
+                          onUncheck: '(UnloadPlugin "bbFooMP")'
+                  - name: 'Menus'
+                    menu:
+                      id: 'bbTT Menu Config'
+
+                  - name: 'Graphics'
+                    menu:
+                      id: 'bbTT Graphics Config'
+
+                  - name: 'WorkSpaces'
+                    menu:
+                      id: 'bbTT WorkSpaces Config'
+
+                  - name: 'Tasks'
+                    menu:
+                      id: 'bbTT Tasks Config'
+
+                  - name: 'misc'
+                    menu:
+                      id: 'bbTT misc Config'
+
 #            - name: 'About'
 #              script: '(CreateWidgetFromId "bbTT About")'
             - name: 'Edit Style'
@@ -224,6 +192,15 @@ Widgets:
     w: 800
     h: 600
     alpha: 192
-
+  - widget: 'Tasks'
+    id: 'bbTT Tasks'
+    show: false
+  - widget: 'RecoverWindows'
+    id: 'bbTT RecoverWindows'
+    x: 0
+    y: 512
+    w: 512
+    h: 768
+    show: false
 
 ...

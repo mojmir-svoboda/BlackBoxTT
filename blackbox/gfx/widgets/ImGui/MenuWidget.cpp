@@ -310,7 +310,8 @@ namespace imgui {
 		if (menufld->m_knownFolder)
 		{
 			char item_text[1024];
-			codecvt_utf16_utf8(item->m_name.c_str(), item_text, 1024);
+			wchar_t const * item_text_ptr = item->m_name.empty() ? menufld->m_folderName.c_str() : item->m_name.c_str();
+			codecvt_utf16_utf8(item_text_ptr, item_text, 1024);
 
 			ImGui::Bullet();
 			if (ImGui::Selectable(item_text, item_selected))

@@ -2,6 +2,7 @@
 #include "MenuConfig.h"
 #include <yaml-cpp/yaml.h>
 #include "utils_yaml.h"
+#include <blackbox/gfx/MenuWidget.h>
 
 namespace bb
 {
@@ -145,6 +146,8 @@ namespace YAML {
 					bb::MenuConfig m = node.as<bb::MenuConfig>();
 					rhs.m_menu = std::move(std::unique_ptr<bb::MenuConfig>(new bb::MenuConfig(std::move(m))));
 					rhs.m_type = bb::e_MenuItemSubMenu;
+					if (rhs.m_menu->m_widgetType.empty())
+						rhs.m_menu->m_widgetType = bb::MenuWidget::c_type;
 				}
 			}
 			catch (std::exception const & e)
@@ -177,6 +180,8 @@ namespace YAML {
 					rhs.m_getScript = node["get"].as<bbstring>();
 					rhs.m_onCheckScript = node["onCheck"].as<bbstring>();
 					rhs.m_onUncheckScript = node["onUncheck"].as<bbstring>();
+					if (rhs.m_name.empty())
+						rhs.m_name = node["checkbox"].as<bbstring>();
 					rhs.m_type = bb::e_MenuItemCheckBox;
 				}
 			}
@@ -207,8 +212,14 @@ namespace YAML {
 				if (node["folder"])
 				{
 					rhs.m_folderName = node["folder"].as<bbstring>();
+					if (rhs.m_menu && rhs.m_menu->m_id.empty())
+						rhs.m_menu->m_id = rhs.m_folderName;
 					rhs.InitFromExplorer();
 					rhs.m_type = bb::e_MenuItemFolder;
+				}
+				else
+				{
+					TRACE_MSG(LL_ERROR, CTX_CONFIG, "YAML error in source %s: need section folder to configure folder", __FILE__);
 				}
 			}
 			catch (std::exception const & e)
