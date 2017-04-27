@@ -53,8 +53,16 @@ namespace bb {
 	HWND getDesktopHandle ()
 	{
 		HWND hShellWnd = GetShellWindow();
+		//HWND  hShellWnd = FindWindow(_T("Progman"), _T("Program Manager"));
 		HWND hDefView = FindWindowEx(hShellWnd, NULL, _T("SHELLDLL_DefView"), NULL);
 		HWND folderView = FindWindowEx(hDefView, NULL, _T("SysListView32"), NULL);
+		return folderView;
+	}
+	HWND getDesktopHandleBruteForce ()
+	{
+		// workaround if the above does not work (can happen when progman crashes)
+		HWND const hDefView = getDesktopParentHandle(); //FindWindowEx(shell_wnd, nullptr, L"SHELLDLL_DefView", nullptr);
+		HWND const folderView = FindWindowEx(hDefView, NULL, L"SysListView32", L"FolderView");
 		return folderView;
 	}
 	bool isDesktopHandle (HWND hwnd)
@@ -66,14 +74,31 @@ namespace bb {
 // 			return hwnd == d;
 // 		}
 
-		// workaround if the above does not work (can happen when progman crashes)
-		HWND const hDefView = getDesktopParentHandle(); //FindWindowEx(shell_wnd, nullptr, L"SHELLDLL_DefView", nullptr);
-		HWND const folderView = FindWindowEx(hDefView, NULL, L"SysListView32", L"FolderView");
-		if (hwnd == folderView)
-			return true;
+		if (HWND explorerFolderView = getDesktopHandleBruteForce())
+		{
+			if (hwnd == explorerFolderView)
+				return true;
+		}
 
 		HWND const desktop_window = ::GetDesktopWindow();
 		return hwnd == desktop_window;
+	}
+
+	bool clickedOnDesktopIcon ()
+	{
+// 		HWND  hwndSysListView32 = getDesktopHandleBruteForce();
+// 		if (hwndSysListView32 != 0)
+// 		{
+// 			int const count = ListView_GetItemCount(hwndSysListView32);
+// 			for (int i = 0; i < count; ++i)
+// 			{
+// 				RECT rc = { };
+// 				BOOL res = ListView_GetItemRect(hwndSysListView32, i, &rc, LVIR_BOUNDS);
+// 				if (res == TRUE)
+// 					return true;
+// 			}
+// 		}
+		return false;
 	}
 
 	void destroyMenuIfInMargin (Gfx * gfx, bb::GuiWidget * w, POINT p, int margin)
