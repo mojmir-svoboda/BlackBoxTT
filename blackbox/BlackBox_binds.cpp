@@ -84,6 +84,147 @@ namespace bb {
 		return hwnd == desktop_window;
 	}
 
+	// begin: following code is from http://www.codeguru.com/cpp/misc/misc/article.php/c3807/Obtaining-Icon-Positions.htm
+	// Posted by Jeroen-bart Engelen 
+	void* AllocMemInForeignProcess(HANDLE process, unsigned long size) throw(...)
+	{
+		void *ptr = VirtualAllocEx(process, NULL, size, MEM_COMMIT, PAGE_READWRITE);
+		if(ptr == NULL) throw(GetLastError());
+		else return ptr;
+	}
+	void FreeMemInForeignProcess(HANDLE process, void* ptr) throw(...)
+	{
+		if(VirtualFreeEx(process, ptr, 0, MEM_RELEASE) == 0) throw(GetLastError());
+	}
+	void ReadFromForeignProcessMemory(HANDLE process, void* ptr, void* target, unsigned long size) throw(...)
+	{
+		if(ReadProcessMemory(process, ptr, target, size, NULL) == 0) throw(GetLastError());
+	}
+	void WriteToForeignProcessMemory(HANDLE process, void* ptr, void* src, unsigned long size) throw(...)
+	{
+		if(WriteProcessMemory(process, ptr, src, size, NULL) == 0) throw(GetLastError());
+	}
+	HANDLE FindExlorerProcess(HWND slave_wnd) throw(...)
+	{ 
+		// Thanks to mr_williams@rave.ch who pointed me to GetWindowThreadProcessId(), that makes this function waaaaaaaaaaaaay shorter.
+		HANDLE proc;
+		DWORD explorer_pid;
+
+		// Get the PID based on a HWND. This is the good stuff. You wouldn't believe the long and difficult function I had to write before I heard of this simple API call.
+		GetWindowThreadProcessId(slave_wnd, &explorer_pid);
+		// Get a process handle which we need for the shared memory functions.
+		proc = OpenProcess(PROCESS_VM_OPERATION|PROCESS_VM_READ|PROCESS_VM_WRITE|PROCESS_QUERY_INFORMATION, FALSE, explorer_pid);
+		if(proc == NULL) throw(GetLastError());
+		else return proc;
+	}
+	/*
+	* Here we query the listview in of the desktop for the icons that are on the desktop. Since we're talking to a foreign process (explorer.exe), we need to use shared memory to get the data.
+	*/
+	void GetDesktopIcons(std::list<icon_t>& icons) throw(...)
+	{
+		HWND listview_wnd = 0;
+		HANDLE explorer = 0;
+		unsigned long iconcount = 0;
+		icon_t* iconbuffer = 0;
+		void* ipc_iconpos = 0;
+		void* ipc_iconlabel = 0;
+		TCHAR* ipc_buffer = 0;
+		bool error = false;
+		LRESULT msg_result = 0;
+		POINT iconpos;
+		LVITEM iconlabel;
+		TCHAR buffer[sizeof(TCHAR)*(MAX_PATH+1)];
+
+		try
+		{
+			// Get the HWND of the listview
+			listview_wnd = FindListView();
+			// Get the total number of icons on the desktop
+			iconcount = static_cast<unsigned long>(SendMessage(listview_wnd, LVM_GETITEMCOUNT, 0, 0));
+			// No icons? Very unlikely, but whatever!
+			if(iconcount == 0) return;
+
+			// Get the PID of the process that houses the listview, i.e.: Explorer.exe
+			explorer = FindExlorerProcess(listview_wnd);
+			// Here we allocate the shared memory buffers to use in our little IPC.
+			ipc_iconpos = AllocMemInForeignProcess(explorer, sizeof(POINT));
+			ipc_iconlabel = AllocMemInForeignProcess(explorer, sizeof(LVITEM));
+			ipc_buffer = static_cast<TCHAR*>(AllocMemInForeignProcess(explorer, sizeof(sizeof(TCHAR)*(MAX_PATH+1))));
+			iconbuffer = new icon_t;
+
+			// A big loop that will retrieve the data for all the icons on the desktop.
+			for(unsigned long loop = 0; loop < iconcount; ++loop)
+			{
+				// First we get the icon position.
+				msg_result = SendMessage(listview_wnd, LVM_GETITEMPOSITION, loop, reinterpret_cast<LPARAM>(ipc_iconpos));
+				if(msg_result != TRUE) 
+				{
+					// Here the bad design and my laziness bites me. I use Windows error codes for exceptions, but a failure in this case won't give us a Windows error code, so I can't really throw anything and so I just show a messagebox.
+					// If I ever update this program, I'll fix this, but as it stands, this program suits my needs.
+					MessageBox(NULL, _T("Unable to get the icon position."), _T("Unable to obtain icon positions"), MB_OK|MB_ICONERROR);
+					error = true;
+					break;
+				}
+
+				// Get the data from the shared memory
+				ReadFromForeignProcessMemory(explorer, ipc_iconpos, &iconpos, sizeof(POINT));
+
+				// Set stuff up to retrieve the label of the icon.
+				iconlabel.iSubItem = 0;
+				iconlabel.cchTextMax = MAX_PATH;
+				iconlabel.mask = LVIF_TEXT;
+				iconlabel.pszText = (LPTSTR)ipc_buffer;
+
+				WriteToForeignProcessMemory(explorer, ipc_iconlabel, &iconlabel, sizeof(LVITEM));
+
+				// Request the label.
+				msg_result = SendMessage(listview_wnd, LVM_GETITEMTEXT, loop, (LPARAM)ipc_iconlabel);
+				if(msg_result < 0)
+				{
+					// Bad design again....don't try this at home kids.
+					MessageBox(NULL, _T("Unable to get the icon label."), _T("Unable to obtain icon positions"), MB_OK|MB_ICONERROR);
+					error = true;
+					break;		
+				}
+
+				ReadFromForeignProcessMemory(explorer, ipc_buffer, &buffer, sizeof(buffer));
+
+				iconbuffer->x = iconpos.x;
+				iconbuffer->y = iconpos.y;
+				iconbuffer->name = buffer;
+				iconbuffer->index = loop;
+
+				// Here we have all we need (coordinates and the label), so we stuff it in out list.
+				icons.push_back(*iconbuffer);
+			}
+
+			// If an error occured, we better clear all the data we gathered.
+			if(error) icons.clear();
+
+			// Always clear up afterwards.
+			FreeMemInForeignProcess(explorer, ipc_iconpos);
+			FreeMemInForeignProcess(explorer, ipc_iconlabel);
+			FreeMemInForeignProcess(explorer, ipc_buffer);
+			CloseHandle(explorer);
+		}
+		catch(DWORD error)
+		{	
+			// This extra try..catch thing is to make sure I release all the stuff I allocated before the app quits.
+			delete iconbuffer;
+			if(explorer)
+			{
+				if(ipc_iconpos) FreeMemInForeignProcess(explorer, ipc_iconpos);
+				if(ipc_iconlabel) FreeMemInForeignProcess(explorer, ipc_iconlabel);
+				if(ipc_buffer) FreeMemInForeignProcess(explorer, ipc_buffer);
+				CloseHandle(explorer);
+			}
+
+			// Rethrow the original error.
+			throw error;
+		}
+	}
+	// end of: following code is from http://www.codeguru.com/cpp/misc/misc/article.php/c3807/Obtaining-Icon-Positions.htm
+
 	bool clickedOnDesktopIcon ()
 	{
 // 		HWND  hwndSysListView32 = getDesktopHandleBruteForce();
@@ -125,6 +266,10 @@ namespace bb {
 			HWND const clicked_window = ::WindowFromPoint(p);
 			if (isDesktopHandle(clicked_window))
 			{
+				if (clickedOnDesktopIcon())
+				{
+					return;
+				}
 				if (!w)
 				{
 					w = m_gfx->MkWidgetFromId(widget_name.c_str());
