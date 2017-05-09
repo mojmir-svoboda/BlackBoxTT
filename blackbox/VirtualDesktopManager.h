@@ -1,8 +1,9 @@
 #pragma once
+#include <ntverp.h>
+#include <common.h>
+#if VER_PRODUCTBUILD > 9600
 #include <vector>
 #include <guiddef.h>
-#include <bblib/bbstring.h>
-#include <platform_win.h>
 struct IVirtualDesktopManagerInternal;
 struct IVirtualDesktopManager;
 struct IApplicationViewCollection;
@@ -58,3 +59,28 @@ namespace bb {
 	};
 
 }
+#else
+namespace bb {
+
+	struct VirtualDesktopManager
+	{
+		bool Init (size_t l, size_t r) { return true; }
+		bool Done () { return true; }
+		bool GetAdjacentDesktop (GUID desk, int dir, GUID & adj_desk) { return false; }
+		bool GetCurrentDesktop (GUID & adj_desk) { return false; }
+		void UpdateDesktopGraph () { }
+		bool FindDesktop (bbstring const & name, size_t & idx) { return false; }
+		bool FindDesktop (GUID const & guid, size_t & idx) { return false; }
+		bool FindDesktopIndex (HWND hwnd, size_t & idx) { return false; }
+		bool AssignDesktopTo (bbstring const & vertex_id, size_t & idx) { return false; }
+		bool CreateDesktops (size_t needed_total_count) { return false; }
+		size_t GetDesktopCount () const { return 0; }
+		void ClearAssignedDesktops () { }
+		bool SwitchDesktop (GUID const & g) { return false; }
+		bool MoveWindowToDesktop (HWND hwnd, GUID const & guid) { return false; }
+		bool SupportsPinnedViews () const { return false; }
+		bool IsPinned (HWND hwnd) const;
+		bool SetPinned (HWND hwnd, bool on) const;
+	};
+}
+#endif

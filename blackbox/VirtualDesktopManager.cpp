@@ -1,10 +1,12 @@
 #include "VirtualDesktopManager.h"
-#include "utils_vdm.h"
-#include <blackbox/common.h>
-#include <memory>
-#include <functional>
-#include <BlackBox.h>
-
+#include <ntverp.h>
+#if VER_PRODUCTBUILD > 9600
+// Windows 10+ SDK code goes here
+#	include "utils_vdm.h"
+#	include <blackbox/common.h>
+#	include <memory>
+#	include <functional>
+#	include <BlackBox.h>
 // void PrintGuid(const GUID &guid)
 // {
 // 	::StringFromGUID2(guid, const_cast<LPOLESTR>(guidStr.c_str()), guidStr.length());
@@ -460,3 +462,7 @@ namespace bb {
 	}
 
 }
+#else
+// Windows 8.1- SDK code goes here
+
+#endif
