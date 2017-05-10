@@ -247,7 +247,7 @@ namespace bb {
 				size_t idx = 0;
 				if (m_vdm->FindDesktop(g, idx))
 				{
-					wg.m_currentVertexId = m_vdm->m_names[idx];
+					wg.m_currentVertexId = m_vdm->GetDesktopName(idx);
 				}
 			}
 		}
@@ -263,7 +263,7 @@ namespace bb {
 						size_t idx = 0;
 						if (m_vdm->FindDesktop(g, idx))
 						{
-							wg.m_currentVertexId = m_vdm->m_ids[idx];
+							wg.m_currentVertexId = m_vdm->GetDesktopId(idx);
 						}
 					}
 				}
@@ -346,7 +346,7 @@ namespace bb {
 
 	GUID WorkSpaces::GetVertexGUID (size_t idx) const
 	{
-		return m_vdm->m_desktops[idx];
+		return m_vdm->GetVertexGUID(idx);
 	}
 
 	bool WorkSpaces::SwitchDesktop (bbstring const & vertex_id)
@@ -361,7 +361,7 @@ namespace bb {
 					{
 						TRACE_MSG(LL_DEBUG, CTX_BB | CTX_WSPACE, "VDM switch to vertex: %ws", vertex_id.c_str());
 						size_t const vdm_idx = cfg->m_idxVDM;
-						m_vdm->SwitchDesktop(m_vdm->m_desktops[vdm_idx]);
+						m_vdm->SwitchDesktop(m_vdm->GetVertexGUID(vdm_idx));
 						return true;
 					}
 			}
@@ -460,39 +460,43 @@ namespace bb {
 	}
 
 	bool WorkSpaces::CreateGraphOfAutoVDM (WorkGraphConfig & w)
+	{
+#if VER_PRODUCTBUILD > 9600
+		w.m_vertexlists.push_back(std::vector<bbstring>());
+
+		for (size_t i = 0, ie = m_vdm->GetDesktopCount(); i < ie; ++i)
+		{
+			bbstring const & v = m_vdm->GetDesktopName(i);
+			w.m_vertexlists[0].push_back(v);
+
+			std::unique_ptr<WorkSpaceConfig> ws(new WorkSpaceConfig);
+			ws->m_id = v;
+			ws->m_label = v;
+			ws->m_isVDM = true;
+			ws->m_idxVDM = i;
+			ws->m_vertex = m_graph.m_vertices.size();
+			TRACE_MSG(LL_DEBUG, CTX_BB | CTX_WSPACE, "Found VDM vertex: %ws", v.c_str());
+			m_graph.m_vertices.push_back(std::move(ws));
+		}
+
+		WorkSpaceConfig * wspace = nullptr;
+		for (auto const & e : m_vdm->m_edges)
+		{
+			WorkSpaceConfig * ws[2] = { 0 };
+			uint32_t const src = std::get<0>(e);
+			uint32_t const ep =  std::get<1>(e);
+			uint32_t const dst = std::get<2>(e);
+			if (m_graph.FindVertex(m_vdm->m_names[src], ws[0]) && m_graph.FindVertex(m_vdm->m_names[dst], ws[1]))
 			{
-				w.m_vertexlists.push_back(std::vector<bbstring>());
-
-				for (size_t i = 0, ie = m_vdm->m_names.size(); i < ie; ++i)
-				{
-					bbstring const & v = m_vdm->m_names[i];
-					w.m_vertexlists[0].push_back(v);
-
-					std::unique_ptr<WorkSpaceConfig> ws(new WorkSpaceConfig);
-					ws->m_id = v;
-					ws->m_label = v;
-					ws->m_isVDM = true;
-					ws->m_idxVDM = i;
-					ws->m_vertex = m_graph.m_vertices.size();
-					TRACE_MSG(LL_DEBUG, CTX_BB | CTX_WSPACE, "Found VDM vertex: %ws", v.c_str());
-					m_graph.m_vertices.push_back(std::move(ws));
-				}
-
-				WorkSpaceConfig * wspace = nullptr;
-				for (auto const & e : m_vdm->m_edges)
-				{
-					WorkSpaceConfig * ws[2] = { 0 };
-					uint32_t const src = std::get<0>(e);
-					uint32_t const ep =  std::get<1>(e);
-					uint32_t const dst = std::get<2>(e);
-					if (m_graph.FindVertex(m_vdm->m_names[src], ws[0]) && m_graph.FindVertex(m_vdm->m_names[dst], ws[1]))
-					{
-						unsigned count = 0;
-						m_graph.m_edges.push_back(std::make_tuple(ws[0], ep, ws[1])); // src ---label_idx---> dst
-						TRACE_MSG(LL_DEBUG, CTX_BB | CTX_WSPACE, "Found edge: %ws --> %ws", ws[0]->m_id.c_str(), ws[1]->m_id.c_str());
-					}
-				}
+				unsigned count = 0;
+				m_graph.m_edges.push_back(std::make_tuple(ws[0], ep, ws[1])); // src ---label_idx---> dst
+				TRACE_MSG(LL_DEBUG, CTX_BB | CTX_WSPACE, "Found edge: %ws --> %ws", ws[0]->m_id.c_str(), ws[1]->m_id.c_str());
+			}
+		}
 		return true;
+#else
+		return false;
+#endif
 	}
 
 	bool WorkSpaces::PrepareVDMForGraph ()
@@ -703,7 +707,7 @@ namespace bb {
 		size_t idx = 0;
 		if (m_vdm->FindDesktopIndex(hwnd, idx))
 		{
-			vertex_id = m_vdm->m_ids[idx];
+			vertex_id = m_vdm->GetDesktopId(idx);
 			return true;
 		}
 

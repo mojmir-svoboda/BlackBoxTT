@@ -23,6 +23,7 @@ namespace bb {
 		uint32_t m_left { 0 }; // shared properies between bb and vdm
 		uint32_t m_right { 0 };
 		bool Init (size_t l, size_t r);
+		bool HasVDM () { return true; }
 		bool Done ();
 
 	protected:
@@ -46,6 +47,9 @@ namespace bb {
 		bool FindDesktop (bbstring const & name, size_t & idx);
 		bool FindDesktop (GUID const & guid, size_t & idx);
 		bool FindDesktopIndex (HWND hwnd, size_t & idx);
+		bbstring const & GetDesktopName (size_t idx) const { return m_names[idx]; }
+		bbstring const & GetDesktopId (size_t idx) const { return m_ids[idx]; }
+		GUID GetVertexGUID (size_t idx) const { return m_desktops[idx]; }
 		bool AssignDesktopTo (bbstring const & vertex_id, size_t & idx);
 		bool CreateDesktops (size_t needed_total_count);
 		size_t GetDesktopCount () const { return m_desktops.size(); }
@@ -64,6 +68,7 @@ namespace bb {
 
 	struct VirtualDesktopManager
 	{
+		bool HasVDM () { return false; }
 		bool Init (size_t l, size_t r) { return true; }
 		bool Done () { return true; }
 		bool GetAdjacentDesktop (GUID desk, int dir, GUID & adj_desk) { return false; }
@@ -79,8 +84,11 @@ namespace bb {
 		bool SwitchDesktop (GUID const & g) { return false; }
 		bool MoveWindowToDesktop (HWND hwnd, GUID const & guid) { return false; }
 		bool SupportsPinnedViews () const { return false; }
-		bool IsPinned (HWND hwnd) const;
-		bool SetPinned (HWND hwnd, bool on) const;
+		bool IsPinned (HWND hwnd) const { return false; }
+		bool SetPinned (HWND hwnd, bool on) const { return false; }
+		bbstring const & GetDesktopName (size_t idx) const { return bbstring(); }
+		bbstring const & GetDesktopId (size_t idx) const { return bbstring(); }
+		GUID GetVertexGUID (size_t idx) const { return GUID(); }
 	};
 }
 #endif
