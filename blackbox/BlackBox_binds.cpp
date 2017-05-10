@@ -112,13 +112,11 @@ namespace bb {
 	HANDLE findExlorerProcess (HWND slave_wnd) throw(...)
 	{ 
 		// Thanks to mr_williams@rave.ch who pointed me to GetWindowThreadProcessId(), that makes this function waaaaaaaaaaaaay shorter.
-		HANDLE proc;
-		DWORD explorer_pid;
-
 		// Get the PID based on a HWND. This is the good stuff. You wouldn't believe the long and difficult function I had to write before I heard of this simple API call.
+		DWORD explorer_pid = 0;
 		::GetWindowThreadProcessId(slave_wnd, &explorer_pid);
 		// Get a process handle which we need for the shared memory functions.
-		proc = ::OpenProcess(PROCESS_VM_OPERATION|PROCESS_VM_READ|PROCESS_VM_WRITE|PROCESS_QUERY_INFORMATION, FALSE, explorer_pid);
+		HANDLE proc = ::OpenProcess(PROCESS_VM_OPERATION|PROCESS_VM_READ|PROCESS_VM_WRITE|PROCESS_QUERY_INFORMATION, FALSE, explorer_pid);
 		if (proc == nullptr)
 			throw(::GetLastError());
 		else
@@ -129,69 +127,59 @@ namespace bb {
 	*/
 	void GetDesktopIcons () throw(...)
 	{
-		HANDLE explorer = 0;
-		void * ipc_icon_rect = 0;
 		bool error = false;
 		LRESULT msg_result = 0;
-
+		HANDLE explorer = nullptr;
 		std::vector<RECT> tmp;
 
 		try
 		{
 			HWND listview_wnd = getDesktopHandleBruteForce(); // Get the HWND of the listview
 			// Get the total number of icons on the desktop
-			int iconcount = ListView_GetItemCount(listview_wnd);
+			int const iconcount = ListView_GetItemCount(listview_wnd);
 			// No icons? Very unlikely, but whatever!
 			if (iconcount == 0)
 				return;
 
 			// Get the PID of the process that houses the listview, i.e.: Explorer.exe
-			explorer = findExlorerProcess(listview_wnd);
-
-			// Here we allocate the shared memory buffers to use in our little IPC.
-			ipc_icon_rect = allocMemInForeignProcess(explorer, sizeof(RECT));
-
+			HANDLE explorer = findExlorerProcess(listview_wnd);
 			for (int loop = 0; loop < iconcount; ++loop)
 			{
-				BOOL res = ListView_GetItemRect(listview_wnd, loop, &ipc_icon_rect, LVIR_BOUNDS);
-				if (res != TRUE) 
+				if (void * ipc_icon_rect = allocMemInForeignProcess(explorer, sizeof(RECT))) // allocate the shared memory buffers to use in our little IPC.
 				{
-					// Here the bad design and my laziness bites me. I use Windows error codes for exceptions, but a failure in this case won't give us a Windows error code, so I can't really throw anything and so I just show a messagebox.
-					// If I ever update this program, I'll fix this, but as it stands, this program suits my needs.
-					::MessageBox(NULL, _T("Unable to get the icon position."), _T("Unable to obtain icon positions"), MB_OK|MB_ICONERROR);
-					error = true;
-					break;
-				}
+					BOOL res = SendMessage(listview_wnd, LVM_GETITEMRECT, loop, reinterpret_cast<LPARAM>(ipc_icon_rect));
+					if (res != TRUE) 
+					{
+						// Here the bad design and my laziness bites me. I use Windows error codes for exceptions, but a failure in this case won't give us a Windows error code, so I can't really throw anything and so I just show a messagebox.
+						// If I ever update this program, I'll fix this, but as it stands, this program suits my needs.
+						::MessageBox(NULL, _T("Unable to get the icon rect."), _T("Unable to obtain icon rect"), MB_OK|MB_ICONERROR);
+						error = true;
+						break;
+					}
 
-				// Get the data from the shared memory
-				RECT icon_rc = { };
-				readFromForeignProcessMemory(explorer, ipc_icon_rect, &icon_rc, sizeof(RECT));
-
-				tmp.push_back(icon_rc);
-			}
-
-			// Always clear up afterwards.
-			freeMemInForeignProcess(explorer, ipc_icon_rect);
-			::CloseHandle(explorer);
-		}
-		catch (DWORD error)
-		{	
-			// This extra try..catch thing is to make sure I release all the stuff I allocated before the app quits.
-			if (explorer)
-			{
-				if (ipc_icon_rect)
+					// Get the data from the shared memory
+					RECT icon_rc = { };
+					readFromForeignProcessMemory(explorer, ipc_icon_rect, &icon_rc, sizeof(RECT));
 					freeMemInForeignProcess(explorer, ipc_icon_rect);
-				::CloseHandle(explorer);
-			}
 
-			// Rethrow the original error.
-			throw error;
+					tmp.push_back(icon_rc);
+				}
+			}
+		}
+		catch (...)
+		{
+		}
+
+		if (explorer)
+		{
+			::CloseHandle(explorer);
 		}
 	}
 	// end of: following code is from http://www.codeguru.com/cpp/misc/misc/article.php/c3807/Obtaining-Icon-Positions.htm
 
 	bool clickedOnDesktopIcon ()
 	{
+		GetDesktopIcons();
 // 		HWND  hwndSysListView32 = getDesktopHandleBruteForce();
 // 		if (hwndSysListView32 != 0)
 // 		{
