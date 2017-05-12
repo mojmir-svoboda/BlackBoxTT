@@ -85,31 +85,25 @@ namespace bb {
 	}
 
 	// begin: following code is from http://www.codeguru.com/cpp/misc/misc/article.php/c3807/Obtaining-Icon-Positions.htm
-	// Posted by Jeroen-bart Engelen 
-	void * allocMemInForeignProcess (HANDLE process, unsigned long size) throw(...)
+	// Posted by Jeroen-bart Engelen, modified to suit my needs (mojmir)
+	void * allocMemInForeignProcess (HANDLE process, unsigned long size)
 	{
 		void * ptr = ::VirtualAllocEx(process, NULL, size, MEM_COMMIT, PAGE_READWRITE);
-		if (ptr == nullptr)
-			throw(::GetLastError());
-		else
-			return ptr;
+		return ptr;
 	}
-	void freeMemInForeignProcess (HANDLE process, void* ptr) throw(...)
+	bool freeMemInForeignProcess (HANDLE process, void * ptr)
 	{
-		if (::VirtualFreeEx(process, ptr, 0, MEM_RELEASE) == 0)
-			throw(::GetLastError());
+		return ::VirtualFreeEx(process, ptr, 0, MEM_RELEASE) == TRUE;
 	}
-	void readFromForeignProcessMemory (HANDLE process, void * ptr, void * target, unsigned long size) throw(...)
+	bool readFromForeignProcessMemory (HANDLE process, void * ptr, void * target, unsigned long size)
 	{
-		if (::ReadProcessMemory(process, ptr, target, size, nullptr) == 0)
-			throw(::GetLastError());
+		return ::ReadProcessMemory(process, ptr, target, size, nullptr) == TRUE;
 	}
-	void WriteToForeignProcessMemory (HANDLE process, void * ptr, void * src, unsigned long size) throw(...)
+	bool WriteToForeignProcessMemory (HANDLE process, void * ptr, void * src, unsigned long size)
 	{
-		if (::WriteProcessMemory(process, ptr, src, size, nullptr) == 0)
-			throw(::GetLastError());
+		return ::WriteProcessMemory(process, ptr, src, size, nullptr) == TRUE;
 	}
-	HANDLE findExlorerProcess (HWND slave_wnd) throw(...)
+	HANDLE findExlorerProcess (HWND slave_wnd)
 	{ 
 		// Thanks to mr_williams@rave.ch who pointed me to GetWindowThreadProcessId(), that makes this function waaaaaaaaaaaaay shorter.
 		// Get the PID based on a HWND. This is the good stuff. You wouldn't believe the long and difficult function I had to write before I heard of this simple API call.
@@ -117,81 +111,63 @@ namespace bb {
 		::GetWindowThreadProcessId(slave_wnd, &explorer_pid);
 		// Get a process handle which we need for the shared memory functions.
 		HANDLE proc = ::OpenProcess(PROCESS_VM_OPERATION|PROCESS_VM_READ|PROCESS_VM_WRITE|PROCESS_QUERY_INFORMATION, FALSE, explorer_pid);
-		if (proc == nullptr)
-			throw(::GetLastError());
-		else
-			return proc;
+		return proc;
 	}
-	/*
-	* Here we query the listview in of the desktop for the icons that are on the desktop. Since we're talking to a foreign process (explorer.exe), we need to use shared memory to get the data.
-	*/
-	void GetDesktopIcons () throw(...)
+
+	int getDesktopIconCount (HWND hwndSysListView32)
+	{
+		int const iconcount = ListView_GetItemCount(hwndSysListView32);
+		return iconcount;
+	}
+	// Query the shell listview of the desktop for the icons that are on the desktop. Since we're talking to a foreign process (explorer.exe), we need to use shared memory to get the data.
+	bool getDesktopIcons (HWND hwndSysListView32, size_t icon_count, RECT * results)
 	{
 		bool error = false;
-		LRESULT msg_result = 0;
-		HANDLE explorer = nullptr;
-		std::vector<RECT> tmp;
-
-		try
+		if (HANDLE explorer = findExlorerProcess(hwndSysListView32)) // Get the PID of the process that houses the listview, i.e.: Explorer.exe
 		{
-			HWND listview_wnd = getDesktopHandleBruteForce(); // Get the HWND of the listview
-			// Get the total number of icons on the desktop
-			int const iconcount = ListView_GetItemCount(listview_wnd);
-			// No icons? Very unlikely, but whatever!
-			if (iconcount == 0)
-				return;
-
-			// Get the PID of the process that houses the listview, i.e.: Explorer.exe
-			HANDLE explorer = findExlorerProcess(listview_wnd);
-			for (int loop = 0; loop < iconcount; ++loop)
+			for (int i = 0; i < icon_count; ++i)
 			{
 				if (void * ipc_icon_rect = allocMemInForeignProcess(explorer, sizeof(RECT))) // allocate the shared memory buffers to use in our little IPC.
 				{
-					BOOL res = SendMessage(listview_wnd, LVM_GETITEMRECT, loop, reinterpret_cast<LPARAM>(ipc_icon_rect));
-					if (res != TRUE) 
+					BOOL const res = ::SendMessage(hwndSysListView32, LVM_GETITEMRECT, i, reinterpret_cast<LPARAM>(ipc_icon_rect));
+					if (res == TRUE) 
 					{
-						// Here the bad design and my laziness bites me. I use Windows error codes for exceptions, but a failure in this case won't give us a Windows error code, so I can't really throw anything and so I just show a messagebox.
-						// If I ever update this program, I'll fix this, but as it stands, this program suits my needs.
-						::MessageBox(NULL, _T("Unable to get the icon rect."), _T("Unable to obtain icon rect"), MB_OK|MB_ICONERROR);
+						RECT icon_rc = { };
+						readFromForeignProcessMemory(explorer, ipc_icon_rect, &icon_rc, sizeof(RECT)); // Get the data from the shared memory
+						results[i] = icon_rc;
+					}
+					else
+					{
+						Assert(0); // something went wrong, cannot get icon rect
 						error = true;
-						break;
 					}
 
-					// Get the data from the shared memory
-					RECT icon_rc = { };
-					readFromForeignProcessMemory(explorer, ipc_icon_rect, &icon_rc, sizeof(RECT));
 					freeMemInForeignProcess(explorer, ipc_icon_rect);
-
-					tmp.push_back(icon_rc);
+					ipc_icon_rect = nullptr;
 				}
 			}
-		}
-		catch (...)
-		{
-		}
 
-		if (explorer)
-		{
 			::CloseHandle(explorer);
 		}
+		return !error;
 	}
 	// end of: following code is from http://www.codeguru.com/cpp/misc/misc/article.php/c3807/Obtaining-Icon-Positions.htm
 
-	bool clickedOnDesktopIcon ()
+	bool clickedOnDesktopIcon (POINT p)
 	{
-		GetDesktopIcons();
-// 		HWND  hwndSysListView32 = getDesktopHandleBruteForce();
-// 		if (hwndSysListView32 != 0)
-// 		{
-// 			int const count = ListView_GetItemCount(hwndSysListView32);
-// 			for (int i = 0; i < count; ++i)
-// 			{
-// 				RECT rc = { };
-// 				BOOL res = ListView_GetItemRect(hwndSysListView32, i, &rc, LVIR_BOUNDS);
-// 				if (res == TRUE)
-// 					return true;
-// 			}
-// 		}
+ 		HWND  hwndSysListView32 = getDesktopHandleBruteForce();
+		int const count = getDesktopIconCount(hwndSysListView32);
+
+		RECT * const rects = reinterpret_cast<RECT *>(alloca(sizeof(RECT) * count));
+		if (getDesktopIcons(hwndSysListView32, count, rects))
+		{
+			for (int i = 0; i < count; ++i)
+			{
+				RECT const & r = rects[i];
+				if (::PtInRect(&r, p))
+					return true;
+			}
+		}
 		return false;
 	}
 
@@ -219,7 +195,7 @@ namespace bb {
 			HWND const clicked_window = ::WindowFromPoint(p);
 			if (isDesktopHandle(clicked_window))
 			{
-				if (clickedOnDesktopIcon())
+				if (clickedOnDesktopIcon(p))
 				{
 					return;
 				}
