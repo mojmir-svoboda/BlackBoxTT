@@ -184,9 +184,6 @@ int beginSlitPlugin (HINSTANCE hPluginInstance, HWND hwndBBSlit)
 
 void endPlugin (HINSTANCE hPluginInstance)
 {
-	if (!hwndSlit)
-		return;
-
 	getSettings().WriteRCSettings();
 
 	if (hwndSlit)
