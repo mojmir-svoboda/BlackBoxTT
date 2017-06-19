@@ -46,6 +46,7 @@ namespace bb {
 
 		void HideExplorer ();
 		void ShowExplorer ();
+		bool IsExplorerVisible () const;
 		LPITEMIDLIST GetItemId (bbstring const & path);
 
 		void OnClickedAt (PIDLIST_ABSOLUTE pidl);

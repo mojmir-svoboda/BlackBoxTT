@@ -62,6 +62,7 @@ namespace bb {
 		HWND h = ::FindWindow(L"Shell_TrayWnd", nullptr);
 		//HWND h2 = ::FindWindowEx(h, nullptr, L"Button", L"Start");
 		::ShowWindow(h, SW_HIDE);
+		m_config.m_show = false;
 	}
 
 	void Explorer::ShowExplorer ()
@@ -69,14 +70,24 @@ namespace bb {
 		HWND h = ::FindWindow(L"Shell_TrayWnd", nullptr);
 		//HWND h2 = ::FindWindowEx(h, nullptr, L"Button", L"Start");
 		::ShowWindow(h, SW_SHOW);
+		m_config.m_show = true;
+	}
+
+	bool Explorer::IsExplorerVisible () const
+	{
+		HWND h = ::FindWindow(L"Shell_TrayWnd", nullptr);
+		return ::IsWindowVisible(h);
 	}
 
 	void Explorer::Update ()
 	{
-		HWND h = ::FindWindow(L"Shell_TrayWnd", nullptr);
-		if (::IsWindowVisible(h) && m_config.m_show == false)
+		if (m_config.m_show == false)
 		{
-			::ShowWindow(h, SW_HIDE);
+			HWND h = ::FindWindow(L"Shell_TrayWnd", nullptr);
+			if (::IsWindowVisible(h))
+			{
+				::ShowWindow(h, SW_HIDE);
+			}
 		}
 	}
 

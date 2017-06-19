@@ -23,6 +23,19 @@ namespace bb {
 		return m_plugins.IsPluginLoaded(plugin_id);
 	}
 
+	void BlackBox::ShowExplorer ()
+	{
+		m_explorer->ShowExplorer();
+	}
+	void BlackBox::HideExplorer ()
+	{
+		m_explorer->HideExplorer();
+	}
+	bool BlackBox::IsExplorerVisible () const
+	{
+		return m_explorer->IsExplorerVisible();
+	}
+
 	void BlackBox::CreateWidgetFromId (bbstring const & widget_id)
 	{
 		m_gfx->MkWidgetFromId(widget_id.c_str());

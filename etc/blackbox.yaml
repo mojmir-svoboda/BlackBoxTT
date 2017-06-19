@@ -170,9 +170,14 @@ Widgets:
                     menu:
                       id: 'bbTT Tasks Config'
 
-                  - name: 'misc'
+                  - name: 'Win annoyances'
                     menu:
-                      id: 'bbTT misc Config'
+                      id: 'Win annoyances'
+                      items:
+                        - checkbox: 'Show Explorer'
+                          get: '(IsExplorerVisible)'
+                          onCheck: '(ShowExplorer)'
+                          onUncheck: '(HideExplorer)'
 
 #            - name: 'About'
 #              script: '(CreateWidgetFromId "bbTT About")'

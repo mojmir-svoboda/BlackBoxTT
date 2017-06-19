@@ -77,6 +77,9 @@ namespace bb {
 		void LoadPlugin (bbstring const & plugin_id);
 		void UnloadPlugin (bbstring const & plugin_id);
 		bool IsPluginLoaded (bbstring const & plugin_id) const;
+		void ShowExplorer ();
+		void HideExplorer ();
+		bool IsExplorerVisible () const;
 		void Quit (uint32_t arg);
 		void CreateWidgetFromId (bbstring const & widget_id);
 		bool ToggleDesktopMenu (bbstring const & menu_id);

@@ -59,6 +59,23 @@ s7_pointer bind_IsPluginLoaded (s7_scheme * sc, s7_pointer args)
 	return s7_wrong_type_arg_error(sc, "IsPluginLoaded", 1, s7_car(args), "utf8 string id of plugin from config section Plugins");
 }
 
+s7_pointer bind_ShowExplorer (s7_scheme * sc, s7_pointer args)
+{
+	getBlackBoxInstanceRW()->ShowExplorer();
+	return s7_nil(sc);
+}
+s7_pointer bind_HideExplorer (s7_scheme * sc, s7_pointer args)
+{
+	getBlackBoxInstanceRW()->HideExplorer();
+	return s7_nil(sc);
+}
+s7_pointer bind_IsExplorerVisible (s7_scheme * sc, s7_pointer args)
+{
+	bb::BlackBox * const bb = getBlackBoxInstanceRW();
+	bool const loaded = bb->IsExplorerVisible();
+	return s7_make_boolean(sc, loaded);
+}
+
 s7_pointer bind_SetQuit (s7_scheme * sc, s7_pointer args)
 {
 	if (s7_is_integer(s7_car(args)))
@@ -175,6 +192,9 @@ namespace bb {
 		s7_define_function(m_scheme, "LoadPlugin", bind_LoadPlugin, 1, 0, false, "(LoadPlugin plugin_id) Load plugin with id from config section [Plugins]");
 		s7_define_function(m_scheme, "UnloadPlugin", bind_UnloadPlugin, 1, 0, false, "(UnloadPlugin plugin_id) Unload plugin with id from config section [Plugins]");
 		s7_define_function(m_scheme, "IsPluginLoaded", bind_IsPluginLoaded, 1, 0, false, "(IsPluginLoaded plugin_id) returns true if plugin is loaded");
+		s7_define_function(m_scheme, "ShowExplorer", bind_ShowExplorer, 0, 0, false, "(ShowExplorer) Show explorer taskbar");
+		s7_define_function(m_scheme, "HideExplorer", bind_HideExplorer, 0, 0, false, "(Explorer) Hide explorer taskbar");
+		s7_define_function(m_scheme, "IsExplorerVisible", bind_IsExplorerVisible, 0, 0, false, "(IsExplorerVisible) returns true if explorer taskbar visible");
 		s7_define_function(m_scheme, "CreateWidgetFromId", bind_CreateWidgetFromId, 1, 0, false, "(CreateWidgetFromId widget_id) Creates widget from id (id from yaml config)");
 		s7_define_function(m_scheme, "ToggleDesktopMenu", bind_ToggleDesktopMenu, 1, 0, false, "(ToggleDesktopMenu widget_name) Show/Hide menu with widget_name if hidden/shown");
 		s7_define_function(m_scheme, "SetCurrentVertexId", bind_SetCurrentVertexId, 1, 0, false, "(SetCurrentVertexId vertex_id_string) Sets WorkSpace Graph to specified VertexId");
