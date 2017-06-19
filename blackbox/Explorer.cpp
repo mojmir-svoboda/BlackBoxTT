@@ -71,6 +71,15 @@ namespace bb {
 		::ShowWindow(h, SW_SHOW);
 	}
 
+	void Explorer::Update ()
+	{
+		HWND h = ::FindWindow(L"Shell_TrayWnd", nullptr);
+		if (::IsWindowVisible(h) && m_config.m_show == false)
+		{
+			::ShowWindow(h, SW_HIDE);
+		}
+	}
+
 	// https://msdn.microsoft.com/en-us/library/windows/desktop/bb761742%28v=vs.85%29.aspx
 	bool Explorer::InitControlPanel ()
 	{

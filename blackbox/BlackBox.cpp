@@ -517,6 +517,7 @@ namespace bb {
 					m_gfx->NewFrame();
 
 				m_tasks.Update();
+				m_explorer->Update();
 				HandleServerMessages();
 
 				if (!m_cmdLine.NoTrayHook())

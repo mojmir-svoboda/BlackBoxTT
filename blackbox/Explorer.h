@@ -31,6 +31,7 @@ namespace bb {
 
 		Explorer ();
 		bool Init (ExplorerConfig const & cfg);
+		void Update ();
 		bool InitControlPanel ();
 		bool InitStartMenu ();
 		void ScanKnownFolders ();
