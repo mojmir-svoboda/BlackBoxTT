@@ -43,6 +43,7 @@ set(blackbox_SOURCES
 	BlackBox_broams.cpp
 	BlackBox_compat.cpp
 	Explorer.cpp
+	ExplorerConfig_yaml.cpp
 	gfx/MenuWidget.cpp
 	VirtualDesktopManager.cpp
 	DesktopWallpaper.cpp
@@ -51,7 +52,8 @@ set(blackbox_SOURCES
 	Tasks.cpp
 	TasksConfig_yaml.cpp
 	Tray.cpp
-	TrayConfig_yaml.cpp #BlackBoxConfig_yaml.cpp
+	TrayConfig_yaml.cpp
+#BlackBoxConfig_yaml.cpp
 	WorkSpacesConfig_yaml.cpp
 	WorkSpacesGraph.cpp
 	WorkSpaces.cpp

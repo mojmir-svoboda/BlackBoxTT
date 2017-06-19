@@ -6,14 +6,9 @@
 #include "Gfx/IconId.h"
 #include <loki/AssocVector.h>
 #include "ExplorerItem.h"
+#include "ExplorerConfig.h"
 
 namespace bb {
-
-	struct ExplorerConfig
-	{
-		bool m_hide;
-		bool m_hideTray;
-	};
 
 // 	inline LPITEMIDLIST clone (LPITEMIDLIST src)
 // 	{
@@ -27,6 +22,7 @@ namespace bb {
 
 	struct Explorer
 	{
+		ExplorerConfig m_config;
 		LPMALLOC m_allocator;
 		IShellFolder * m_shell;
 		std::vector<ExplorerItem> m_controlPanel;
@@ -34,7 +30,7 @@ namespace bb {
 		Loki::AssocVector<bbstring, KnwnFldr> m_knownFolders;
 
 		Explorer ();
-		bool Init ();
+		bool Init (ExplorerConfig const & cfg);
 		bool InitControlPanel ();
 		bool InitStartMenu ();
 		void ScanKnownFolders ();
@@ -47,7 +43,7 @@ namespace bb {
 		bool IsKnownFolder (bbstring const & name) const;
 		bool Done ();
 
-		void HideExplorer (ExplorerConfig const & cfg);
+		void HideExplorer ();
 		void ShowExplorer ();
 		LPITEMIDLIST GetItemId (bbstring const & path);
 

@@ -8,6 +8,7 @@
 #include "plugin/PluginsConfig.h"
 #include "menu/MenuConfig.h"
 #include "GfxConfig.h"
+#include "ExplorerConfig.h"
 
 namespace bb {
 
@@ -41,6 +42,7 @@ namespace bb {
 		DisplayConfig m_display;
 		TasksConfig m_tasks;
 		GfxConfig m_gfx;
+		ExplorerConfig m_explorer;
 		TrayConfig m_tray;
 		WorkSpacesConfig m_wspaces;
 		PluginsConfig m_plugins;

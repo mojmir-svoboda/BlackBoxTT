@@ -13,9 +13,10 @@ namespace bb {
 		, m_shell(nullptr)
 	{ }
 
-	bool Explorer::Init ()
+	bool Explorer::Init (ExplorerConfig const & cfg)
 	{
 		TRACE_MSG(LL_INFO, CTX_BB | CTX_INIT, "Initializing explorer");
+		m_config = cfg;
 		HRESULT hr = ::SHGetMalloc(&m_allocator);
 
 		if (::SHGetDesktopFolder(&m_shell) != NO_ERROR)
@@ -26,12 +27,21 @@ namespace bb {
 		r &= InitControlPanel();
 		r &= InitStartMenu();
 
+		if (!cfg.m_show)
+		{
+			HideExplorer();
+		}
+
 		return r;
 	}
 
 	bool Explorer::Done ()
 	{
 		TRACE_MSG(LL_INFO, CTX_BB, "Terminating explorer");
+		if (!m_config.m_show)
+		{
+			ShowExplorer();
+		}
 		m_controlPanel.clear();
 		m_startMenu.clear();
 		if (m_shell)
@@ -47,12 +57,18 @@ namespace bb {
 		return true;
 	}
 
-	void Explorer::HideExplorer (ExplorerConfig const & cfg)
+	void Explorer::HideExplorer ()
 	{
+		HWND h = ::FindWindow(L"Shell_TrayWnd", nullptr);
+		//HWND h2 = ::FindWindowEx(h, nullptr, L"Button", L"Start");
+		::ShowWindow(h, SW_HIDE);
 	}
 
 	void Explorer::ShowExplorer ()
 	{
+		HWND h = ::FindWindow(L"Shell_TrayWnd", nullptr);
+		//HWND h2 = ::FindWindowEx(h, nullptr, L"Button", L"Start");
+		::ShowWindow(h, SW_SHOW);
 	}
 
 	// https://msdn.microsoft.com/en-us/library/windows/desktop/bb761742%28v=vs.85%29.aspx

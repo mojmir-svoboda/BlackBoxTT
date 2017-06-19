@@ -253,6 +253,17 @@ namespace bb {
 				TRACE_MSG(LL_ERROR, CTX_BB | CTX_CONFIG, "* failed to load tasks section");
 			}
 
+			ExplorerConfig expl_cfg;
+			if (loadExplorerConfig(*m_y_config, expl_cfg))
+			{
+				TRACE_MSG(LL_INFO, CTX_BB | CTX_CONFIG, "* loaded explorer section");
+				m_config.m_explorer = expl_cfg;
+			}
+			else
+			{
+				TRACE_MSG(LL_ERROR, CTX_BB | CTX_CONFIG, "* failed to load tray section");
+			}
+
 			TrayConfig tray_cfg;
 			if (loadTrayConfig(*m_y_config, tray_cfg))
 			{
@@ -403,7 +414,7 @@ namespace bb {
 			TRACE_MSG(LL_ERROR, CTX_BB | CTX_INIT, "Cannot initialize graphics.");
 			return false;
 		}
-		if (!m_explorer->Init())
+		if (!m_explorer->Init(m_config.m_explorer))
 		{
 			TRACE_MSG(LL_ERROR, CTX_BB | CTX_INIT, "Cannot initialize explorer.");
 			return false;

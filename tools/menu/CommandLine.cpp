@@ -21,12 +21,12 @@ namespace bb {
 				return true;
 			}
 		}
-		catch (TCLAP::ArgException & e)
+		catch (TCLAP::ArgException &)
 		{
 			//TRACE_MSG(LL_ERROR, CTX_INIT | CTX_CONFIG, "Command line parse error: %s at arg=%i", e.error().c_str(), e.argId());
 			return false;
 		}
-		catch (TCLAP::ExitException & e)
+		catch (TCLAP::ExitException &)
 		{
 			return false;
 		}
