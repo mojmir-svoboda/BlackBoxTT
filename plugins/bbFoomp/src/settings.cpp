@@ -160,34 +160,36 @@ void Settings::ReadRCSettings ()
 
 void Settings::WriteRCSettings ()
 {
-// 	// Write current position to the config file if *not* docked to the slit...
-// 	if (!FooDockedToSlit)
-// 	{
-// 		WriteInt(rcpath, "bbfoomp.xpos:", xpos);
-// 		WriteInt(rcpath, "bbfoomp.ypos:", ypos);
-// 
-// 		WriteInt(rcpath, "bbfoomp.borderwidth:", BorderWidth);
-// 	}
-// 	else SendMessage(hwndSlit, SLIT_REMOVE, NULL, (LPARAM)hwndPlugin);
-// 
-// 	// Writing of following vars:
-// 	// FooMode (Mouse Over Mode), FooWidth (Width) and Height (Height).
-// 	WriteInt(rcpath, "bbfoomp.displaytype:", FooMode);
-// 	WriteInt(rcpath, "bbfoomp.FooWidth:", FooWidth);
-// 	WriteInt(rcpath, "bbfoomp.height:", height);
-// 
-// 	// Write custom button commands.
-// 	for (int i = 0; i < e_last_button_item; ++i)
-// 	{
-// 		FoompButton &b = buttons[i];
-// 		char picname[100], cmdname[100], altcmdname[100];
-// 		sprintf(picname,"bbfoomp.button%d.image:",i+1);
-// 		sprintf(cmdname,"bbfoomp.button%d.command:",i+1);
-// 		sprintf(altcmdname,"bbfoomp.button%d.altcommand:",i+1);
-// 		WriteInt(rcpath, picname, b.type);
-// 		WriteString(rcpath, cmdname, b.cmdarg);
-// 		WriteString(rcpath, altcmdname, b.altcmdarg);
-// 	}
+	// Write current position to the config file if *not* docked to the slit...
+	if (!FooDockedToSlit)
+	{
+		WriteInt(rcpath.c_str(), L"bbfoomp.xpos:", xpos);
+		WriteInt(rcpath.c_str(), L"bbfoomp.ypos:", ypos);
+
+		WriteInt(rcpath.c_str(), L"bbfoomp.borderwidth:", BorderWidth);
+	}
+	else SendMessage(hwndSlit, SLIT_REMOVE, NULL, (LPARAM)hwndPlugin);
+
+	// Writing of following vars:
+	// FooMode (Mouse Over Mode), FooWidth (Width) and Height (Height).
+	WriteInt(rcpath.c_str(), L"bbfoomp.displaytype:", FooMode);
+	WriteInt(rcpath.c_str(), L"bbfoomp.FooWidth:", FooWidth);
+	WriteInt(rcpath.c_str(), L"bbfoomp.height:", height);
+
+	// Write custom button commands.
+	for (int i = 0; i < e_last_button_item; ++i)
+	{
+		FoompButton & b = buttons[i];
+		wchar_t picname[128];
+		wchar_t cmdname[128];
+		wchar_t altcmdname[128];
+		_snwprintf(picname, 128, L"bbfoomp.button%d.image:", i+1);
+		_snwprintf(cmdname, 128, L"bbfoomp.button%d.command:", i+1);
+		_snwprintf(altcmdname, 128, L"bbfoomp.button%d.altcommand:", i+1);
+		WriteInt(rcpath.c_str(), picname, b.type);
+		WriteString(rcpath.c_str(), cmdname, b.cmdarg.c_str());
+		WriteString(rcpath.c_str(), altcmdname, b.altcmdarg.c_str());
+	}
 }
 
 

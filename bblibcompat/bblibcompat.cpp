@@ -528,10 +528,16 @@ void WriteBool (const TCHAR * fileName, const TCHAR * szKey, bool value)
 // API: WriteInt
 //===========================================================================
 
-void WriteInt(const TCHAR * fileName, const TCHAR * szKey, int value)
+// namespace rc {
+// 	bool writeString (tstring const & fileName, tstring const & szKey, tstring const & defaultString);
+// }
+
+void WriteInt(const TCHAR * fname, const TCHAR * key, int value)
 {
-	TCHAR buff[32];
-	write_value(fileName, szKey, _itot(value, buff, 10));
+//	TCHAR buff[32];
+//	_itot(value, buff, 10);
+//	rc::writeString(tstring(fname), tstring(key), tstring(buff));
+	//write_value(fileName, szKey, );
 }
 
 //===========================================================================
