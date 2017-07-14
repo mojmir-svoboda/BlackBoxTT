@@ -1,6 +1,7 @@
 ; # = Win  ! = Alt  ^ = Control  + = Shift
 
 RButton::
+RButton Up::
 	; if bbmenu returns 1 it means it accepts the click. otherwise forward the click to explorer
  	RunWait, c:\bb_devel\bbmenu.exe -c "(ToggleDesktopMenu ""bbTT Menu"")",, UseErrorLevel
 	if ErrorLevel = 0
