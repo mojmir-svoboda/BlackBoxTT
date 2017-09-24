@@ -5,8 +5,10 @@ namespace bb {
 
 	CommandLine::CommandLine ()
 		: m_nostartup("n", "nostartup", "Do not run startup programs", false)
+#if defined(USE_HOOKS)
 		, m_taskhook("t", "taskhook", "Run task hook dll (dll injection)", false)
 		, m_trayhook("y", "trayhook", "Run tray hook dll (dll injection)", false)
+#endif
 		, m_configdir("d", "dir", "Specify directory with config files.", false, "", "directory")
 		, m_logdir("l", "logdir", "Specify directory for log files.", false, "", "directory")
 		, m_unbuffered("u", "unbuffered", "Logging output is unbuffered.", false)
@@ -27,8 +29,10 @@ namespace bb {
 			{
 				m_cmdLine->setExceptionHandling(false);
 				m_cmdLine->add(m_nostartup);
+#if defined(USE_HOOKS)
 				m_cmdLine->add(m_trayhook);
 				m_cmdLine->add(m_taskhook);
+#endif
 				m_cmdLine->add(m_configdir);
 				m_cmdLine->add(m_logdir);
 				m_cmdLine->add(m_rcfile);

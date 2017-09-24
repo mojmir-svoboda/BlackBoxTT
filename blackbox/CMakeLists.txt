@@ -9,23 +9,26 @@ set_target_properties(bbversion_h PROPERTIES FOLDER "bbTT")
 
 include_directories(${CMAKE_SOURCE_DIR}/blackbox)
 
-if ( buildbits EQUAL 64 )
-	if (MSVC)
-		string(REGEX REPLACE " Win64" "" GENERATOR_FOR_32 ${CMAKE_GENERATOR})
-	endif (MSVC)
-	if (MINGW)
-		# TODO
-	endif (MINGW)
-	message("${arg} 32 on 64bit... 32bit generator=${GENERATOR_FOR_32}")
-endif( buildbits EQUAL 64 )
+if (OPTION_USE_HOOKS)
 
+	if ( buildbits EQUAL 64 )
+		if (MSVC)
+			string(REGEX REPLACE " Win64" "" GENERATOR_FOR_32 ${CMAKE_GENERATOR})
+		endif (MSVC)
+		if (MINGW)
+			# TODO
+		endif (MINGW)
+		message("${arg} 32 on 64bit... 32bit generator=${GENERATOR_FOR_32}")
+	endif( buildbits EQUAL 64 )
 
 # native hooks first
-add_subdirectory(hooks)
+	add_definitions("-DUSE_HOOKS")
+	add_subdirectory(hooks)
 
 # 32b for 64b build
-Build32on64(taskhook hooks "32on64")
-Build32on64(blackbox hooks "32on64") # NOTE: this is not blackbox, but blackbox32.exe
+	Build32on64(taskhook hooks "32on64")
+	Build32on64(blackbox hooks "32on64") # NOTE: this is not blackbox, but blackbox32.exe
+endif (OPTION_USE_HOOKS)
 
 # bb networking
 add_subdirectory(net)
@@ -167,7 +170,9 @@ add_library(blackbox SHARED ${blackbox_SOURCES} ${blackbox_HEADERS} blackbox.def
 set_target_properties(blackbox PROPERTIES ENABLE_EXPORTS ON)
 target_link_libraries(blackbox bblib)
 target_link_libraries(blackbox version comctl32 shlwapi)
-target_link_libraries(blackbox taskhook trayhook)
+if (OPTION_USE_HOOKS)
+	target_link_libraries(blackbox taskhook trayhook)
+endif (OPTION_USE_HOOKS)
 target_link_libraries(blackbox yaml-cpp)
 target_link_libraries(blackbox dwmapi)
 target_link_libraries(blackbox net)

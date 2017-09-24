@@ -520,8 +520,10 @@ namespace bb {
 				m_explorer->Update();
 				HandleServerMessages();
 
+#if defined(USE_HOOKS)
 				if (!m_cmdLine.NoTrayHook())
 					m_tray.UpdateFromTrayHook();
+#endif
 
 				if (m_gfx)
 					m_gfx->Render();

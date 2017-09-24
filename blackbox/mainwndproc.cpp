@@ -1,6 +1,8 @@
 #include <platform_win.h>
-#include <hooks/taskhook.h>
-#include <hooks/trayhook.h>
+#if defined(USE_HOOKS)
+#	include <hooks/taskhook.h>
+#	include <hooks/trayhook.h>
+#endif
 #include <blackbox/common.h>
 #include <vector>
 #include <SpinLock.h>
@@ -19,6 +21,7 @@ LRESULT CALLBACK mainWndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 	{
 		case WM_CREATE:
 		{
+#if defined(USE_HOOKS)
 			if (!bb.m_cmdLine.NoTaskHook())
 			{
 				initTaskHook(hwnd, bb.GetTaskHookWM());
@@ -28,10 +31,13 @@ LRESULT CALLBACK mainWndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 			{
 				initTrayHook(hwnd);
 			}
+#endif
 			return 0;
 		}
 		case WM_DESTROY:
+#if defined(USE_HOOKS)
 			doneTaskHook();
+#endif
 			PostQuitMessage(0);
 			break;
 

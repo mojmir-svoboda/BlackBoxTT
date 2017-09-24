@@ -22,6 +22,7 @@ namespace bb {
 
 	void Tray::UpdateFromTrayHook ()
 	{
+#if defined(USE_HOOKS)
 		TrayData const * hook_data = g_trayData;
 		m_data.m_lock.Lock();
 		hook_data->m_lock.Lock();
@@ -35,6 +36,7 @@ namespace bb {
 
 		hook_data->m_lock.Unlock();
 		m_data.m_lock.Unlock();
+#endif
 	}
 
 }

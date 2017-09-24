@@ -10,6 +10,7 @@ option(OPTION_RUN_ASN1C "Generate code from asn.1 (run asn1c)" OFF)
 option(OPTION_USE_TRACE "Logging" ON)
 option(OPTION_USE_TRACE_TCP "Logging to external application" OFF)
 option(OPTION_USE_TCL "TCL" OFF)
+option(OPTION_USE_HOOKS "Use hooks (dll injection)" OFF)
 
 # use this for develoment, if you do not pass it from command line:
 # development build means:
@@ -84,24 +85,26 @@ include_directories (3rd_party/yaml-cpp/include)
 add_definitions("-DASIO_STANDALONE")
 include_directories (${CMAKE_SOURCE_DIR}/3rd_party/asio/include)
 
-include(ExternalProject)
-# TODO directory into arguments
-function(Build32on64 proj_name proj_dir proj_subdir)
-	if ( buildbits EQUAL 64 )
-		set(${proj_name}_SOURCE_DIR  ${CMAKE_CURRENT_SOURCE_DIR}/${proj_dir})
-		set(${proj_name}32_PATH ${${proj_name}_SOURCE_DIR}/${proj_subdir})
-		message("32on64: ${proj_name} sources=${${proj_name}32_PATH}")
-		ExternalProject_Add (
-			${proj_name}32
-			CMAKE_GENERATOR ${GENERATOR_FOR_32}
-      CMAKE_ARGS -DBB32on64=1 -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
-      BINARY_DIR ${CMAKE_BINARY_DIR}/${proj_name}32
-			SOURCE_DIR	${${proj_name}32_PATH}
-			DOWNLOAD_COMMAND ""
-		)
-		set_property(TARGET ${proj_name}32 PROPERTY FOLDER "${proj_dir}/${proj_name}")
-	endif( buildbits EQUAL 64 )
-endfunction()
+if (OPTION_USE_HOOKS)
+	include(ExternalProject)
+	# TODO directory into arguments
+	function(Build32on64 proj_name proj_dir proj_subdir)
+		if ( buildbits EQUAL 64 )
+			set(${proj_name}_SOURCE_DIR  ${CMAKE_CURRENT_SOURCE_DIR}/${proj_dir})
+			set(${proj_name}32_PATH ${${proj_name}_SOURCE_DIR}/${proj_subdir})
+			message("32on64: ${proj_name} sources=${${proj_name}32_PATH}")
+			ExternalProject_Add (
+				${proj_name}32
+				CMAKE_GENERATOR ${GENERATOR_FOR_32}
+				CMAKE_ARGS -DBB32on64=1 -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+				BINARY_DIR ${CMAKE_BINARY_DIR}/${proj_name}32
+				SOURCE_DIR	${${proj_name}32_PATH}
+				DOWNLOAD_COMMAND ""
+			)
+			set_property(TARGET ${proj_name}32 PROPERTY FOLDER "${proj_dir}/${proj_name}")
+		endif( buildbits EQUAL 64 )
+	endfunction()
+endif (OPTION_USE_HOOKS)
 
 # bbproto + asn1
 add_definitions("-DASSUMESTDTYPES") # asn1: use types from cstdint 
