@@ -9,8 +9,7 @@ namespace bb {
 		ID3D11RenderTargetView * view = nullptr;
 
 		ID3D11Texture2D * pBackBuffer;
-		D3D11_RENDER_TARGET_VIEW_DESC render_target_view_desc;
-		ZeroMemory(&render_target_view_desc, sizeof(render_target_view_desc));
+		D3D11_RENDER_TARGET_VIEW_DESC render_target_view_desc = {};
 		render_target_view_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		render_target_view_desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 		chain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
