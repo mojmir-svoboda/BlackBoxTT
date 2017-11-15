@@ -1,17 +1,19 @@
 #pragma once
-#include <imgui/imgui.h>
+#include <nuklear/nuklear_config.h>
 #include <platform_win.h>
 #include <vector>
 #include <blackbox/gfx/Gui.h>
 #include <blackbox/gfx/GuiWidget.h>
-#include <blackbox/gfx/shared/GfxWindow.h>
 #include <bblib/bbstring.h>
 struct ID3D11Buffer; struct ID3D10Blob;
 struct ID3D11VertexShader; struct ID3D11InputLayout; struct ID3D11PixelShader; struct ID3D11SamplerState;
 struct ID3D11ShaderResourceView; struct ID3D11RasterizerState; struct ID3D11BlendState;
 
 namespace bb {
-namespace imgui {
+namespace shared {
+	struct GfxWindow;
+}
+namespace nuklear {
 	struct Gfx;
 
 	struct Gui : bb::Gui
@@ -20,11 +22,12 @@ namespace imgui {
 		HWND m_hwnd { nullptr };
 		Gfx * m_gfx { nullptr };
 		shared::GfxWindow * m_gfxWindow { nullptr };
-		ImGuiContext * m_context { nullptr };
+
 		using GuiWidgetPtr = std::unique_ptr<GuiWidget>;
 		std::vector<GuiWidgetPtr> m_widgets;
 		bbstring m_name { };
 
+		virtual void ResetInput () override { }
 		virtual void NewFrame () override;
 		virtual void DrawUI () override;
 		virtual void Render () override;
@@ -36,10 +39,8 @@ namespace imgui {
 		virtual GuiWidget * FindWidget (wchar_t const * widgetId) override;
 		virtual bool RmWidget (GuiWidget * widget) override;
 
-		static LRESULT CALLBACK GuiWndProcDispatch (HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam);
-		LRESULT WndProcHandler (HWND, UINT msg, WPARAM wParam, LPARAM lParam);
+		virtual LRESULT WndProcHandler (HWND, UINT msg, WPARAM wParam, LPARAM lParam) override;
 
-		virtual void ResetInput () override { }
 		void OnResize (unsigned w, unsigned h);
 		void FeedInput ();
 	};

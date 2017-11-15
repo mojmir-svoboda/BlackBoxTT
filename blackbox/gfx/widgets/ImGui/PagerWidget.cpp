@@ -127,10 +127,10 @@ namespace imgui {
 		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiSetCond_Always);
 
 		ImVec2 const & display = ImGui::GetIO().DisplaySize;
-		if (m_contentSize.x > 0 && m_contentSize.y > 0)
+		if (std::get<0>(m_contentSize) > 0 && std::get<1>(m_contentSize) > 0)
 		{
 			ImGuiStyle & style = ImGui::GetStyle();
-			resizeWindowToContents(m_gfxWindow->m_hwnd, m_contentSize.x, m_contentSize.y, style.WindowMinSize.x, style.WindowMinSize.y, style.WindowRounding);
+			resizeWindowToContents(m_gfxWindow->m_hwnd, std::get<0>(m_contentSize), std::get<1>(m_contentSize), style.WindowMinSize.x, style.WindowMinSize.y, style.WindowRounding);
 		}
 
 		bool win_opened = true;

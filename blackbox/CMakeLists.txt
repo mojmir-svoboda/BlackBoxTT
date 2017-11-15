@@ -68,6 +68,11 @@ set(blackbox_SOURCES
 	utils_vdm.cpp
 	menu/MenuConfig_yaml.cpp
 	menu/Menuconfig.cpp
+	gfx/shared/Gfx.cpp
+	gfx/shared/DX11.cpp
+	gfx/shared/GfxWindow.cpp
+	gfx/shared/IconCache.cpp
+	gfx/Gui.cpp
 )
 
 set (blackbox_HEADERS
@@ -105,13 +110,13 @@ set (blackbox_HEADERS
 	plugin/PluginsConfig.h
 	menu/Menuconfig.h
 	menu/MenuConfig_yaml.h
+	gfx/shared/Gfx.h
+	gfx/shared/DX11.h
+	gfx/shared/IconCache.h
 )
 
 set (blackbox_ImGui_SOURCES
-	gfx/ImGui/DX11.cpp
 	gfx/ImGui/Gfx.cpp
-	gfx/ImGui/IconCache.cpp
-	gfx/ImGui/GfxWindow.cpp
 	gfx/ImGui/Gui.cpp
 	#gfx/widgets/ImGui/PluginsWidget.cpp
 	gfx/widgets/ImGui/StyleEditorWidget.cpp
@@ -130,11 +135,8 @@ set (blackbox_ImGui_SOURCES
 set (blackbox_ImGui_HEADERS
 	gfx/ImGui/imgui.h
 	gfx/ImGui/utils_imgui.h
-	gfx/ImGui/DX11.h
 	gfx/ImGui/Gfx.h
-	gfx/ImGui/GfxWindow.h
 	gfx/ImGui/Gui.h
-	gfx/ImGui/IconCache.h
 	#gfx/widgets/ImGui/PluginsWidget.h
 	gfx/widgets/ImGui/StyleEditorWidget.h
 	#gfx/widgets/ImGui/ControlPanelWidget.h
@@ -149,6 +151,44 @@ set (blackbox_ImGui_HEADERS
 	#gfx/widgets/ImGui/QuickBarWidget.h
 )
 
+set (blackbox_nuklear_SOURCES
+	gfx/nuklear/nuklear.cpp
+	gfx/nuklear/Gfx.cpp
+	gfx/nuklear/Gui.cpp
+	#gfx/widgets/nuklear/PluginsWidget.cpp
+	#gfx/widgets/nuklear/StyleEditorWidget.cpp
+	#gfx/widgets/nuklear/ControlPanelWidget.cpp
+	#gfx/widgets/nuklear/DebugWidget.cpp
+	#gfx/widgets/nuklear/TasksWidget.cpp
+	#gfx/widgets/nuklear/MenuWidget.cpp
+	#gfx/widgets/nuklear/RecoverWindowsWidget.cpp
+	#gfx/widgets/nuklear/TrayWidget.cpp
+	gfx/widgets/nuklear/PagerWidget.cpp
+	#gfx/widgets/nuklear/QuickBarWidget.cpp
+	gfx/widgets/nuklear/MenuWidget.cpp
+	#gfx/widgets/nuklear/QuickBarWidget.cpp
+)
+
+set (blackbox_nuklear_HEADERS
+	../3rd_party/nuklear/nuklear.h
+	../3rd_party/nuklear/nuklear_config.h
+	gfx/nuklear/Gfx.h
+	gfx/nuklear/Gui.h
+	#gfx/widgets/nuklear/PluginsWidget.h
+	#gfx/widgets/nuklear/StyleEditorWidget.h
+	#gfx/widgets/nuklear/ControlPanelWidget.h
+	#gfx/widgets/nuklear/DebugWidget.h
+	#gfx/widgets/nuklear/TasksWidget.h
+	#gfx/widgets/nuklear/MenuWidget.h
+	#gfx/widgets/nuklear/RecoverWindowsWidget.h
+	#gfx/widgets/nuklear/TrayWidget.h
+	gfx/widgets/nuklear/PagerWidget.h
+	#gfx/widgets/nuklear/QuickBarWidget.h
+	gfx/widgets/nuklear/MenuWidget.h
+	#gfx/widgets/nuklear/QuickBarWidget.h
+)
+
+
 if (NOT MINGW)
 	set(blackbox_SOURCES ${blackbox_SOURCES} ${PluginManager_SOURCES})
 	set(blackbox_HEADERS ${blackbox_HEADERS} ${PluginManager_HEADERS})
@@ -161,11 +201,16 @@ endif (NOT MINGW)
 
 ### blackbox dll
 
-#add_library(bbImGui SHARED ${blackbox_ImGui_SOURCES} ${blackbox_ImGui_HEADERS})
+##add_library(bbImGui SHARED ${blackbox_ImGui_SOURCES} ${blackbox_ImGui_HEADERS})
 add_library(bbImGui ${blackbox_ImGui_SOURCES} ${blackbox_ImGui_HEADERS})
 target_link_libraries(bbImGui d3d11)
 target_link_libraries(bbImGui d3dcompiler)
 target_link_libraries(bbImGui imgui)
+
+add_library(bbnuklear ${blackbox_nuklear_SOURCES} ${blackbox_nuklear_HEADERS})
+target_link_libraries(bbnuklear d3d11)
+target_link_libraries(bbnuklear d3dcompiler)
+
 add_library(blackbox SHARED ${blackbox_SOURCES} ${blackbox_HEADERS} blackbox.def)
 set_target_properties(blackbox PROPERTIES ENABLE_EXPORTS ON)
 target_link_libraries(blackbox bblib)
@@ -181,6 +226,7 @@ target_link_libraries(blackbox bbprotolib)
 target_link_libraries(blackbox libcrazyrc)
 target_link_libraries(blackbox Pathcch)
 target_link_libraries(blackbox bbImGui)
+target_link_libraries(blackbox bbnuklear)
 target_link_libraries(blackbox Assert)
 if(OPTION_USE_TRACE)
 	target_link_libraries(blackbox ${TRACE_LIBRARY})

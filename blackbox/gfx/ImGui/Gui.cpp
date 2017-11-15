@@ -1,9 +1,9 @@
 #include "Gui.h"
-#include "GfxWindow.h"
+#include <blackbox/gfx/GfxWindow.h>
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 #include "Gfx.h"
-#include "DX11.h"
+#include <blackbox/gfx/shared/DX11.h>
 #include "BlackBox.h"
 #include "utils_imgui.h"
 #include <bblib/codecvt.h>

@@ -1,7 +1,7 @@
 #pragma once
 #include "Gui.h"
 #include <imgui/imgui.h>
-#include "DX11.h"
+#include <blackbox/gfx/shared/DX11.h>
 #include "BlackBox.h"
 
 namespace ImGui

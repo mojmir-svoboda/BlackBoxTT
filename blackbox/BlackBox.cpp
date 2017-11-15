@@ -13,6 +13,7 @@
 #include "hooks/taskhook.h"
 #include "gfx/Gfx.h"
 #include "gfx/ImGui/Gfx.h"
+#include "gfx/nuklear/Gfx.h"
 #include <experimental/filesystem>
 
 extern "C"
@@ -343,6 +344,13 @@ namespace bb {
 			m_gfx = std::move(gfx); // base to m_gfx
 			return true;
 		}
+		if (use == L"nuklear")
+		{
+			std::unique_ptr<bb::nuklear::Gfx> imgui_gfx(new bb::nuklear::Gfx(m_tasks, *m_y_config.get()));
+			gfx = std::move(imgui_gfx); // imgui to base
+			m_gfx = std::move(gfx); // base to m_gfx
+			return true;
+		}
 		return false;
 	}
 
@@ -503,6 +511,9 @@ namespace bb {
 			/* Main message loop */
 			for (;;)
 			{
+				if (m_gfx)
+					m_gfx->ResetInput();
+
 				DWORD timeout = 16;
 				if (::MsgWaitForMultipleObjects(0, NULL, FALSE, timeout, QS_ALLINPUT) == WAIT_OBJECT_0)
 				{

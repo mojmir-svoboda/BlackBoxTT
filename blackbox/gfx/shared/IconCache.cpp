@@ -1,12 +1,12 @@
 #pragma once
 #include "IconCache.h"
 #include <blackbox/gfx/utils_gdi.h>
-#include <imgui/imgui.h>
 #include <blackbox/BlackBox.h>
-#include <blackbox/gfx/ImGui/DX11.h>
+#include <blackbox/gfx/shared/DX11.h>
+#include <blackbox/common.h>
 
 namespace bb {
-namespace imgui {
+namespace shared {
 
 	IconSlab::~IconSlab ()
 	{
@@ -48,7 +48,7 @@ namespace imgui {
 			return false;
 
 		uint32_t const idx = m_end++;
-		assert(idx <= IconId(~0U, ~0U, ~0U).m_index);
+		Assert(idx <= IconId(~0U, ~0U, ~0U).m_index);
 		id.m_index = idx;
 		m_names.push_back(name);
 		uint32_t const bytes = m_bits / CHAR_BIT;
@@ -69,7 +69,7 @@ namespace imgui {
 		return true;
 	}
 
-	bool IconSlab::Get (uint32_t index, ImTextureID & texid, ImVec2 & uv0, ImVec2 & uv1) const
+	bool IconSlab::Get (uint32_t index, void * & texid, float & x0, float & y0, float & x1, float & y1) const
 	{
 		if (index < m_nx * m_ny)
 		{
@@ -87,8 +87,10 @@ namespace imgui {
 			float const u1 = u1x / szx;
 			float const v1 = u1y / szy;
 			texid = static_cast<void *>(m_view);
-			uv0 = ImVec2(u0, v0);
-			uv1 = ImVec2(u1, v1);
+			x0 = u0;
+			y0 = v0;
+			x1 = u1;
+			y1 = v1;
 			return true;
 		}
 		return false;
@@ -106,7 +108,7 @@ namespace imgui {
 			{
 				if (placed = slab.AddIconToSlab(name, b, buff, buffsz, id))
 				{
-					assert(s <= IconId(~0U, ~0U, ~0U).m_slab);
+					Assert(s <= IconId(~0U, ~0U, ~0U).m_slab);
 					id.m_slab = s;
 					return true;
 				}
@@ -126,7 +128,7 @@ namespace imgui {
 			slab.Init(b.bmWidth, b.bmHeight, nx, ny, b.bmBitsPixel);
 			if (slab.AddIconToSlab(name, b, buff, buffsz, id))
 			{
-				assert(s <= IconId(~0U, ~0U, ~0U).m_slab);
+				Assert(s <= IconId(~0U, ~0U, ~0U).m_slab);
 				id.m_slab = s;
 				return true;
 			}
@@ -139,7 +141,7 @@ namespace imgui {
 		for (size_t s = 0, se = m_slabs.size(); s < se; ++s)
 			if (m_slabs[s]->Find(name, id))
 			{
-				assert(s <= IconId(~0U, ~0U, ~0U).m_slab);
+				Assert(s <= IconId(~0U, ~0U, ~0U).m_slab);
 				id.m_slab = s;
 				return true;
 			}

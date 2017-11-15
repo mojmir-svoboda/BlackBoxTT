@@ -4,11 +4,10 @@
 #include <memory>
 #include <blackbox/gfx/IconId.h>
 #include <loki/AssocVector.h>
-#include <imgui/imgui.h>
 struct ID3D11ShaderResourceView;
 
 namespace bb {
-namespace imgui {
+namespace shared {
 
 	uint32_t const c_maxIconTextureSize = 2048;
 
@@ -32,7 +31,7 @@ namespace imgui {
 		bool AddIconToSlab (bbstring const & name, BITMAP const & b, uint8_t * buff, size_t buffsz, IconId & id);
 		void Update ();
 		bool IsFull () const { return m_end >= m_nx * m_ny; }
-		bool Get (uint32_t index, ImTextureID & texid, ImVec2 & uv0, ImVec2 & uv1) const;
+		bool Get (uint32_t index, void * & texid, float & x0, float & y0, float & x1, float & y1) const;
 		bool Find (bbstring const & name, IconId & id) const;
 	};
 

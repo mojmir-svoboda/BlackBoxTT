@@ -1,11 +1,11 @@
 #include "GfxWindow.h"
 #include "Gfx.h"
 #include "DX11.h"
-#include "Gui.h"
+#include <blackbox/gfx/Gui.h>
 #include <blackbox/utils_window.h>
 
 namespace bb {
-namespace imgui {
+namespace shared {
 
 	void GfxWindow::NewFrame ()
 	{
@@ -16,10 +16,8 @@ namespace imgui {
 	{
 		if (m_chain && m_view)
 		{
-			m_gui->m_gfx->m_dx11->m_pd3dDeviceContext->OMSetRenderTargets(1, &m_view, nullptr);
-			m_gui->m_gfx->m_dx11->m_pd3dDeviceContext->ClearRenderTargetView(m_view, (float*)&m_clrCol);
-			m_gui->Render();
-			m_chain->Present(0, 0);
+			m_gui->Render();	
+			m_chain->Present(1, 0);
 		}
 	}
 

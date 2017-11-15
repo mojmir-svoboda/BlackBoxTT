@@ -1,23 +1,22 @@
 #pragma once
 #include "platform_win.h"
-#include "imgui.h"
 #include <memory>
 #include <bblib/bbstring.h>
-#include "Gui.h"
+#include <blackbox/gfx/Gui.h>
 #include <blackbox/gfx/GfxWindow.h>
 struct IDXGISwapChain1;
 struct ID3D11RenderTargetView;
 struct ID3D11DepthStencilView;
 
 namespace bb {
-namespace imgui {
+namespace shared {
 
 	struct GfxWindow : ::bb::GfxWindow
 	{
 		IDXGISwapChain1 * m_chain { nullptr };
 		std::unique_ptr<Gui> m_gui { nullptr };
 		ID3D11RenderTargetView * m_view { nullptr };
-		ImVec4 m_clrCol { ImColor(0, 0, 0, 255) };
+		float m_clrCol[4] { 0.0f, 0.0f, 0.0f, 255.0f };
 
 		GfxWindow () { }
 		virtual ~GfxWindow () { }

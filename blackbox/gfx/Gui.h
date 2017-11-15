@@ -2,6 +2,9 @@
 #include <vector>
 #include <memory>
 #include <bblib/bbstring.h>
+#include <blackbox/common.h>
+#include <minwindef.h>
+#include "GuiWidget.h"
 
 namespace bb {
 	struct GfxWindow;
@@ -16,6 +19,7 @@ namespace bb {
 		Gui () { }
 		virtual ~Gui () { }
 
+		virtual void ResetInput () = 0;
 		virtual void NewFrame () = 0;
 		virtual void DrawUI () = 0;
 		virtual void Render () = 0;
@@ -26,6 +30,9 @@ namespace bb {
 
 		virtual void Show (bool on) { m_show = on; }
 		virtual bool Visible () const { return m_show; }
+
+		static LRESULT CALLBACK GuiWndProcDispatch (HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam);
+		virtual LRESULT WndProcHandler (HWND, UINT msg, WPARAM wParam, LPARAM lParam) = 0;
 	};
 }
 

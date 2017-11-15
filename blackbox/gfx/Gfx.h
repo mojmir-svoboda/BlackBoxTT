@@ -4,6 +4,7 @@
 #include "GfxWindow.h"
 #include "GuiWidget.h"
 #include "GfxConfig.h"
+#include "IconId.h"
 
 namespace bb {
 
@@ -13,6 +14,7 @@ namespace bb {
 		virtual ~Gfx () { }
 		virtual bool Init (GfxConfig & cfg) = 0;
 		virtual void Render () = 0;
+		virtual void ResetInput () = 0;
 		virtual void NewFrame () = 0;
 		virtual bool Done () = 0;
 

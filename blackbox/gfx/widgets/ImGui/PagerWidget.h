@@ -14,7 +14,7 @@ namespace imgui {
 	{
 		constexpr static wchar_t const * const c_type = L"Pager";
 		PagerWidgetConfig m_config;
-		ImVec2 m_contentSize { 0 , 0 };
+		std::tuple<int, int> m_contentSize { 0 , 0 };
 		int m_iconsPerRow { 3 };
 		std::vector<TaskInfo> m_tasks;
 		HWND m_dragged { nullptr };
