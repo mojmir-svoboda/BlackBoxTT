@@ -4,7 +4,7 @@
 #include "Gfx.h"
 #include <blackbox/gfx/shared/DX11.h>
 #include "BlackBox.h"
-#include "utils_imgui.h"
+#include "utils_gui.h"
 #include <bblib/codecvt.h>
 #include <logging.h>
 #include <bblib/ScopeGuard.h>
@@ -88,6 +88,92 @@ namespace nuklear {
 		return 123;
 	}
 
+	NK_API void nk_d3d11_render(Gfx * gfx, Gui * gui, ID3D11DeviceContext *context, enum nk_anti_aliasing AA)
+	{
+		const float blend_factor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+		const UINT stride = sizeof(struct nk_d3d11_vertex);
+		const UINT offset = 0;
+
+		context->IASetInputLayout(gfx->m_pInputLayout);
+		context->IASetVertexBuffers(0, 1, &gfx->m_pVB, &stride, &offset);
+		context->IASetIndexBuffer(gfx->m_pIB, DXGI_FORMAT_R16_UINT, 0);
+		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		context->VSSetShader(gfx->m_pVertexShader, NULL, 0);
+		context->VSSetConstantBuffers(0, 1, &gfx->m_pVertexConstantBuffer);
+
+		context->PSSetShader(gfx->m_pPixelShader, NULL, 0);
+		context->PSSetSamplers(0, 1, &gfx->m_pFontSampler);
+
+		context->OMSetBlendState(gfx->m_pBlendState, blend_factor, 0xffffffff);
+		context->RSSetState(gfx->m_pRasterizerState);
+		context->RSSetViewports(1, &gfx->m_viewport);
+
+		/* Convert from command queue into draw list and draw to screen */
+		{/* load draw vertices & elements directly into vertex + element buffer */
+			D3D11_MAPPED_SUBRESOURCE vertices;
+			D3D11_MAPPED_SUBRESOURCE indices;
+			const struct nk_draw_command *cmd;
+			UINT offset = 0;
+			HRESULT hr;
+
+			hr = context->Map((ID3D11Resource *)gfx->m_pVB, 0, D3D11_MAP_WRITE_DISCARD, 0, &vertices);
+			//NK_ASSERT(SUCCEEDED(hr));
+			hr = context->Map((ID3D11Resource *)gfx->m_pIB, 0, D3D11_MAP_WRITE_DISCARD, 0, &indices);
+			//NK_ASSERT(SUCCEEDED(hr));
+
+			{/* fill converting configuration */
+				struct nk_convert_config config;
+				NK_STORAGE const struct nk_draw_vertex_layout_element vertex_layout[] = {
+					{NK_VERTEX_POSITION, NK_FORMAT_FLOAT, NK_OFFSETOF(struct nk_d3d11_vertex, position)},
+					{NK_VERTEX_TEXCOORD, NK_FORMAT_FLOAT, NK_OFFSETOF(struct nk_d3d11_vertex, uv)},
+					{NK_VERTEX_COLOR, NK_FORMAT_R8G8B8A8, NK_OFFSETOF(struct nk_d3d11_vertex, col)},
+					{NK_VERTEX_LAYOUT_END}
+				};
+				memset(&config, 0, sizeof(config));
+				config.vertex_layout = vertex_layout;
+				config.vertex_size = sizeof(struct nk_d3d11_vertex);
+				config.vertex_alignment = NK_ALIGNOF(struct nk_d3d11_vertex);
+				config.global_alpha = 1.0f;
+				config.shape_AA = AA;
+				config.line_AA = AA;
+				config.circle_segment_count = 22;
+				config.curve_segment_count = 22;
+				config.arc_segment_count = 22;
+				config.null = gfx->m_nullTexture;
+
+				{/* setup buffers to load vertices and elements */
+					struct nk_buffer vbuf, ibuf;
+					nk_buffer_init_fixed(&vbuf, vertices.pData, gfx->m_VertexBufferSize);
+					nk_buffer_init_fixed(&ibuf, indices.pData, gfx->m_IndexBufferSize);
+					nk_convert(&gui->m_context, &gfx->m_cmd, &vbuf, &ibuf, &config);
+				}
+			}
+
+			context->Unmap((ID3D11Resource *)gfx->m_pVB, 0);
+			context->Unmap((ID3D11Resource *)gfx->m_pIB, 0);
+
+			/* iterate over and execute each draw command */
+			nk_draw_foreach(cmd, &gui->m_context, &gfx->m_cmd)
+			{
+				D3D11_RECT scissor;
+				ID3D11ShaderResourceView *texture_view = (ID3D11ShaderResourceView *)cmd->texture.ptr;
+				if (!cmd->elem_count) continue;
+
+				scissor.left = (LONG)cmd->clip_rect.x;
+				scissor.right = (LONG)(cmd->clip_rect.x + cmd->clip_rect.w);
+				scissor.top = (LONG)cmd->clip_rect.y;
+				scissor.bottom = (LONG)(cmd->clip_rect.y + cmd->clip_rect.h);
+
+				context->PSSetShaderResources(0, 1, &texture_view);
+				context->RSSetScissorRects(1, &scissor);
+				context->DrawIndexed((UINT)cmd->elem_count, offset, 0);
+				offset += cmd->elem_count;
+			}
+			nk_clear(&gui->m_context);
+		}
+	}
+
 	void Gui::Render ()
 	{
 		if (m_show)
@@ -97,6 +183,7 @@ namespace nuklear {
 			m_gfx->m_dx11->m_pd3dDeviceContext->ClearRenderTargetView(m_gfxWindow->m_view, (float*)&m_gfxWindow->m_clrCol);
 			m_gfx->m_dx11->m_pd3dDeviceContext->OMSetRenderTargets(1, &m_gfxWindow->m_view, nullptr);
 			m_gfx->RenderImGui();
+			nk_d3d11_render(m_gfx, this, m_gfx->m_dx11->m_pd3dDeviceContext, NK_ANTI_ALIASING_ON);
 		}
 	}
 
@@ -114,34 +201,15 @@ namespace nuklear {
 
 	void Gui::FeedInput ()
 	{
-// 		ImGuiIO & io = ImGui::GetIO();
-// 
-// 		// Read keyboard modifiers inputs
-// 		io.KeyCtrl = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
-// 		io.KeyShift = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
-// 		io.KeyAlt = (GetKeyState(VK_MENU) & 0x8000) != 0;
-// 		//...
+	}
+
+	void Gui::ResetInput ()
+	{
+		nk_input_begin(&m_context);
 	}
 
 	void Gui::NewFrame ()
 	{
-		if (m_show)
-		{
-// 			ImGuiContext * const old_ctx = ImGui::GetCurrentContext();
-// 			ImGui::SetCurrentContext(m_context);
-// 			scope_guard_t on_exit = bb::mkScopeGuard(std::ptr_fun(&ImGui::SetCurrentContext), old_ctx);
-// 			{
-// 				ImGuiIO & io = ImGui::GetIO();
-// 
-// 				RECT rect;
-// 				GetClientRect(m_hwnd, &rect); // Setup display size (every frame to accommodate for window resizing)
-// 				io.DisplaySize = ImVec2((float)(rect.right - rect.left), (float)(rect.bottom - rect.top));
-// 
-// 				FeedInput();
-// 
-// 				//ImGui::NewFrame(); // Start the frame
-// 			}
-		}
 	}
 
 	LRESULT Gui::WndProcHandler (HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
@@ -162,88 +230,88 @@ namespace nuklear {
 						case VK_SHIFT:
 						case VK_LSHIFT:
 						case VK_RSHIFT:
-							nk_input_key(&m_gfx->m_context, NK_KEY_SHIFT, down);
+							nk_input_key(&m_context, NK_KEY_SHIFT, down);
 							return 1;
 
 						case VK_DELETE:
-							nk_input_key(&m_gfx->m_context, NK_KEY_DEL, down);
+							nk_input_key(&m_context, NK_KEY_DEL, down);
 							return 1;
 
 						case VK_RETURN:
-							nk_input_key(&m_gfx->m_context, NK_KEY_ENTER, down);
+							nk_input_key(&m_context, NK_KEY_ENTER, down);
 							return 1;
 
 						case VK_TAB:
-							nk_input_key(&m_gfx->m_context, NK_KEY_TAB, down);
+							nk_input_key(&m_context, NK_KEY_TAB, down);
 							return 1;
 
 						case VK_LEFT:
 							if (ctrl)
-								nk_input_key(&m_gfx->m_context, NK_KEY_TEXT_WORD_LEFT, down);
+								nk_input_key(&m_context, NK_KEY_TEXT_WORD_LEFT, down);
 							else
-								nk_input_key(&m_gfx->m_context, NK_KEY_LEFT, down);
+								nk_input_key(&m_context, NK_KEY_LEFT, down);
 							return 1;
 
 						case VK_RIGHT:
 							if (ctrl)
-								nk_input_key(&m_gfx->m_context, NK_KEY_TEXT_WORD_RIGHT, down);
+								nk_input_key(&m_context, NK_KEY_TEXT_WORD_RIGHT, down);
 							else
-								nk_input_key(&m_gfx->m_context, NK_KEY_RIGHT, down);
+								nk_input_key(&m_context, NK_KEY_RIGHT, down);
 							return 1;
 
 						case VK_BACK:
-							nk_input_key(&m_gfx->m_context, NK_KEY_BACKSPACE, down);
+							nk_input_key(&m_context, NK_KEY_BACKSPACE, down);
 							return 1;
 
 						case VK_HOME:
-							nk_input_key(&m_gfx->m_context, NK_KEY_TEXT_START, down);
-							nk_input_key(&m_gfx->m_context, NK_KEY_SCROLL_START, down);
+							nk_input_key(&m_context, NK_KEY_TEXT_START, down);
+							nk_input_key(&m_context, NK_KEY_SCROLL_START, down);
 							return 1;
 
 						case VK_END:
-							nk_input_key(&m_gfx->m_context, NK_KEY_TEXT_END, down);
-							nk_input_key(&m_gfx->m_context, NK_KEY_SCROLL_END, down);
+							nk_input_key(&m_context, NK_KEY_TEXT_END, down);
+							nk_input_key(&m_context, NK_KEY_SCROLL_END, down);
 							return 1;
 
 						case VK_NEXT:
-							nk_input_key(&m_gfx->m_context, NK_KEY_SCROLL_DOWN, down);
+							nk_input_key(&m_context, NK_KEY_SCROLL_DOWN, down);
 							return 1;
 
 						case VK_PRIOR:
-							nk_input_key(&m_gfx->m_context, NK_KEY_SCROLL_UP, down);
+							nk_input_key(&m_context, NK_KEY_SCROLL_UP, down);
 							return 1;
 
 						case 'C':
 							if (ctrl) {
-								nk_input_key(&m_gfx->m_context, NK_KEY_COPY, down);
+								nk_input_key(&m_context, NK_KEY_COPY, down);
 								return 1;
 							}
 							break;
 
 						case 'V':
 							if (ctrl) {
-								nk_input_key(&m_gfx->m_context, NK_KEY_PASTE, down);
+								nk_input_key(&m_context, NK_KEY_PASTE, down);
 								return 1;
 							}
 							break;
 
 						case 'X':
 							if (ctrl) {
-								nk_input_key(&m_gfx->m_context, NK_KEY_CUT, down);
+								nk_input_key(&m_context, NK_KEY_CUT, down);
 								return 1;
 							}
 							break;
 
 						case 'Z':
 							if (ctrl) {
-								nk_input_key(&m_gfx->m_context, NK_KEY_TEXT_UNDO, down);
+								nk_input_key(&m_context, NK_KEY_TEXT_UNDO, down);
 								return 1;
 							}
 							break;
 
 						case 'R':
 							if (ctrl) {
-								nk_input_key(&m_gfx->m_context, NK_KEY_TEXT_REDO, down);
+								nk_input_key(&m_context, NK_KEY_TEXT_REDO, down);
 								return 1;
 							}
 							break;
@@ -254,7 +322,7 @@ namespace nuklear {
 				case WM_CHAR:
 					if (wparam >= 32)
 					{
-						nk_input_unicode(&m_gfx->m_context, (nk_rune)wparam);
+						nk_input_unicode(&m_context, (nk_rune)wparam);
 						return 1;
 					}
 					break;
@@ -266,23 +334,23 @@ namespace nuklear {
 						::SendMessage(hwnd, WM_SYSCOMMAND, SC_MOVE | HTCAPTION, 0);
 						return 0;
 					}
-					nk_input_button(&m_gfx->m_context, NK_BUTTON_LEFT, (short)LOWORD(lparam), (short)HIWORD(lparam), 1);
+					nk_input_button(&m_context, NK_BUTTON_LEFT, (short)LOWORD(lparam), (short)HIWORD(lparam), 1);
 					SetCapture(hwnd);
 					return 1;
 
 				case WM_LBUTTONUP:
-					nk_input_button(&m_gfx->m_context, NK_BUTTON_DOUBLE, (short)LOWORD(lparam), (short)HIWORD(lparam), 0);
-					nk_input_button(&m_gfx->m_context, NK_BUTTON_LEFT, (short)LOWORD(lparam), (short)HIWORD(lparam), 0);
+					nk_input_button(&m_context, NK_BUTTON_DOUBLE, (short)LOWORD(lparam), (short)HIWORD(lparam), 0);
+					nk_input_button(&m_context, NK_BUTTON_LEFT, (short)LOWORD(lparam), (short)HIWORD(lparam), 0);
 					ReleaseCapture();
 					return 1;
 
 				case WM_RBUTTONDOWN:
-					nk_input_button(&m_gfx->m_context, NK_BUTTON_RIGHT, (short)LOWORD(lparam), (short)HIWORD(lparam), 1);
+					nk_input_button(&m_context, NK_BUTTON_RIGHT, (short)LOWORD(lparam), (short)HIWORD(lparam), 1);
 					SetCapture(hwnd);
 					return 1;
 
 				case WM_RBUTTONUP:
-					nk_input_button(&m_gfx->m_context, NK_BUTTON_RIGHT, (short)LOWORD(lparam), (short)HIWORD(lparam), 0);
+					nk_input_button(&m_context, NK_BUTTON_RIGHT, (short)LOWORD(lparam), (short)HIWORD(lparam), 0);
 					ReleaseCapture();
 					return 1;
 
@@ -293,25 +361,25 @@ namespace nuklear {
 						::SendMessage(hwnd, WM_SYSCOMMAND, SC_SIZE | HTCAPTION, 0);
 						return 0;
 					}
-					nk_input_button(&m_gfx->m_context, NK_BUTTON_MIDDLE, (short)LOWORD(lparam), (short)HIWORD(lparam), 1);
+					nk_input_button(&m_context, NK_BUTTON_MIDDLE, (short)LOWORD(lparam), (short)HIWORD(lparam), 1);
 					SetCapture(hwnd);
 					return 1;
 
 				case WM_MBUTTONUP:
-					nk_input_button(&m_gfx->m_context, NK_BUTTON_MIDDLE, (short)LOWORD(lparam), (short)HIWORD(lparam), 0);
+					nk_input_button(&m_context, NK_BUTTON_MIDDLE, (short)LOWORD(lparam), (short)HIWORD(lparam), 0);
 					ReleaseCapture();
 					return 1;
 
 				case WM_MOUSEWHEEL:
-					nk_input_scroll(&m_gfx->m_context, nk_vec2(0, (float)(short)HIWORD(wparam) / WHEEL_DELTA));
+					nk_input_scroll(&m_context, nk_vec2(0, (float)(short)HIWORD(wparam) / WHEEL_DELTA));
 					return 1;
 
 				case WM_MOUSEMOVE:
-					nk_input_motion(&m_gfx->m_context, (short)LOWORD(lparam), (short)HIWORD(lparam));
+					nk_input_motion(&m_context, (short)LOWORD(lparam), (short)HIWORD(lparam));
 					return 1;
 
 				case WM_LBUTTONDBLCLK:
-					nk_input_button(&m_gfx->m_context, NK_BUTTON_DOUBLE, (short)LOWORD(lparam), (short)HIWORD(lparam), 1);
+					nk_input_button(&m_context, NK_BUTTON_DOUBLE, (short)LOWORD(lparam), (short)HIWORD(lparam), 1);
 					return 1;
 			}
 		}
@@ -352,7 +420,7 @@ namespace nuklear {
 		nk_font_atlas_begin(&atlas);
 	}
 
-	NK_API void nk_d3d11_font_stash_end (Gfx * m_gfx)
+	NK_API void nk_d3d11_font_stash_end (Gfx * m_gfx, Gui * gui)
 	{
 		int w, h;
 		const void * image = nk_font_atlas_bake(&m_gfx->m_atlas, &w, &h, NK_FONT_ATLAS_RGBA32);
@@ -397,7 +465,7 @@ namespace nuklear {
 
 		nk_font_atlas_end(&m_gfx->m_atlas, nk_handle_ptr(m_gfx->m_pFontTextureView), &m_gfx->m_nullTexture);
 		if (m_gfx->m_atlas.default_font)
-			nk_style_set_font(&m_gfx->m_context, &m_gfx->m_atlas.default_font->handle);
+			nk_style_set_font(&gui->m_context, &m_gfx->m_atlas.default_font->handle);
 	}
 
 
@@ -406,7 +474,7 @@ namespace nuklear {
 		TRACE_MSG(LL_INFO, CTX_BB | CTX_GFX | CTX_INIT , "Initializing GUI for hwnd=0x%x", w->m_hwnd);
 		GfxWindow * imgui_w = static_cast<GfxWindow *>(w);
 		m_hwnd = w->m_hwnd;
-		nk_init_default(&m_gfx->m_context, 0);
+		nk_init_default(&m_context, 0);
 		nk_buffer_init_default(&m_gfx->m_cmd);
 
 		/* Load Fonts: if none of these are loaded a default font will be used  */
@@ -419,7 +487,7 @@ namespace nuklear {
 			/*struct nk_font *clean = nk_font_atlas_add_from_file(atlas, "../../extra_font/ProggyClean.ttf", 12, 0);*/
 			/*struct nk_font *tiny = nk_font_atlas_add_from_file(atlas, "../../extra_font/ProggyTiny.ttf", 10, 0);*/
 			/*struct nk_font *cousine = nk_font_atlas_add_from_file(atlas, "../../extra_font/Cousine-Regular.ttf", 13, 0);*/
-			nk_d3d11_font_stash_end(m_gfx);
+			nk_d3d11_font_stash_end(m_gfx, this);
 			/*nk_style_load_all_cursors(ctx, atlas->cursors);*/
 			/*nk_style_set_font(ctx, &droid->handle)*/;
 		}
@@ -436,9 +504,9 @@ namespace nuklear {
 		TRACE_MSG(LL_DEBUG, CTX_BB | CTX_GFX, "destroying ImGui context");
 		nk_font_atlas_clear(&m_gfx->m_atlas);
 		nk_buffer_free(&m_gfx->m_cmd);
-		nk_free(&m_gfx->m_context);
+		nk_free(&m_context);
 
-		m_gfx->m_context = nk_context { };
+		m_context = nk_context { };
 		m_gfxWindow = nullptr;
 		m_gfx = nullptr;
 		return true;

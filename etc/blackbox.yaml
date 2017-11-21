@@ -84,7 +84,8 @@ Wallpapers:
     - 'media/wallpaper/NASA/v2016069.westernnorthatlantic.half_.jpg'
 
 Gfx:
-  use: 'ImGui'
+  #use: 'ImGui'
+  use: 'nuklear'
   start: [ 'bbTT Pager' ]
 
 Widgets:

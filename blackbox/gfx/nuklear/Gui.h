@@ -22,12 +22,26 @@ namespace nuklear {
 		HWND m_hwnd { nullptr };
 		Gfx * m_gfx { nullptr };
 		shared::GfxWindow * m_gfxWindow { nullptr };
+		nk_context m_context { };
+
+		ID3D11Buffer *						m_pVB{ nullptr };
+		ID3D11Buffer *						m_pIB{ nullptr };
+		ID3D10Blob *							m_pVertexShaderBlob{ nullptr };
+		ID3D11VertexShader *			m_pVertexShader{ nullptr };
+		ID3D11InputLayout *				m_pInputLayout{ nullptr };
+		ID3D11Buffer *						m_pVertexConstantBuffer{ nullptr };
+		ID3D10Blob *							m_pPixelShaderBlob{ nullptr };
+		ID3D11PixelShader *				m_pPixelShader{ nullptr };
+		ID3D11SamplerState *			m_pFontSampler{ nullptr };
+		ID3D11ShaderResourceView * m_pFontTextureView{ nullptr };
+		ID3D11RasterizerState *		m_pRasterizerState{ nullptr };
+		ID3D11BlendState *				m_pBlendState{ nullptr };
 
 		using GuiWidgetPtr = std::unique_ptr<GuiWidget>;
 		std::vector<GuiWidgetPtr> m_widgets;
 		bbstring m_name { };
 
-		virtual void ResetInput () override { }
+		virtual void ResetInput () override;
 		virtual void NewFrame () override;
 		virtual void DrawUI () override;
 		virtual void Render () override;

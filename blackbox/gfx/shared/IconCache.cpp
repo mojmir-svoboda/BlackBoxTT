@@ -96,6 +96,27 @@ namespace shared {
 		return false;
 	}
 
+	bool IconSlab::Get (uint32_t index, void * & texid, uint32_t & sz_x, uint32_t & sz_y, uint32_t & x0, uint32_t & y0, uint32_t & x1, uint32_t & y1) const
+	{
+		if (index < m_nx * m_ny)
+		{
+			uint32_t const sz = static_cast<float>(m_x);
+			uint32_t const x = index % m_nx;
+			uint32_t const y = index / m_nx;
+			float const szx = m_x * m_nx;
+			float const szy = m_y * m_ny;
+			texid = static_cast<void *>(m_view);
+			sz_x = static_cast<uint32_t>(szx);
+			sz_y = static_cast<uint32_t>(szy);
+			x0 = static_cast<uint32_t>(x * m_x);
+			y0 = static_cast<uint32_t>(y * m_x);
+			x1 = static_cast<uint32_t>(m_x);
+			y1 = static_cast<uint32_t>(m_y);
+			return true;
+		}
+		return false;
+	}
+
 	bool IconSlabs::AddIconToSlab (bbstring const & name, BITMAP const & b, uint8_t * buff, size_t buffsz, IconId & id)
 	{
 		bool placed = false;

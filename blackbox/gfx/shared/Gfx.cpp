@@ -215,6 +215,15 @@ namespace shared {
 		return false;
 	}
 
+	bool Gfx::FindIconCoords (IconId id, void * & texid, uint32_t & sz_x, uint32_t & sz_y, uint32_t & x0, uint32_t & y0, uint32_t & x1, uint32_t & y1) const
+	{
+		bb::shared::IconSlab const * slab = nullptr;
+		if (m_iconCache.GetSlab(id, slab))
+			if (slab->Get(id.m_index, texid, sz_x, sz_y, x0, y0, x1, y1))
+				return true;
+		return false;
+	}
+
 	void Gfx::UpdateIconCache ()
 	{
 		for (auto & it : m_iconCache.m_slabs)

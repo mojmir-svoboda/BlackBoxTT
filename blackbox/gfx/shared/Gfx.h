@@ -26,19 +26,6 @@ namespace bb {
 		std::vector<GfxWindowPtr> m_windows;
 		std::vector<GfxWindowPtr> m_newWindows;
 		IconCache m_iconCache;
-		bool m_hasDeviceObjects { false };
-		ID3D11Buffer *						m_pVB { nullptr };
-		ID3D11Buffer *						m_pIB { nullptr };
-		ID3D10Blob *							m_pVertexShaderBlob { nullptr };
-		ID3D11VertexShader *			m_pVertexShader { nullptr };
-		ID3D11InputLayout *				m_pInputLayout { nullptr };
-		ID3D11Buffer *						m_pVertexConstantBuffer { nullptr };
-		ID3D10Blob *							m_pPixelShaderBlob { nullptr };
-		ID3D11PixelShader *				m_pPixelShader { nullptr };
-		ID3D11SamplerState *			m_pFontSampler { nullptr };
-		ID3D11ShaderResourceView * m_pFontTextureView { nullptr };
-		ID3D11RasterizerState *		m_pRasterizerState { nullptr };
-		ID3D11BlendState *				m_pBlendState { nullptr };
 
 		Gfx (Tasks & t, YAML::Node & y_root) : m_tasks(t), m_y_root(y_root) { }
 		virtual ~Gfx ();
@@ -72,6 +59,7 @@ namespace bb {
 			return m_iconCache.Find(name, id);
 		}
 		virtual bool FindIconCoords (IconId id, void * & texture, float & u0, float & v0, float & u1, float & v1) const override;
+		virtual bool FindIconCoords (IconId id, void * & texid, uint32_t & sz_x, uint32_t & sz_y, uint32_t & x0, uint32_t & y0, uint32_t & x1, uint32_t & y1) const;
 		bool MkIconResourceView (IconSlab & slab);
 		bool UpdateIconResourceView (IconSlab & slab);
 		void UpdateIconCache ();

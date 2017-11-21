@@ -18,7 +18,7 @@ namespace ImGui
 			ImGui::Image(texid, ImVec2(id.m_size, id.m_size), ImVec2(u0, v0), ImVec2(u1, v1), tint_col, border_col);
 			return true;
 		}
-		if (id.IsValid())
+		if (!id.IsValid())
 			TRACE_MSG(LL_ERROR, CTX_BB | CTX_GFX, "Error - cannot find icon, iconid=(sz=%i, slb=%i, idx=%i)", id.m_size, id.m_slab, id.m_index);
 		return false;
 	}
@@ -33,7 +33,7 @@ namespace ImGui
 		{
 			return ImGui::ImageButton(texid, ImVec2(id.m_size, id.m_size), ImVec2(u0, v0), ImVec2(u1, v1), framing, tint_col, border_col);
 		}
-		if (id.IsValid())
+		if (!id.IsValid())
 			TRACE_MSG(LL_ERROR, CTX_BB | CTX_GFX, "Error - cannot find icon, iconid=(sz=%i, slb=%i, idx=%i)", id.m_size, id.m_slab, id.m_index);
 		return false;
 	}

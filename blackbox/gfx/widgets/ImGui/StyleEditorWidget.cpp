@@ -1,6 +1,6 @@
 #include "StyleEditorWidget.h"
 #include <blackbox/BlackBox.h>
-#include <blackbox/gfx/ImGui/utils_imgui.h>
+#include <blackbox/gfx/ImGui/utils_gui.h>
 #include <bblib/codecvt.h>
 #include <imgui/imgui_internal.h>
 #include <blackbox/utils_window.h>

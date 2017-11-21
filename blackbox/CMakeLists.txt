@@ -134,7 +134,7 @@ set (blackbox_ImGui_SOURCES
 
 set (blackbox_ImGui_HEADERS
 	gfx/ImGui/imgui.h
-	gfx/ImGui/utils_imgui.h
+	gfx/ImGui/utils_gui.h
 	gfx/ImGui/Gfx.h
 	gfx/ImGui/Gui.h
 	#gfx/widgets/ImGui/PluginsWidget.h
@@ -152,6 +152,7 @@ set (blackbox_ImGui_HEADERS
 )
 
 set (blackbox_nuklear_SOURCES
+	gfx/nuklear/utils_gui.h
 	gfx/nuklear/nuklear.cpp
 	gfx/nuklear/Gfx.cpp
 	gfx/nuklear/Gui.cpp

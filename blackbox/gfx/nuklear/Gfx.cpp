@@ -154,7 +154,10 @@ namespace nuklear {
 
 	void Gfx::ResetInput ()
 	{
-		nk_input_begin(&m_context);
+		for (auto & it : m_windows)
+		{
+			it->GetGui()->ResetInput();
+		}
 	}
 
 	bool Gfx::CreateDeviceObjects ()
@@ -328,94 +331,9 @@ namespace nuklear {
 		CreateDeviceObjects();
 	}
 
-	NK_API void nk_d3d11_render(Gfx * gfx, ID3D11DeviceContext *context, enum nk_anti_aliasing AA)
-	{
-		const float blend_factor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-		const UINT stride = sizeof(struct nk_d3d11_vertex);
-		const UINT offset = 0;
-
-		context->IASetInputLayout(gfx->m_pInputLayout);
-		context->IASetVertexBuffers(0, 1, &gfx->m_pVB, &stride, &offset);
-		context->IASetIndexBuffer(gfx->m_pIB, DXGI_FORMAT_R16_UINT, 0);
-		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-		context->VSSetShader(gfx->m_pVertexShader, NULL, 0);
-		context->VSSetConstantBuffers(0, 1, &gfx->m_pVertexConstantBuffer);
-
-		context->PSSetShader(gfx->m_pPixelShader, NULL, 0);
-		context->PSSetSamplers(0, 1, &gfx->m_pFontSampler);
-
-		context->OMSetBlendState(gfx->m_pBlendState, blend_factor, 0xffffffff);
-		context->RSSetState(gfx->m_pRasterizerState);
-		context->RSSetViewports(1, &gfx->m_viewport);
-
-		/* Convert from command queue into draw list and draw to screen */
-		{/* load draw vertices & elements directly into vertex + element buffer */
-			D3D11_MAPPED_SUBRESOURCE vertices;
-			D3D11_MAPPED_SUBRESOURCE indices;
-			const struct nk_draw_command *cmd;
-			UINT offset = 0;
-			HRESULT hr;
-
-			hr = context->Map((ID3D11Resource *)gfx->m_pVB, 0, D3D11_MAP_WRITE_DISCARD, 0, &vertices);
-			//NK_ASSERT(SUCCEEDED(hr));
-			hr = context->Map((ID3D11Resource *)gfx->m_pIB, 0, D3D11_MAP_WRITE_DISCARD, 0, &indices);
-			//NK_ASSERT(SUCCEEDED(hr));
-
-			{/* fill converting configuration */
-				struct nk_convert_config config;
-				NK_STORAGE const struct nk_draw_vertex_layout_element vertex_layout[] = {
-					{NK_VERTEX_POSITION, NK_FORMAT_FLOAT, NK_OFFSETOF(struct nk_d3d11_vertex, position)},
-					{NK_VERTEX_TEXCOORD, NK_FORMAT_FLOAT, NK_OFFSETOF(struct nk_d3d11_vertex, uv)},
-					{NK_VERTEX_COLOR, NK_FORMAT_R8G8B8A8, NK_OFFSETOF(struct nk_d3d11_vertex, col)},
-					{NK_VERTEX_LAYOUT_END}
-				};
-				memset(&config, 0, sizeof(config));
-				config.vertex_layout = vertex_layout;
-				config.vertex_size = sizeof(struct nk_d3d11_vertex);
-				config.vertex_alignment = NK_ALIGNOF(struct nk_d3d11_vertex);
-				config.global_alpha = 1.0f;
-				config.shape_AA = AA;
-				config.line_AA = AA;
-				config.circle_segment_count = 22;
-				config.curve_segment_count = 22;
-				config.arc_segment_count = 22;
-				config.null = gfx->m_nullTexture;
-
-				{/* setup buffers to load vertices and elements */
-					struct nk_buffer vbuf, ibuf;
-					nk_buffer_init_fixed(&vbuf, vertices.pData, gfx->m_VertexBufferSize);
-					nk_buffer_init_fixed(&ibuf, indices.pData, gfx->m_IndexBufferSize);
-					nk_convert(&gfx->m_context, &gfx->m_cmd, &vbuf, &ibuf, &config); }
-			}
-
-			context->Unmap((ID3D11Resource *)gfx->m_pVB, 0);
-			context->Unmap((ID3D11Resource *)gfx->m_pIB, 0);
-
-			/* iterate over and execute each draw command */
-			nk_draw_foreach(cmd, &gfx->m_context, &gfx->m_cmd)
-			{
-				D3D11_RECT scissor;
-				ID3D11ShaderResourceView *texture_view = (ID3D11ShaderResourceView *)cmd->texture.ptr;
-				if (!cmd->elem_count) continue;
-
-				scissor.left = (LONG)cmd->clip_rect.x;
-				scissor.right = (LONG)(cmd->clip_rect.x + cmd->clip_rect.w);
-				scissor.top = (LONG)cmd->clip_rect.y;
-				scissor.bottom = (LONG)(cmd->clip_rect.y + cmd->clip_rect.h);
-
-				context->PSSetShaderResources(0, 1, &texture_view);
-				context->RSSetScissorRects(1, &scissor);
-				context->DrawIndexed((UINT)cmd->elem_count, offset, 0);
-				offset += cmd->elem_count;
-			}
-			nk_clear(&gfx->m_context); 
-		}
-	}
-
 	void Gfx::RenderImGui ()
 	{
-		nk_d3d11_render(this, m_dx11->m_pd3dDeviceContext, NK_ANTI_ALIASING_ON);
+		//nk_d3d11_render(this, m_dx11->m_pd3dDeviceContext, NK_ANTI_ALIASING_ON);
 	}
 
 }}

@@ -5,7 +5,7 @@
 #include "Gfx.h"
 #include <blackbox/gfx/shared/DX11.h>
 #include "BlackBox.h"
-#include "utils_imgui.h"
+#include "utils_gui.h"
 #include <bblib/codecvt.h>
 #include <logging.h>
 #include <bblib/ScopeGuard.h>

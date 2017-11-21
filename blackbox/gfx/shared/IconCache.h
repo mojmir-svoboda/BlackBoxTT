@@ -32,6 +32,7 @@ namespace shared {
 		void Update ();
 		bool IsFull () const { return m_end >= m_nx * m_ny; }
 		bool Get (uint32_t index, void * & texid, float & x0, float & y0, float & x1, float & y1) const;
+		bool Get (uint32_t index, void * & texid, uint32_t & sz_x, uint32_t & sz_y, uint32_t & x0, uint32_t & y0, uint32_t & x1, uint32_t & y1) const;
 		bool Find (bbstring const & name, IconId & id) const;
 	};
 

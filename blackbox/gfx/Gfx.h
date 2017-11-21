@@ -21,6 +21,7 @@ namespace bb {
 		virtual bool AddIconToCache (bbstring const & name, HICON ico, IconId & id) = 0;
 		virtual bool FindIconInCache (bbstring const & name, IconId & id) const = 0;
 		virtual bool FindIconCoords (IconId id, void * & texture, float & u0, float & v0, float & u1, float & v1) const = 0;
+		virtual bool FindIconCoords (IconId id, void * & texture, uint32_t & sz_x, uint32_t & sz_y, uint32_t & x0, uint32_t & y0, uint32_t & x1, uint32_t & y1) const = 0;
 
 		virtual GuiWidget * FindWidget (wchar_t const * name) = 0;
 		virtual GuiWidget * MkWidgetFromId (wchar_t const * widgetId) = 0;
