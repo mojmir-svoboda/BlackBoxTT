@@ -6,6 +6,7 @@
 #include "utils_yaml.h"
 #include "WidgetConfig_yaml.h"
 #include <nuklear/nuklear_config.h>
+#include <blackbox/gfx/nuklear/utils_gui.h>
 
 // todle nechci
 #include <blackbox/gfx/nuklear/Gui.h>
