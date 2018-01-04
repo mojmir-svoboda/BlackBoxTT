@@ -41,7 +41,7 @@ namespace bb {
 		m_gfx->MkWidgetFromId(widget_id.c_str());
 	}
 
-	void destroyMenuIfInMargin (Gfx * gfx, bb::GuiWidget * w, POINT p, int margin)
+	bool destroyMenuIfInMargin (Gfx * gfx, bb::GuiWidget * w, POINT p, int margin)
 	{
 		RECT r;
 		::GetWindowRect(w->m_gfxWindow->m_hwnd, &r);
@@ -53,8 +53,10 @@ namespace bb {
 		{
 			gfx->DestroyWindow(w->GetId().c_str());
 			w = nullptr;
+			return true;
 		}
-	};
+		return false;
+	}
 
 	bool BlackBox::ToggleDesktopMenu (bbstring const & widget_name)
 	{
@@ -66,19 +68,27 @@ namespace bb {
 			if (!w)
 			{
 				w = m_gfx->MkWidgetFromId(widget_name.c_str());
+				w->MoveWindow(p.x, p.y);
+				m_tasks.Focus(w->m_gfxWindow->m_hwnd);
+				setOnTop(w->m_gfxWindow->m_hwnd);
+				w->Show(true);
+				return true;
 			}
 			else
 			{
-				destroyMenuIfInMargin(m_gfx.get(), w, p, -5);
+				if (destroyMenuIfInMargin(m_gfx.get(), w, p, -5))
+					return true;
 			}
 
 			if (w && clicked_window == w->m_gfxWindow->m_hwnd)
 			{
-				destroyMenuIfInMargin(m_gfx.get(), w, p, 5);
+				if (destroyMenuIfInMargin(m_gfx.get(), w, p, 5))
+					return true;
 			}
 			else if (w && clicked_window != w->m_gfxWindow->m_hwnd)
 			{
-				destroyMenuIfInMargin(m_gfx.get(), w, p, -5);
+				if (destroyMenuIfInMargin(m_gfx.get(), w, p, -5))
+					return true;
 			}
 
 			if (w)
