@@ -508,9 +508,12 @@ namespace bb {
 		//TRACE_MSG(trace::e_Info, trace::CTX_BBCore, "Entering main message loop...");
 		__try
 		{
+			std::chrono::high_resolution_clock::time_point next_frame = std::chrono::high_resolution_clock::now();
 			/* Main message loop */
 			for (;;)
 			{
+				next_frame += std::chrono::milliseconds(1000 / 12);
+
 				if (m_gfx)
 					m_gfx->ResetInput();
 
@@ -543,6 +546,8 @@ namespace bb {
 				{
 					break;
 				}
+
+				std::this_thread::sleep_until(next_frame);
 			}
 		}
 		/* On crash: gather windows, then pass it to the OS */
