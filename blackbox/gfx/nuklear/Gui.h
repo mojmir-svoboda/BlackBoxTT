@@ -23,6 +23,8 @@ namespace nuklear {
 		Gfx * m_gfx { nullptr };
 		shared::GfxWindow * m_gfxWindow { nullptr };
 		nk_context m_context { };
+		nk_buffer m_cmd { };
+		nk_font_atlas m_atlas { };
 
 		ID3D11Buffer *						m_pVB{ nullptr };
 		ID3D11Buffer *						m_pIB{ nullptr };

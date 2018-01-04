@@ -301,11 +301,6 @@ namespace nuklear {
 			m_pPixelShaderBlob->Release();
 			m_pPixelShaderBlob = NULL;
 		}
-		if (m_pVertexConstantBuffer)
-		{
-			m_pVertexConstantBuffer->Release();
-			m_pVertexConstantBuffer = NULL;
-		}
 		if (m_pInputLayout)
 		{
 			m_pInputLayout->Release();

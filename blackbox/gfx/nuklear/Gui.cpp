@@ -23,15 +23,16 @@ namespace nuklear {
 				m_gfxWindow->m_view->Release();
 				m_gfxWindow->m_view = nullptr;
 			}
+
 			m_gfx->m_dx11->m_pd3dDeviceContext->OMSetRenderTargets(0, nullptr, nullptr);
 			if (!SUCCEEDED(m_gfxWindow->m_chain->ResizeBuffers(0, w, h, DXGI_FORMAT_UNKNOWN, 0)))
 			{
 			}
 
-			if (m_gfx->m_pVertexConstantBuffer)
+			if (m_gfxWindow->m_vertexConstantBuffer)
 			{
-				m_gfx->m_pVertexConstantBuffer->Release();
-				m_gfx->m_pVertexConstantBuffer = nullptr;
+				m_gfxWindow->m_vertexConstantBuffer->Release();
+				m_gfxWindow->m_vertexConstantBuffer = nullptr;
 			}
 
 			/* constant buffer */
@@ -50,24 +51,28 @@ namespace nuklear {
 				data.SysMemPitch = 0;
 				data.SysMemSlicePitch = 0;
 
-				m_gfx->m_dx11->m_pd3dDevice->CreateBuffer(&desc, &data, &m_gfx->m_pVertexConstantBuffer);
+				m_gfx->m_dx11->m_pd3dDevice->CreateBuffer(&desc, &data, &m_gfxWindow->m_vertexConstantBuffer);
 
 				D3D11_MAPPED_SUBRESOURCE mapped;
-				if (SUCCEEDED(m_gfx->m_dx11->m_pd3dDeviceContext->Map((ID3D11Resource *)m_gfx->m_pVertexConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped)))
+				if (SUCCEEDED(m_gfx->m_dx11->m_pd3dDeviceContext->Map((ID3D11Resource *)m_gfxWindow->m_vertexConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped)))
 				{
 					nk_d3d11_get_projection_matrix(w, h, (float *)mapped.pData);
-					m_gfx->m_dx11->m_pd3dDeviceContext->Unmap((ID3D11Resource *)m_gfx->m_pVertexConstantBuffer, 0);
+					m_gfx->m_dx11->m_pd3dDeviceContext->Unmap((ID3D11Resource *)m_gfxWindow->m_vertexConstantBuffer, 0);
 				}
 			}
 
 			/* viewport */
+			if (m_gfxWindow->m_viewport == nullptr)
+				m_gfxWindow->m_viewport = new D3D11_VIEWPORT;
+
+			if (m_gfxWindow->m_viewport)
 			{
-				m_gfx->m_viewport.TopLeftX = 0.0f;
-				m_gfx->m_viewport.TopLeftY = 0.0f;
-				m_gfx->m_viewport.Width = (float)w;
-				m_gfx->m_viewport.Height = (float)h;
-				m_gfx->m_viewport.MinDepth = 0.0f;
-				m_gfx->m_viewport.MaxDepth = 1.0f;
+				m_gfxWindow->m_viewport->TopLeftX = 0.0f;
+				m_gfxWindow->m_viewport->TopLeftY = 0.0f;
+				m_gfxWindow->m_viewport->Width = (float)w;
+				m_gfxWindow->m_viewport->Height = (float)h;
+				m_gfxWindow->m_viewport->MinDepth = 0.0f;
+				m_gfxWindow->m_viewport->MaxDepth = 1.0f;
 			}
 
 			m_gfxWindow->m_view = m_gfx->m_dx11->CreateRenderTarget(m_gfxWindow->m_chain);
@@ -100,14 +105,14 @@ namespace nuklear {
 		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		context->VSSetShader(gfx->m_pVertexShader, NULL, 0);
-		context->VSSetConstantBuffers(0, 1, &gfx->m_pVertexConstantBuffer);
+		context->VSSetConstantBuffers(0, 1, &gui->m_gfxWindow->m_vertexConstantBuffer);
 
 		context->PSSetShader(gfx->m_pPixelShader, NULL, 0);
 		context->PSSetSamplers(0, 1, &gfx->m_pFontSampler);
 
 		context->OMSetBlendState(gfx->m_pBlendState, blend_factor, 0xffffffff);
 		context->RSSetState(gfx->m_pRasterizerState);
-		context->RSSetViewports(1, &gfx->m_viewport);
+		context->RSSetViewports(1, gui->m_gfxWindow->m_viewport);
 
 		/* Convert from command queue into draw list and draw to screen */
 		{/* load draw vertices & elements directly into vertex + element buffer */
@@ -146,7 +151,7 @@ namespace nuklear {
 					struct nk_buffer vbuf, ibuf;
 					nk_buffer_init_fixed(&vbuf, vertices.pData, gfx->m_VertexBufferSize);
 					nk_buffer_init_fixed(&ibuf, indices.pData, gfx->m_IndexBufferSize);
-					nk_convert(&gui->m_context, &gfx->m_cmd, &vbuf, &ibuf, &config);
+					nk_convert(&gui->m_context, &gui->m_cmd, &vbuf, &ibuf, &config);
 				}
 			}
 
@@ -154,7 +159,7 @@ namespace nuklear {
 			context->Unmap((ID3D11Resource *)gfx->m_pIB, 0);
 
 			/* iterate over and execute each draw command */
-			nk_draw_foreach(cmd, &gui->m_context, &gfx->m_cmd)
+			nk_draw_foreach(cmd, &gui->m_context, &gui->m_cmd)
 			{
 				D3D11_RECT scissor;
 				ID3D11ShaderResourceView *texture_view = (ID3D11ShaderResourceView *)cmd->texture.ptr;
@@ -423,7 +428,7 @@ namespace nuklear {
 	NK_API void nk_d3d11_font_stash_end (Gfx * m_gfx, Gui * gui)
 	{
 		int w, h;
-		const void * image = nk_font_atlas_bake(&m_gfx->m_atlas, &w, &h, NK_FONT_ATLAS_RGBA32);
+		const void * image = nk_font_atlas_bake(&gui->m_atlas, &w, &h, NK_FONT_ATLAS_RGBA32);
 
 		/* upload font to texture and create texture view */
 		ID3D11Texture2D * font_texture = nullptr;
@@ -463,9 +468,9 @@ namespace nuklear {
 		}
 		font_texture->Release();
 
-		nk_font_atlas_end(&m_gfx->m_atlas, nk_handle_ptr(m_gfx->m_pFontTextureView), &m_gfx->m_nullTexture);
-		if (m_gfx->m_atlas.default_font)
-			nk_style_set_font(&gui->m_context, &m_gfx->m_atlas.default_font->handle);
+		nk_font_atlas_end(&gui->m_atlas, nk_handle_ptr(m_gfx->m_pFontTextureView), &m_gfx->m_nullTexture);
+		if (gui->m_atlas.default_font)
+			nk_style_set_font(&gui->m_context, &gui->m_atlas.default_font->handle);
 	}
 
 
@@ -475,12 +480,12 @@ namespace nuklear {
 		GfxWindow * imgui_w = static_cast<GfxWindow *>(w);
 		m_hwnd = w->m_hwnd;
 		nk_init_default(&m_context, 0);
-		nk_buffer_init_default(&m_gfx->m_cmd);
+		nk_buffer_init_default(&m_cmd);
 
 		/* Load Fonts: if none of these are loaded a default font will be used  */
 		/* Load Cursor: if you uncomment cursor loading please hide the cursor */
 		{
-			nk_d3d11_font_stash_begin(m_gfx->m_atlas);
+			nk_d3d11_font_stash_begin(m_atlas);
 			/*struct nk_font *droid = nk_font_atlas_add_from_file(atlas, "../../extra_font/DroidSans.ttf", 14, 0);*/
 			/*struct nk_font *robot = nk_font_atlas_add_from_file(atlas, "../../extra_font/Roboto-Regular.ttf", 14, 0);*/
 			/*struct nk_font *future = nk_font_atlas_add_from_file(atlas, "../../extra_font/kenvector_future_thin.ttf", 13, 0);*/
@@ -502,8 +507,8 @@ namespace nuklear {
 		TRACE_MSG(LL_INFO, CTX_BB | CTX_GFX, "Terminating GUI");
 		m_widgets.clear();
 		TRACE_MSG(LL_DEBUG, CTX_BB | CTX_GFX, "destroying ImGui context");
-		nk_font_atlas_clear(&m_gfx->m_atlas);
-		nk_buffer_free(&m_gfx->m_cmd);
+		nk_font_atlas_clear(&m_atlas);
+		nk_buffer_free(&m_cmd);
 		nk_free(&m_context);
 
 		m_context = nk_context { };

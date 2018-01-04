@@ -7,6 +7,10 @@
 namespace bb {
 namespace shared {
 
+	GfxWindow::~GfxWindow ()
+	{
+	}
+
 	void GfxWindow::NewFrame ()
 	{
 		m_gui->NewFrame();
@@ -34,6 +38,18 @@ namespace shared {
 
 	bool GfxWindow::Done ()
 	{
+		if (m_viewport)
+		{
+			delete m_viewport;
+			m_viewport = nullptr;
+		}
+
+		if (m_vertexConstantBuffer)
+		{
+			m_vertexConstantBuffer->Release();
+			m_vertexConstantBuffer = nullptr;
+		}
+
 		if (m_gui)
 		{
 			m_gui->Done();

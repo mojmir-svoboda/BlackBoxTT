@@ -7,6 +7,8 @@
 struct IDXGISwapChain1;
 struct ID3D11RenderTargetView;
 struct ID3D11DepthStencilView;
+struct D3D11_VIEWPORT;
+struct ID3D11Buffer;
 
 namespace bb {
 namespace shared {
@@ -16,10 +18,12 @@ namespace shared {
 		IDXGISwapChain1 * m_chain { nullptr };
 		std::unique_ptr<Gui> m_gui { nullptr };
 		ID3D11RenderTargetView * m_view { nullptr };
+		D3D11_VIEWPORT * m_viewport { nullptr };
+		ID3D11Buffer * m_vertexConstantBuffer { nullptr };
 		float m_clrCol[4] { 0.0f, 0.0f, 0.0f, 255.0f };
 
 		GfxWindow () { }
-		virtual ~GfxWindow () { }
+		virtual ~GfxWindow ();
 		virtual void Render () override;
 		virtual void NewFrame () override;
 		virtual bool Done () override;
