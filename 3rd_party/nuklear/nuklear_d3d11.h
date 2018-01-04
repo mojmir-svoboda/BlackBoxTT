@@ -463,27 +463,23 @@ nk_d3d11_init(ID3D11Device *device, int width, int height, unsigned int max_vert
     NK_ASSERT(SUCCEEDED(hr));}
 
     /* constant buffer */
-    {
-			float matrix[4*4];
-			D3D11_BUFFER_DESC desc;
-			memset(&desc, 0, sizeof(desc));
-			desc.ByteWidth = sizeof(matrix);
-			desc.Usage = D3D11_USAGE_DYNAMIC;
-			desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-			desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-			desc.MiscFlags = 0;
+    {float matrix[4*4];
+    D3D11_BUFFER_DESC desc;
+    memset(&desc, 0, sizeof(desc));
+    desc.ByteWidth = sizeof(matrix);
+    desc.Usage = D3D11_USAGE_DYNAMIC;
+    desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    desc.MiscFlags = 0;
 
-    {
-			D3D11_SUBRESOURCE_DATA data;
-			data.pSysMem = matrix;
-			data.SysMemPitch = 0;
-			data.SysMemSlicePitch = 0;
+    {D3D11_SUBRESOURCE_DATA data;
+    data.pSysMem = matrix;
+    data.SysMemPitch = 0;
+    data.SysMemSlicePitch = 0;
 
-			nk_d3d11_get_projection_matrix(width, height, matrix);
-			hr = ID3D11Device_CreateBuffer(device, &desc, &data, &d3d11.const_buffer);
-			NK_ASSERT(SUCCEEDED(hr));
-		}
-		}
+    nk_d3d11_get_projection_matrix(width, height, matrix);
+    hr = ID3D11Device_CreateBuffer(device, &desc, &data, &d3d11.const_buffer);
+    NK_ASSERT(SUCCEEDED(hr));}}
 
     /* pixel shader */
     {hr = ID3D11Device_CreatePixelShader(device, nk_d3d11_pixel_shader, sizeof(nk_d3d11_pixel_shader), NULL, &d3d11.pixel_shader);
